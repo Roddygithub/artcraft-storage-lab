@@ -51,7 +51,9 @@ window size.
 
 VectorCraft does **not** speak the `?host=parent` protocol the other three
 applications speak. It exposes its page API instead, so the host page gained a
-**second transport adapter**:
+**second transport adapter** — and the dispatch entry no longer claims
+`?host=parent` for it, because it would be a lie (`docs/reviews/REVIEW-04.md`,
+G4):
 
 | | postMessage bridge (gridcraft, pdfcraft, wordcraft, cadcraft) | page API (vectorcraft) |
 | --- | --- | --- |
@@ -62,17 +64,38 @@ applications speak. It exposes its page API instead, so the host page gained a
 The adapter lives in `integration/gateway/hostpage.py` and is selected by the
 application name. The postMessage path is unchanged.
 
-**Two gaps are recorded, not hidden:**
+**Four gaps are recorded, not hidden** (the independent review, REVIEW-04, found
+three of them):
 
-1. the page API has **no save event and no dirty signal**, so the host page polls
-   `files()` every 700 ms and compares the size; a save that produced identical
-   bytes is invisible;
-2. the page API is **not** the common contract. It is VectorCraft's own surface,
+1. the page API has **no save event and no dirty signal**. The host page polls
+   `files()` every 700 ms and compares a **content fingerprint**, so a save that
+   produced the same bytes as the last one is still noticed; and only a **stored**
+   save becomes the new baseline, so a refused save is retried instead of lost;
+2. because there is no dirty signal, the host page cannot warn about unsaved
+   *edits*. It warns on `beforeunload` **while a save is in flight**. The editor
+   itself keeps unsaved work in **recovery copies** in the browser: *"Your unsaved
+   changes are kept in this browser: reload the page to get them back."* A dirty
+   signal is upstream work (`docs/UPSTREAM-PLAN.md` A-2);
+3. the page API is **not** the common contract. It is VectorCraft's own surface,
    and it is the reason this GR is a *proof of the integration*, not a proof that
    the common contract covers non-Office formats. That is GR-004's open question
-   Q-2 (a line-by-line diff of the existing bridges) and the RFC's rollout step.
+   Q-2 and the RFC's rollout step;
+4. the page keeps at most **16** saved files
+   (`apps/vectorcraft-web/src/saved_files.rs`: `MAX_SAVED = 16`), oldest first, so
+   a seventeenth save evicts the first. The 700 ms poll makes that window small,
+   but the limit is upstream.
 
-## 3. The run
+The adapter also checks the frame before it drives it: `frameIsOurs()` verifies
+the frame's **origin** (REVIEW-04, G9) — a direct property read crosses no
+boundary that `postMessage` would have checked, so the check is made here.
+
+## 3. The run (after REVIEW-04's remediation)
+
+The assertions are about the **content**, not about proxies: the bytes the editor
+produced, a valid SVG holding a path element, a content id that changed against
+the one captured **before** the edit, a version count that grew, and — the
+strongest one — the bytes Seafile holds being **byte-identical** to what the
+editor produced.
 
 ```sh
 export ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=...
@@ -124,19 +147,25 @@ warning: [eframe::web::app_runner] ...: Title("synthetic.svg - VectorCraft")    
   artwork but not everything…"**;
 * the host page's status: **"Saved — new version 2026-10-22T15:06:09+00:00"**.
 
-## 5. The save warning, and why it is correct
+## 6. The save warning, and why it is correct
 
-VectorCraft's save said:
+VectorCraft's save returned, in its `warnings`:
 
 ```text
 SVG keeps the artwork but not everything a VectorCraft document holds
-(editable effects, …)
+(editable effects, symbols, swatches, styles): save as VectorCraft to keep it
+all editable
 ```
 
 That is the editor being honest about its own format, not the integration losing
 data: the document was **opened from SVG**, so it is saved back as SVG, and SVG
 cannot hold everything a VectorCraft document can. The same warning appears in
 the desktop application.
+
+`svg: {}` in the save call means *"the document's own SVG options"* and makes the
+save run **directly** instead of opening the SVG Options dialog
+(`docs/control-protocol.md`: "With `svg: {…}` (the `document.formats` SVG options)
+they run directly").
 
 It is also a useful reminder for the dispatcher (`docs/FILE-DISPATCH.md`): a
 round trip through an interchange format is lossy by nature, and the editor says

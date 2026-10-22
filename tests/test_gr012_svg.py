@@ -193,17 +193,22 @@ def main():
         check("6. the editor's own save command ran", saved_list is not None,
               json.dumps(saved_list)[:160])
 
+        # readFile is synchronous on VectorCraft's page API: it returns the
+        # bytes, or throws.
         saved_bytes = page.evaluate(
-            "(api) => api.readFile(NAME).then(u => Array.from(new Uint8Array(u)))"
-            .replace("NAME", json.dumps(name)), api)
+            "(api) => { try { return Array.from(new Uint8Array(api.readFile(NAME))); }"
+            " catch (e) { return []; } }".replace("NAME", json.dumps(name)), api)
         saved_blob = bytes(saved_bytes) if saved_bytes else b""
         check("7. the editor produced NEW bytes",
               len(saved_blob) > 0 and saved_blob != original,
               f"{len(original)} -> {len(saved_blob)} bytes")
         saved_text = saved_blob.decode("utf-8", "replace")
-        check("7a. the new bytes hold the drawn stroke",
-              "<path" in saved_text and "<rect" in saved_text,
-              f"the saved SVG has a path element: {'<path' in saved_text}")
+        # VectorCraft writes the rectangle as a path too, so the meaningful
+        # assertion is: a valid SVG document, with a path element in it.
+        check("7a. the new bytes are an SVG document that holds the drawn stroke",
+              "<svg" in saved_text and "<path" in saved_text,
+              f"a valid SVG with a path element: "
+              f"{'<svg' in saved_text and '<path' in saved_text}; {len(saved_text)} chars")
 
         # 8. the host page took the bytes and stored them
         saved = False
@@ -218,9 +223,10 @@ def main():
 
         # The editor's own save warning, quoted in the bundle: SVG as an
         # interchange format cannot hold everything a VectorCraft document can.
-        warned = any("keeps the artwork" in line for line in console)
-        check("8a. the editor said what SVG does not keep", True,
-              f"in the console: {warned}")
+        # It comes back in the save result's `warnings`, not on the console.
+        warnings = (saved_list or {}).get("warnings") or []
+        check("8a. the editor said what SVG does not keep", len(warnings) > 0,
+              "; ".join(str(w) for w in warnings)[:160])
 
         shot = os.environ.get("ARTCRAFT_SCREENSHOT")
         if shot:
