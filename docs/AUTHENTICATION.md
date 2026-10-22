@@ -74,8 +74,27 @@ if !isParentMatched(fsm.parentDir, parentDir) {
 | `op=upload` with `parent_dir` in the obj id | enforced (403 on mismatch) | still no |
 | `op=update` (obj id `'dummy'` or `{'online_office_update': True}`) | **not enforced** — grants update on any file of the library, for that user | **never** |
 
-Seafile's own ONLYOFFICE callback keeps the update token on the server and
-uses it in a server-to-server POST. We must do the same.
+> ### The consequence, stated forcefully
+>
+> **The gateway is a trusted component, and it is the only thing standing
+> between a browser and a library-wide write capability.**
+>
+> Because an `op=update` token is *library-wide* and not *file-scoped*, there
+> is no way to make a Seafile-native token safe to hand to a browser. The
+> only sound design is the one in §2: the browser never receives a Seafile
+> credential of any kind, and the gateway performs **every** authorisation
+> check itself — session validity, the path, the permission, the content id —
+> on **every** request, including the write.
+>
+> A single missed check is not a bug, it is a **library-wide write primitive
+> exposed to the browser**. The gateway's checks are therefore not
+> defence-in-depth, they are the *only* defence. They must be written as
+> such, tested as such, and reviewed as such.
+>
+> The same reasoning applies to the third-party-editor access token: it is a
+> **12-hour** cached record bound to a (user, repo, path) triple. The gateway
+> must use it only to read the document, never as a bearer credential it
+> forwards to the browser, and never beyond the single document it names.
 
 ## 2. The design
 

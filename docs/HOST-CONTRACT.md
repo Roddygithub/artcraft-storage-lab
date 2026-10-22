@@ -12,10 +12,21 @@ Feasibility: artcraft-owner · Independent review: artcraft-reviewer (pending)
 > to **document the existing one as the suite-wide standard, extend it to the
 > other eleven apps upstream, and implement the Seafile side against it.**
 
+> **Caveat, verified in the source and confirmed by the independent review:**
+> the two existing bridges are **not** identical in the one place that matters
+> for data integrity — whether the Craft app learns that a save **failed**.
+> GridCraft cannot (its `download` hook has no `Result`); PdfCraft can, but
+> only synchronously; WordCraft can, asynchronously, through the `async_saves`
+> machinery that already exists. The generalised contract therefore needs one
+> extra message (§3.7) and the upstream patch needs to unify the three.
+> See §3.5-§3.7.
+
 This is the answer to the mission's question *"does a common host contract
 already exist between several Craft web apps?"* — **yes, de facto, in 2 of 13,
-with a clear and consistent shape.** We do not need to create `craft-host` from
-scratch; we need to **generalise and upstream `host.rs`**.
+with a clear and consistent shape for the open and dirty parts, and a
+divergent shape for the save part.** We do not need to create `craft-host` from
+scratch; we need to **generalise and upstream `host.rs`**, and to settle the
+save-outcome semantics.
 
 ---
 
@@ -137,6 +148,7 @@ CRAFT -> HOST
 | R6 | The Craft app reports `dirty`; it never decides that a save succeeded | the host owns persistence |
 | R7 | The Craft app reports `failed` when it cannot start | the host must be able to show the error |
 | R8 | The host must be able to detect **stale** documents | the contract carries the document name; the *version* is the host's business (GR-008) |
+| R9 | **The host tells the Craft app whether the save succeeded** | the Craft app must not believe a save succeeded when the host refused it (§3.5). Not implemented upstream yet (§3.7) — until it is, the host keeps its own "not persisted" state. |
 
 ### 2.2 Deliberately **not** in the contract
 
@@ -235,7 +247,7 @@ removes any cross-origin messaging problem entirely.
 ### 3.4 The save flow
 
 ```text
-1. The iframe posts wordcraft:save { name, bytes }.
+1. The iframe posts <app>:save { name, bytes }.
 2. The host page POSTs the bytes to the integration service.
 3. The service:
    a. checks the session (exists, not expired, not revoked);
@@ -244,44 +256,91 @@ removes any cross-origin messaging problem entirely.
       -> CONFLICT if different;
    d. writes through the seafhttp update API;
    e. returns the new file id (or "no change" if the content is identical).
-4. The host page shows "Saved".
-5. The Craft app has already marked the document clean — it does that on the
-   successful delivery of the bytes, exactly as it does for a browser download.
+4. The host page shows "Saved" or the error.
+5. The Craft app is told the outcome (see below).
 ```
 
-**On failure**, the service answers with an error and the host page shows it.
-The Craft app's own view of the document is unaffected — which is correct: the
-Craft app believes it delivered the bytes to the host, and the *host* owns
-persistence. The mission's §30 requirement ("Craft remains dirty on failure")
-is therefore a **host-side** obligation, not a Craft-side one, and it must be
-enforced by the host page's own state machine (the host knows the file is still
-unpersisted; the Craft app does not).
+### 3.5 Does the Craft app know that the save failed?
 
-> This is a real design point and a real risk: the Craft app marks the document
-> saved as soon as the bytes leave the frame. If the host then fails to persist
-> them, the Craft app is "clean" while the file on the server is stale.
-> The host page must therefore keep its own "unpersisted" state and warn on
-> close. **The integration layer must not pretend.** See GR-007.
+**This is not uniform across the suite, and the difference matters.** It was
+verified in the source of the three apps that have a bridge or the services
+they need.
+
+| App | The service hook | Its type | Can the app learn that the write failed? |
+| --- | --- | --- | --- |
+| **WordCraft** | `Services::download` + `Services::async_saves` | `Fn(&str, &[u8]) -> Result<(), String>` | **Yes, and asynchronously.** The host calls `AsyncSaves::start()` to get a ticket, and later `AsyncSaves::finish(ticket, Saved \| Cancelled \| Failed(error))`. On `Failed` the app sets `session.dirty = true` again and shows *"Couldn't download {name}: {error}"*. |
+| **PdfCraft** | `Services::host_save` (`HostSaveFn`) | `Fn(&str, &[u8], bool) -> Result<(), String>` | **Yes, but synchronously.** On `Err` the app does not mark the document saved and shows the error. |
+| **GridCraft** | `Services::download` | `Fn(&str, &[u8])` — **no `Result`** | **No.** The bridge logs a failed `postMessage` and the app still marks the workbook saved. |
+
+Sources:
+
+```text
+storytold/wordcraft/crates/ui-egui/src/lib.rs:123-131   (download + async_saves fields)
+storytold/wordcraft/crates/ui-egui/src/lib.rs:1286-1305 (settle_async_saves: Failed -> dirty = true)
+storytold/wordcraft/crates/ui-egui/src/async_saves.rs   (start / finish / SaveOutcome)
+storytold/pdfcraft/crates/ui-egui/src/lib.rs:635-636     (host_save: Option<HostSaveFn>)
+storytold/pdfcraft/crates/ui-egui/src/editing.rs:670-685 (Err -> not marked saved)
+storytold/gridcraft/crates/ui-egui/src/lib.rs:195-196    (download: Fn(&str, &[u8]), no Result)
+storytold/gridcraft/apps/gridcraft-web/src/host.rs:60-66 (the error is only logged)
+```
+
+### 3.6 The consequence, and the correction to an earlier draft
+
+An earlier draft of this document claimed that "the Craft app has already marked
+the document clean as soon as the bytes leave the frame". **That is only true
+for GridCraft** (and it is a defect there). It is **false for WordCraft**, whose
+`async_saves` machinery exists precisely to keep the document dirty until the
+save is confirmed, and whose `Failed` outcome puts `dirty` back.
+
+That is good news, and it changes the shape of the upstream proposal:
+
+* **The "Craft remains dirty on failure" requirement (mission §30) is
+  implementable with the machinery the apps already have.**
+* The existing five-message vocabulary is **not sufficient on its own** to
+  guarantee it: it has no message for the save outcome.
+
+### 3.7 The proposed extension to the contract (PROPOSED — not implemented upstream)
+
+```text
+HOST  -> CRAFT
+
+  <app>:saveResult  { ok: true }                    (the host persisted it)
+  <app>:saveResult  { ok: false, error: "..." }     (the host refused or failed)
+```
+
+The Craft app keeps the document dirty until it receives `ok: true`. For
+WordCraft this maps directly onto the existing `AsyncSaves` ticket
+(`start()` / `finish(ticket, Saved | Failed(error))`); for PdfCraft onto the
+`Result` of `host_save`; for GridCraft it requires the `Services::download`
+signature to gain a `Result` — a small but real change.
+
+> This extension is **our proposal**, not something the Craft apps implement
+> today. It is part of the upstream RFC (GR-013) and the first upstream patch
+> (GR-014).
+
+Until it exists, the host page must keep **its own** "not persisted" state and
+warn on close, because a GridCraft-style app will believe the document is
+saved. **The integration layer must never pretend a save succeeded.**
 
 ---
 
 ## 4. Gaps that must be closed upstream
 
-| App | `?host=parent` bridge | What is needed |
-| --- | --- | --- |
-| gridcraft | **yes** | reference implementation |
-| pdfcraft | **yes** | reference implementation (adds `saveAs`) |
-| wordcraft | no | **the MVP blocker** — port the bridge |
-| deckcraft | no | port the bridge |
-| vectorcraft | no | has a *different* mechanism (`window.vectorcraft`, a promise API) — see §6 |
-| designcraft | no | port the bridge |
-| photocraft | no | port the bridge |
-| figcraft | no | port the bridge (+ `figcraft-server` to evaluate) |
-| cadcraft | no | port the bridge |
-| filmcraft | no | port the bridge |
-| lightcraft | no | port the bridge |
-| effectcraft | no | port the bridge |
-| soundcraft | no | port the bridge |
+| App | `?host=parent` bridge | The save hook it has | What is needed |
+| --- | --- | --- | --- |
+| gridcraft | **yes** | `download: Fn(&str, &[u8])` — **no `Result`** | reference for the open/dirty part; the save part must gain a `Result` |
+| pdfcraft | **yes** | `host_save: Fn(&str, &[u8], bool) -> Result<(), String>` — synchronous | reference for the save-failure part; would need to become asynchronous to match WordCraft |
+| wordcraft | no | `download: Fn(...) -> Result<(), String>` **+ `async_saves`** | **the MVP blocker** — port the bridge, and wire `AsyncSaves::start`/`finish` to the save outcome |
+| deckcraft | no | not surveyed in detail | port the bridge |
+| vectorcraft | no | has a *different* mechanism (`window.vectorcraft`, a promise API) — see §6 | decide whether to port the bridge or adapt the page API |
+| designcraft | no | `download` present, `open_async` present, no `async_saves` | port the bridge; check the save hook's signature |
+| photocraft | no | `inbox` present, no `download` | port the bridge; the save hook may not exist yet |
+| figcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
+| cadcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
+| filmcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
+| lightcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
+| effectcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
+| soundcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
 
 ### 4.1 The upstream patch shape (GR-014 candidate)
 

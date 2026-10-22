@@ -57,7 +57,7 @@ Entry point: `seahub/views/file.py` (around lines 940-970).
 | Token | How it is built | What it authorizes |
 | --- | --- | --- |
 | `dl_token` | `seafile_api.get_fileserver_access_token(repo_id, file_id, 'download', username, use_onetime=False)` | The **file server** lets the holder download this *one file id*. The editor server fetches the bytes through it. |
-| `file_key` | `jwt.encode({'repo_id', 'file_path'}, ONLYOFFICE_JWT_SECRET)` | Identifies the file to the editor. Sent as `referenceData.fileKey`; `referenceData.instanceId` = the site base URL. |
+| `file_key` | `jwt.encode({'repo_id', 'file_path'}, ONLYOFFICE_JWT_SECRET)` | Identifies the file to the editor. Sent as `referenceData.fileKey`; `referenceData.instanceId` = the site base URL. **It carries no content id**, so it cannot detect a concurrent modification on its own (see GR-008). |
 | `onlyoffice_jwt_token` | `jwt.encode(config, ONLYOFFICE_JWT_SECRET)`, `config['exp'] = now + 3*24*3600` | Signs the whole editor configuration (document url, permissions, callback URL, user). Valid **3 days**. |
 
 `config` contains:
@@ -102,6 +102,14 @@ office-suite extension lists in `seahub/onlyoffice/settings.py`
 | --- | --- | --- |
 | read-only (`can_edit=False`) | `md5(repo_id + file_path + file_id)[:20]` | changes with every new content version |
 | editable (`can_edit=True`) | looked up by `md5(repo_id + file_path)` in `OnlyOfficeDocKey` (unique on `repo_id_file_path_md5`), else created | **stable across content versions and across concurrent users** -> the same editing session, i.e. co-editing |
+
+> **Note, added after the independent review.** This "one key per document"
+> property is what makes ONLYOFFICE's co-editing possible. **Our integration
+> does not want that property**: the ArtCraft gateway gives every user their
+> own session, so two people editing the same file are two sessions, and the
+> second save is refused as a conflict rather than merged. The stable key is a
+> **session-isolation tool** for us, not a co-editing enabler. Real
+> co-editing is out of scope for this project.
 
 `OnlyOfficeDocKey` (`seahub/onlyoffice/models.py`) stores
 `doc_key`, `username`, `repo_id`, `file_path`. On save/close the row is deleted

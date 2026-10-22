@@ -24,7 +24,7 @@ GR-002 · Owner: artcraft-owner · Architecture: artcraft-architect (GR-001/GR-0
 
 | Candidate | Verdict | Why |
 | --- | --- | --- |
-| **Seahub "third-party editor" hook** (`ENABLE_THIRDPARTY_EDITOR` + `THIRDPARTY_EDITOR_ACTION_URL_DICT`) | **CHOSEN for the MVP** | exists upstream *and* in Pro; configuration-only; already implements the session, the permission record and the content delivery; no fork |
+| **Seahub "third-party editor" hook** (`ENABLE_THIRDPARTY_EDITOR` + `THIRDPARTY_EDITOR_ACTION_URL_DICT`) | **CHOSEN for the MVP** | exists upstream *and* in Pro; configuration-only; already implements the session, the permission record and the content delivery; no fork. **Read-only by design** (see Q4) |
 | Custom online-editor integration in `seahub/views/file.py` | rejected for now | it is what the third-party hook already is, only worse (a hard fork) |
 | External editing service (our own, on our own URL) | **CHOSEN, as a component** | this is the "action_url" the hook points at; it hosts the Craft app and owns the write |
 | Iframe host page | **CHOSEN, as a component** | the Craft `?host=parent` bridge needs a same-origin parent page |
@@ -50,6 +50,11 @@ THIRDPARTY_EDITOR_ACCESS_TOKEN_EXPIRATION = 12 * 60 * 60     # default
 
 Keys are **file extensions without the dot**, lowercase
 (`get_file_type_and_ext()` returns `os.path.splitext(name)[1][1:].lower()`).
+
+> The extension is the one **after the last dot**: `report.final.docx` -> `docx`,
+> `archive.tar.gz` -> `gz`. A file with no dot has no extension and is never
+> dispatched. The same rule applies to our own dispatch table
+> (`docs/FILE-DISPATCH.md`).
 
 ### 2.2 The flow, in the actual code
 
@@ -166,6 +171,21 @@ Two ways forward:
 B gets the whole flow working with zero Seafile changes, which is the
 strongest possible demonstration; A is the better long-term shape and is a
 small, generic, defensible contribution.
+
+> ### The user-visible consequence of option B, stated plainly
+>
+> Under option B the write is performed by the **gateway's service account**.
+> In the Seafile **file history** the new version is therefore attributed to
+> **that account, not to the person who edited the document**. The person sees
+> a version whose author is a service account.
+>
+> This is not a cosmetic detail: attribution is part of the audit trail of a
+> document library, and it is what a user relies on to know who changed a
+> contract. It is the strongest argument for option A, and it is the reason
+> the upstream patch is on the critical path for anything beyond a prototype.
+>
+> Option B is acceptable **for the MVP and for a single-user self-hosted
+> library**, and it is **not** acceptable as the production answer.
 
 ### Q5 — How is a new version created?
 
@@ -368,10 +388,11 @@ identity checked.
 | L1 | the hook is **read-only** | we must write ourselves | option B (our gateway) for the MVP; option A (upstream patch) for the production shape |
 | L2 | the hook **shadows ONLYOFFICE** per extension | `.docx` cannot be claimed without taking it from ONLYOFFICE | GR-005 on `.pdf`/`.svg`; GR-006 on a dedicated test instance; upstream patch (c) for production |
 | L3 | **share links** are not covered by the hook | share-link editing is not available | upstream patch; documented as out of scope for the MVP |
-| L4 | the write is attributed to the **service account** | the file history shows the service account, not the user | option A fixes it; otherwise documented |
-| L5 | the hook does not check the **file lock** or the **online-preview size limit** | we must check them ourselves | our gateway does |
-| L6 | the access token lives 12 h in the Django cache | a leaked token is valid for 12 h | our gateway uses it only to fetch the content, never as a bearer credential for the browser; the session we hand to the browser is short-lived and opaque |
-| L7 | the hook does not know the file's **object id** | no conflict check is possible from the hook's data alone | our gateway reads the obj_id itself via `file/detail` |
+| L3 | the write is attributed to the **service account** | the file history shows the service account, not the user | option A fixes it; until then this is a **known, stated limitation**, not a detail (see the callout in §Q4) |
+| L4 | the hook does not check the **file lock** or the **online-preview size limit** | we must check them ourselves | our gateway does |
+| L5 | the access token lives 12 h in the Django cache | a leaked token is valid for 12 h | our gateway uses it only to fetch the content, never as a bearer credential for the browser; the session we hand to the browser is short-lived and opaque |
+| L6 | the hook does not know the file's **object id** | no conflict check is possible from the hook's data alone | our gateway reads the obj_id itself via `file/detail` |
+| L7 | **share links are not covered** | the third-party hook exists only in `view_lib_file`; `view_shared_file` and `view_file_via_shared_dir` have no third-party path | **explicitly out of scope for the MVP.** Share-link editing is listed in the test matrix as a gap, and it needs the upstream patch (option A) to exist at all. A read-only share link keeps working exactly as it does today, because the hook is never reached. |
 
 ---
 
