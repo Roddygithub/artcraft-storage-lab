@@ -67,15 +67,15 @@ outside this repository (`~/Projects/seafile-thirdparty-save-patch/`).
 | GR-003 | ArtCraft Web capability matrix | `docs/ARTCRAFT-WEB-CAPABILITIES.md` | PASS (remediated) | PENDING |
 | GR-004 | Common Craft Web Host Contract | `docs/HOST-CONTRACT.md` | PASS (remediated) | PENDING |
 | GR-005 | First technical proof | `docs/reviews/GR-005/` | PASS (remediated) | PENDING |
-| GR-006 | WordCraft DOCX MVP | `docs/reviews/GR-006/` | review 03 in flight | PENDING |
-| GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | pending | PENDING |
+| GR-006 | WordCraft DOCX MVP | `docs/reviews/GR-006/` | PASS (REVIEW-03) | PENDING |
+| GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PASS (REVIEW-03) | PENDING |
 | GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | PASS (remediated) | PENDING |
 | GR-009 | Web integration security | `docs/SECURITY.md` | PASS (remediated) | PENDING |
-| GR-010 | GridCraft | `docs/reviews/GR-005/` (the `.xlsx` path) | PASS (remediated) | PENDING |
-| GR-011 | DeckCraft | — | not started | PENDING |
-| GR-012 | Non-office Craft integration | — | not started | PENDING |
-| GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | pending | PENDING |
-| GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | review 03 in flight | PENDING |
+| GR-010 | GridCraft (`.xlsx`) | `docs/reviews/GR-010/README.md` | PASS (remediated) | PENDING |
+| GR-011 | DeckCraft | — | not started (needs the upstream bridge) | PENDING |
+| GR-012 | Non-Office Craft integration (SVG/VectorCraft) | `docs/reviews/GR-012/` | PASS (remediated, REVIEW-04) | PENDING |
+| GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PASS (REVIEW-03) | PENDING |
+| GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | PASS (REVIEW-03) | PENDING |
 
 ## 5. The relevant upstream repositories and SHAs
 
@@ -206,8 +206,11 @@ The full list, with what is still open, is in `docs/SECURITY.md`.
 | 3 | **share links** are not covered by the hook | `docs/SEAFILE-INTEGRATION-POINTS.md` L7 |
 | 4 | the click in the Seafile file list is not driven by the automated test | `docs/reviews/GR-006/README.md` §5 |
 | 5 | the gateway runs on the owner's workstation for the proof | `docs/DEPLOYMENT.md` |
-| 6 | only `.pdf`, `.xlsx` and `.docx` are dispatched | `docs/FILE-DISPATCH.md` |
-| 7 | the other ten Craft applications have no bridge | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
+| 5b | a **leave-page warning about unsaved edits** is impossible for VectorCraft without an upstream dirty signal; the editor itself keeps unsaved work in recovery copies in the browser | `docs/reviews/GR-012/README.md` §2 |
+| 6 | only `.pdf`, `.svg`, `.xlsx` and `.docx` are dispatched | `docs/FILE-DISPATCH.md` |
+| 7 | the other ten Craft applications have no bridge; **VectorCraft is driven by its own page API instead** | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
+| 7b | VectorCraft's page API has **no dirty signal and no save event**; the host page polls `files()` with a content fingerprint | `docs/reviews/GR-012/README.md` §2 |
+| 7c | VectorCraft keeps at most **16** saved files in the page | upstream: `apps/vectorcraft-web/src/saved_files.rs` |
 | 8 | GridCraft's own bridge cannot report a failed save | `docs/HOST-CONTRACT.md` §3.5 |
 | 9 | no CSP, no CSRF check on the state-changing endpoints, no rate limit yet | `docs/SECURITY.md` §7 |
 
@@ -227,7 +230,14 @@ RFC sent anywhere.
 | --- | --- | --- |
 | REVIEW-01 (GR-001/002/004) | **FAIL** | `docs/reviews/REVIEW-01.md` — 1 blocker, 4 majors, 3 minors, all fixed |
 | REVIEW-02 (the gateway) | **FAIL** | `docs/reviews/REVIEW-02.md` — 3 blockers, 6 majors, 3 minors, all fixed |
-| REVIEW-03 (the WordCraft bridge, GR-006) | in flight | — |
+| REVIEW-03 (the WordCraft bridge, GR-006/007/013/014) | **PASS** | `docs/reviews/REVIEW-03.md` — 4 majors, 4 minors, all fixed or accepted |
+| REVIEW-04 (GR-012, the VectorCraft transport) | **FAIL** | `docs/reviews/REVIEW-04.md` — 4 blockers, 5 majors, 4 minors, all fixed or documented |
+
+| Model incident | Where |
+| --- | --- |
+| MiniMax free withdrawn mid-session; the owner role moved to GLM-5.3-Flash | `docs/AI-ROUTING.md` |
+| the architect timed out twice (GR-001, GR-003); both artifacts existed already | `docs/AI-ROUTING.md`, incident log |
+| DeepSeek timed out once on the smoke test, succeeded on the retry | `docs/AI-ROUTING.md` |
 
 **The reviews were performed by an independent agent that did not write the code
 under review.** Their verdicts are `PROVISIONAL`.
@@ -271,11 +281,15 @@ Only GPT REVIEW PASS may unlock upstream publication.
 ### 13.1 Where to look first
 
 1. `docs/reviews/GR-006/README.md` — is the "VERIFIED END-TO-END" claim honest?
+   (Two of the twelve steps are marked *partly*: the click in the Seafile file
+   list, and the user-facing close.)
 2. `.work/wordcraft-patch` — is the ticket flow right? (The application claims the
    ticket the bridge started; the bridge finishes it. If they are not the same
-   ticket, the document never gets marked saved.)
+   ticket, the document never gets marked saved. REVIEW-03 verified this.)
 3. `integration/gateway/server.py` — is any check missing?
 4. `docs/reviews/GR-008/SEAFILE-CONCURRENCY-PRIMITIVES.md` — is the conflict
    analysis right against the Go file server?
-5. `docs/reviews/REVIEW-01.md` and `REVIEW-02.md` — is the remediation real, and
+5. `docs/reviews/REVIEW-01.md` … `REVIEW-04.md` — is the remediation real, and
    did it introduce anything new?
+6. `docs/reviews/GR-012/README.md` §2 — is the VectorCraft transport divergence
+   (a page API, not the common contract) stated honestly, and are its gaps?
