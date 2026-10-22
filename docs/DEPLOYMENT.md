@@ -133,21 +133,142 @@ deployed, the rollback path is:
    restores the previous behaviour with no change to Seafile or ONLYOFFICE.
 4. The integration service is stateless and can be stopped independently.
 
-## Part 2 — Target deployment design
+## Part 2 — The target deployment design
 
-> Pending GR-002 and GR-003. The candidate shapes to evaluate are:
->
-> * a Seahub extension / app (no core patch),
-> * a small integration service behind the existing reverse proxy (additive path),
-> * a containerised sidecar,
-> * a purely static Craft Web host plus a callback service.
->
-> Constraints already established:
->
-> * 100 % self-hosted, free / open-source.
-> * Must not require a permanent fork of Seafile.
-> * Must not degrade, disable or replace the existing ONLYOFFICE integration.
-> * The Craft side must not know about Seafile repository ids, tokens or URLs.
->
-> Decision: see `docs/SEAFILE-INTEGRATION-POINTS.md` (GR-002) and
-> `docs/HOST-CONTRACT.md` (GR-004).
+### 2.1 The decision
+
+```text
+   Seafile (unchanged, unforked)
+        |  one setting: THIRDPARTY_EDITOR_ACTION_URL_DICT
+        |  one URL per extension
+        v
+   the reverse proxy
+        |
+        +-- /            ->  Seafile          (unchanged)
+        +-- /seafhttp/   ->  Seafile          (unchanged)
+        +-- /onlyoffice/ ->  ONLYOFFICE       (unchanged)
+        +-- /artcraft/   ->  the gateway      (NEW, additive)
+                |
+                +-- /artcraft/open/          the host page
+                +-- /artcraft/<app>/         the Craft web build, static
+                +-- /artcraft/api/           the session endpoints
+```
+
+**One new service, one new path, no change to Seafile's code, no change to
+ONLYOFFICE.** Everything is additive and reversible.
+
+### 2.2 The candidates, and why they lost
+
+| Candidate | Why it lost |
+| --- | --- |
+| a Seahub **extension** (a "seahub app") | a Seahub app gives URLs and views, but the *file list* and the *onlyoffice branch* are core. It would still need a patch, and it adds a moving part inside the product we must not destabilise. |
+| a **patched Seahub** (a fork) | a permanent fork of a product the user does not develop is a maintenance trap, and it puts the "never break ONLYOFFICE" rule at risk on every upgrade. The one patch we do need (a write endpoint) is prepared **separately** and is small enough to propose upstream. |
+| a **browser-only** solution (no service) | the browser would need a Seafile credential, and an `op=update` token is library-wide. Not acceptable. |
+| a **desktop client** | out of scope, and it is not the target experience. |
+| **SeaDrive** | explicitly out of scope. |
+| a **static site + a callback service** | close to the decision, but the host page has to be served by the service anyway (it holds the session), so the split buys nothing. |
+
+### 2.3 What the gateway is
+
+A small HTTP service. In the reference implementation it is **Python, standard
+library only** (`integration/gateway/`), because the point of the prototype is the
+*contract*, not the service.
+
+For a real deployment it would be a container:
+
+```text
+artcraft-gateway
+  image: a small Python or Go service
+  configuration:
+    ARTCRAFT_SEAFILE_URL        the Seafile base URL
+    ARTCRAFT_SEAFILE_TOKEN      the account token, from the secret store
+    ARTCRAFT_MAX_BYTES          the document size limit
+  volumes:
+    /srv/artcraft/wordcraft      the Craft web build (static)
+  ports:
+    8777                        behind the reverse proxy, not exposed
+```
+
+**It must be reachable from the browser** (the browser POSTs the access token to
+it, and it frames the Craft app), and it must be able to reach **Seafile** (to
+read the document and to write it back).
+
+### 2.4 Where the Craft web builds live
+
+They are **static files** and they are the largest part of the deployment:
+13 MB compressed for WordCraft, 7 MB for GridCraft.
+
+Two options:
+
+| Option | How | Notes |
+| --- | --- | --- |
+| **the gateway serves them** | they sit next to the gateway and it serves them with the right MIME types | **the simplest**, and it guarantees the host page and the app are **same-origin**, which the `?host=parent` bridge requires |
+| the reverse proxy serves them | a second `location` with a `root` | they must still be on the **same origin** as the host page, so they would have to be a path of the *same* vhost that serves the gateway — which is what the option above does anyway |
+
+The Craft build's own documentation gives the exact requirements:
+`application/wasm` for the module, gzip or Brotli, immutable caching for the
+hashed assets, `no-cache` for `index.html`, and **HTTPS** (WebGPU and the
+clipboard need a secure context; without it the app falls back to WebGL2).
+
+### 2.5 The nginx rules
+
+```nginx
+location /artcraft/ {
+    proxy_pass http://<gateway>:8777;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Scheme $scheme;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    client_max_body_size 64m;          # the document limit, plus room
+    proxy_read_timeout 120s;
+}
+```
+
+And, in the gateway's own responses (already implemented):
+
+```text
+Content-Type: application/wasm      for .wasm
+Cache-Control: immutable             for the hashed assets
+Cache-Control: no-cache              for index.html
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+```
+
+**To add before a public deployment** (they are listed in `docs/SECURITY.md` §7):
+a `Content-Security-Policy` for the gateway's pages, an `Origin` check on the
+state-changing endpoints, and a rate limit on `/open/`.
+
+### 2.6 The self-hosting constraints
+
+| Constraint | How it is met |
+| --- | --- |
+| 100 % self-hosted | the gateway, the Craft builds and Seafile all run on the operator's own machines; nothing calls out |
+| free / open-source | the gateway is original code under MIT/Apache-2.0; the Craft builds are MIT/Apache-2.0; Seafile and ONLYOFFICE are the operator's own |
+| no permanent fork | the MVP needs **no** Seafile code change; the one upstream patch is prepared separately and is optional |
+| ONLYOFFICE keeps working | it is not touched; the extension the hook claims (`.xlsx`) is one that ONLYOFFICE does not claim on this instance, and no file in any other library uses it. The per-library `artcraft` office-suite id (upstream) removes even that constraint |
+| the Craft side knows nothing about Seafile | the Craft app receives bytes and returns bytes; the gateway is the only thing that knows the platform |
+| the browser holds no credential | the browser holds one opaque session id |
+
+### 2.7 On the Proxmox host
+
+The reference deployment runs the gateway **on the owner's workstation**, because
+the browser is there and the URL in Seafile's setting has to be reachable from
+it. On a real deployment the gateway would run where the operator wants it: a
+container on the Proxmox host, a small LXC, or the same machine as the reverse
+proxy. **Nothing in the design requires a new virtual machine** — it is one
+container behind one path.
+
+### 2.8 The test environment versus production
+
+| | Reference instance | What a test instance would add |
+| --- | --- | --- |
+| the Seafile code | **Professional 12.0.14, unforked** | the Community edition, or a second Professional instance |
+| the change | one extension in one dict, backed up | none needed |
+| the ONLYOFFICE integration | present and **untouched** | present, or absent |
+| the data | one **empty** library (`OnlyOffice`) with synthetic files | the same |
+| the real data | **never touched** | — |
+
+The reference instance was chosen because it is the one the operator can test,
+and because the change is small enough to be provably harmless: one extension
+that nothing else uses. A dedicated instance would be the right answer for a
+*production* deployment, where `.docx` has to be claimed without taking it from
+ONLYOFFICE — and that is what the upstream per-library suite id is for.
