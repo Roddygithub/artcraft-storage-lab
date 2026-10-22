@@ -121,6 +121,7 @@ browser *without an error* while the document showed as saved.
 | **CSP** | the gateway sends `X-Content-Type-Options: nosniff` and `Referrer-Policy: no-referrer`. A full `Content-Security-Policy` is **not** set by the gateway | **open** — the deployment (Nginx) should set it; see `docs/DEPLOYMENT.md` |
 | **iframe sandbox** | the Craft app is framed by our own page, which we control; the app's own docs require `allow-scripts allow-same-origin allow-downloads allow-popups` for a *third-party* embed | n/a for our own frame; documented for third-party embeds |
 | **postMessage origin validation** | both directions check the origin **and** the source | addressed |
+| **the page-API transport (VectorCraft)** | VectorCraft exposes no postMessage bridge, so the host page calls `frame.contentWindow.vectorcraft` directly. It verifies the frame's **origin** first (`frameIsOurs()`), and re-verifies it on every poll; a cross-origin read throws, which the check treats as "not ours" | addressed (REVIEW-04, G9) |
 | **targetOrigin "*"** | never used | addressed |
 | **same-origin / cross-origin isolation** | the host page and the Craft app are same-origin; the app needs no `SharedArrayBuffer`, so **no COOP/COEP** is required | addressed |
 | **token leakage** | the browser holds no token; the gateway's token is in its environment; the file-server tokens never leave the gateway | addressed |

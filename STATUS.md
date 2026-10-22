@@ -1,7 +1,7 @@
 # STATUS
 
 ```text
-PHASE:      Phase 6-7 — WordCraft MVP, save protocol, conflicts, security
+PHASE:      Phases 0-12 complete; 13 (GPT review) pending
 BRANCH:     main
 SHA:        (see git log)
 
@@ -49,13 +49,13 @@ NEXT:
 | GR-004 | Common Craft Web Host Contract | `docs/HOST-CONTRACT.md` | PASS (remediated, REVIEW-01) | PENDING |
 | GR-005 | First technical proof | `docs/reviews/GR-005/` | PASS (remediated, REVIEW-02) | PENDING |
 | GR-006 | WordCraft Seafile MVP | `docs/reviews/GR-006/` | PASS (REVIEW-03) | PENDING |
-| GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PENDING | PENDING |
+| GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PASS (REVIEW-03) | PENDING |
 | GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | PASS (remediated, REVIEW-02) | PENDING |
 | GR-009 | Web integration security | `docs/SECURITY.md` | PENDING | PENDING |
-| GR-010 | GridCraft Seafile integration | proven in `docs/reviews/GR-005/` | PASS (remediated, REVIEW-02) | PENDING |
+| GR-010 | GridCraft Seafile integration | `docs/reviews/GR-010/README.md` | PASS (remediated, REVIEW-02) | PENDING |
 | GR-011 | DeckCraft Seafile integration | — (needs the upstream bridge) | not started | PENDING |
-| GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | PENDING | PENDING |
-| GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PENDING | PENDING |
+| GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | PASS (remediated, REVIEW-04) | PENDING |
+| GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PASS (REVIEW-03) | PENDING |
 | GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | PASS (REVIEW-03) | PENDING |
 
 ## What is already true

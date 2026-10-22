@@ -2,6 +2,37 @@
 
 Running log. Newest first.
 
+## 2026-10-22 — the fourth review, and the GR-012 proof hardened
+
+* **REVIEW-04 (Nemotron) on GR-012: FAIL, remediated.** Four blockers, all right:
+  the "document really changed" assertion compared the *length* of a
+  `document.inspect` snapshot instead of the content; the save poll compared
+  *sizes*, so an identical re-save was invisible; there was no `beforeunload`
+  guard and no dirty state for VectorCraft; and `dispatch.json` claimed
+  `?host=parent` for an application that does not speak it.
+* The fixes: the test now reads the **bytes the editor produced** and asserts
+  they differ from the original and form a valid SVG with a path element; the
+  poll compares a **content fingerprint** and only a *stored* save becomes the
+  new baseline; the host page warns on unload while a save is in flight; the
+  dispatch entry no longer claims a contract VectorCraft does not implement; the
+  adapter verifies the frame's **origin** before it drives it.
+* Two bugs the remediation itself found: `api.readFile` is **synchronous** (it
+  throws, it does not return a promise), and VectorCraft's SVG export writes a
+  rectangle as a `<path>`, so an assertion looking for `<rect>` failed on a
+  correct file.
+* Final GR-012 run: **12/12 PASS**, including the strongest check — the bytes
+  Seafile holds are **byte-identical** to what the editor produced.
+* **GR-010** bundle written: the `.xlsx` round-trip, distinct from GR-005 (the
+  mechanism) by being about the format and its conflict behaviour.
+* The unit check on the dispatch table was corrected to match the truth: only
+  the applications that speak the bridge name `?host=parent` in their URL.
+* The architect sub-agent timed out a **second** time (GR-003), after cloning and
+  reading all fourteen repositories for hours. Both GR-001 and GR-003 had already
+  been completed independently by the owner, so nothing was lost. The lesson is
+  recorded in `docs/AI-ROUTING.md`: a very long research brief is a bad fit for a
+  single sub-agent call; research is now split into bounded questions, and the
+  owner's own verification is the primary path.
+
 ## 2026-10-22 — GR-012, and the owner model retired mid-flight
 
 * **GR-012** — proved a **non-Office** round-trip: an SVG opened from Seafile in

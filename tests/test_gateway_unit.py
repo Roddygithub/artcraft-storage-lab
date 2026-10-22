@@ -146,8 +146,17 @@ def main():
     check("every dispatch entry names an app and a url",
           all("app" in v and "url" in v for v in dispatch.values()), str(dispatch)[:120])
     check("the dispatch keys carry no dot", all("." not in k for k in dispatch), str(list(dispatch)))
-    check("every dispatch url asks for the host mode",
-          all("host=parent" in v["url"] for v in dispatch.values()), str(dispatch)[:120])
+    # Only the applications that speak the ?host=parent bridge name it in their
+    # URL. VectorCraft is driven by its own page API instead, so its URL does
+    # not claim a contract it does not implement (REVIEW-04, G4).
+    bridge_apps = {"pdfcraft", "gridcraft", "wordcraft"}
+    for ext, entry in dispatch.items():
+        if entry["app"] in bridge_apps:
+            check(f"the {ext} url asks for the host mode", "host=parent" in entry["url"],
+                  entry["url"])
+        else:
+            check(f"the {ext} url does not claim the host mode",
+                  "host=parent" not in entry["url"], entry["url"])
 
     print()
     if FAILURES:
