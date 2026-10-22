@@ -35,9 +35,15 @@ class Seafile:
 
     # -- plumbing ---------------------------------------------------------
 
-    def _request(self, url, method="GET", headers=None, data=None, raw=False):
+    def _request(self, url, method="GET", headers=None, data=None, raw=False, auth=True):
+        """Perform a request.
+
+        `auth=False` sends no credential. The file server's own URLs already carry
+        a short-lived token in the query string, so the account token must not be
+        sent to them: it would widen the blast radius of a leak for no gain.
+        """
         headers = dict(headers or {})
-        if self.token and "Authorization" not in headers:
+        if auth and self.token and "Authorization" not in headers:
             headers["Authorization"] = "Token " + self.token
         req = urllib.request.Request(url, method=method, data=data, headers=headers)
         try:
@@ -109,7 +115,8 @@ class Seafile:
         link = self.download_link(repo_id, path)
         if not isinstance(link, str) or not link:
             raise SeafileError(f"no download link for {repo_id} {path}: {link!r}")
-        status, body = self._request(link, raw=True)
+        # The link carries its own file-server token; the account token stays home.
+        status, body = self._request(link, raw=True, auth=False)
         return body
 
     def update_link(self, repo_id, parent_dir):
@@ -145,13 +152,19 @@ class Seafile:
             "Content-Type": f"multipart/form-data; boundary={boundary}",
             "Content-Length": str(len(body)),
         }
-        status, resp = self._request(link, method="POST", headers=headers, data=body, raw=True)
-        return resp.decode(errors="replace").strip()
+        status, resp = self._request(link, method="POST", headers=headers, data=body, raw=True,
+                                     auth=False)
+        return self._file_id(resp)
 
     def upload_file(self, repo_id, parent_dir, name, data, replace=True):
-        """Upload a new file. Returns the new content id."""
+        """Upload a new file, or replace the one with that name. Returns the new content id.
+
+        `replace` is a **form field** of the upload, not a parameter of the link
+        (the file server reads it with `r.FormValue("replace")`). Without it the
+        upload creates a second file with the name in brackets.
+        """
         url = (f"{self.base_url}/api2/repos/{repo_id}/upload-link/"
-               f"?p={urllib.parse.quote(parent_dir)}&replace={1 if replace else 0}")
+               f"?p={urllib.parse.quote(parent_dir)}")
         link = self._json(url)
         if not isinstance(link, str) or not link:
             raise SeafileError(f"no upload link for {repo_id} {parent_dir}: {link!r}")
@@ -165,14 +178,30 @@ class Seafile:
             f"\r\n--{boundary}\r\n".encode(),
             f'Content-Disposition: form-data; name="parent_dir"\r\n\r\n'.encode(),
             parent_dir.encode(),
+            f"\r\n--{boundary}\r\n".encode(),
+            f'Content-Disposition: form-data; name="replace"\r\n\r\n'.encode(),
+            (b"1" if replace else b"0"),
             f"\r\n--{boundary}--\r\n".encode(),
         ])
         headers = {
             "Content-Type": f"multipart/form-data; boundary={boundary}",
             "Content-Length": str(len(body)),
         }
-        status, resp = self._request(link, method="POST", headers=headers, data=body, raw=True)
-        return resp.decode(errors="replace").strip()
+        status, resp = self._request(link, method="POST", headers=headers, data=body, raw=True,
+                                     auth=False)
+        return self._file_id(resp)
+
+    @staticmethod
+    def _file_id(body):
+        """The content id the file server answers a write with.
+
+        It is a hex id. Anything else means the answer is not what we expect, and
+        treating it as an id would corrupt the session's conflict check.
+        """
+        text = body.decode(errors="replace").strip().strip('"')
+        if not text or any(c not in "0123456789abcdef" for c in text.lower()):
+            raise SeafileError(f"the file server did not answer with a file id: {text[:120]!r}")
+        return text
 
 
     @staticmethod

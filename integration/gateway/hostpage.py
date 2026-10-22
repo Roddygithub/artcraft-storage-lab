@@ -90,7 +90,11 @@ window.addEventListener("message", async (event) => {
 
     case APP + ":save": {
       const bytes = data.bytes instanceof ArrayBuffer ? new Uint8Array(data.bytes) : data.bytes;
+      // The ticket the app gave this save, if it uses one (WordCraft's async_saves).
+      const ticket = data.ticket;
       say("Saving…", "busy");
+      let ok = false;
+      let error = "the save did not happen";
       try {
         const resp = await fetch("/session/" + SID + "/save", {
           method: "POST",
@@ -99,20 +103,37 @@ window.addEventListener("message", async (event) => {
           body: bytes,
         });
         const result = await resp.json();
-        window.__lastSave = result;
-        if (!resp.ok || !result.ok) {
-          say("Save failed: " + (result.error || resp.status), "err");
+        ok = !!resp.ok && result.ok === true;
+        if (!ok) {
+          error = result.error || ("HTTP " + resp.status);
         } else {
-          say("Saved — new version " + (result.version || ""), "ok");
+          error = "";
         }
+        window.__lastSave = result;
+        say(ok ? ("Saved" + (result.version ? " — new version " + result.version : "")) : ("Save failed: " + error),
+            ok ? "ok" : "err");
       } catch (err) {
-        say("Save failed: " + err.message, "err");
+        error = err.message;
+        say("Save failed: " + error, "err");
+      }
+      // Tell the app how the save ended. Without this the app waits for a
+      // confirmation that never comes and the document stays dirty forever.
+      if (ticket !== undefined && ticket !== null) {
+        toCraft("saveResult", { ticket: ticket, ok: ok, error: error });
       }
       break;
     }
 
     case APP + ":dirty":
       window.__lastDirty = !!data.dirty;
+      // The gateway keeps the "not persisted" state, so the host can warn on
+      // close and the service knows the document is unsaved.
+      fetch("/session/" + SID + "/dirty", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "text/plain" },
+        body: data.dirty ? "true" : "false",
+      }).catch(() => {});
       say(data.dirty ? "Unsaved changes" : FILE_NAME + " (no changes)", data.dirty ? "busy" : "ok");
       break;
 

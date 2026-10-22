@@ -47,11 +47,12 @@ def load_dispatch(path=CONFIG_PATH):
 
 
 class Gateway:
-    def __init__(self, seafile, dispatch, static_root=STATIC_ROOT, max_bytes=50 * 1024 * 1024):
+    def __init__(self, seafile, dispatch, static_root=STATIC_ROOT, max_bytes=None):
         self.seafile = seafile
         self.dispatch = dispatch
         self.static_root = static_root
-        self.max_bytes = max_bytes
+        self.max_bytes = max_bytes or int(
+            os.environ.get("ARTCRAFT_MAX_BYTES", 50 * 1024 * 1024))
         self.sessions = SessionStore()
 
     def app_for(self, filename):
@@ -126,7 +127,16 @@ class Gateway:
         return data
 
     def save(self, session, data):
-        """Write the bytes back. Returns (result_dict, http_status)."""
+        """Write the bytes back. Returns (result_dict, http_status).
+
+        The conflict check below is a **read-then-write**, not an atomic
+        compare-and-swap: Seafile's update API has no such primitive
+        (`docs/reviews/GR-008/SEAFILE-CONCURRENCY-PRIMITIVES.md` §1.3-§1.4).
+        A write that lands in the narrow window between the check and the
+        update therefore wins over a concurrent one. The window is one API
+        round trip; closing it would need a patch to the file server, which is
+        upstream work (GR-014).
+        """
         if not session.can_edit:
             return {"ok": False, "error": "you do not have permission to edit this file"}, 403
         if len(data) > self.max_bytes:
@@ -152,7 +162,8 @@ class Gateway:
                 "expected": session.file_id,
                 "current": current,
             }, 409
-        if detail.get("permission") not in EDITABLE_PERMISSIONS:
+        permission = detail.get("permission")
+        if permission not in EDITABLE_PERMISSIONS:
             return {"ok": False, "error": "you no longer have permission to edit this file"}, 403
 
         try:
@@ -247,14 +258,27 @@ class Handler(BaseHTTPRequestHandler):
             result, status = gateway.save(session, data)
             return self._json(status, result)
 
+        if path.startswith("/session/") and path.endswith("/dirty"):
+            sid = path.split("/")[2]
+            session = gateway.sessions.get(sid)
+            if session is None:
+                return self._json(404, {"ok": False, "error": "unknown or expired session"})
+            body = self._read_body(limit=64) or b""
+            session.unsaved = body.strip().lower() in (b"true", b"1")
+            return self._json(200, {"ok": True, "unsaved": session.unsaved})
+
         return self._json(404, {"ok": False, "error": "not found"})
 
     def _open(self, gateway):
+        parsed = urllib.parse.urlparse(self.path)
         body = self._read_body(limit=64 * 1024)
         fields = urllib.parse.parse_qs(body.decode("utf-8", "replace"))
         access_token = (fields.get("access_token") or [""])[0]
         repo_id = (fields.get("repo_id") or [""])[0]
         path = (fields.get("path") or [""])[0]
+        # A caller that wants the session as data rather than as a page.
+        as_json = "format=json" in parsed.query or \
+            "application/json" in (self.headers.get("Accept") or "")
 
         if access_token:
             session, error = gateway.open_session(access_token)
@@ -265,6 +289,9 @@ class Handler(BaseHTTPRequestHandler):
 
         if session is None:
             return self._json(400, {"ok": False, "error": error})
+
+        if as_json:
+            return self._json(200, {"ok": True, **session.as_dict()})
 
         target = gateway.dispatch[session.name.rsplit(".", 1)[-1].lower()]
         page = hostpage.render(
@@ -282,8 +309,12 @@ class Handler(BaseHTTPRequestHandler):
         if rel.startswith("..") or os.path.isabs(rel):
             return self._json(400, {"ok": False, "error": "bad path"})
         target = os.path.join(gateway.static_root, rel)
-        target = os.path.abspath(target)
-        if not target.startswith(os.path.abspath(gateway.static_root) + os.sep):
+        # realpath, not abspath: a symlink inside the static root must not lead
+        # out of it. Both the file we serve and the directory it is in are
+        # checked against the real root.
+        real_root = os.path.realpath(gateway.static_root)
+        target = os.path.realpath(target)
+        if target != real_root and not target.startswith(real_root + os.sep):
             return self._json(400, {"ok": False, "error": "bad path"})
         if os.path.isdir(target):
             # "/artcraft/<app>/" and "/artcraft/<app>" both serve the app's index.

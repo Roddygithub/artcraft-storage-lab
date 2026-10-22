@@ -1,7 +1,5 @@
 {
-  "pdf":  { "app": "pdfcraft",    "url": "/artcraft/pdfcraft/?host=parent" },
-  "svg":  { "app": "vectorcraft", "url": "/artcraft/vectorcraft/?host=parent" },
-  "docx": { "app": "wordcraft",   "url": "/artcraft/wordcraft/?host=parent" },
-  "xlsx": { "app": "gridcraft",   "url": "/artcraft/gridcraft/?host=parent" },
-  "pptx": { "app": "deckcraft",   "url": "/artcraft/deckcraft/?host=parent" }
+  "pdf":  { "app": "pdfcraft",  "url": "/artcraft/pdfcraft/?host=parent" },
+  "xlsx": { "app": "gridcraft", "url": "/artcraft/gridcraft/?host=parent" },
+  "docx": { "app": "wordcraft", "url": "/artcraft/wordcraft/?host=parent" }
 }

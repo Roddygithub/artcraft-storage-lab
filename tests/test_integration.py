@@ -79,6 +79,7 @@ def history(repo_id, path):
 
 
 def open_session(repo_id, path):
+    """Open a session. Returns (sid, page_html)."""
     body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
     status, raw = http(f"{GATEWAY}/open/", method="POST", data=body,
                         headers={"Content-Type": "application/x-www-form-urlencoded"})
@@ -87,6 +88,16 @@ def open_session(repo_id, path):
     page = raw.decode()
     sid = page.split('const SID = "')[1].split('"')[0]
     return sid, page
+
+
+def open_session_json(repo_id, path):
+    """Open a session and read it as data (the gateway's JSON form of /open/)."""
+    body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
+    status, raw = http(f"{GATEWAY}/open/?format=json", method="POST", data=body,
+                        headers={"Content-Type": "application/x-www-form-urlencoded"})
+    if status != 200:
+        raise SystemExit(f"gateway /open/ -> HTTP {status}: {raw[:300]!r}")
+    return json.loads(raw)
 
 
 def gateway_json(url, method="GET", data=None):
@@ -126,6 +137,35 @@ def cell_value(xlsx_bytes, cell):
     return match.group(1) if match else ""
 
 
+def reset_fixture(repo_id, path):
+    """Put the pristine synthetic fixture back, so the test starts from a known state.
+
+    A previous run left GridCraft's own workbook there; the test rewrites a cell
+    and looks for it by name, so it needs the fixture it was written for.
+    """
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "integration"))
+    from gateway.seafile import Seafile
+
+    name = path.rsplit("/", 1)[-1]
+    fixtures = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
+    fixture = os.path.join(fixtures, name)
+    if not os.path.isfile(fixture):
+        # The fixtures are generated, not committed: build them first.
+        import subprocess
+
+        subprocess.run([sys.executable, os.path.join(fixtures, "make_fixtures.py"), fixtures],
+                       check=True, stdout=subprocess.DEVNULL)
+    if not os.path.isfile(fixture):
+        print(f"  (no fixture for {name}; leaving the file as it is)")
+        return
+    with open(fixture, "rb") as handle:
+        data = handle.read()
+    parent = path.rsplit("/", 1)[0] or "/"
+    seafile = Seafile(SEAFILE, TOKEN)
+    seafile.upload_file(repo_id, parent, name, data, replace=True)
+    print(f"  (fixture restored: {name}, {len(data)} bytes)")
+
+
 def main():
     if len(sys.argv) < 3:
         print(__doc__)
@@ -135,6 +175,8 @@ def main():
 
     if not SEAFILE or not TOKEN:
         raise SystemExit("ARTCRAFT_SEAFILE_URL and ARTCRAFT_SEAFILE_TOKEN must be set")
+
+    reset_fixture(repo_id, path)
 
     # ---- 1. open -------------------------------------------------------
     detail_before = api_json(f"/api2/repos/{repo_id}/file/detail/?p={urllib.parse.quote(path)}")
@@ -146,6 +188,14 @@ def main():
     check("1. the host page is rendered", "const SID =" in page and "/artcraft/" in page)
     check("1. the host page asks for a document over the session", f"/session/{sid}/document" in page
           or sid in page)
+
+    # the same session, read as data: the session id is not parsed out of HTML
+    info = open_session_json(repo_id, path)
+    check("1. the session is described as data", info.get("ok") is True and bool(info.get("sid")),
+          json.dumps(info)[:160])
+    check("1. the session is bound to the file that was opened",
+          info.get("path") == path and info.get("name", "").endswith(path.rsplit("/", 1)[-1]),
+          f"{info.get('path')} / {info.get('name')}")
 
     status, body = http(f"{GATEWAY}/session/{sid}/document")
     check("1. the document is delivered", status == 200 and len(body) > 0,
@@ -208,6 +258,45 @@ def main():
     sid6, _ = open_session(repo_id, path)
     status, result = http(f"{GATEWAY}/session/{sid6}/save", method="POST", data=edited)
     check("5. a known session can still write", status == 200, f"HTTP {status}")
+
+    # ---- 6. the file disappears under the editor ------------------------
+    sid7, _ = open_session(repo_id, path)
+    gone = path + ".deleted-for-the-test"
+    # Rename the file away: the update then finds nothing at the old path.
+    status, _ = http(f"{SEAFILE}/api2/repos/{repo_id}/file/?p={urllib.parse.quote(path)}",
+                      method="POST",
+                      data=urllib.parse.urlencode({"operation": "rename",
+                                                   "oldname": path.rsplit("/", 1)[-1],
+                                                   "newname": gone.rsplit("/", 1)[-1]}).encode(),
+                      headers={"Authorization": "Token " + TOKEN,
+                               "Content-Type": "application/x-www-form-urlencoded"})
+    status, result = gateway_json(f"{GATEWAY}/session/{sid7}/save", method="POST", data=edited)
+    check("6. a save of a file that is gone is REFUSED, not silently accepted",
+          status != 200 and result.get("ok") is False, f"HTTP {status} {str(result)[:140]}")
+    # put it back
+    http(f"{SEAFILE}/api2/repos/{repo_id}/file/?p={urllib.parse.quote(gone)}",
+         method="POST",
+         data=urllib.parse.urlencode({"operation": "rename",
+                                      "oldname": gone.rsplit("/", 1)[-1],
+                                      "newname": path.rsplit("/", 1)[-1]}).encode(),
+         headers={"Authorization": "Token " + TOKEN,
+                  "Content-Type": "application/x-www-form-urlencoded"})
+
+    # ---- 7. the static handler refuses to leave its root ----------------
+    import tempfile
+    static_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "integration", "static")
+    link = os.path.join(static_root, "escape-test")
+    try:
+        os.symlink("/etc/passwd", link)
+    except FileExistsError:
+        pass
+    status, body = http(f"{GATEWAY}/artcraft/escape-test")
+    check("7. a symlink out of the static root is refused", status in (400, 404),
+          f"HTTP {status}")
+    try:
+        os.unlink(link)
+    except FileNotFoundError:
+        pass
 
     print()
     if FAILURES:
