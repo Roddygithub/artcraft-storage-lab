@@ -68,8 +68,11 @@ class SessionStore:
         sid = secrets.token_urlsafe(24)
         session = Session(sid=sid, **kwargs)
         with self._lock:
-            self._prune_locked()
             self._sessions[sid] = session
+            # Prune after the insert, so the cap is the cap: pruning first
+            # would leave room for one more and the store would hold
+            # max_sessions + 1.
+            self._prune_locked()
         return session
 
     def get(self, sid):
