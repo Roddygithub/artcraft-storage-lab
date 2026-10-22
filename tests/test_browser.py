@@ -130,8 +130,13 @@ def main():
         #    First make the document dirty by typing into a cell, so the save
         #    is a real edit and not a no-op.
         canvas = page.frame_locator("#frame").locator("canvas")
-        canvas.click(position={"x": 90, "y": 90})
-        page.keyboard.type("4242")
+        # Where to click depends on the application: a spreadsheet cell, or the
+        # text area of a word processor.
+        click = {"x": int(os.environ.get("ARTCRAFT_CLICK_X", 90)),
+                 "y": int(os.environ.get("ARTCRAFT_CLICK_Y", 90))}
+        typed = os.environ.get("ARTCRAFT_TYPED", "4242")
+        canvas.click(position=click)
+        page.keyboard.type(typed)
         page.keyboard.press("Enter")
         page.wait_for_timeout(1500)
 
@@ -139,7 +144,7 @@ def main():
         check("3a. the editor reported unsaved changes after the edit", dirty is True,
               f"dirty = {dirty}")
 
-        canvas.click(position={"x": 90, "y": 90})
+        canvas.click(position=click)
         page.keyboard.press("Control+s")
         shot = os.environ.get("ARTCRAFT_SCREENSHOT")
         if shot:
@@ -177,12 +182,35 @@ def main():
     try:
         with zipfile.ZipFile(io.BytesIO(blob)) as zf:
             for name in zf.namelist():
-                if name.startswith("xl/worksheets/") or name.startswith("xl/sharedStrings"):
+                if name.startswith(("xl/worksheets/", "xl/sharedStrings", "word/")):
                     inside += zf.read(name).decode("utf-8", "replace")
     except Exception as exc:
         inside = f"<not a zip: {exc}>"
-    check("5. the typed text is in the file Seafile now holds", "4242" in inside,
-          f"{len(blob)} bytes; the worksheet contains 4242: {'4242' in inside}")
+    typed = os.environ.get("ARTCRAFT_TYPED", "4242")
+    check("5. the typed text is in the file Seafile now holds", typed in inside,
+          f"{len(blob)} bytes; the document contains {typed!r}: {typed in inside}")
+
+    # 6. reopen the document from Seafile: the edit must still be there.
+    #    A fresh session fetches the bytes Seafile holds now.
+    import io
+    import zipfile
+
+    body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
+    status, raw = http(f"{GATEWAY}/open/?format=json", method="POST", data=body,
+                        headers={"Content-Type": "application/x-www-form-urlencoded"})
+    reopened = json.loads(raw)
+    status, blob = http(f"{GATEWAY}/session/{reopened['sid']}/document")
+    inside = ""
+    try:
+        with zipfile.ZipFile(io.BytesIO(blob)) as zf:
+            for name in zf.namelist():
+                if name.startswith(("xl/worksheets/", "xl/sharedStrings", "word/")):
+                    inside += zf.read(name).decode("utf-8", "replace")
+    except Exception as exc:
+        inside = f"<not a zip: {exc}>"
+    typed = os.environ.get("ARTCRAFT_TYPED", "4242")
+    check("6. the document reopened from Seafile still has the edit", typed in inside,
+          f"{len(blob)} bytes; it contains {typed!r}: {typed in inside}")
 
     if console:
         print("\n--- browser console ---")
