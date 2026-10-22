@@ -8,6 +8,11 @@ build/
 # Local scratch: upstream clones used for read-only research
 .work/
 
+# Prebuilt Craft web builds, fetched by scripts/fetch-craft-web.sh
+# (upstream release artifacts, ~15 MB each - not ours to version)
+integration/static/*/
+!integration/static/README.md
+
 # Python
 __pycache__/
 *.py[cod]
