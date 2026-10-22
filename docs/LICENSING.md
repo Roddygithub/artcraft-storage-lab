@@ -15,8 +15,14 @@ owner's decision, it is marked `OWNER DECISION REQUIRED`.
 | Seafile / Seahub — open-source upstream (`haiwen/seahub`, `haiwen/seafile`) | **GPLv2** (Seahub) / LGPL-ish mix for the C server components | upstream repository licence files | Any code we take from it must be GPLv2. |
 | ONLYOFFICE Document Server | proprietary (Ascensio System SIA) | `local.json`, container labels, `api.js` copyright header ("Copyright (C) Ascensio System SIA, 2009-2026") | We study its **behaviour**, never its code. |
 | ArtCraft apps (`storytold/*`) | to be confirmed per repo — **NOT VERIFIED yet** | each repo's licence file | must be checked before any ArtCraft code is vendored or derived from |
-| `storytold/craft-libs` | to be confirmed — **NOT VERIFIED yet** | ditto | same |
+| `storytold/craft-libs` | **MIT OR Apache-2.0** | `LICENSE-MIT` + `LICENSE-APACHE` in the repository root | compatible |
 | `storytold/craftrules` | not accessible from outside | HTTP 404 | no constraint we can observe |
+
+**Verified on 2026-10-22: all 13 `storytold/*` applications AND `storytold/craft-libs`
+ship both `LICENSE-MIT` and `LICENSE-APACHE`** — i.e. they are dual MIT / Apache-2.0,
+which is exactly this repository's licence. The table's "to be confirmed" entries for
+the applications are therefore **closed**; the only remaining licence question is
+whether the *upstream maintainers* accept a contribution under those terms (L-3).
 
 ## 2. The GPLv2 / Apache-2.0 incompatibility — the decisive constraint
 
@@ -43,10 +49,9 @@ the project.
 
 ### Status
 
-> **PROVISIONAL — FREE REVIEW PENDING.** The exact licence of every
-> `storytold/*` repository is **NOT VERIFIED** in this document yet. GR-003 and
-> the GR-014 patch phase must fill the table above with the real licence file
-> contents before any ArtCraft code is vendored, derived from, or contributed to.
+> **PROVISIONAL — FREE REVIEW PENDING.** The licences are now **verified** for
+> every `storytold/*` repository (see the table). What is *not* verified is the
+> upstream contribution's acceptance (L-3).
 
 ## 3. What we will never do
 
@@ -88,8 +93,8 @@ kind that would infect this repository.
 
 | # | Question | Status |
 | --- | --- | --- |
-| L-1 | Exact licence of each of the 13 `storytold/*` repos | **NOT VERIFIED** — GR-003 |
-| L-2 | Licence of `storytold/craft-libs` | **NOT VERIFIED** — GR-003 |
+| L-1 | Exact licence of each of the 13 `storytold/*` repos | **CLOSED** — all dual MIT / Apache-2.0 (2026-10-22) |
+| L-2 | Licence of `storytold/craft-libs` | **CLOSED** — dual MIT / Apache-2.0 |
 | L-3 | Does the ArtCraft upstream accept a contribution under its own licence terms? | **NOT VERIFIED** — GR-013 |
 | L-4 | Should this repository stay dual MIT/Apache, or move to MIT only to keep GPLv2 compatibility? | **OWNER DECISION REQUIRED** (recommended: keep dual, and keep the network boundary) |
 | L-5 | Does the Seafile upstream (GPLv2) accept the patch shape we intend? | **NOT VERIFIED** — GR-002 / GR-014 |
