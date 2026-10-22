@@ -68,6 +68,14 @@ def main():
     except ImportError:
         raise SystemExit("playwright is not installed: npm i playwright && npx playwright install chromium")
 
+    # The test needs a known starting point, like the HTTP test has. This has
+    # to happen BEFORE the session is opened, or the session is already stale
+    # when the browser starts and every save is refused as a conflict.
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from test_integration import reset_fixture
+
+    reset_fixture(repo_id, path)
+
     # The state before the browser touches anything.
     before = seafile_json(f"/api2/repos/{repo_id}/file/detail/?p={urllib.parse.quote(path)}")
     before_id = before["id"]
@@ -84,6 +92,10 @@ def main():
     # The gateway returns the host page itself; we serve the same page to the
     # browser by re-posting, so we drive the real flow.
     host_page = raw.decode()
+
+    # The bytes the document had before the edit, to compare against afterwards.
+    link = seafile_json(f"/api2/repos/{repo_id}/file/?p={urllib.parse.quote(path)}")
+    _status, original_bytes = http(link, headers={"Authorization": "Token " + TOKEN})
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch(
@@ -138,9 +150,12 @@ def main():
         canvas.click(position=click)
         page.keyboard.type(typed)
         page.keyboard.press("Enter")
-        page.wait_for_timeout(1500)
-
-        dirty = page.evaluate("() => window.__lastDirty === true")
+        # Wait for the editor to say the document changed, not for a fixed time.
+        try:
+            page.wait_for_function("() => window.__lastDirty === true", timeout=20000)
+            dirty = True
+        except Exception:
+            dirty = page.evaluate("() => window.__lastDirty === true")
         check("3a. the editor reported unsaved changes after the edit", dirty is True,
               f"dirty = {dirty}")
 
@@ -148,17 +163,23 @@ def main():
         page.keyboard.press("Control+s")
         shot = os.environ.get("ARTCRAFT_SCREENSHOT")
         if shot:
-            page.wait_for_timeout(500)
+            page.wait_for_timeout(800)
             page.screenshot(path=shot)
-        saved = False
-        for _ in range(60):
-            state = page.eval_on_selector("#state", "el => el.textContent")
-            if "Saved" in state or "failed" in state or "Save failed" in state:
-                saved = True
-                break
-            page.wait_for_timeout(500)
-        check("3. the editor's own Save reached the host and was persisted", saved,
-              page.eval_on_selector("#state", "el => el.textContent"))
+        try:
+            page.wait_for_function(
+                "() => /Saved|Save failed/.test(document.getElementById('state').textContent)",
+                timeout=30000)
+            saved = True
+        except Exception:
+            saved = False
+        state = page.eval_on_selector("#state", "el => el.textContent")
+        check("3. the editor's own Save reached the host and was persisted", saved, state)
+
+        # The application must have confirmed the save itself, not only the host
+        # page: its own log says so when the ticket comes back as Saved.
+        confirmed = any("saved" in line and "save" in line for line in console)
+        check("3b. the editor confirmed the save itself", confirmed,
+              next((line[:120] for line in console if "saved" in line), "no confirmation line"))
 
         browser.close()
 
@@ -179,16 +200,23 @@ def main():
     link = seafile_json(f"/api2/repos/{repo_id}/file/?p={urllib.parse.quote(path)}")
     status, blob = http(link, headers={"Authorization": "Token " + TOKEN})
     inside = ""
+    is_zip = True
     try:
         with zipfile.ZipFile(io.BytesIO(blob)) as zf:
             for name in zf.namelist():
                 if name.startswith(("xl/worksheets/", "xl/sharedStrings", "word/")):
                     inside += zf.read(name).decode("utf-8", "replace")
-    except Exception as exc:
-        inside = f"<not a zip: {exc}>"
+    except Exception:
+        is_zip = False
+        inside = blob.decode("latin-1", "replace")
     typed = os.environ.get("ARTCRAFT_TYPED", "4242")
-    check("5. the typed text is in the file Seafile now holds", typed in inside,
-          f"{len(blob)} bytes; the document contains {typed!r}: {typed in inside}")
+    if is_zip:
+        check("5. the typed text is in the file Seafile now holds", typed in inside,
+              f"{len(blob)} bytes; the document contains {typed!r}: {typed in inside}")
+    else:
+        # A format that is not a zip (a PDF): the content has to have changed.
+        check("5. the file Seafile holds is the one the editor produced",
+              blob != original_bytes, f"{len(original_bytes)} -> {len(blob)} bytes")
 
     # 6. reopen the document from Seafile: the edit must still be there.
     #    A fresh session fetches the bytes Seafile holds now.

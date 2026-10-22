@@ -167,6 +167,24 @@ NEVER   a file served from outside the static root
 
 ## 7. Open security work
 
+### 7.1 The pre-deployment gate
+
+**None of these may be open when the gateway is exposed to anyone but the
+operator.** They are the difference between a self-hosted prototype and a
+service:
+
+| # | Item | Why it blocks |
+| --- | --- | --- |
+| S-1 | a `Content-Security-Policy` for the gateway's own pages | the host page is the one page that frames a third-party WebAssembly module; a CSP pins what that module may load |
+| S-2 | an `Origin` / `Referer` check on the state-changing endpoints | a cross-site form POST to `/open/` is possible without a token; the session id is the only thing protecting `/save` |
+| S-3 | a rate limit on `/open/` | the session store's cap is a backstop, not a limit |
+| S-4 | a bound on the **expanded** size of an OOXML document | a 50 MB limit on the compressed file is not a limit on what it expands to; the Craft app must bound its own expansion |
+| S-7 | a formal abuse-case list per endpoint | the threat list above is a checklist, not a model |
+
+S-5 (the share-link path) and S-6 (read-only enforced by the gateway) are
+different: S-6 is **done**, and S-5 is a **scope decision** rather than a hole —
+a share link never reaches the hook, so it behaves exactly as it did before.
+
 | # | Item | Priority |
 | --- | --- | --- |
 | S-1 | A `Content-Security-Policy` for the gateway's own pages | before any public deployment |

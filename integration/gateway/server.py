@@ -173,10 +173,19 @@ class Gateway:
 
         session.file_id = new_id or session.file_id
         session.unsaved = False
+        # The version is the file's modification time AFTER the write. The one
+        # read before the write would be the old version's, and saying so would
+        # be a lie.
+        version = None
+        try:
+            after = self.seafile.file_detail(session.repo_id, session.path)
+            version = after.get("last_modified")
+        except SeafileError:
+            pass
         return {
             "ok": True,
             "file_id": session.file_id,
-            "version": detail.get("last_modified"),
+            "version": version,
             "message": "saved",
         }, 200
 

@@ -119,7 +119,11 @@ window.addEventListener("message", async (event) => {
       // Tell the app how the save ended. Without this the app waits for a
       // confirmation that never comes and the document stays dirty forever.
       if (ticket !== undefined && ticket !== null) {
-        toCraft("saveResult", { ticket: ticket, ok: ok, error: error });
+        // The app shows this message to the user, so it must not carry the
+        // internals (paths, ids, upstream answers). The full error stays in the
+        // host page's console and in the service's log.
+        const shown = ok ? "" : "the file could not be stored";
+        toCraft("saveResult", { ticket: ticket, ok: ok, error: shown });
       }
       break;
     }
