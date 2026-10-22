@@ -141,13 +141,17 @@ is committed here:
 
 ```text
 ~/Projects/seafile-thirdparty-save-patch/
-  README.md        the same specification as §2.2, in full
-  seahub.patch     the diff against haiwen/seahub
-  APPLY.md         how to apply it to a local checkout
+  README.md        the full specification, in the patch's own words
+  seahub.patch     the diff against haiwen/seahub (3 files, +90/-3)
+  BASE_COMMIT.txt  the upstream commit it applies to
 ```
 
+Base: `haiwen/seahub` at `c01d46bcaa0b2ce24c71561c6c61d15fea808d1a` (2026-10-21).
+
 The patch is **prepared**, not applied to the reference instance, and not
-published.
+published. It has been checked for syntax and for import cycles, but it has
+**not** been executed against a running Seahub: that needs a test instance, and
+it is the first thing to do once the GPT review has passed.
 
 ---
 
