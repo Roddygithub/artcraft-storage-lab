@@ -1,80 +1,281 @@
 # GPT Handoff
 
-A single document that lets a future GPT session take over this project **without
+A single document that lets a GPT session take over this project **without
 trusting the summaries produced by the free models**.
 
-It is filled in progressively. When it is complete, GPT should be able to verify
-every claim from the repository itself.
+Everything here can be checked against the repository, the upstream sources and
+the reference instance. Where a claim was made by a free model and not
+independently verified, it says so.
 
-## Repository
+## 1. Repository
 
 | Item | Value |
 | --- | --- |
 | Local path | `~/Projects/artcraft-storage-lab` |
-| GitHub | `artcraft-storage-lab` (public) |
+| GitHub | `https://github.com/Roddygithub/artcraft-storage-lab` (public) |
 | Default branch | `main` |
-| HEAD SHA | _(filled at freeze time)_ |
+| Licence | dual MIT / Apache-2.0 |
+| HEAD | see `git log -1` |
 
-## Architecture
+## 2. What the project is
 
-_(filled at freeze time — the concrete integration architecture, with a diagram)_
+A research and prototyping project that makes **ArtCraft's browser editors
+usable from a self-hosted file platform**, the way ONLYOFFICE is usable from
+Seafile today: click a file in Seafile Web, edit it in the browser, press Save,
+and Seafile records a new version. No SeaDrive, no manual download, no manual
+upload, no desktop application.
 
-## GR list
+## 3. Architecture
+
+```text
+   the browser                    the gateway                    Seafile
+  ┌───────────────┐             ┌────────────────┐          ┌──────────────┐
+  │  the Craft    │  postMessage │  the host page  │ account  │  Seahub      │
+  │  app (wasm)   │ ──────────► │  + the service  │ token ─► │  + seafhttp  │
+  │  in an iframe │ ◄────────── │                 │ ◄─────── │              │
+  └───────────────┘             └────────────────┘          └──────────────┘
+```
+
+* the **Craft app** is the upstream web build, unmodified except for the host
+  bridge patch (`docs/reviews/GR-014/`). It knows nothing about Seafile.
+* the **host page** is served by the gateway and frames the Craft app **from the
+  same origin** (the `?host=parent` bridge requires it).
+* the **gateway** holds the Seafile credential and performs every authorisation
+  check. The browser holds **one opaque session id** and nothing else.
+* the **seafhttp write** goes through the file server's `update-api`, which
+  creates a normal Seafile version.
+
+### 3.1 The two integration points
+
+| Point | Where | What it does |
+| --- | --- | --- |
+| the file-type dispatcher | Seafile's `seahub/thirdparty_editor/` hook, configured by `THIRDPARTY_EDITOR_ACTION_URL_DICT` | maps an extension to the host page's URL, mints the access token, serves the bytes |
+| the save | the gateway | the conflict check and the write, with the gateway's credential |
+
+**The Seafile hook is read-only by design** (`can_edit: False`), so the write is
+done by the gateway. The consequence — the new version is attributed to the
+**service account**, not to the user — is stated in
+`docs/SEAFILE-INTEGRATION-POINTS.md` §Q4, and the upstream fix is prepared
+outside this repository (`~/Projects/seafile-thirdparty-save-patch/`).
+
+## 4. The GR list
 
 | GR | Title | Artifact | Free review | GPT review |
 | --- | --- | --- | --- | --- |
-| GR-001 | Seafile online-editor contract | `docs/SEAFILE-ONLYOFFICE-RESEARCH.md` | | PENDING |
-| GR-002 | Seafile integration point | `docs/SEAFILE-INTEGRATION-POINTS.md` | | PENDING |
-| GR-003 | ArtCraft Web capability matrix | `docs/ARTCRAFT-WEB-CAPABILITIES.md` | | PENDING |
-| GR-004 | Common Craft Web Host Contract | `docs/HOST-CONTRACT.md` | | PENDING |
-| GR-005 | First technical proof | `integration/`, `prototypes/` | | PENDING |
-| GR-006 | WordCraft Seafile MVP | `docs/reviews/GR-006/` | | PENDING |
-| GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | | PENDING |
-| GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` | | PENDING |
-| GR-009 | Web integration security | `docs/SECURITY.md` | | PENDING |
-| GR-010 | GridCraft | `docs/reviews/GR-010/` | | PENDING |
-| GR-011 | DeckCraft | `docs/reviews/GR-011/` | | PENDING |
-| GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | | PENDING |
-| GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | | PENDING |
-| GR-014 | First upstream patch | `docs/reviews/GR-014/` | | PENDING |
+| GR-001 | Seafile online-editor contract | `docs/reviews/GR-001/DEPLOYED-INSTANCE-CONTRACT.md` | PASS (remediated) | PENDING |
+| GR-002 | Seafile integration point | `docs/SEAFILE-INTEGRATION-POINTS.md` | PASS (remediated) | PENDING |
+| GR-003 | ArtCraft Web capability matrix | `docs/ARTCRAFT-WEB-CAPABILITIES.md` | PASS (remediated) | PENDING |
+| GR-004 | Common Craft Web Host Contract | `docs/HOST-CONTRACT.md` | PASS (remediated) | PENDING |
+| GR-005 | First technical proof | `docs/reviews/GR-005/` | PASS (remediated) | PENDING |
+| GR-006 | WordCraft DOCX MVP | `docs/reviews/GR-006/` | review 03 in flight | PENDING |
+| GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | pending | PENDING |
+| GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | PASS (remediated) | PENDING |
+| GR-009 | Web integration security | `docs/SECURITY.md` | PASS (remediated) | PENDING |
+| GR-010 | GridCraft | `docs/reviews/GR-005/` (the `.xlsx` path) | PASS (remediated) | PENDING |
+| GR-011 | DeckCraft | — | not started | PENDING |
+| GR-012 | Non-office Craft integration | — | not started | PENDING |
+| GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | pending | PENDING |
+| GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | review 03 in flight | PENDING |
 
-## Relevant upstream repositories and SHAs
+## 5. The relevant upstream repositories and SHAs
 
-_(filled at freeze time — every repo inspected, with the exact commit SHA and
-the date of inspection)_
+| Repository | SHA / version | Why |
+| --- | --- | --- |
+| `haiwen/seahub` | `c01d46bcaa0b2ce24c71561c6c61d15fea808d1a` (2026-10-21) | the open-source Seahub; the `thirdparty_editor` hook |
+| `haiwen/seafile-server` | `master` (the Go file server) | the `update-api`, the `441`, the `last_modify` finding |
+| `storytold/wordcraft` | `00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d` (2026-10-22) | the patch target |
+| `storytold/gridcraft` | `main` | the reference bridge |
+| `storytold/pdfcraft` | `main` | the reference save-failure bridge |
+| `storytold/cadcraft` | `main` | the third bridge |
+| `storytold/vectorcraft` | `main` | the `window.vectorcraft` page API |
+| `storytold/craft-libs` | `main` | where a shared host crate would go |
+| the other eight `storytold/*` apps | `main` | the capability matrix |
 
-## Test environment
+All of them are **public** and were read read-only. **Nothing was published
+anywhere.**
 
-_(filled at freeze time — how to reproduce the test setup, which services are
-needed, which synthetic fixtures are used)_
+## 6. The reference environment
 
-## Commands
+| Item | Value |
+| --- | --- |
+| Seafile | **12.0.14 Professional**, LXC `108` (192.168.1.108) |
+| Seahub | on `:8000`; the file server on `:8082` |
+| reverse proxy | Nginx Proxy Manager, LXC `103` (192.168.1.103) |
+| public name | `svc-seafile-host.tailb64fb1.ts.net` |
+| ONLYOFFICE | Document Server 24.04, LXC `112` — **untouched** |
+| test library | `c82cc792-389d-43e6-b963-0dab1a47a9a8` ("OnlyOffice"), folder `/artcraft-lab/` |
+| the real data | library `46ea6c3c-8df3-48b6-bf95-fdc300dcf65c` ("Google Drive") — **never touched** |
 
-_(filled at freeze time — the exact commands to run the test suite)_
+### 6.1 The ONE change made to the instance
 
-## Integration flow
+`/opt/seafile/conf/seahub_settings.py`, appended:
 
-_(filled at freeze time)_
+```python
+ENABLE_THIRDPARTY_EDITOR = True
+THIRDPARTY_EDITOR_ACTION_URL_DICT = {
+    "xlsx": "http://127.0.0.1:8777/open/",
+}
+```
 
-## Seafile configuration changes
+* **Backup:** `/opt/seafile/conf/seahub_settings.py.bak-artcraft-20261022-123134`
+* **Rollback:** restore it and `systemctl restart seahub`.
+* **Blast radius:** one extension that **no file in any other library uses**, and
+  that the deployed ONLYOFFICE configuration does not claim. **No existing file
+  changed behaviour.**
+* Seahub was restarted **once**, right after the edit; `seahub` and `seafile`
+  both came back `active`.
+* The ONLYOFFICE block in the same file is **unchanged**.
 
-_(filled at freeze time — every key added to `seahub_settings.py` / `local_settings.py`,
-with the exact value shape and how to roll it back)_
+The `127.0.0.1` in the URL is the address of the gateway **on the owner's
+workstation** — it works because the browser is there. The production design puts
+the gateway on its own host.
 
-## ArtCraft changes
+## 7. The commands
 
-_(filled at freeze time)_
+```sh
+# the Craft web builds (upstream release artifacts)
+./scripts/fetch-craft-web.sh
 
-## Security assumptions
+# the WordCraft build with the host bridge (needs a Rust toolchain)
+rustup target add wasm32-unknown-unknown
+cd .work/wordcraft-patch/apps/wordcraft-web && trunk build --release
+cp -a ../../../dist/web/. ../../../../integration/static/wordcraft/
 
-_(filled at freeze time — the trust boundaries, token lifetimes, origin checks,
-and anything still assumed-but-unverified)_
+# the synthetic fixtures
+python3 tests/fixtures/make_fixtures.py tests/fixtures
 
-## Known limitations
+# a synthetic library
+ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=... \
+  python3 tests/upload_fixtures.py <repo_id> artcraft-lab
 
-_(filled at freeze time)_
+# the gateway
+cd integration && ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=... \
+  python3 -m gateway --host 127.0.0.1 --port 8777
 
-## Prepared upstream patches
+# the tests
+ARTCRAFT_GATEWAY=http://127.0.0.1:8777 \
+  python3 tests/test_integration.py <repo_id> /artcraft-lab/synthetic.xlsx
+ARTCRAFT_GATEWAY=http://127.0.0.1:8777 \
+  python3 tests/test_browser.py <repo_id> /artcraft-lab/synthetic.docx
+```
 
-_(filled at freeze time — location of each prepared diff, and the explicit
-statement that none of them has been published)_
+## 8. The integration flow
+
+```text
+1. The user clicks a .xlsx in Seafile.
+2. Seahub's view_lib_file finds the extension in THIRDPARTY_EDITOR_ACTION_URL_DICT,
+   mints an access token (12 h, cached), and renders a page that POSTs the token
+   to the gateway.
+3. The gateway reads file-info and file-content, creates a session, and serves the
+   host page.
+4. The host page frames the Craft app (same origin, ?host=parent).
+5. The Craft app posts <app>:ready; the host page sends <app>:open with the bytes.
+6. The user edits; the app posts <app>:dirty.
+7. The user saves; the app posts <app>:save with the bytes and a ticket.
+8. The host page POSTs the bytes to the gateway.
+9. The gateway re-reads the file's content id, compares it with the one from the
+   session, and either refuses (409) or writes through seafhttp update-api.
+10. The host page answers <app>:saveResult; the app marks the document saved, or
+    puts it back in its dirty state and says why.
+11. Seafile has a new version.
+```
+
+## 9. The security assumptions
+
+* the browser holds **no** Seafile credential of any kind, only an opaque session
+  id;
+* an `op=update` file-server token is **library-wide**, so it is never given to
+  the browser; the gateway's checks are the only defence;
+* the host page and the Craft app are **same-origin**, and both check the origin
+  **and** the source of every message; the `targetOrigin` is always explicit;
+* the session id is unguessable, single-document, and short-lived (30 min
+  absolute, 15 min idle);
+* the path, the library and the user come from the **session**, never from the
+  request;
+* the conflict check is a **read-then-write**: a write inside that one-round-trip
+  window wins. Seafile has no compare-and-swap.
+
+The full list, with what is still open, is in `docs/SECURITY.md`.
+
+## 10. The known limitations
+
+| # | Limitation | Where |
+| --- | --- | --- |
+| 1 | the new version is attributed to the **service account**, not the user | `docs/SEAFILE-INTEGRATION-POINTS.md` §Q4 |
+| 2 | the conflict check has a one-round-trip race window | `docs/CONFLICTS.md` §2.1 |
+| 3 | **share links** are not covered by the hook | `docs/SEAFILE-INTEGRATION-POINTS.md` L7 |
+| 4 | the click in the Seafile file list is not driven by the automated test | `docs/reviews/GR-006/README.md` §5 |
+| 5 | the gateway runs on the owner's workstation for the proof | `docs/DEPLOYMENT.md` |
+| 6 | only `.pdf`, `.xlsx` and `.docx` are dispatched | `docs/FILE-DISPATCH.md` |
+| 7 | the other ten Craft applications have no bridge | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
+| 8 | GridCraft's own bridge cannot report a failed save | `docs/HOST-CONTRACT.md` §3.5 |
+| 9 | no CSP, no CSRF check on the state-changing endpoints, no rate limit yet | `docs/SECURITY.md` §7 |
+
+## 11. The prepared upstream patches
+
+| Patch | Where | State |
+| --- | --- | --- |
+| the WordCraft `?host=parent` bridge | `docs/reviews/GR-014/DIFF.patch` (in this repository; the target is Apache-2.0) | compiles, builds, **runs in a browser** |
+| a write path in Seafile's third-party-editor hook | `~/Projects/seafile-thirdparty-save-patch/seahub.patch` (outside this repository; the target is GPLv2) | written, **not executed** against a running Seahub |
+
+**Neither has been published.** No issue, no PR, no comment, no branch push, no
+RFC sent anywhere.
+
+## 12. The free-model review record
+
+| Review | Verdict | Remediation |
+| --- | --- | --- |
+| REVIEW-01 (GR-001/002/004) | **FAIL** | `docs/reviews/REVIEW-01.md` — 1 blocker, 4 majors, 3 minors, all fixed |
+| REVIEW-02 (the gateway) | **FAIL** | `docs/reviews/REVIEW-02.md` — 3 blockers, 6 majors, 3 minors, all fixed |
+| REVIEW-03 (the WordCraft bridge, GR-006) | in flight | — |
+
+**The reviews were performed by an independent agent that did not write the code
+under review.** Their verdicts are `PROVISIONAL`.
+
+## 13. The instruction for the GPT review
+
+```text
+Do not trust previous free-model PASS verdicts.
+
+Independently inspect and verify:
+
+- Seafile integration assumptions
+- OnlyOffice reference analysis
+- ArtCraft Web capability matrix
+- Host Contract
+- browser messaging
+- authentication
+- authorization
+- Save protocol
+- version creation
+- concurrency handling
+- data integrity
+- security
+- licensing
+- deployment
+- source code
+- diffs
+- tests
+- upstream RFC
+- proposed ArtCraft patches
+
+Return:
+
+BLOCKER
+MAJOR
+MINOR
+
+Only GPT REVIEW PASS may unlock upstream publication.
+```
+
+### 13.1 Where to look first
+
+1. `docs/reviews/GR-006/README.md` — is the "VERIFIED END-TO-END" claim honest?
+2. `.work/wordcraft-patch` — is the ticket flow right? (The application claims the
+   ticket the bridge started; the bridge finishes it. If they are not the same
+   ticket, the document never gets marked saved.)
+3. `integration/gateway/server.py` — is any check missing?
+4. `docs/reviews/GR-008/SEAFILE-CONCURRENCY-PRIMITIVES.md` — is the conflict
+   analysis right against the Go file server?
+5. `docs/reviews/REVIEW-01.md` and `REVIEW-02.md` — is the remediation real, and
+   did it introduce anything new?
