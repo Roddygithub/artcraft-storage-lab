@@ -10,12 +10,8 @@ empty library on the reference instance) · Folder `/artcraft-lab/`
 | --- | --- |
 | Seafile -> gateway -> document bytes -> Craft app -> saved bytes -> **a new Seafile version** | **PROVEN**, end to end, against the real instance |
 | The **conflict** behaviour: a stale save is refused and the file is left alone | **PROVEN** |
-| The Craft web app actually rendering in a browser and talking to the host page | **not yet proven in a browser** (no browser on this machine at the time of writing) |
-
-The browser half is a *rendering* question; the protocol half (the message
-vocabulary, the origin checks, the byte transfer) is verified by reading the
-Craft source, and the two implementations of it are documented in
-`docs/HOST-CONTRACT.md`. The missing piece is a browser to click in.
+| **A real Craft web application, running in a real browser, editing the Seafile document and saving it back** | **PROVEN** — see §2 |
+| The user flow *starting from a click in Seafile Web* | **PROVEN for the mechanics**, but the click itself was not driven (the browser test opens the host page the way Seahub's hook does) |
 
 ## 1. Why GridCraft and `.xlsx` for the first proof
 
@@ -80,7 +76,82 @@ The gateway holds the Seafile credential. **The browser never sees it**: the
 browser only ever holds an opaque session id that maps to one document, one
 user, for 30 minutes.
 
-## 4. The flow that was exercised
+## 4. The browser proof
+
+The HTTP test above proves the *Seafile* side. The **browser** test proves the
+whole thing, because it drives the Craft application's own Save command and
+checks the bytes the application produced.
+
+```sh
+# once
+npm i playwright && npx playwright install chromium
+uv venv /tmp/pwvenv && uv pip install --python /tmp/pwvenv/bin/python playwright
+
+export ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=...
+export ARTCRAFT_GATEWAY=http://127.0.0.1:8777
+export ARTCRAFT_SCREENSHOT=docs/reviews/GR-005/browser-proof.png
+/tmp/pwvenv/bin/python tests/test_browser.py \
+    c82cc792-389d-43e6-b963-0dab1a47a9a8 /artcraft-lab/synthetic.xlsx
+```
+
+Result on 2026-10-22 (Chromium 156, headless, SwiftShader for WebGL2):
+
+```text
+[PASS] 1. the Craft app loaded and the document was delivered  -- synthetic.xlsx opened
+[PASS] 2. the Craft app rendered a canvas  -- {"framed": true, "canvas": true, "w": 1280, "h": 686}
+[PASS] 3a. the editor reported unsaved changes after the edit  -- dirty = True
+[PASS] 3. the editor's own Save reached the host and was persisted  -- Saved - new version 2026-10-22T12:42:11+00:00
+[PASS] 4. a NEW Seafile version exists  -- 406d6c86... -> 06865c3b...
+[PASS] 4. the history grew  -- 7 -> 8 versions
+[PASS] 5. the typed text is in the file Seafile now holds  -- 4074 bytes; the worksheet contains 4242: True
+
+ALL CHECKS PASSED
+```
+
+What each check means:
+
+| Check | How it is established |
+| --- | --- |
+| 1 | the host page received `gridcraft:ready` and sent `gridcraft:open`; the Craft application then set its title to `synthetic.xlsx` (visible in the browser console as `Title("synthetic.xlsx")`) |
+| 2 | the application's `<canvas>` exists in the framed document, 1280x686 |
+| 3a | the application sent `gridcraft:dirty { dirty: true }` after the test typed into a cell |
+| 3 | the test pressed **Ctrl+S** — the Craft application's own Save command — and the resulting `gridcraft:save` message reached the host page, which persisted it and showed the confirmation |
+| 4 | checked through the Seafile API: the content id changed and the file history grew by one |
+| 5 | the file Seafile now holds was downloaded and unzipped: the worksheet contains the typed text `4242` |
+
+**The bytes that reached Seafile are the ones the editor produced.** Nothing
+was faked, mocked or uploaded by hand.
+
+### 4.1 The evidence screenshot
+
+`docs/reviews/GR-005/browser-proof.png` — the browser at the moment of the
+save. It shows:
+
+* the **GridCraft** application, running in the browser, with its real ribbon;
+* the window title **`synthetic.xlsx`** — the Seafile document, delivered over
+  the bridge;
+* the edited cell (`A1` reads `4242 Synthetic`);
+* the host page's status line at the bottom:
+  **`Saved - new version 2026-10-22T12:42:11+00:00`**.
+
+### 4.2 Two real bugs the browser test found
+
+Both were invisible to the HTTP test and would have shipped broken:
+
+1. `hostpage.py` put the file name into the JavaScript **unquoted**
+   (`const FILE_NAME = synthetic.xlsx;`) -> `ReferenceError: synthetic is not
+   defined`. The page rendered; the script did not run.
+2. The static file handler did not map `/artcraft/<app>/` to the app's
+   `index.html`, so the iframe URL used by the dispatch table returned 404.
+
+A third bug was in the test harness itself: the host page listened for
+`message` on the `<iframe>` **element** instead of on the **window**. A message
+posted by a child frame is delivered to the parent's window.
+
+> The lesson is recorded in `AGENTS.md`: a page that renders is not a page that
+> works. Only a browser can tell the difference.
+
+## 5. The flow that was exercised
 
 ```text
 Seafile Web
@@ -97,7 +168,7 @@ Seafile Web
   -> Seafile creates a NEW VERSION
 ```
 
-## 5. The test
+## 6. The test (the Seafile side, without a browser)
 
 ```sh
 export ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=...
@@ -128,7 +199,7 @@ Result on 2026-10-22:
 ALL CHECKS PASSED
 ```
 
-### 5.1 What "a new version exists" means, precisely
+### 6.1 What "a new version exists" means, precisely
 
 Checked through the Seafile API, not through the gateway:
 
@@ -140,7 +211,7 @@ Checked through the Seafile API, not through the gateway:
 
 The gateway's own answer is **not** taken as evidence.
 
-### 5.2 The conflict case, precisely
+### 6.2 The conflict case, precisely
 
 The test opens two sessions on the same version, saves from the second one, and
 then saves from the first one:
@@ -158,17 +229,17 @@ and the file on the server still holds B's content, not A's. **A's write never
 happened.** This is strictly better than Seafile's own ONLYOFFICE callback,
 which writes unconditionally (`docs/reviews/GR-008/SEAFILE-CONCURRENCY-PRIMITIVES.md`).
 
-## 6. Known limitations of this proof
+## 7. Known limitations of this proof
 
 | # | Limitation |
 | --- | --- |
-| L1 | The Craft app was not clicked in a real browser (no browser on the machine). The gateway side and the protocol are proven; the rendering is not. |
-| L2 | The gateway's `action_url` is `http://127.0.0.1:8777`, which only works for a browser on this machine. The production design puts the gateway on its own host. |
+| L1 | The **click in Seafile Web** was not driven by the test (the browser test opens the host page the way Seahub's hook does). The mechanics from there on are proven in a real browser. The hook itself is exercised by the configuration, and the extension it claims (`.xlsx`) exists in no other library. |
+| L2 | The gateway's `action_url` is `http://127.0.0.1:8777`, which only works for a browser on this machine. The production design puts the gateway on its own host. It also means the browser test could not be driven through Seahub itself, since Seahub is on https and the gateway on http. |
 | L3 | The write is attributed to the **service account**, not the user who edited. The upstream patch (option A in `docs/SEAFILE-INTEGRATION-POINTS.md`) fixes this by writing inside Seahub as the user. |
 | L4 | The host page does not yet model "the Craft app believes it saved but the host failed" (the Craft app marks the document clean when the bytes leave the frame). The host page keeps its own state and shows the failure, but the Craft app does not know. This is the open question Q-5 in `docs/HOST-CONTRACT.md`. |
 | L5 | Only the `.xlsx` extension is claimed. `.docx` is deliberately **not** claimed, because the deployed ONLYOFFICE configuration includes it and the rule is that ONLYOFFICE must keep working. |
 
-## 7. What GR-006 adds
+## 8. What GR-006 adds
 
 GR-006 is the WordCraft DOCX MVP. It needs:
 

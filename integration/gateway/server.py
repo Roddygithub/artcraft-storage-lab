@@ -285,7 +285,11 @@ class Handler(BaseHTTPRequestHandler):
         target = os.path.abspath(target)
         if not target.startswith(os.path.abspath(gateway.static_root) + os.sep):
             return self._json(400, {"ok": False, "error": "bad path"})
-        if not os.path.isfile(target):
+        if os.path.isdir(target):
+            # "/artcraft/<app>/" and "/artcraft/<app>" both serve the app's index.
+            index = os.path.join(target, "index.html")
+            target = index if os.path.isfile(index) else ""
+        if not target or not os.path.isfile(target):
             return self._json(404, {"ok": False, "error": "not found"})
 
         ctype, _ = mimetypes.guess_type(target)

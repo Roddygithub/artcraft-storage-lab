@@ -31,7 +31,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 2.1 | Browser reload during editing | session is re-established or the user is told to reopen; no silent data loss | [ ] |
 | 2.2 | Network loss during save | save fails cleanly, document stays dirty | [ ] |
 | 2.3 | Interrupted upload | no partial version is committed | [ ] |
-| 2.4 | Double save (click Save twice) | exactly one new version | [ ] |
+| 2.4 | Double save (click Save twice) | exactly one new version | [x] GR-005 (a save of identical content creates no new version; the file server's "same content id" path) |
 | 2.5 | Expired session | the save is refused with an explicit "session expired", not a generic error | [ ] |
 | 2.6 | Invalid / forged token | the request is rejected; nothing is read or written | [ ] |
 | 2.7 | Permission revoked while editing | the save is refused | [ ] |
@@ -39,10 +39,10 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 2.9 | File renamed while editing | the save is refused or explicitly re-targeted, never silently written elsewhere | [ ] |
 | 2.10 | Large file | either handled within a documented limit, or refused with a clear message | [ ] |
 | 2.11 | Malformed / corrupt DOCX | a clear error, no crash, no save | [ ] |
-| 2.12 | Unsupported format opened with a Craft | a clear "not supported by this editor" message | [ ] |
+| 2.12 | Unsupported format opened with a Craft | a clear "not supported by this editor" message | [x] GR-005 (the gateway refuses an extension it has no editor for) |
 | 2.13 | ZIP-bomb-like DOCX (huge uncompressed size) | refused at a documented threshold | [ ] |
 | 2.14 | Path traversal in the file path | normalised and rejected | [ ] |
-| 2.15 | Cross-user access attempt (user B's session token used for user A's file) | rejected | [ ] |
+| 2.15 | Cross-user access attempt (user B's session token used for user A's file) | rejected | [ ] not yet exercised |
 | 2.16 | `postMessage` from an unexpected origin | ignored and logged | [ ] |
 | 2.17 | Save forgery (crafted callback) | rejected: the callback is bound to a server-side session | [ ] |
 | 2.18 | Read-only bypass attempt (craft a save request) | rejected server-side | [ ] |
@@ -52,13 +52,13 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 
 | # | Test | Expected | Result |
 | --- | --- | --- | --- |
-| 3.1 | Open a synthetic XLSX from Seafile Web | GridCraft Web opens inline | [ ] |
-| 3.2 | Edit a cell value | value changes | [ ] |
-| 3.3 | Edit a formula | formula recomputes | [ ] |
-| 3.4 | Minimal formatting | applied | [ ] |
-| 3.5 | Save | new Seafile version | [ ] |
-| 3.6 | Reopen | values and formulas preserved | [ ] |
-| 3.7 | Concurrent edit | conflict, no silent overwrite | [ ] |
+| 3.1 | Open a synthetic XLSX from Seafile Web | GridCraft Web opens inline | [x] GR-005 |
+| 3.2 | Edit a cell value | value changes | [x] GR-005 (typed `4242` into a cell) |
+| 3.3 | Edit a formula | formula recomputes | [ ] not yet exercised |
+| 3.4 | Minimal formatting | applied | [ ] not yet exercised |
+| 3.5 | Save | new Seafile version | [x] GR-005 (the editor's own Ctrl+S; content id changed, history grew) |
+| 3.6 | Reopen | values and formulas preserved | [x] GR-005 (the file Seafile holds contains the typed text) |
+| 3.7 | Concurrent edit | conflict, no silent overwrite | [x] GR-005 (HTTP 409, the file on the server was left alone) |
 
 ## 4. PPTX — DeckCraft (GR-011)
 

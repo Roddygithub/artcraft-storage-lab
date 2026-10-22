@@ -64,7 +64,9 @@ function toCraft(type, extra) {
   frame.contentWindow.postMessage(msg, ORIGIN);
 }
 
-frame.addEventListener("message", async (event) => {
+// The message listener belongs to the WINDOW: a message posted by the child
+// frame is delivered to the parent's window, not to the <iframe> element.
+window.addEventListener("message", async (event) => {
   // Both checks: the origin AND the source window. A page on our origin that is
   // not our frame must not be able to inject bytes or claim a save.
   if (event.origin !== ORIGIN) return;
@@ -97,6 +99,7 @@ frame.addEventListener("message", async (event) => {
           body: bytes,
         });
         const result = await resp.json();
+        window.__lastSave = result;
         if (!resp.ok || !result.ok) {
           say("Save failed: " + (result.error || resp.status), "err");
         } else {
@@ -109,6 +112,7 @@ frame.addEventListener("message", async (event) => {
     }
 
     case APP + ":dirty":
+      window.__lastDirty = !!data.dirty;
       say(data.dirty ? "Unsaved changes" : FILE_NAME + " (no changes)", data.dirty ? "busy" : "ok");
       break;
 
@@ -141,5 +145,5 @@ def render(sid, app, app_url, file_name, can_edit):
         .replace("__SID__", json.dumps(sid))
         .replace("__APP__", json.dumps(app))
         .replace("__CAN_EDIT__", "true" if can_edit else "false")
-        .replace("__FILE_NAME__", html.escape(file_name))
+        .replace("__FILE_NAME__", json.dumps(file_name))
     )
