@@ -1,0 +1,38 @@
+# Build artifacts
+target/
+dist/
+build/
+*.wasm
+*.node
+
+# Local scratch: upstream clones used for read-only research
+.work/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+secrets.*.json
+*.seafile-token
+secrets.yaml
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Logs
+*.log
