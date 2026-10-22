@@ -77,13 +77,25 @@ function toCraft(type, extra) {
 // polls the saved files instead.
 // ---------------------------------------------------------------------------
 const VECTORCRAFT = (APP === "vectorcraft");
-let lastSeenSize = -1;
+let lastSavedHash = null;      // the content we last stored, not its size
 let saving = false;
+
+// The frame we are about to drive must be the one we created, on our own
+// origin. A direct property read crosses no boundary that postMessage would
+// have checked, so the check is made here instead.
+function frameIsOurs() {
+  try {
+    return frame.contentWindow && frame.contentWindow.location.origin === ORIGIN;
+  } catch (err) {
+    return false;                 // reading a cross-origin location throws
+  }
+}
 
 function waitForApi() {
   return new Promise((resolve, reject) => {
     let tries = 0;
     const tick = () => {
+      if (!frameIsOurs()) { if (++tries > 200) return reject(new Error("the editor's frame is not ours")); return setTimeout(tick, 250); }
       const f = frame.contentWindow;
       if (f && f.vectorcraft && typeof f.vectorcraft.openFile === "function") return resolve(f.vectorcraft);
       if (++tries > 200) return reject(new Error("the editor's page API did not appear"));
@@ -91,6 +103,19 @@ function waitForApi() {
     };
     tick();
   });
+}
+
+// A cheap content fingerprint. VectorCraft's page API has no save event and no
+// dirty signal, so the only way to notice a save that produced the same bytes as
+// the last one is to look at the bytes themselves.
+function fingerprint(bytes) {
+  let h = 2166136261 >>> 0;
+  const view = new Uint8Array(bytes);
+  for (let i = 0; i < view.length; i++) {
+    h ^= view[i];
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return view.length + ":" + h.toString(16);
 }
 
 async function openThroughApi(api) {
@@ -111,11 +136,17 @@ function pollSaved(api) {
     if (!Array.isArray(files)) return;
     const mine = files.find((f) => (f.path || "").endsWith(FILE_NAME));
     if (!mine || !mine.size) return;
-    if (mine.size === lastSeenSize) return;
     saving = true;
-    lastSeenSize = mine.size;
+    let bytes;
     try {
-      const bytes = await api.readFile(FILE_NAME);
+      bytes = await api.readFile(FILE_NAME);
+    } catch (err) {
+      saving = false;
+      return;
+    }
+    const hash = fingerprint(bytes);
+    if (hash === lastSavedHash) { saving = false; return; }
+    try {
       say("Saving…", "busy");
       const resp = await fetch("/session/" + SID + "/save", {
         method: "POST", credentials: "same-origin",
@@ -124,8 +155,12 @@ function pollSaved(api) {
       const result = await resp.json();
       window.__lastSave = result;
       const ok = !!resp.ok && result.ok === true;
-      say(ok ? ("Saved" + (result.version ? " — new version " + result.version : ""))
-             : ("Save failed: " + (result.error || resp.status)), ok ? "ok" : "err");
+      // Only a stored save becomes the new baseline: a refused one is retried on
+      // the next poll, which is what makes a failed save visible instead of lost.
+      if (ok) lastSavedHash = hash;
+      const version = ok ? (result.version ? " — new version " + result.version : "") : "";
+      say(ok ? ("Saved" + version) : ("Save failed: " + (result.error || resp.status)),
+          ok ? "ok" : "err");
     } catch (err) {
       say("Save failed: " + err.message, "err");
     } finally {
@@ -133,6 +168,17 @@ function pollSaved(api) {
     }
   }, 700);
 }
+
+// VectorCraft's page API has no dirty signal, so the host page cannot warn about
+// unsaved *edits*. It can warn while a save is on its way to the server, which is
+// the window in which closing the tab would lose bytes the editor already handed
+// over. (The editor itself keeps unsaved work in recovery copies in the browser.)
+window.addEventListener("beforeunload", (event) => {
+  if (saving) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+});
 
 if (VECTORCRAFT) {
   waitForApi().then(async (api) => {

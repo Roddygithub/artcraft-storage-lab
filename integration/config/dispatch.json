@@ -5,7 +5,7 @@
   },
   "svg": {
     "app": "vectorcraft",
-    "url": "/artcraft/vectorcraft/?host=parent"
+    "url": "/artcraft/vectorcraft/"
   },
   "xlsx": {
     "app": "gridcraft",

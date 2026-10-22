@@ -136,6 +136,15 @@ Rules in force:
 | 2026-10-22 | `artcraft-deepseek-worker` | `Timed out waiting for response headers` on smoke test #1 | retried once, succeeded | none |
 | 2026-10-22 | `artcraft-owner` (MiniMax) | the free endpoint was **withdrawn** mid-session, during GR-012 | the owner role moved to `nvidia/z-ai/glm-5.3-flash#thinking`; no work was redone, no file was rewritten; the project state was reconstituted from `STATUS.md`, `HISTORY.md`, `docs/GPT-REVIEW-QUEUE.md`, `docs/reviews/` and `git log` | the session continued from where it stood |
 | 2026-10-22 | `artcraft-architect` (GLM-5.3) | `Timed out waiting for response headers` on the GR-001 research task, after a long run | the task was abandoned; GR-001 had already been completed **independently** by the owner from the deployed instance (`docs/reviews/GR-001/DEPLOYED-INSTANCE-CONTRACT.md`), so nothing was lost | none — the artifact existed before the timeout |
+| 2026-10-22 | `artcraft-architect` (GLM-5.3) | the same timeout on the GR-003 capability audit, after cloning all 14 repositories and reading them for hours | abandoned; the owner had already completed GR-003 independently and verified it against the sources (`docs/ARTCRAFT-WEB-CAPABILITIES.md`, `docs/reviews/GR-003/WEB-BUILD-SURVEY.md`) | none — the artifact existed before the timeout |
+
+> **A note on the architect.** Two long research tasks produced no artifact
+> before the provider timed out. Both were already covered by the owner's own
+> verified work, so nothing was lost — but the pattern is real: a **very long
+> research brief** is a bad fit for a single sub-agent call. The fix, applied
+> from here on, is to split research into bounded questions and to keep the
+> owner's own verification as the primary path. The architect stays for
+> **bounded** architectural questions, not for open-ended surveys.
 
 ### The model-ID table (as of 2026-10-22, after the retirement)
 

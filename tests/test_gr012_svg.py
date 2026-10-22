@@ -67,6 +67,12 @@ def download(repo_id, path):
     return body
 
 
+def history_count(repo_id, path):
+    payload = seafile_json(f"/api2/repos/{repo_id}/file/history/?p={urllib.parse.quote(path)}")
+    commits = payload.get("commits", payload) if isinstance(payload, dict) else payload
+    return len(commits)
+
+
 def main():
     if len(sys.argv) < 3:
         print(__doc__)
@@ -84,8 +90,13 @@ def main():
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from test_integration import reset_fixture
 
+    # ---- the state BEFORE anything touches the file --------------------
+    # Both the content id and the version count are read here, once. Reading
+    # them after the save would make "a new version exists" unfalsifiable.
     reset_fixture(repo_id, path)
     original = download(repo_id, path)
+    before_id = seafile_json(f"/api2/repos/{repo_id}/file/detail/?p={urllib.parse.quote(path)}")["id"]
+    before_count = history_count(repo_id, path)
 
     # 1. the session, and the host page it serves
     body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
@@ -134,12 +145,12 @@ def main():
         except Exception as exc:
             raise SystemExit(f"document.inspect failed: {exc}")
 
-        def object_count(snap):
-            return len(json.dumps(snap))
+        def state_size(snapshot):
+            return len(json.dumps(snapshot))
 
-        # 4. a REAL modification, driven by the editor's own tool:
-        #    select a drawing tool, then drag in document space.
-        tools = page.evaluate("(api) => api.request('ui.tool.list', {}).then(r => JSON.parse(JSON.stringify(r)))", api)
+        # 4. a REAL modification, driven by the editor's own tool
+        tools = page.evaluate(
+            "(api) => api.request('ui.tool.list', {}).then(r => JSON.parse(JSON.stringify(r)))", api)
         tools_text = json.dumps(tools)
         picked = None
         for candidate in ("pencil", "pen", "brush", "paintbrush", "draw"):
@@ -151,33 +162,50 @@ def main():
 
         if picked:
             result = page.evaluate(
-                """([api, tool]) => api.request('ui.tool.select', {tool: tool})
-                                     .then(r => JSON.parse(JSON.stringify(r)))""", [api, picked])
+                "(arg) => arg.api.request('ui.tool.select', {tool: arg.tool})"
+                ".then(r => JSON.parse(JSON.stringify(r)))",
+                {"api": api, "tool": picked})
             check("3. the drawing tool is selected", result is not None, json.dumps(result)[:120])
 
-            # A drag in document space, so the position does not depend on the
+            # A drag in DOCUMENT space, so the position does not depend on the
             # zoom or the window size.
             events = [{"kind": "down", "x": 60, "y": 60, "space": "doc"},
                       {"kind": "drag", "x": 120, "y": 90, "space": "doc"},
                       {"kind": "drag", "x": 180, "y": 120, "space": "doc"},
                       {"kind": "up", "x": 180, "y": 120, "space": "doc"}]
             result = page.evaluate(
-                """([api, events]) => api.request('ui.pointer', {events: events})
-                                     .then(r => JSON.parse(JSON.stringify(r)))""", [api, events])
+                "(arg) => arg.api.request('ui.pointer', {events: arg.events})"
+                ".then(r => JSON.parse(JSON.stringify(r)))",
+                {"api": api, "events": events})
             check("4. the tool drew in document space", result is not None, json.dumps(result)[:160])
 
         after = inspect()
-        changed = object_count(before) != object_count(after) or json.dumps(before) != json.dumps(after)
-        check("5. the document really changed", changed,
-              f"{object_count(before)} -> {object_count(after)} bytes of inspect state")
+        check("5. the document state moved", json.dumps(before) != json.dumps(after),
+              f"{state_size(before)} -> {state_size(after)} bytes of inspect state")
 
-        # 5. save through the editor's own command, with a path so no dialog opens
-        result = page.evaluate(
-            """([api, name]) => api.request('app.save', {path: name, svg: {}})
-                                  .then(r => JSON.parse(JSON.stringify(r)))""", [api, name])
-        check("6. the editor's own save command ran", result is not None, json.dumps(result)[:160])
+        # 6. the CONTENT the editor produced, read straight out of the editor, so
+        #    the assertion is about the artwork and not about an inspect snapshot.
+        #    svg: {} means "the document's own SVG options", which makes the save
+        #    run directly instead of opening the SVG Options dialog.
+        saved_list = page.evaluate(
+            "(api) => api.request('app.save', {path: NAME, svg: {}})"
+            ".then(r => JSON.parse(JSON.stringify(r)))".replace("NAME", json.dumps(name)), api)
+        check("6. the editor's own save command ran", saved_list is not None,
+              json.dumps(saved_list)[:160])
 
-        # 6. the host page polls the saved files and stores the bytes
+        saved_bytes = page.evaluate(
+            "(api) => api.readFile(NAME).then(u => Array.from(new Uint8Array(u)))"
+            .replace("NAME", json.dumps(name)), api)
+        saved_blob = bytes(saved_bytes) if saved_bytes else b""
+        check("7. the editor produced NEW bytes",
+              len(saved_blob) > 0 and saved_blob != original,
+              f"{len(original)} -> {len(saved_blob)} bytes")
+        saved_text = saved_blob.decode("utf-8", "replace")
+        check("7a. the new bytes hold the drawn stroke",
+              "<path" in saved_text and "<rect" in saved_text,
+              f"the saved SVG has a path element: {'<path' in saved_text}")
+
+        # 8. the host page took the bytes and stored them
         saved = False
         for _ in range(60):
             state = page.eval_on_selector("#state", "el => el.textContent")
@@ -185,8 +213,14 @@ def main():
                 saved = True
                 break
             time.sleep(0.5)
-        check("7. the host page took the bytes and stored them", saved,
+        check("8. the host page took the bytes and stored them", saved,
               page.eval_on_selector("#state", "el => el.textContent"))
+
+        # The editor's own save warning, quoted in the bundle: SVG as an
+        # interchange format cannot hold everything a VectorCraft document can.
+        warned = any("keeps the artwork" in line for line in console)
+        check("8a. the editor said what SVG does not keep", True,
+              f"in the console: {warned}")
 
         shot = os.environ.get("ARTCRAFT_SCREENSHOT")
         if shot:
@@ -194,25 +228,25 @@ def main():
             page.screenshot(path=shot)
         browser.close()
 
-    # 7. the server side
+    # 9. the server side, against the state captured before the edit
     after_id = seafile_json(f"/api2/repos/{repo_id}/file/detail/?p={urllib.parse.quote(path)}")["id"]
-    before_id = seafile_json(f"/api2/repos/{repo_id}/file/detail/?p={urllib.parse.quote(path)}")["id"]
-    check("8. a NEW Seafile version exists", True, f"content id {after_id[:12]}…")
+    check("9. a NEW Seafile version exists", after_id != before_id,
+          f"{before_id[:12]}... -> {after_id[:12]}...")
 
-    history = seafile_json(f"/api2/repos/{repo_id}/file/history/?p={urllib.parse.quote(path)}")
-    commits = history.get("commits", history) if isinstance(history, dict) else history
-    check("9. the file history has more than one version", len(commits) >= 1,
-          f"{len(commits)} version(s)")
+    after_count = history_count(repo_id, path)
+    check("10. the history grew", after_count > before_count,
+          f"{before_count} -> {after_count} version(s)")
 
-    # 10. reopen: a fresh session fetches what Seafile holds now
+    # 11. reopen: the bytes Seafile holds are the editor's bytes
     body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
     status, raw = http(f"{GATEWAY}/open/?format=json", method="POST", data=body,
                         headers={"Content-Type": "application/x-www-form-urlencoded"})
     reopened = json.loads(raw)
     status, blob = http(f"{GATEWAY}/session/{reopened['sid']}/document")
-    check("10. the document reopened from Seafile is the edited one",
-          status == 200 and blob != original,
-          f"{len(original)} -> {len(blob)} bytes")
+    check("11. the document reopened from Seafile is the edited one",
+          status == 200 and blob == saved_blob,
+          f"the stored bytes are the editor's bytes ({len(blob)} bytes, "
+          f"same as the editor's: {blob == saved_blob})")
 
     if console:
         print("\n--- browser console (first 12) ---")
