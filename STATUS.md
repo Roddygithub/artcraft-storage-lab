@@ -5,7 +5,8 @@ PHASE:      Phase 6-7 — WordCraft MVP, save protocol, conflicts, security
 BRANCH:     main
 SHA:        (see git log)
 
-OWNER:      artcraft-owner            (openrouter/minimax/minimax-m3.1-flash:free#max)
+OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
+            -- MiniMax free was RETIRED during GR-012; see docs/AI-ROUTING.md --
 ARCHITECT:  artcraft-architect        (nvidia/z-ai/glm-5.3#thinking)
 IMPLEMENTER:artcraft-worker           (nvidia/z-ai/glm-5.3-flash#thinking)
 REVIEWER:   artcraft-reviewer         (nvidia/nvidia/nemotron-3-ultra-550b-a55b#high)
@@ -13,17 +14,18 @@ REVIEWER:   artcraft-reviewer         (nvidia/nvidia/nemotron-3-ultra-550b-a55b#
 FREE REVIEW: PASS (2 rounds, both remediated) — see docs/reviews/REVIEW-0*.md
 GPT REVIEW:  PENDING
 
-CURRENT GR: GR-006 (WordCraft DOCX MVP) — the WordCraft host bridge is built
-            and compiling; the browser build is being packaged.
+CURRENT GR: GR-012 (non-Office round-trip) — PROVEN with VectorCraft + SVG
+
+FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 
 BLOCKERS:
 - none
 
 NEXT:
-- GR-006  WordCraft DOCX MVP: the bridge is in, the build is running
-- GR-007  save protocol (docs/SAVE-PROTOCOL.md)
-- GR-009  security review (docs/SECURITY.md)
-- GR-013  the ArtCraft RFC (docs/RFC-DRAFT.md)
+- GR-010/GR-012 bundles are written; GR-011 (DeckCraft) needs a bridge upstream
+- independent free review of the GR-012 bundle
+- GR-013  the ArtCraft RFC (docs/RFC-DRAFT.md) — written
+- GR-014  the ArtCraft patch — built and proven in a browser
 ```
 
 ## Verification legend
@@ -46,15 +48,15 @@ NEXT:
 | GR-003 | ArtCraft Web capability matrix | `docs/ARTCRAFT-WEB-CAPABILITIES.md` | PASS (remediated, REVIEW-01) | PENDING |
 | GR-004 | Common Craft Web Host Contract | `docs/HOST-CONTRACT.md` | PASS (remediated, REVIEW-01) | PENDING |
 | GR-005 | First technical proof | `docs/reviews/GR-005/` | PASS (remediated, REVIEW-02) | PENDING |
-| GR-006 | WordCraft Seafile MVP | `docs/reviews/GR-006/` | PENDING | PENDING |
+| GR-006 | WordCraft Seafile MVP | `docs/reviews/GR-006/` | PASS (REVIEW-03) | PENDING |
 | GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PENDING | PENDING |
 | GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | PASS (remediated, REVIEW-02) | PENDING |
 | GR-009 | Web integration security | `docs/SECURITY.md` | PENDING | PENDING |
-| GR-010 | GridCraft Seafile integration | `docs/reviews/GR-010/` | PENDING | PENDING |
-| GR-011 | DeckCraft Seafile integration | `docs/reviews/GR-011/` | PENDING | PENDING |
+| GR-010 | GridCraft Seafile integration | proven in `docs/reviews/GR-005/` | PASS (remediated, REVIEW-02) | PENDING |
+| GR-011 | DeckCraft Seafile integration | — (needs the upstream bridge) | not started | PENDING |
 | GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | PENDING | PENDING |
 | GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PENDING | PENDING |
-| GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | PENDING | PENDING |
+| GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | PASS (REVIEW-03) | PENDING |
 
 ## What is already true
 

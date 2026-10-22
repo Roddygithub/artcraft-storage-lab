@@ -64,6 +64,83 @@ function toCraft(type, extra) {
   frame.contentWindow.postMessage(msg, ORIGIN);
 }
 
+// ---------------------------------------------------------------------------
+// VectorCraft's transport.
+//
+// VectorCraft does not speak the `?host=parent` protocol: it exposes its own
+// page API (`window.vectorcraft`), which is the same control protocol the
+// desktop app and the CLI speak. It is deterministic -- `openFile`,
+// `execute`, `captureDownloads`, `files`, `readFile` -- and it is how a
+// non-Office format is proved round.
+//
+// There is no dirty signal and no save event on that API, so the host page
+// polls the saved files instead.
+// ---------------------------------------------------------------------------
+const VECTORCRAFT = (APP === "vectorcraft");
+let lastSeenSize = -1;
+let saving = false;
+
+function waitForApi() {
+  return new Promise((resolve, reject) => {
+    let tries = 0;
+    const tick = () => {
+      const f = frame.contentWindow;
+      if (f && f.vectorcraft && typeof f.vectorcraft.openFile === "function") return resolve(f.vectorcraft);
+      if (++tries > 200) return reject(new Error("the editor's page API did not appear"));
+      setTimeout(tick, 250);
+    };
+    tick();
+  });
+}
+
+async function openThroughApi(api) {
+  say("Loading " + FILE_NAME + "…");
+  const resp = await fetch("/session/" + SID + "/document", { credentials: "same-origin" });
+  if (!resp.ok) throw new Error("HTTP " + resp.status);
+  const buf = await resp.arrayBuffer();
+  api.captureDownloads(true);
+  if (!api.openFile(FILE_NAME, new Uint8Array(buf))) throw new Error("the editor refused the file");
+  say(FILE_NAME + " opened", "ok");
+}
+
+function pollSaved(api) {
+  setInterval(async () => {
+    if (saving) return;
+    let files;
+    try { files = await api.files(); } catch (e) { return; }
+    if (!Array.isArray(files)) return;
+    const mine = files.find((f) => (f.path || "").endsWith(FILE_NAME));
+    if (!mine || !mine.size) return;
+    if (mine.size === lastSeenSize) return;
+    saving = true;
+    lastSeenSize = mine.size;
+    try {
+      const bytes = await api.readFile(FILE_NAME);
+      say("Saving…", "busy");
+      const resp = await fetch("/session/" + SID + "/save", {
+        method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/octet-stream" }, body: bytes,
+      });
+      const result = await resp.json();
+      window.__lastSave = result;
+      const ok = !!resp.ok && result.ok === true;
+      say(ok ? ("Saved" + (result.version ? " — new version " + result.version : ""))
+             : ("Save failed: " + (result.error || resp.status)), ok ? "ok" : "err");
+    } catch (err) {
+      say("Save failed: " + err.message, "err");
+    } finally {
+      saving = false;
+    }
+  }, 700);
+}
+
+if (VECTORCRAFT) {
+  waitForApi().then(async (api) => {
+    await openThroughApi(api);
+    pollSaved(api);
+  }).catch((err) => say("Could not start: " + err.message, "err"));
+}
+
 // The message listener belongs to the WINDOW: a message posted by the child
 // frame is delivered to the parent's window, not to the <iframe> element.
 window.addEventListener("message", async (event) => {
@@ -76,6 +153,7 @@ window.addEventListener("message", async (event) => {
 
   switch (data.type) {
     case APP + ":ready":
+      if (VECTORCRAFT) break;           // VectorCraft is driven by its own API above
       say("Loading " + FILE_NAME + "…");
       try {
         const resp = await fetch("/session/" + SID + "/document", { credentials: "same-origin" });

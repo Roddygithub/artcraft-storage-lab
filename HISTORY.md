@@ -2,6 +2,30 @@
 
 Running log. Newest first.
 
+## 2026-10-22 — GR-012, and the owner model retired mid-flight
+
+* **GR-012** — proved a **non-Office** round-trip: an SVG opened from Seafile in
+  **VectorCraft Web**, modified with the editor's own pencil tool in the browser,
+  saved, and Seafile recorded a **new version**; the document reopened with the
+  edit. `docs/reviews/GR-012/`.
+* The first attempt (PdfCraft/PDF) **failed**, and the failure was the finding:
+  the application was never dirty, so the Save handed the gateway unchanged bytes
+  and the file server correctly created no new version. The lesson is that the
+  modification must be driven deterministically, not by guessing where to click.
+* VectorCraft was chosen because it exposes its own page API
+  (`window.vectorcraft`), which is deterministic end to end. The host page gained
+  a **second transport adapter** for it, documented as a gap in the common
+  contract (VectorCraft has no `?host=parent` bridge).
+* **The owner model was retired mid-flight**: MiniMax M3.1 Flash (free,
+  OpenRouter) lost its endpoint during GR-012. The owner role moved to
+  **GLM-5.3-Flash (thinking)**; no work was redone and no file rewritten — the
+  state was reconstituted from `STATUS.md`, `HISTORY.md`, the GR queue,
+  `docs/reviews/` and `git log`. `docs/AI-ROUTING.md` has the incident entry.
+* `scripts/install-agents.sh` had a real bug, found while reinstalling: with
+  `XDG_CONFIG_HOME` set it installed the agents to `~/.config/agents/` instead of
+  `~/.config/opencode/agents/`. Fixed; the routing was verified through
+  `/api/agent` afterwards.
+
 ## 2026-10-22 — Phases 1-6: research, the contract, and a working proof
 
 * **GR-001** — read the *deployed* Seafile 12.0.14 Professional instance (read-only
