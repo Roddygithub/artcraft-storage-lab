@@ -135,6 +135,7 @@ Rules in force:
 | --- | --- | --- | --- | --- |
 | 2026-10-22 | `artcraft-deepseek-worker` | `Timed out waiting for response headers` on smoke test #1 | retried once, succeeded | none |
 | 2026-10-22 | `artcraft-owner` (MiniMax) | the free endpoint was **withdrawn** mid-session, during GR-012 | the owner role moved to `nvidia/z-ai/glm-5.3-flash#thinking`; no work was redone, no file was rewritten; the project state was reconstituted from `STATUS.md`, `HISTORY.md`, `docs/GPT-REVIEW-QUEUE.md`, `docs/reviews/` and `git log` | the session continued from where it stood |
+| 2026-10-22 | `artcraft-architect` (GLM-5.3) | `Timed out waiting for response headers` on the GR-001 research task, after a long run | the task was abandoned; GR-001 had already been completed **independently** by the owner from the deployed instance (`docs/reviews/GR-001/DEPLOYED-INSTANCE-CONTRACT.md`), so nothing was lost | none — the artifact existed before the timeout |
 
 ### The model-ID table (as of 2026-10-22, after the retirement)
 
