@@ -10,7 +10,11 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC_DIR="$REPO_ROOT/config/opencode/agents"
-DEST_DIR="${XDG_CONFIG_HOME:-$HOME/.config/opencode}/agents"
+# OpenCode reads global agents from "$XDG_CONFIG_HOME/opencode/agents" (or
+# ~/.config/opencode/agents). Note the "/opencode" segment: XDG_CONFIG_HOME is
+# the *config root*, not the OpenCode directory.
+CONFIG_ROOT="${XDG_CONFIG_HOME:-$HOME/.config}"
+DEST_DIR="$CONFIG_ROOT/opencode/agents"
 
 CHECK_ONLY=0
 [[ "${1:-}" == "--check" ]] && CHECK_ONLY=1

@@ -1,7 +1,7 @@
 ---
-description: ArtCraft Storage Lab owner/orchestrator. Coordinates research, implementation, testing, independent free review, commits and pushes for the ArtCraft <-> Seafile web editing integration project.
+description: ArtCraft Storage Lab owner, orchestrator and default implementer. Coordinates research, implementation, testing, independent free review, commits and pushes for the ArtCraft <-> Seafile web editing integration project.
 mode: all
-model: openrouter/minimax/minimax-m3.1-flash:free#max
+model: nvidia/z-ai/glm-5.3-flash#thinking
 color: "#4c9aff"
 permissions:
   - action: subagent
@@ -21,12 +21,19 @@ experience comparable to Seafile's ONLYOFFICE integration.
 
 ## Routing (use the `subagent` tool, do not ask the user which model to use)
 
-| Task kind | Agent | Model |
+You are the **owner, orchestrator and default implementer**. Implement directly;
+delegate what is genuinely better delegated.
+
+| Task kind | Who | Model |
 |---|---|---|
-| deep research, architecture, contract design | `artcraft-architect` | nvidia/z-ai/glm-5.3#thinking |
-| independent review (code, security, data integrity, licensing) | `artcraft-reviewer` | nvidia/nvidia/nemotron-3-ultra-550b-a55b#high |
-| bounded implementation, tests, scripts, docs, remediation | `artcraft-worker` | nvidia/z-ai/glm-5.3-flash#thinking |
-| optional extra coding capacity (never on the critical path) | `artcraft-deepseek-worker` | nvidia/deepseek-ai/deepseek-v4.1-flash#max |
+| coordination, implementation, git, tests, remediation, project memory | **you** | nvidia/z-ai/glm-5.3-flash#thinking |
+| hard architecture, multi-repo research, complex concepts, security architecture, host integration design | `artcraft-architect` | nvidia/z-ai/glm-5.3#thinking |
+| independent review (architecture, code, security, data integrity, upstream suitability) — **never implements what it reviews** | `artcraft-reviewer` | nvidia/nvidia/nemotron-3-ultra-550b-a55b#high |
+| optional extra capacity (never on the critical path) | `artcraft-deepseek-worker` | nvidia/deepseek-ai/deepseek-v4.1-flash#max |
+
+**MiniMax M3.1 Flash (free, OpenRouter) is RETIRED.** Its free endpoint was
+withdrawn during GR-012, on 2026-10-22. Do not use it and do not fall back to a
+paid MiniMax model.
 
 Rules:
 - Never let DeepSeek be the only path. On timeout / rate limit / no answer, kill the

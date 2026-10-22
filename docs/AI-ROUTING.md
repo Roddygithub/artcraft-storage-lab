@@ -37,13 +37,25 @@ not have participated in the work under review):
 
 ## The routing table
 
-| Role | Agent ID | Model | Variant |
-| --- | --- | --- | --- |
-| Owner / Orchestrator | `artcraft-owner` | `openrouter/minimax/minimax-m3.1-flash:free` | `max` |
-| Architect / Deep research | `artcraft-architect` | `nvidia/z-ai/glm-5.3` | `thinking` |
-| Independent reviewer | `artcraft-reviewer` | `nvidia/nvidia/nemotron-3-ultra-550b-a55b` | `high` |
-| Bounded worker / remediation | `artcraft-worker` | `nvidia/z-ai/glm-5.3-flash` | `thinking` |
-| Optional worker (never critical) | `artcraft-deepseek-worker` | `nvidia/deepseek-ai/deepseek-v4.1-flash` | `max` |
+**Changed on 2026-10-22, during GR-012**: the MiniMax free endpoint was withdrawn,
+so the owner role moved to GLM-5.3-Flash. See the incident log below.
+
+| Role | Agent ID | Model | Variant | Since |
+| --- | --- | --- | --- | --- |
+| Owner / Orchestrator / **default implementer** | `artcraft-owner` | `nvidia/z-ai/glm-5.3-flash` | `thinking` | 2026-10-22 |
+| Architect / Deep research | `artcraft-architect` | `nvidia/z-ai/glm-5.3` | `thinking` | start |
+| Independent reviewer | `artcraft-reviewer` | `nvidia/nvidia/nemotron-3-ultra-550b-a55b` | `high` | start |
+| Bounded worker / remediation | `artcraft-worker` | `nvidia/z-ai/glm-5.3-flash` | `thinking` | start |
+| Optional worker (never critical) | `artcraft-deepseek-worker` | `nvidia/deepseek-ai/deepseek-v4.1-flash` | `max` | start |
+
+**RETIRED**: `openrouter/minimax/minimax-m3.1-flash:free#max` — the free endpoint
+was withdrawn. It is **not** replaced by a paid MiniMax model. The definitions in
+`config/opencode/agents/` no longer name it, and `scripts/install-agents.sh`
+installs the current ones.
+
+The owner now implements directly (it is the *default implementer*), and delegates
+only what is genuinely better delegated: hard architecture to the architect,
+independent review to the reviewer.
 
 ## How the agents are defined
 
@@ -96,7 +108,8 @@ parent's model is a **FAIL**.
 
 | Agent | Expected | Actual | Result |
 | --- | --- | --- | --- |
-| `artcraft-owner` | `openrouter/minimax/minimax-m3.1-flash:free#max` | same (session model) | OK |
+| `artcraft-owner` | `openrouter/minimax/minimax-m3.1-flash:free#max` | same (session model) | OK at the time — **the model has since been retired**, see the incident log |
+| `artcraft-owner` (re-smoked after the retirement) | `nvidia/z-ai/glm-5.3-flash#thinking` | `nvidia/z-ai/glm-5.3-flash` | OK — verified through `/api/agent` |
 | `artcraft-architect` | `nvidia/z-ai/glm-5.3#thinking` | `nvidia/z-ai/glm-5.3` | OK |
 | `artcraft-reviewer` | `nvidia/nvidia/nemotron-3-ultra-550b-a55b#high` | `nvidia/nvidia/nemotron-3-ultra-550b-a55b` | OK |
 | `artcraft-worker` | `nvidia/z-ai/glm-5.3-flash#thinking` | `nvidia/z-ai/glm-5.3-flash` | OK |
@@ -121,6 +134,17 @@ Rules in force:
 | Date | Agent | Symptom | Action | Impact |
 | --- | --- | --- | --- | --- |
 | 2026-10-22 | `artcraft-deepseek-worker` | `Timed out waiting for response headers` on smoke test #1 | retried once, succeeded | none |
+| 2026-10-22 | `artcraft-owner` (MiniMax) | the free endpoint was **withdrawn** mid-session, during GR-012 | the owner role moved to `nvidia/z-ai/glm-5.3-flash#thinking`; no work was redone, no file was rewritten; the project state was reconstituted from `STATUS.md`, `HISTORY.md`, `docs/GPT-REVIEW-QUEUE.md`, `docs/reviews/` and `git log` | the session continued from where it stood |
+
+### The model-ID table (as of 2026-10-22, after the retirement)
+
+| Display name | Real OpenCode model ID | Variants | Role |
+| --- | --- | --- | --- |
+| GLM-5.3-Flash | `nvidia/z-ai/glm-5.3-flash` | `none` `thinking` | **owner** |
+| GLM-5.3 | `nvidia/z-ai/glm-5.3` | `none` `thinking` | architect |
+| Nemotron 3 Ultra 550B A55B | `nvidia/nvidia/nemotron-3-ultra-550b-a55b` | `none` `medium` `high` | reviewer |
+| DeepSeek V4.1 Flash | `nvidia/deepseek-ai/deepseek-v4.1-flash` | `none` `low` `high` `max` | optional worker |
+| ~~MiniMax M3.1 Flash (free)~~ | ~~`openrouter/minimax/minimax-m3.1-flash:free`~~ | — | **RETIRED** |
 
 ## Fallback review policy
 

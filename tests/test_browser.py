@@ -148,6 +148,12 @@ def main():
                  "y": int(os.environ.get("ARTCRAFT_CLICK_Y", 90))}
         typed = os.environ.get("ARTCRAFT_TYPED", "4242")
         canvas.click(position=click)
+        # Some applications need a second click to place the caret (a PDF
+        # editor opens a tool menu first).
+        click2 = os.environ.get("ARTCRAFT_CLICK_X2")
+        if click2:
+            canvas.click(position={"x": int(click2),
+                                   "y": int(os.environ.get("ARTCRAFT_CLICK_Y2", 0))})
         page.keyboard.type(typed)
         page.keyboard.press("Enter")
         # Wait for the editor to say the document changed, not for a fixed time.
