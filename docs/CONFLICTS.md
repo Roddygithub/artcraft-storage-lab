@@ -1,6 +1,6 @@
 # Conflicts and data integrity
 
-Status: **PROVISIONAL — FREE REVIEW PASS** (remediated) · GPT REVIEW: PENDING
+Status: **PROVISIONAL — GPT REVIEW FAIL; remediation applied** · GPT REVIEW: PENDING
 Evidence: `docs/reviews/GR-008/SEAFILE-CONCURRENCY-PRIMITIVES.md`
 
 ## 0. The rule
@@ -19,10 +19,16 @@ application are never trusted for either.
 | File history | **yes** | `GET /api2/repos/<id>/file/history/?p=` — every write creates a version |
 | "the file is gone" | **yes** | the file server answers `441` when the name is not in the current head commit |
 | "the content did not change" | **yes** | the file server creates **no new commit** when the new bytes hash to the same id |
-| Conditional update (ETag / `If-Match` / compare-and-swap) | **no** | `last_modify` only stamps the mtime; `head` is not a guard (GR-008 §1.3-§1.4) |
+| Conditional update through the public `update-api` | **no supported file-id condition** | `last_modify` stamps mtime; `head` selects a base commit but is not a target-file-id condition (GR-008 §1.3-§1.4) |
+| Internal branch compare-and-update | **yes** | Seafile Server 12.0.14 has `seaf_branch_manager_test_and_update_branch()` in `common/branch-mgr.c`; `gen_new_commit()` uses it to reject or merge a concurrent branch-head update. No third-party-editor endpoint binds this primitive to the file id observed at open. |
 | Advisory lock | **yes** | Seafile's own `OnlineOffice` lock; a 40-minute lease, refreshed from the browser |
 
-So: **the check has to be ours**, and it has to be a read-then-write.
+So: a read-then-write check in the gateway is insufficient. The deployed public
+API has no conditional-save endpoint, but Seafile's core has a branch-level
+transaction primitive that may support one. A safe endpoint must compare the
+target path's content id against the editor's opened id on every retry and must
+return a conflict if that path changed. This needs a tested Seahub + file-server
+change; it is not provided by the current gateway or public API.
 
 ## 2. The check
 
@@ -51,14 +57,17 @@ over the concurrent one: the second writer's content is silently replaced by the
 first's.
 
 * The window is **one API round trip** to Seafile (tens of milliseconds).
-* Seafile offers no primitive that closes it (GR-008 §1.3-§1.4).
-* Closing it would need a **file-server patch** that takes the expected content id
-  and refuses the write when it no longer matches — an upstream change, tracked with
-  the other upstream work (GR-014).
+* The public update endpoint offers no file-id condition. Internally, the exact
+  Seafile 12.0.14 source uses a transactional branch compare-and-update in
+  `seaf_branch_manager_test_and_update_branch()`; the upload path also retries
+  concurrent branch updates, so a patch must re-check the target file id on every
+  retry and stop rather than reapply stale bytes.
+* Closing it requires a **file-server endpoint change** that checks the opened file
+  id and commits against the branch atomically, returning conflict when the file
+  changed. This remains to be implemented and tested (GR-014).
 
-Until then the behaviour is stated plainly: **a conflict is detected and refused
-except for a write that lands inside that window.** The gateway does not pretend
-otherwise.
+Until that endpoint is implemented and tested, the safe behavior is a failed
+save; the gateway does not call the unconditional update endpoint.
 
 ### 2.2 What the user sees
 
@@ -108,7 +117,7 @@ upstream patch has to fix that.
 | the file is renamed away under the editor | `tests/test_integration.py` §6 | **PASS** — HTTP 404 "the file no longer exists" |
 | a save of unchanged content | `tests/test_integration.py` §3 | **PASS** — accepted, and the file server creates no new version |
 | an unknown session | `tests/test_integration.py` §4 | **PASS** — HTTP 404 |
-| the write race inside the window | — | **not tested** — see §2.1 |
+| the write race inside the window | `tests/test_gateway_unit.py` fake CAS barrier | **PASS** — one 200 and one 409; external Seafile writers remain NOT VERIFIED |
 | the permission revoked mid-session | — | **not tested** |
 | the session idle timeout | — | **not tested** |
 | a browser reload during editing | — | **not tested** |

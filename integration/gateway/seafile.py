@@ -5,8 +5,7 @@ Only the calls the gateway needs. No dependency beyond the standard library.
 Credentials come from the environment, never from a file in the repository:
 
     ARTCRAFT_SEAFILE_URL     e.g. https://seafile.example.org
-    ARTCRAFT_SEAFILE_TOKEN   an account token (Authorization: Token <t>)
-    ARTCRAFT_SEAFILE_USER    the user the token belongs to (for attribution)
+    ARTCRAFT_SEAFILE_TOKEN   optional account token for read-only diagnostics
 """
 
 import json
@@ -83,10 +82,11 @@ class Seafile:
                f"?access_token={urllib.parse.quote(access_token)}")
         return self._json(url)
 
-    def thirdparty_file_content(self, access_token):
-        """GET /thirdparty-editor/file-content/ - the document bytes."""
+    def thirdparty_file_content(self, access_token, expected_file_id):
+        """GET the bytes, refusing a file that changed after the open."""
         url = (f"{self.base_url}/thirdparty-editor/file-content/"
-               f"?access_token={urllib.parse.quote(access_token)}")
+               f"?access_token={urllib.parse.quote(access_token)}"
+               f"&expected_file_id={urllib.parse.quote(expected_file_id)}")
         status, body = self._request(url, raw=True)
         return body
 
@@ -97,6 +97,53 @@ class Seafile:
         url = (f"{self.base_url}/api2/repos/{repo_id}/file/detail/"
                f"?p={urllib.parse.quote(path)}")
         return self._json(url)
+
+    def user_file_detail(self, repo_id, path, username, access_token):
+        """Read current detail through the Seafile user-bound editor token."""
+        info = self.thirdparty_file_info(access_token)
+        if info.get("repo_id") != repo_id or info.get("file_path") != path:
+            raise SeafileError("editor token is bound to a different document", status=403)
+        if info.get("username") != username:
+            raise SeafileError("editor token is bound to a different user", status=403)
+        return {
+            "id": info.get("file_id"),
+            "permission": info.get("permission"),
+            "can_edit": info.get("can_edit"),
+            "head_commit_id": info.get("head_commit_id"),
+            "last_modified": info.get("head_commit_id"),
+        }
+
+    def thirdparty_file_save(self, access_token, expected_id, expected_head, name, data):
+        """Ask Seahub to re-authorize and atomically commit one editor save."""
+        url = (f"{self.base_url}/thirdparty-editor/file-save/"
+               f"?access_token={urllib.parse.quote(access_token)}")
+        headers = {
+            "Content-Type": "application/octet-stream",
+            "X-Seafile-File-ID": expected_id,
+            "X-Seafile-Head-ID": expected_head,
+            "X-ArtCraft-Filename": urllib.parse.quote(name, safe=""),
+        }
+        status, body = self._request(url, method="POST", headers=headers, data=data, raw=True)
+        try:
+            result = json.loads(body)
+        except Exception as exc:
+            raise SeafileError(f"invalid save response: {body[:200]!r}", status, body) from exc
+        if status != 200:
+            raise SeafileError(self._describe(status, body), status, body)
+        if not isinstance(result, dict) or not result.get("file_id") or not result.get("head_commit_id"):
+            raise SeafileError("Seafile did not confirm a committed version", status=502)
+        return result
+
+    def atomic_update_file(self, repo_id, path, data, expected_id, username):
+        """Replace only if `expected_id` is still current.
+
+        The ordinary update link is unconditional.  This method is deliberately
+        unavailable until the upstream Seafile endpoint supplies an atomic CAS.
+        """
+        raise SeafileError(
+            "Seafile has no atomic compare-and-swap file update; writes are disabled",
+            status=501,
+        )
 
     def file_history(self, repo_id, path):
         """GET /api2/repos/<id>/file/history/ - the versions of a file."""
@@ -208,9 +255,8 @@ class Seafile:
     def from_env():
         url = os.environ.get("ARTCRAFT_SEAFILE_URL")
         token = os.environ.get("ARTCRAFT_SEAFILE_TOKEN")
-        if not url or not token:
+        if not url:
             raise SystemExit(
-                "ARTCRAFT_SEAFILE_URL and ARTCRAFT_SEAFILE_TOKEN must be set "
-                "(the token is an account token; keep it out of the repository)"
+                "ARTCRAFT_SEAFILE_URL must be set"
             )
         return Seafile(url, token)

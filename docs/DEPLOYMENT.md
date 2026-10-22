@@ -3,8 +3,10 @@
 ## Part 1 — Current real deployment (the reference environment)
 
 Read-only survey of the Seafile instance owned by the project owner, performed
-2026-10-22. **No change was made to any running service.** Every secret value is
-redacted here; nothing sensitive is stored in this repository.
+2026-10-22. After the survey, the erroneous global `.xlsx` third-party-editor
+mapping was removed and Seahub restarted to restore OnlyOffice routing. No
+OnlyOffice setting or document was changed. Every secret value is redacted here;
+nothing sensitive is stored in this repository.
 
 ### Topology
 
@@ -103,8 +105,9 @@ corresponding editor views). This is the central input to **GR-002**.
 
 ### Licensing consequence of running the Professional edition
 
-The installed Seahub is the **Professional** build. The open-source upstream
-(`haiwen/seahub`) is GPLv2; the Professional build adds proprietary modules
+The installed Seahub is the **Professional** build. The inspected upstream
+Seahub revision `c01d46bc` is Apache-2.0; the inspected Seafile Server revision
+`a652460e` is AGPLv3 with an OpenSSL exception. The Professional build adds proprietary modules
 (`pro-data/`, `IsProVersion` permission class, `repo_office_suite` endpoint).
 
 Consequences for this project:
@@ -112,38 +115,37 @@ Consequences for this project:
 1. **We must not copy Seahub code into this repository.** We may *read* it and
    *document* facts and interfaces; we may not ship it.
 2. The **upstream contribution target** is the open-source `haiwen/seahub`
-   (GPLv2), not the Professional build. Any patch we prepare must be written
-   against the open-source tree.
-3. GPLv2 is **not** compatible with Apache-2.0 (only GPLv3 is). Therefore our
-   own connector should reach Seafile over its **HTTP API** (a network boundary,
-   not a link) so that this repository can stay MIT/Apache. This is a first-class
-   architectural constraint, tracked in `docs/LICENSING.md`.
+   not the Professional build. Any patch we prepare must be written against a
+   specifically identified upstream tree and its licence must be re-verified.
+3. The connector reaches Seafile over its **HTTP API** (a network boundary, not
+   a link), and exact upstream licensing must be re-verified before any code is
+   derived or contributed. This is tracked in `docs/LICENSING.md`.
 
-### Rollback posture
+### Current live state and rollback
 
-Nothing has been changed on the server. When the integration is eventually
-deployed, the rollback path is:
+The live `.xlsx -> http://127.0.0.1:8777/open/` third-party mapping was removed
+from `/opt/seafile/conf/seahub_settings.py` on LXC 108. Its exact backup is
+`/root/seahub_settings.py.artcraft-rollback-20261022`. `ENABLE_ONLYOFFICE` and
+its 15-format extension list were left unchanged. Seahub, Nginx, Seafile and
+LXC 112 OnlyOffice were active after the restart. The gateway is not installed
+on LXC 108, and no ArtCraft path has been added to the reverse proxy.
 
-1. The ONLYOFFICE configuration in `seahub_settings.py` is untouched and
-   reversible by removing the added keys (the file is a plain Python module, and
-   a timestamped backup must be taken before any edit).
-2. The reverse proxy configuration in Nginx Proxy Manager is edited through its
-   own UI/DB, and a snapshot of the affected proxy host must be exported first.
-3. Any new path (`/artcraft/...`) is additive: removing the location block
-   restores the previous behaviour with no change to Seafile or ONLYOFFICE.
-4. The integration service is stateless and can be stopped independently.
+Rollback means restoring that backup and restarting `seahub.service`. Before a
+future deployment, save the current Nginx Proxy Manager host config; its
+`/open/`, `/session/` and `/artcraft/` locations will be additive and removable.
 
 ## Part 2 — The target deployment design
 
 ### 2.1 The decision
 
 ```text
-   Seafile (unchanged, unforked)
-        |  one setting: THIRDPARTY_EDITOR_ACTION_URL_DICT
-        |  one URL per extension
+   Seafile Web
+        |  allow-listed repository + supported extension
+        |  user-bound third-party-editor token
         v
-   the reverse proxy
+   same-origin reverse proxy
         |
+        +-- /open/, /session/, /artcraft/ -> ArtCraft gateway
         +-- /            ->  Seafile          (unchanged)
         +-- /seafhttp/   ->  Seafile          (unchanged)
         +-- /onlyoffice/ ->  ONLYOFFICE       (unchanged)
@@ -154,8 +156,11 @@ deployed, the rollback path is:
                 +-- /artcraft/api/           the session endpoints
 ```
 
-**One new service, one new path, no change to Seafile's code, no change to
-ONLYOFFICE.** Everything is additive and reversible.
+**One Seafile connector, one gateway and per-library routing.** The current
+third-party-editor hook is read-only, so a user-bound save endpoint and a
+fileserver conditional-update change are required for durable writes. The
+ArtCraft route must be scoped by repository so its extensions never take files
+away from ONLYOFFICE in other libraries.
 
 ### 2.2 The candidates, and why they lost
 
@@ -190,8 +195,9 @@ artcraft-gateway
 ```
 
 **It must be reachable from the browser** (the browser POSTs the access token to
-it, and it frames the Craft app), and it must be able to reach **Seafile** (to
-read the document and to write it back).
+it, and it frames the Craft app), and it must be able to reach **Seafile**. The
+current client reads with the user-bound token and sends saves to the planned
+Seahub endpoint; it no longer needs a broad service-account token for writes.
 
 ### 2.4 Where the Craft web builds live
 
@@ -213,10 +219,20 @@ clipboard need a secure context; without it the app falls back to WebGL2).
 ### 2.5 The nginx rules
 
 ```nginx
-location /artcraft/ {
+    location = /open/ {
+        proxy_pass http://<gateway>:8777;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location /session/ {
+        proxy_pass http://<gateway>:8777;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location /artcraft/ {
     proxy_pass http://<gateway>:8777;
     proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-Scheme $scheme;
+        proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Forwarded-For $remote_addr;
     client_max_body_size 64m;          # the document limit, plus room
     proxy_read_timeout 120s;
@@ -233,9 +249,10 @@ X-Content-Type-Options: nosniff
 Referrer-Policy: no-referrer
 ```
 
-**To add before a public deployment** (they are listed in `docs/SECURITY.md` §7):
-a `Content-Security-Policy` for the gateway's pages, an `Origin` check on the
-state-changing endpoints, and a rate limit on `/open/`.
+**Still required before public deployment** (see `docs/SECURITY.md` §7): a
+`Content-Security-Policy` and a rate limit on `/open/`. The gateway now checks
+same-origin on state-changing endpoints; this does not by itself approve public
+exposure.
 
 ### 2.6 The self-hosting constraints
 
@@ -243,32 +260,28 @@ state-changing endpoints, and a rate limit on `/open/`.
 | --- | --- |
 | 100 % self-hosted | the gateway, the Craft builds and Seafile all run on the operator's own machines; nothing calls out |
 | free / open-source | the gateway is original code under MIT/Apache-2.0; the Craft builds are MIT/Apache-2.0; Seafile and ONLYOFFICE are the operator's own |
-| no permanent fork | the MVP needs **no** Seafile code change; the one upstream patch is prepared separately and is optional |
-| ONLYOFFICE keeps working | it is not touched; the extension the hook claims (`.xlsx`) is one that ONLYOFFICE does not claim on this instance, and no file in any other library uses it. The per-library `artcraft` office-suite id (upstream) removes even that constraint |
+| no permanent fork | the current gateway source does not need a permanent fork, but safe user-bound conditional writes require a Seahub endpoint and a Seafile Server CAS change; draft patches are in `docs/reviews/GR-015/` |
+| ONLYOFFICE keeps working | only repository-scoped ArtCraft dispatch can claim formats in the synthetic library; the old global `.xlsx` map is removed, and ONLYOFFICE's settings are unchanged |
 | the Craft side knows nothing about Seafile | the Craft app receives bytes and returns bytes; the gateway is the only thing that knows the platform |
 | the browser holds no credential | the browser holds one opaque session id |
 
 ### 2.7 On the Proxmox host
 
-The reference deployment runs the gateway **on the owner's workstation**, because
-the browser is there and the URL in Seafile's setting has to be reachable from
-it. On a real deployment the gateway would run where the operator wants it: a
-container on the Proxmox host, a small LXC, or the same machine as the reverse
-proxy. **Nothing in the design requires a new virtual machine** — it is one
-container behind one path.
+The gateway currently runs in the **development workspace only**. The target is
+to install it on the Seafile LXC or a dedicated LXC and expose it through the
+existing Nginx Proxy Manager hostname. No new virtual machine is required.
 
 ### 2.8 The test environment versus production
 
 | | Reference instance | What a test instance would add |
 | --- | --- | --- |
 | the Seafile code | **Professional 12.0.14, unforked** | the Community edition, or a second Professional instance |
-| the change | one extension in one dict, backed up | none needed |
+| the change | no ArtCraft route currently; former global `.xlsx` map removed and backed up | repository-scoped routing patch |
 | the ONLYOFFICE integration | present and **untouched** | present, or absent |
 | the data | one **empty** library (`OnlyOffice`) with synthetic files | the same |
 | the real data | **never touched** | — |
 
-The reference instance was chosen because it is the one the operator can test,
-and because the change is small enough to be provably harmless: one extension
-that nothing else uses. A dedicated instance would be the right answer for a
-*production* deployment, where `.docx` has to be claimed without taking it from
-ONLYOFFICE — and that is what the upstream per-library suite id is for.
+The reference instance is the operator's test system, and its synthetic library
+is the only permitted target for the first live test. The prior extension hook
+was not safely scoped and has been removed. Per-library routing is part of the
+local Seahub patch in `docs/reviews/GR-015/`; it has not been built or deployed.

@@ -10,10 +10,16 @@ no Seafile instance: they exercise the gateway's own code.
 import os
 import sys
 import time
+import threading
+import zipfile
+import io
+import http.client
+from http.server import ThreadingHTTPServer
+import urllib.parse
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "integration"))
 
-from gateway.server import Gateway, load_dispatch  # noqa: E402
+from gateway.server import Gateway, Handler, load_dispatch  # noqa: E402
 from gateway.sessions import SessionStore  # noqa: E402
 
 FAILURES = []
@@ -35,16 +41,55 @@ class FakeSeafile:
         self.content = content
         self.written = []
         self.detail_calls = 0
+        self.user = "alice"
+        self.head_id = "head-a"
+        self.save_detail_barrier = None
+        self.save_detail_calls = 0
+        self._write_lock = threading.Lock()
 
     def file_detail(self, repo_id, path):
         self.detail_calls += 1
         return {"id": self.obj_id, "permission": self.permission, "size": len(self.content)}
 
+    def thirdparty_file_info(self, access_token):
+        return {"repo_id": "repo", "file_path": "/a.docx", "file_name": "a.docx",
+                "username": self.user, "file_id": self.obj_id,
+                "head_commit_id": self.head_id, "permission": self.permission,
+                "can_edit": self.permission in ("rw", "cloud-edit", "preview-edit")}
+
+    def user_file_detail(self, repo_id, path, username, access_token):
+        info = self.thirdparty_file_info(access_token)
+        return {"id": info["file_id"], "permission": info["permission"],
+                "head_commit_id": info["head_commit_id"], "size": len(self.content)}
+
     def download(self, repo_id, path):
         return self.content
 
-    def thirdparty_file_content(self, access_token):
+    def thirdparty_file_content(self, access_token, expected_file_id):
+        if self.obj_id != expected_file_id:
+            from gateway.seafile import SeafileError
+            raise SeafileError("conflict", status=409)
         return self.content
+
+    def thirdparty_file_save(self, access_token, expected_id, expected_head, name, data):
+        if self.save_detail_barrier:
+            barrier = self.save_detail_barrier
+            self.save_detail_calls += 1
+            if self.save_detail_calls >= 2:
+                self.save_detail_barrier = None
+            barrier.wait()
+        with self._write_lock:
+            if self.permission not in ("rw", "cloud-edit", "preview-edit"):
+                from gateway.seafile import SeafileError
+                raise SeafileError("permission revoked", status=403)
+            if self.obj_id != expected_id or self.head_id != expected_head:
+                from gateway.seafile import SeafileError
+                raise SeafileError("conflict", status=409)
+            self.content = data
+            self.obj_id = "bbbb"
+            self.head_id = "head-b"
+            self.written.append(("repo", "/a.docx", data))
+            return {"file_id": self.obj_id, "head_commit_id": self.head_id}
 
     def update_file(self, repo_id, path, data):
         self.written.append((repo_id, path, data))
@@ -60,6 +105,22 @@ def make_gateway(seafile, dispatch=None):
     return Gateway(seafile, dispatch)
 
 
+def valid_docx():
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w") as archive:
+        archive.writestr("[Content_Types].xml",
+                         "<Types><Override ContentType="
+                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"
+                         "/></Types>")
+    return out.getvalue()
+
+
+def open_user_session(gw):
+    session, error = gw.open_session("user-token")
+    check("a user-bound token opens", session is not None, str(error))
+    return session
+
+
 def main():
     # ---- the extension rule ------------------------------------------------
     gw = make_gateway(FakeSeafile())
@@ -73,21 +134,21 @@ def main():
     # ---- a read-only session cannot write ---------------------------------
     seafile = FakeSeafile(permission="r")
     gw = make_gateway(seafile)
-    session, error = gw.open_session_direct("repo", "/a.xlsx")
+    session, error = gw.open_session("user-token")
     check("a read-only file opens in view mode", session is not None and session.can_edit is False,
           f"can_edit={getattr(session, 'can_edit', None)}")
-    result, status = gw.save(session, b"payload")
+    result, status = gw.save(session, valid_docx())
     check("a read-only session cannot write", status == 403 and result["ok"] is False, str(result)[:120])
     check("a refused write writes nothing", seafile.written == [], f"{len(seafile.written)} write(s)")
 
     # ---- the permission is re-read on every write --------------------------
     seafile = FakeSeafile(permission="rw")
     gw = make_gateway(seafile)
-    session, _ = gw.open_session_direct("repo", "/a.xlsx")
+    session = open_user_session(gw)
     check("an editable file may write", session.can_edit is True)
     # the permission is taken away while the editor is open
     seafile.permission = "r"
-    result, status = gw.save(session, b"payload")
+    result, status = gw.save(session, valid_docx())
     check("a revoked permission stops the write", status == 403 and result["ok"] is False,
           f"HTTP {status}")
     check("the revoked write wrote nothing", seafile.written == [])
@@ -95,17 +156,17 @@ def main():
     # ---- a stale session is refused ---------------------------------------
     seafile = FakeSeafile(permission="rw", obj_id="aaaa")
     gw = make_gateway(seafile)
-    session, _ = gw.open_session_direct("repo", "/a.xlsx")
+    session = open_user_session(gw)
     seafile.obj_id = "cccc"          # somebody else saved
-    result, status = gw.save(session, b"payload")
+    result, status = gw.save(session, valid_docx())
     check("a stale save is refused", status == 409 and result.get("conflict") is True, f"HTTP {status}")
     check("the refused stale save wrote nothing", seafile.written == [])
 
     # ---- a current session writes -----------------------------------------
     seafile = FakeSeafile(permission="rw", obj_id="aaaa")
     gw = make_gateway(seafile)
-    session, _ = gw.open_session_direct("repo", "/a.xlsx")
-    result, status = gw.save(session, b"payload")
+    session = open_user_session(gw)
+    result, status = gw.save(session, valid_docx())
     check("a current save is accepted", status == 200 and result["ok"] is True, str(result)[:120])
     check("the write happened", len(seafile.written) == 1)
     check("the session now holds the new content id", session.file_id == "bbbb",
@@ -115,7 +176,7 @@ def main():
     seafile = FakeSeafile()
     gw = make_gateway(seafile)
     gw.max_bytes = 10
-    session, _ = gw.open_session_direct("repo", "/a.xlsx")
+    session = open_user_session(gw)
     result, status = gw.save(session, b"x" * 11)
     check("a document over the limit is refused", status == 413 and result["ok"] is False,
           f"HTTP {status}")
@@ -123,19 +184,82 @@ def main():
 
     # ---- an unknown extension is refused ----------------------------------
     gw = make_gateway(FakeSeafile())
-    session, error = gw.open_session_direct("repo", "/a.unknownext")
-    check("an extension with no editor is refused", session is None and error, str(error)[:100])
+    check("an extension with no editor is refused", gw.app_for("a.unknownext") is None)
+
+    # ---- direct HTTP-style opening is closed -----------------------------
+    session, error = gw.open_session_direct("repo", "/a.docx")
+    check("direct repo/path opening is disabled", session is None and "disabled" in error)
+
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    httpd.gateway = gw
+    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread.start()
+    connection = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
+    origin = f"http://127.0.0.1:{httpd.server_port}"
+    connection.request("POST", "/open/?format=json",
+                       urllib.parse.urlencode({"repo_id": "repo", "path": "/a.docx"}),
+                       {"Content-Type": "application/x-www-form-urlencoded", "Origin": origin,
+                        "Connection": "close"})
+    response = connection.getresponse()
+    body = response.read().decode()
+    connection.close()
+    check("HTTP direct /open cannot mint a session",
+          response.status == 401 and "access_token" in body,
+          f"HTTP {response.status}: {body[:120]}")
+
+    connection = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
+    connection.request("POST", "/open/?format=json",
+                       urllib.parse.urlencode({"access_token": "user-token"}),
+                       {"Content-Type": "application/x-www-form-urlencoded",
+                        "Origin": "https://attacker.invalid", "Connection": "close"})
+    response = connection.getresponse()
+    body = response.read().decode()
+    connection.close()
+    httpd.shutdown()
+    thread.join(timeout=3)
+    check("cross-origin POST cannot open or save a document", response.status == 403,
+          f"HTTP {response.status}")
+
+    # ---- Save As/export and format mismatch are refused ------------------
+    seafile = FakeSeafile()
+    gw = make_gateway(seafile)
+    session = open_user_session(gw)
+    result, status = gw.save(session, valid_docx(), name="export.pdf")
+    check("Save As cannot replace the original", status == 400 and not result["ok"])
+    result, status = gw.save(session, b"%PDF-1.7", name="a.docx")
+    check("PDF export cannot replace a DOCX", status == 400 and not result["ok"])
+
+    # ---- deterministic CAS race -----------------------------------------
+    seafile = FakeSeafile()
+    gw = make_gateway(seafile)
+    first = open_user_session(gw)
+    second = open_user_session(gw)
+    seafile.save_detail_barrier = threading.Barrier(2)
+    results = []
+    threads = [threading.Thread(target=lambda s, d: results.append(gw.save(s, d)),
+                                args=(first, valid_docx())),
+               threading.Thread(target=lambda s, d: results.append(gw.save(s, d)),
+                                args=(second, valid_docx()))]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    statuses = sorted(status for _, status in results)
+    check("concurrent saves have one winner", statuses == [200, 409], str(statuses))
+    check("the losing concurrent save is explicitly a conflict",
+          sum(1 for result, status in results if status == 409 and result.get("conflict")) == 1)
+    check("the fake upstream CAS stored one version", len(seafile.written) == 1)
 
     # ---- the session store -------------------------------------------------
     store = SessionStore(ttl=60, idle_ttl=30, max_sessions=3)
     a = store.create(repo_id="r", path="/a", name="a", file_id="1", user="u", can_edit=True,
-                     access_token="t", app="gridcraft")
+                     access_token="t", app="gridcraft", user_authorized=True)
     check("a session is created with an unguessable id", len(a.sid) >= 24, f"{len(a.sid)} chars")
     check("a session is found", store.get(a.sid) is not None)
     check("an unknown session is not found", store.get("nope") is None)
     for i in range(5):
         store.create(repo_id="r", path=f"/{i}", name="x", file_id="1", user="u", can_edit=True,
-                     access_token="t", app="gridcraft")
+                         access_token="t", app="gridcraft", user_authorized=True)
     check("the session store is capped", len(store._sessions) <= 3, f"{len(store._sessions)} sessions")
     store.ttl = 0
     check("an expired session is not found", store.get(a.sid) is None)

@@ -156,6 +156,27 @@ Rules in force:
 | DeepSeek V4.1 Flash | `nvidia/deepseek-ai/deepseek-v4.1-flash` | `none` `low` `high` `max` | optional worker |
 | ~~MiniMax M3.1 Flash (free)~~ | ~~`openrouter/minimax/minimax-m3.1-flash:free`~~ | — | **RETIRED** |
 
+## Final GPT review roles
+
+Verified with `opencode models` on OpenCode v2.1.0 on 2026-10-22. These roles
+are independent of the free-model routing above and do not change the frozen
+candidate SHA.
+
+| Role | Agent ID | OpenCode model ID | Permission |
+| --- | --- | --- | --- |
+| GPT review owner / forensic auditor / test reproducer | `artcraft-gpt-auditor` | `openai/gpt-5.6-luna` | read-only implementation review |
+| Independent final reviewer / adversarial gate | `artcraft-gpt-final-reviewer` | `openai/gpt-6.1-sol` | read-only |
+
+Both definitions live in `config/opencode/agents/` and are installed in the
+global OpenCode agent directory. The final reviewer must not implement before
+its first verdict. GPT review tooling changes made after candidate freeze are
+not part of the candidate being reviewed.
+
+The OpenCode binary exposes model IDs `openai/gpt-5.6-luna` and
+`openai/gpt-6.1-sol`. The T3 Code live catalog uses its own IDs (`gpt-5.6-luna`
+and `gpt-6.1-sol`); do not substitute the inherited `gpt-6-luna` for either
+requested role.
+
 ## Fallback review policy
 
 * Primary reviewer: `artcraft-reviewer` (Nemotron 3 Ultra 550B A55B).

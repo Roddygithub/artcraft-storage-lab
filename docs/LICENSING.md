@@ -12,7 +12,7 @@ owner's decision, it is marked `OWNER DECISION REQUIRED`.
 | Component | Licence | Evidence | Consequence for us |
 | --- | --- | --- | --- |
 | Seafile Server — **Professional** edition (the deployed instance) | proprietary (Seafile Ltd.) | the deployed tree ships `pro-data/` and Pro-only modules (`IsProVersion` permission class, `repo_office_suite` endpoint) | **We must not copy its code.** Reading it and documenting its interfaces is fine. |
-| Seafile / Seahub — open-source upstream (`haiwen/seahub`, `haiwen/seafile`) | **GPLv2** (Seahub) / LGPL-ish mix for the C server components | upstream repository licence files | Any code we take from it must be GPLv2. |
+| Seafile / Seahub — inspected upstream revisions | **Apache-2.0** (Seahub `c01d46bc`) / **AGPLv3 with OpenSSL exception** (Seafile Server `a652460e`) | [Seahub LICENSE](https://raw.githubusercontent.com/haiwen/seahub/c01d46bcaa0b2ce24c71561c6c61d15fea808d1a/LICENSE.txt), [Seafile Server LICENSE](https://raw.githubusercontent.com/haiwen/seafile-server/a652460e9d4314d5e67c82e0ebe9aa48e8ea1212/LICENSE.txt) | Do not copy code; re-verify the exact target revision before deriving or contributing. |
 | ONLYOFFICE Document Server | proprietary (Ascensio System SIA) | `local.json`, container labels, `api.js` copyright header ("Copyright (C) Ascensio System SIA, 2009-2026") | We study its **behaviour**, never its code. |
 | ArtCraft apps (`storytold/*`) | to be confirmed per repo — **NOT VERIFIED yet** | each repo's licence file | must be checked before any ArtCraft code is vendored or derived from |
 | `storytold/craft-libs` | **MIT OR Apache-2.0** | `LICENSE-MIT` + `LICENSE-APACHE` in the repository root | compatible |
@@ -24,14 +24,16 @@ which is exactly this repository's licence. The table's "to be confirmed" entrie
 the applications are therefore **closed**; the only remaining licence question is
 whether the *upstream maintainers* accept a contribution under those terms (L-3).
 
-## 2. The GPLv2 / Apache-2.0 incompatibility — the decisive constraint
+## 2. Upstream licensing and the network boundary
 
-* Apache-2.0 is compatible with **GPLv3**, and **not** with GPLv2.
-* MIT is compatible with GPLv2.
+* The inspected Seafile Server revision is AGPLv3 with an OpenSSL exception;
+  the inspected Seahub revision is Apache-2.0. The deployed Professional build
+  and the exact revision intended for any contribution still require separate
+  verification.
 * This repository is dual-licensed MIT / Apache-2.0.
 
-Therefore, **any ArtCraft or Seafile code that is GPLv2 must not be linked into
-or vendored into this repository** if we want to keep the Apache-2.0 option.
+Therefore, **no Seafile or Seahub code is linked into or vendored into this
+repository**, regardless of upstream edition or revision.
 
 ### Architectural consequence
 
@@ -86,7 +88,7 @@ Currently the only such material is in
 `docs/reviews/GR-001/DEPLOYED-INSTANCE-CONTRACT.md` and
 `docs/DEPLOYMENT.md`: it documents **interfaces, parameter names and behaviour**,
 not code. Where a short snippet is quoted for clarity, it is attributed and is
-from GPLv2/proprietary upstream — it is documentation, not a derived work of the
+from upstream/proprietary material — it is documentation, not a derived work of the
 kind that would infect this repository.
 
 ## 6. Decisions to confirm
@@ -96,5 +98,5 @@ kind that would infect this repository.
 | L-1 | Exact licence of each of the 13 `storytold/*` repos | **CLOSED** — all dual MIT / Apache-2.0 (2026-10-22) |
 | L-2 | Licence of `storytold/craft-libs` | **CLOSED** — dual MIT / Apache-2.0 |
 | L-3 | Does the ArtCraft upstream accept a contribution under its own licence terms? | **NOT VERIFIED** — GR-013 |
-| L-4 | Should this repository stay dual MIT/Apache, or move to MIT only to keep GPLv2 compatibility? | **OWNER DECISION REQUIRED** (recommended: keep dual, and keep the network boundary) |
-| L-5 | Does the Seafile upstream (GPLv2) accept the patch shape we intend? | **NOT VERIFIED** — GR-002 / GR-014 |
+| L-4 | Should this repository stay dual MIT/Apache? | **OWNER DECISION REQUIRED** (recommended: keep dual, and keep the network boundary) |
+| L-5 | Does the selected Seafile upstream revision accept the patch shape we intend? | **NOT VERIFIED** — GR-002 / GR-014 |

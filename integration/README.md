@@ -12,14 +12,16 @@ Seafile Web  --(form POST, access_token)-->  the gateway  -->  the Craft app
                     +-- the gateway serves the host page and the Craft build
 ```
 
-The gateway is the **trust boundary**: it holds the Seafile credential, and the
-browser never sees one.
+The gateway is the **trust boundary**: it keeps the Seafile third-party-editor
+capability server-side, and the browser receives only a short-lived opaque
+session id. Production save requires the user-bound conditional endpoint in
+`docs/reviews/GR-015/`; that patch is not deployed yet.
 
 ## What it is
 
 | File | What it does |
 | --- | --- |
-| `gateway/seafile.py` | the Seafile client: the third-party-editor hook API, `file/detail`, `file/history`, the seafhttp write |
+| `gateway/seafile.py` | the Seafile client: user-bound file info/content/save calls |
 | `gateway/sessions.py` | the editing sessions: an opaque id, bound to one document, short-lived |
 | `gateway/hostpage.py` | the host page: the parent side of the Craft `?host=parent` bridge |
 | `gateway/server.py` | the HTTP server |
@@ -31,7 +33,6 @@ browser never sees one.
 
 ```sh
 export ARTCRAFT_SEAFILE_URL=https://seafile.example.org
-export ARTCRAFT_SEAFILE_TOKEN=<an account token>       # server-side only
 cd integration
 python3 -m gateway --host 127.0.0.1 --port 8777
 ```
@@ -39,22 +40,24 @@ python3 -m gateway --host 127.0.0.1 --port 8777
 | Environment variable | Meaning | Default |
 | --- | --- | --- |
 | `ARTCRAFT_SEAFILE_URL` | the Seafile base URL | required |
-| `ARTCRAFT_SEAFILE_TOKEN` | an account token, sent as `Authorization: Token` | required |
+| `ARTCRAFT_SEAFILE_TOKEN` | optional token for test fixture upload/diagnostics; not required by the gateway |
+| `ARTCRAFT_SEAFILE_ACCESS_TOKEN` | test-only Seafile hook token for integration runs | not set |
 | `ARTCRAFT_MAX_BYTES` | the largest document the gateway will read or write | 50 MiB |
 | `ARTCRAFT_GATEWAY_HOST` / `ARTCRAFT_GATEWAY_PORT` | where to listen | `127.0.0.1` / `8777` |
 | `ARTCRAFT_GATEWAY_VERBOSE` | log every request | off |
 
-**The token is read from the environment and never written to disk.** It is the
-gateway's own credential; the browser gets an opaque session id and nothing else.
+Test scripts that reset/upload fixtures still need a synthetic library account
+token. The deployed gateway should use the per-file capability Seahub posts to
+it; it must not use a broad service-account write credential.
 
 ## The endpoints
 
 | Endpoint | What it does |
 | --- | --- |
 | `GET /healthz` | liveness |
-| `POST /open/` | open a session. Either `access_token` (what Seahub's hook posts) or `repo_id` + `path` (the direct form). `?format=json` returns the session as data instead of the page. |
+| `POST /open/` | open a session from Seafile's `access_token` only. Direct `repo_id` + `path` opening is disabled because it has no editing-user identity. `?format=json` returns the session as data instead of the page. |
 | `GET /session/<sid>/document` | the document's bytes |
-| `POST /session/<sid>/save` | store the bytes: the conflict check, then the write |
+| `POST /session/<sid>/save` | user-bound save with original file id and repository head; the server patch must commit the version before acknowledgement |
 | `POST /session/<sid>/dirty` | the editor's dirty state |
 | `GET /artcraft/<app>/…` | the Craft web build, statically |
 
@@ -80,8 +83,8 @@ patch in `docs/reviews/GR-014/`); see that bundle for the commands.
 export ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=...
 export ARTCRAFT_GATEWAY=http://127.0.0.1:8777
 
-# the Seafile side: open, save, a new version, a refused stale save, a file
-# that is gone, a symlink escape
+# the Seafile side: reset the synthetic fixture, then open, save, a new version,
+# a refused stale save, a file that is gone, and a symlink escape
 python3 tests/test_integration.py <repo_id> /artcraft-lab/synthetic.xlsx
 
 # the whole thing, in a real browser
@@ -101,10 +104,9 @@ see — see `docs/reviews/GR-005/README.md` §4.2.
 
 ## The deployment shape
 
-The gateway is a plain HTTP service. In the reference deployment it sits behind
-the same reverse proxy as Seafile, on **its own path**, and the Craft builds are
-served from it, so the host page and the Craft app are **same-origin** — which
-the `?host=parent` bridge requires.
+The gateway is a plain HTTP service. It must sit behind the same HTTPS origin as
+Seafile on `/open/`, `/session/`, and `/artcraft/`, so the host page and Craft
+app are **same-origin** — required by the existing `?host=parent` bridges.
 
 ```nginx
 location /artcraft/ {

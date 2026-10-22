@@ -11,7 +11,7 @@ Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 ### GR-001 — Seafile online-editor integration contract
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); remediation pending re-review
 Owner:      artcraft-owner
 Reviewer:   artcraft-reviewer (free pass) -> GPT (final)
 
@@ -112,14 +112,15 @@ Files:          integration/gateway/, docs/reviews/GR-005/
 Tests:          tests/test_integration.py (20 checks) + tests/test_browser.py
 Free review:    FAIL -> remediated (REVIEW-02 G1, G4, G5, G6, G8, G9, G10)
 Evidence:       docs/reviews/GR-005/ (with browser-proof.png)
-Known risks:    The gateway writes with its own credential, so the version is
-                attributed to the service account, not the user.
+Known risks:    The original service-account write path is closed; stock
+                Seafile lacks user-bound authorization and atomic CAS, so the
+                gateway is read-only until the upstream endpoint exists.
 ```
 
 ### GR-006 — WordCraft Seafile MVP
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); remediation pending re-review
 Branch/SHA: (filled at freeze time)
 
 Requirements:  The 12-step MVP checklist of ROADMAP.md, VERIFIED END-TO-END on
@@ -131,12 +132,11 @@ Decision:       The WordCraft ?host=parent bridge (the GR-014 patch) makes the
                against a real Seafile: open, edit, the editor's own Ctrl+S, a new
                Seafile version, and the reopened document has the edit.
 Files:          docs/reviews/GR-006/, docs/reviews/GR-014/
-Tests:          tests/test_browser.py (8 checks, all PASS)
+Tests:          tests/test_gateway_unit.py; browser test is NOT VERIFIED
 Free review:    pending (review 03 in flight)
 Evidence:       docs/reviews/GR-006/ (with browser-proof.png)
-Known risks:    The click in the Seafile file list and the user-facing close are
-                not driven by the test; .docx is not yet claimed by the hook,
-                because ONLYOFFICE claims it.
+Known risks:    The real Seafile Web click/close/save flow is NOT VERIFIED;
+                stock Seafile lacks user-bound authorization and atomic CAS.
 ```
 
 ### GR-007 — Save protocol
@@ -162,21 +162,21 @@ Known risks:    GridCraft's bridge (not ours) cannot report a failed save; the
 ### GR-008 — Data integrity and conflicts
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); remediation pending re-review
 Branch/SHA: (filled at freeze time)
 
 Requirements:  Concurrent edit, deleted file, renamed file, revoked permission,
                expired session, network loss, interrupted upload, double save,
                browser reload. Must use a mechanism Seafile really provides.
-Decision:       Seafile has NO compare-and-swap, so the conflict check is ours:
-               compare the content id (obj_id) at save time. A stale save is
-               refused with 409 and the file is left alone.
+Decision:       Seafile has NO compare-and-swap. The gateway requires an
+               upstream atomic save and fails closed instead of using a
+               read-then-unconditional-write sequence.
 Files:          docs/CONFLICTS.md, docs/reviews/GR-008/
 Tests:          tests/test_integration.py (conflict, file-gone, same content)
 Free review:    FAIL -> remediated (REVIEW-02 G2: the TOCTOU window is documented)
 Evidence:       the Go file server's source, read directly
-Known risks:    The check is a read-then-write: a write inside that one-round-trip
-                window wins. Closing it needs a file-server patch.
+Known risks:    External-writer concurrency is NOT VERIFIED until an upstream
+                atomic CAS/lock endpoint is implemented and exercised.
 ```
 
 ### GR-009 — Web integration security

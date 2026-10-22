@@ -15,18 +15,21 @@ import time
 
 
 class Session:
-    __slots__ = ("sid", "repo_id", "path", "name", "file_id", "user", "can_edit",
+    __slots__ = ("sid", "repo_id", "path", "name", "file_id", "head_commit_id", "user", "can_edit",
+                 "user_authorized",
                  "created", "last_seen", "access_token", "app", "unsaved")
 
     def __init__(self, sid, repo_id, path, name, file_id, user, can_edit,
-                 access_token, app):
+                 user_authorized, access_token, app, head_commit_id=""):
         self.sid = sid
         self.repo_id = repo_id
         self.path = path
         self.name = name
         self.file_id = file_id
+        self.head_commit_id = head_commit_id
         self.user = user
         self.can_edit = can_edit
+        self.user_authorized = user_authorized
         self.access_token = access_token
         self.app = app
         self.created = time.time()
@@ -49,8 +52,10 @@ class Session:
             "path": self.path,
             "name": self.name,
             "file_id": self.file_id,
+            "head_commit_id": self.head_commit_id,
             "user": self.user,
             "can_edit": self.can_edit,
+            "user_authorized": self.user_authorized,
             "app": self.app,
             "unsaved": self.unsaved,
         }
@@ -65,6 +70,7 @@ class SessionStore:
         self._lock = threading.Lock()
 
     def create(self, **kwargs):
+        kwargs.setdefault("user_authorized", False)
         sid = secrets.token_urlsafe(24)
         session = Session(sid=sid, **kwargs)
         with self._lock:

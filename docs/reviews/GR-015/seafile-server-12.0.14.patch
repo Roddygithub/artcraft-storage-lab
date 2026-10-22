@@ -1,0 +1,124 @@
+diff --git i/common/rpc-service.c w/common/rpc-service.c
+index b86dbbe..8f6027f 100644
+--- i/common/rpc-service.c
++++ w/common/rpc-service.c
+@@ -2609,6 +2609,7 @@ seafile_put_file (const char *repo_id, const char *temp_file_path,
+     seaf_repo_manager_put_file (seaf->repo_mgr, repo_id,
+                                 temp_file_path, rpath,
+                                 norm_file_name, user, head_id,
++                                NULL,
+                                 0,
+                                 &new_file_id, error);
+ 
+diff --git i/server/repo-mgr.h w/server/repo-mgr.h
+index 66269dc..d6936fd 100644
+--- i/server/repo-mgr.h
++++ w/server/repo-mgr.h
+@@ -407,6 +407,7 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
+                             const char *file_name,
+                             const char *user,
+                             const char *head_id,
++                            const char *expected_file_id,
+                             gint64 mtime,
+                             char **new_file_id,                            
+                             GError **error);
+diff --git i/server/repo-op.c w/server/repo-op.c
+index 528f3f6..a151cc1 100644
+--- i/server/repo-op.c
++++ w/server/repo-op.c
+@@ -4308,6 +4308,7 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
+                             const char *file_name,
+                             const char *user,
+                             const char *head_id,
++                            const char *expected_file_id,
+                             gint64 mtime,
+                             char **new_file_id,
+                             GError **error)
+@@ -4404,6 +4405,14 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
+                                                   head_commit->root_id,
+                                                   fullpath, NULL, NULL);
+ 
++    /* Conditional editor saves bind both the file id and branch head. */
++    if (expected_file_id && g_strcmp0 (old_file_id, expected_file_id) != 0) {
++        g_set_error (error, SEAFILE_DOMAIN, SEAF_ERR_CONCURRENT_UPLOAD,
++                     "Concurrent upload");
++        ret = -1;
++        goto out;
++    }
++
+     if (g_strcmp0(old_file_id, new_dent->id) == 0) {
+         if (new_file_id)
+             *new_file_id = g_strdup(new_dent->id);
+@@ -4422,7 +4431,8 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
+ 
+     /* Commit. */
+     snprintf(buf, SEAF_PATH_MAX, "Modified \"%s\"", file_name);
+-    if (gen_new_commit (repo_id, head_commit, root_id, user, buf, NULL, TRUE, TRUE, gc_id, error) < 0) {
++    if (gen_new_commit (repo_id, head_commit, root_id, user, buf, NULL,
++                        expected_file_id == NULL, TRUE, gc_id, error) < 0) {
+         ret = -1;
+         goto out;       
+     }
+diff --git i/server/upload-file.c w/server/upload-file.c
+index 5316c6e..9fea912 100755
+--- i/server/upload-file.c
++++ w/server/upload-file.c
+@@ -47,6 +47,7 @@ enum UploadError {
+     ERROR_RECV,
+     ERROR_BLOCK_MISSING,
+     ERROR_INTERNAL,
++    ERROR_CONFLICT,
+ };
+ 
+ typedef struct Progress {
+@@ -207,6 +208,9 @@ send_reply_by_error_code (evhtp_request_t *req, int error_code)
+     case ERROR_BLOCK_MISSING:
+         send_error_reply (req, SEAF_HTTP_RES_BLOCK_MISSING, "Block missing.\n");
+         break;
++    case ERROR_CONFLICT:
++        send_error_reply (req, EVHTP_RES_CONFLICT, "Concurrent upload.\n");
++        break;
+     case ERROR_FORBIDDEN:
+         send_error_reply (req, SEAF_HTTP_RES_FORBIDDEN, "Permission denied.");
+         break;
+@@ -1288,6 +1292,7 @@ update_api_cb(evhtp_request_t *req, void *arg)
+     char *last_modify = NULL;
+     gint64 mtime = 0;
+     const char *head_id = NULL;
++    const char *expected_file_id = NULL;
+     GError *error = NULL;
+     int error_code = -1;
+     char *new_file_id = NULL;
+@@ -1384,6 +1389,7 @@ update_api_cb(evhtp_request_t *req, void *arg)
+         goto out;
+ 
+     head_id = evhtp_kv_find (req->uri->query, "head");
++    expected_file_id = evhtp_kv_find (req->uri->query, "expected_file_id");
+ 
+     gint64 content_len;
+     if (fsm->fsize > 0)
+@@ -1404,6 +1410,7 @@ update_api_cb(evhtp_request_t *req, void *arg)
+                                          filename,
+                                          fsm->user,
+                                          head_id,
++                                         expected_file_id,
+                                          mtime,
+                                          &new_file_id,
+                                          &error);
+@@ -1412,6 +1419,8 @@ update_api_cb(evhtp_request_t *req, void *arg)
+         if (error) {
+             if (g_strcmp0 (error->message, "file does not exist") == 0) {
+                 error_code = ERROR_NOT_EXIST;
++            } else if (error->code == SEAF_ERR_CONCURRENT_UPLOAD) {
++                error_code = ERROR_CONFLICT;
+             }
+             g_clear_error (&error);
+         }
+@@ -1791,6 +1800,7 @@ update_ajax_cb(evhtp_request_t *req, void *arg)
+                                          filename,
+                                          fsm->user,
+                                          head_id,
++                                         NULL,
+                                          mtime,
+                                          &new_file_id,
+                                          &error);

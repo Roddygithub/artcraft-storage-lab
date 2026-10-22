@@ -6,13 +6,12 @@ holds: nothing goes to `storytold/*` or to Seafile before `GPT REVIEW PASS`.
 | Contribution | Target | Licence of the target | Where the patch lives |
 | --- | --- | --- | --- |
 | the Craft Web host bridge | `storytold/wordcraft` (+ the other apps) | MIT OR Apache-2.0 | **in this repository**: `docs/reviews/GR-014/DIFF.patch` |
-| a write path in the third-party-editor hook | `haiwen/seahub` | **GPLv2** | **outside this repository** (see §2) |
+| a write path in the third-party-editor hook | `haiwen/seahub` | **verify at target revision** (inspected Seahub `c01d46bc` is Apache-2.0) | **outside this repository** |
 
-The split is not a preference, it is a licence constraint: this repository is
-dual MIT / Apache-2.0, and GPLv2 code cannot live in it without changing the
-repository's own terms (`docs/LICENSING.md` §2). The ArtCraft patch can live here
-because the target is Apache-2.0; the Seafile patch cannot, because the target is
-GPLv2.
+The split is a repository-boundary and maintenance constraint: this repository
+does not copy or vendor Seafile/Seahub code. The exact target licence must be
+verified at the revision selected for any upstream contribution
+(`docs/LICENSING.md`).
 
 ---
 
@@ -55,9 +54,8 @@ GPLv2.
 
 ## 2. Seafile — a write path in the third-party-editor hook
 
-**Specified, not written into this repository.** The target is GPLv2; a diff
-against it is a GPLv2 work, and it does not belong in a dual MIT / Apache-2.0
-repository.
+**Specified, not written into this repository.** The target patch remains an
+external artifact; this repository does not vendor Seafile/Seahub code.
 
 ### 2.1 The problem it solves
 
@@ -136,7 +134,7 @@ applied to them. That is stated as a limitation, not hidden.
 
 ### 2.5 Where the patch will live
 
-Outside this repository, in a separate working directory, so that no GPLv2 code
+Outside this repository, in a separate working directory, so that no upstream code
 is committed here:
 
 ```text

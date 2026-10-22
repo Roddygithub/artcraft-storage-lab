@@ -11,10 +11,12 @@ The service holds the Seafile credential. The browser never does.
 """
 
 import json
+import io
 import mimetypes
 import os
 import posixpath
 import urllib.parse
+import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from . import hostpage
@@ -37,6 +39,29 @@ APP_ALIASES = {
     "pdfcraft": "pdfcraft",
     "vectorcraft": "vectorcraft",
 }
+
+
+def payload_matches_name(name, data):
+    """Reject a known export format before it can replace the original."""
+    ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
+    if ext == "pdf":
+        return data.startswith(b"%PDF-")
+    if ext == "svg":
+        text = data[:4096].decode("utf-8", "ignore").lower()
+        return "<svg" in text
+    if ext in {"docx", "xlsx", "pptx"}:
+        try:
+            with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                types = archive.read("[Content_Types].xml").decode("utf-8", "ignore")
+        except (KeyError, zipfile.BadZipFile):
+            return False
+        expected = {
+            "docx": "wordprocessingml.document",
+            "xlsx": "spreadsheetml.sheet",
+            "pptx": "presentationml.presentation",
+        }[ext]
+        return expected in types
+    return True
 
 
 def load_dispatch(path=CONFIG_PATH):
@@ -75,23 +100,12 @@ class Gateway:
         if not repo_id or not path:
             return None, "Seafile did not say which file to open"
 
-        return self._make_session(repo_id, path, name, info.get("username", ""), access_token)
+        return self._make_session(repo_id, path, name, info.get("username", ""),
+                                  access_token, detail=info)
 
     def open_session_direct(self, repo_id, path, user=None):
-        """Open a document using the gateway's own Seafile credential.
-
-        This is the second entry point: it does not need Seafile's
-        third-party-editor hook. It is what the integration tests drive, and it
-        is the path a future "Open with Craft" entry would use.
-        """
-        try:
-            detail = self.seafile.file_detail(repo_id, path)
-        except SeafileError as exc:
-            if exc.status == 404:
-                return None, "the file does not exist"
-            return None, f"cannot read the file: {exc}"
-        name = path.rsplit("/", 1)[-1]
-        return self._make_session(repo_id, path, name, user or "", None, detail=detail)
+        """Disabled: a repo/path request has no editing-user identity."""
+        return None, "direct repo/path opening is disabled; use Seafile's access_token"
 
     def _make_session(self, repo_id, path, name, user, access_token, detail=None):
         target = self.app_for(name)
@@ -99,93 +113,82 @@ class Gateway:
             return None, f"no Craft editor is registered for '{name}'"
         app = target["app"]
 
-        # The real permission, not the hook's placeholder.
-        can_edit = False
         if detail is None:
             try:
-                detail = self.seafile.file_detail(repo_id, path)
-            except SeafileError:
+                detail = self.seafile.user_file_detail(repo_id, path, user, access_token)
+            except (AttributeError, SeafileError):
                 detail = {}
-        can_edit = detail.get("permission") in EDITABLE_PERMISSIONS
+        can_edit = detail.get("can_edit")
+        if not isinstance(can_edit, bool):
+            can_edit = detail.get("permission") in EDITABLE_PERMISSIONS
 
-        file_id = detail.get("id") or ""
+        file_id = detail.get("file_id") or detail.get("id") or ""
+        head_commit_id = detail.get("head_commit_id") or ""
         session = self.sessions.create(
             repo_id=repo_id, path=path, name=name, file_id=file_id,
             user=user, can_edit=can_edit,
+            user_authorized=can_edit,
             access_token=access_token, app=app,
+            head_commit_id=head_commit_id,
         )
         return session, None
 
     def document(self, session):
         """The bytes of the document being edited."""
         if session.access_token:
-            data = self.seafile.thirdparty_file_content(session.access_token)
+            data = self.seafile.thirdparty_file_content(
+                session.access_token, session.file_id)
         else:
             data = self.seafile.download(session.repo_id, session.path)
         if len(data) > self.max_bytes:
             raise SeafileError(f"the document is larger than the {self.max_bytes} byte limit")
         return data
 
-    def save(self, session, data):
+    def save(self, session, data, name=None):
         """Write the bytes back. Returns (result_dict, http_status).
 
-        The conflict check below is a **read-then-write**, not an atomic
-        compare-and-swap: Seafile's update API has no such primitive
-        (`docs/reviews/GR-008/SEAFILE-CONCURRENCY-PRIMITIVES.md` §1.3-§1.4).
-        A write that lands in the narrow window between the check and the
-        update therefore wins over a concurrent one. The window is one API
-        round trip; closing it would need a patch to the file server, which is
-        upstream work (GR-014).
+        Writes require user-bound authorization and an upstream atomic
+        compare-and-swap primitive. Stock Seafile has neither, so this gateway
+        fails closed until an upstream endpoint supplies both; a gateway lock
+        cannot protect against external writers.
         """
-        if not session.can_edit:
+        if not session.can_edit or not session.user_authorized:
             return {"ok": False, "error": "you do not have permission to edit this file"}, 403
+        if name is not None and name != session.name:
+            return {"ok": False, "error": "Save As and exports cannot replace the original file"}, 400
         if len(data) > self.max_bytes:
             return {"ok": False, "error": "the document is larger than the limit"}, 413
+        if not payload_matches_name(session.name, data):
+            return {"ok": False, "error": "saved content does not match the original document type"}, 400
 
-        # The conflict check: the content id must still be the one we opened.
+        # Seahub re-authorizes the user and the fileserver atomically checks the
+        # opened file id and repository head before committing the new version.
         try:
-            detail = self.seafile.file_detail(session.repo_id, session.path)
+            saved = self.seafile.thirdparty_file_save(
+                session.access_token, session.file_id, session.head_commit_id,
+                session.name, data)
+        except AttributeError:
+            return {"ok": False, "error": "user-bound Seafile save is unavailable"}, 503
         except SeafileError as exc:
             if exc.status == 404:
                 return {"ok": False, "error": "the file no longer exists"}, 404
-            return {"ok": False, "error": f"cannot read the file: {exc}"}, 502
-
-        current = detail.get("id") or ""
-        if not current:
-            return {"ok": False, "error": "the file no longer exists"}, 404
-        if current != session.file_id:
-            return {
-                "ok": False,
-                "error": "this file was modified by someone else while you were editing it; "
-                         "your changes were not saved",
-                "conflict": True,
-                "expected": session.file_id,
-                "current": current,
-            }, 409
-        permission = detail.get("permission")
-        if permission not in EDITABLE_PERMISSIONS:
-            return {"ok": False, "error": "you no longer have permission to edit this file"}, 403
-
-        try:
-            new_id = self.seafile.update_file(session.repo_id, session.path, data)
-        except SeafileError as exc:
-            return {"ok": False, "error": f"Seafile refused the write: {exc}"}, 502
-
-        session.file_id = new_id or session.file_id
+            if exc.status in (401, 403):
+                return {"ok": False, "error": "you no longer have permission to edit this file"}, 403
+            if exc.status == 409:
+                return {
+                    "ok": False,
+                    "error": "this file or library changed while you were editing it; "
+                             "your changes were not saved",
+                    "conflict": True,
+                }, 409
+            return {"ok": False, "error": f"Seafile save failed: {exc}"}, 502
+        session.file_id = saved["file_id"]
+        session.head_commit_id = saved["head_commit_id"]
         session.unsaved = False
-        # The version is the file's modification time AFTER the write. The one
-        # read before the write would be the old version's, and saying so would
-        # be a lie.
-        version = None
-        try:
-            after = self.seafile.file_detail(session.repo_id, session.path)
-            version = after.get("last_modified")
-        except SeafileError:
-            pass
         return {
             "ok": True,
             "file_id": session.file_id,
-            "version": version,
+            "version": session.head_commit_id,
             "message": "saved",
         }, 200
 
@@ -240,7 +243,9 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 data = gateway.document(session)
             except SeafileError as exc:
-                return self._json(502, {"ok": False, "error": str(exc)})
+                status = exc.status if exc.status in (403, 404, 409) else 502
+                return self._json(status, {"ok": False, "error": str(exc),
+                                          "conflict": status == 409})
             return self._send(200, data, "application/octet-stream",
                               {"Cache-Control": "no-store"})
 
@@ -252,6 +257,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         path = urllib.parse.urlparse(self.path).path
         gateway = self.server.gateway
+        if not self._same_origin():
+            return self._json(403, {"ok": False, "error": "same-origin request required"})
 
         if path == "/open/":
             return self._open(gateway)
@@ -264,7 +271,8 @@ class Handler(BaseHTTPRequestHandler):
             data = self._read_body(limit=gateway.max_bytes)
             if data is None:
                 return self._json(413, {"ok": False, "error": "the document is larger than the limit"})
-            result, status = gateway.save(session, data)
+            name = self.headers.get("X-ArtCraft-Filename")
+            result, status = gateway.save(session, data, name=name)
             return self._json(status, result)
 
         if path.startswith("/session/") and path.endswith("/dirty"):
@@ -291,10 +299,8 @@ class Handler(BaseHTTPRequestHandler):
 
         if access_token:
             session, error = gateway.open_session(access_token)
-        elif repo_id and path:
-            session, error = gateway.open_session_direct(repo_id, path)
         else:
-            return self._json(400, {"ok": False, "error": "no access_token and no repo_id/path"})
+            return self._json(401, {"ok": False, "error": "a Seafile access_token is required"})
 
         if session is None:
             return self._json(400, {"ok": False, "error": error})
@@ -311,6 +317,17 @@ class Handler(BaseHTTPRequestHandler):
             can_edit=session.can_edit,
         )
         return self._send(200, page, "text/html; charset=utf-8", {"Cache-Control": "no-store"})
+
+    def _same_origin(self):
+        origin = urllib.parse.urlsplit(self.headers.get("Origin") or "")
+        request_host = self.headers.get("Host", "").lower()
+        forwarded_proto = self.headers.get("X-Forwarded-Proto", "")
+        request_scheme = forwarded_proto.split(",", 1)[0].strip().lower() or origin.scheme.lower()
+        return bool(
+            origin.scheme.lower() == request_scheme
+            and origin.netloc.lower() == request_host
+            and request_host
+        )
 
     def _serve_static(self, path):
         gateway = self.server.gateway

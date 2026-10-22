@@ -23,8 +23,10 @@ import time
 import urllib.parse
 
 GATEWAY = os.environ.get("ARTCRAFT_GATEWAY", "http://127.0.0.1:8777").rstrip("/")
+GATEWAY_ORIGIN = urllib.parse.urlsplit(GATEWAY).scheme + "://" + urllib.parse.urlsplit(GATEWAY).netloc
 SEAFILE = os.environ.get("ARTCRAFT_SEAFILE_URL", "").rstrip("/")
 TOKEN = os.environ.get("ARTCRAFT_SEAFILE_TOKEN", "")
+ACCESS_TOKEN = os.environ.get("ARTCRAFT_SEAFILE_ACCESS_TOKEN", "")
 
 FAILURES = []
 
@@ -62,6 +64,8 @@ def main():
     repo_id = sys.argv[1]
     path = sys.argv[2] if sys.argv[2].startswith("/") else "/" + sys.argv[2]
     headed = "--headed" in sys.argv
+    if not ACCESS_TOKEN:
+        raise SystemExit("NOT VERIFIED: ARTCRAFT_SEAFILE_ACCESS_TOKEN is required; direct opening is disabled")
 
     try:
         from playwright.sync_api import sync_playwright
@@ -83,9 +87,10 @@ def main():
         f"/api2/repos/{repo_id}/file/history/?p={urllib.parse.quote(path)}").get("commits", [])
 
     # The host page, opened the way the gateway opens it.
-    body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
+    body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
     status, raw = http(f"{GATEWAY}/open/", method="POST", data=body,
-                        headers={"Content-Type": "application/x-www-form-urlencoded"})
+                        headers={"Content-Type": "application/x-www-form-urlencoded",
+                                 "Origin": GATEWAY_ORIGIN})
     if status != 200:
         raise SystemExit(f"gateway /open/ -> HTTP {status}: {raw[:300]!r}")
     page_url = "http://127.0.0.1:8777/open-test.html"
@@ -173,7 +178,7 @@ def main():
             page.screenshot(path=shot)
         try:
             page.wait_for_function(
-                "() => /Saved|Save failed/.test(document.getElementById('state').textContent)",
+                "() => /^Saved/.test(document.getElementById('state').textContent)",
                 timeout=30000)
             saved = True
         except Exception:
@@ -235,9 +240,10 @@ def main():
     import io
     import zipfile
 
-    body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
+    body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
     status, raw = http(f"{GATEWAY}/open/?format=json", method="POST", data=body,
-                        headers={"Content-Type": "application/x-www-form-urlencoded"})
+                        headers={"Content-Type": "application/x-www-form-urlencoded",
+                                 "Origin": GATEWAY_ORIGIN})
     reopened = json.loads(raw)
     status, blob = http(f"{GATEWAY}/session/{reopened['sid']}/document")
     inside = ""

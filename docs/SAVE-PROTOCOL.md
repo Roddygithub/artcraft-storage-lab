@@ -74,18 +74,19 @@ host and the application talk about the same save.
 
 ### 2.2 The host page persists the bytes
 
-The host page POSTs the bytes to the gateway's `/session/<sid>/save`. It does
-**not** decide anything: it has no credential and no rule.
+The host page POSTs the bytes and emitted filename to the gateway's
+`/session/<sid>/save`. It does **not** decide anything: it has no credential
+and no rule.
 
 ### 2.3 The gateway checks, then writes
 
 ```text
 1. the session exists, is not expired, is not idle
-2. the session may write (the permission was re-read from Seafile)
-3. the file still exists
-4. the file has not changed since it was opened   -> else 409
-5. the bytes are within the size limit
-6. the write goes through the file server's update API
+2. the original filename and document type match (Save As/export is rejected)
+3. the actual editing user is authorized on every save
+4. the bytes are within the size limit
+5. an upstream atomic CAS save accepts the opened content id; otherwise the
+   gateway fails closed
 ```
 
 The order matters: **the checks come before the write**, and the write is the last

@@ -148,9 +148,10 @@ function pollSaved(api) {
     if (hash === lastSavedHash) { saving = false; return; }
     try {
       say("Saving…", "busy");
+      window.__saveInFlight = true;
       const resp = await fetch("/session/" + SID + "/save", {
         method: "POST", credentials: "same-origin",
-        headers: { "Content-Type": "application/octet-stream" }, body: bytes,
+        headers: { "Content-Type": "application/octet-stream", "X-ArtCraft-Filename": FILE_NAME }, body: bytes,
       });
       const result = await resp.json();
       window.__lastSave = result;
@@ -158,23 +159,23 @@ function pollSaved(api) {
       // Only a stored save becomes the new baseline: a refused one is retried on
       // the next poll, which is what makes a failed save visible instead of lost.
       if (ok) lastSavedHash = hash;
+      window.__lastDirty = !ok;
       const version = ok ? (result.version ? " — new version " + result.version : "") : "";
       say(ok ? ("Saved" + version) : ("Save failed: " + (result.error || resp.status)),
           ok ? "ok" : "err");
     } catch (err) {
       say("Save failed: " + err.message, "err");
     } finally {
+      window.__saveInFlight = false;
       saving = false;
     }
   }, 700);
 }
 
-// VectorCraft's page API has no dirty signal, so the host page cannot warn about
-// unsaved *edits*. It can warn while a save is on its way to the server, which is
-// the window in which closing the tab would lose bytes the editor already handed
-// over. (The editor itself keeps unsaved work in recovery copies in the browser.)
+// Warn before unloading while an editor is dirty or its bytes are in flight.
+// VectorCraft has no dirty signal, so only its save-in-flight window is visible.
 window.addEventListener("beforeunload", (event) => {
-  if (saving) {
+  if (window.__lastDirty === true || window.__saveInFlight || saving) {
     event.preventDefault();
     event.returnValue = "";
   }
@@ -217,13 +218,14 @@ window.addEventListener("message", async (event) => {
       // The ticket the app gave this save, if it uses one (WordCraft's async_saves).
       const ticket = data.ticket;
       say("Saving…", "busy");
+      window.__saveInFlight = true;
       let ok = false;
       let error = "the save did not happen";
       try {
         const resp = await fetch("/session/" + SID + "/save", {
           method: "POST",
           credentials: "same-origin",
-          headers: { "Content-Type": "application/octet-stream" },
+          headers: { "Content-Type": "application/octet-stream", "X-ArtCraft-Filename": data.name || FILE_NAME },
           body: bytes,
         });
         const result = await resp.json();
@@ -234,12 +236,14 @@ window.addEventListener("message", async (event) => {
           error = "";
         }
         window.__lastSave = result;
+        window.__lastDirty = !ok;
         say(ok ? ("Saved" + (result.version ? " — new version " + result.version : "")) : ("Save failed: " + error),
             ok ? "ok" : "err");
       } catch (err) {
         error = err.message;
         say("Save failed: " + error, "err");
       }
+      window.__saveInFlight = false;
       // Tell the app how the save ended. Without this the app waits for a
       // confirmation that never comes and the document stays dirty forever.
       if (ticket !== undefined && ticket !== null) {

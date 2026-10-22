@@ -29,8 +29,10 @@ import urllib.request
 import zipfile
 
 GATEWAY = os.environ.get("ARTCRAFT_GATEWAY", "http://127.0.0.1:8777").rstrip("/")
+GATEWAY_ORIGIN = urllib.parse.urlsplit(GATEWAY).scheme + "://" + urllib.parse.urlsplit(GATEWAY).netloc
 SEAFILE = os.environ.get("ARTCRAFT_SEAFILE_URL", "").rstrip("/")
 TOKEN = os.environ.get("ARTCRAFT_SEAFILE_TOKEN", "")
+ACCESS_TOKEN = os.environ.get("ARTCRAFT_SEAFILE_ACCESS_TOKEN", "")
 
 FAILURES = []
 
@@ -80,9 +82,12 @@ def history(repo_id, path):
 
 def open_session(repo_id, path):
     """Open a session. Returns (sid, page_html)."""
-    body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
+    if not ACCESS_TOKEN:
+        raise SystemExit("NOT VERIFIED: ARTCRAFT_SEAFILE_ACCESS_TOKEN is required; direct opening is disabled")
+    body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
     status, raw = http(f"{GATEWAY}/open/", method="POST", data=body,
-                        headers={"Content-Type": "application/x-www-form-urlencoded"})
+                        headers={"Content-Type": "application/x-www-form-urlencoded",
+                                 "Origin": GATEWAY_ORIGIN})
     if status != 200:
         raise SystemExit(f"gateway /open/ -> HTTP {status}: {raw[:300]!r}")
     page = raw.decode()
@@ -92,16 +97,20 @@ def open_session(repo_id, path):
 
 def open_session_json(repo_id, path):
     """Open a session and read it as data (the gateway's JSON form of /open/)."""
-    body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
+    if not ACCESS_TOKEN:
+        raise SystemExit("NOT VERIFIED: ARTCRAFT_SEAFILE_ACCESS_TOKEN is required; direct opening is disabled")
+    body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
     status, raw = http(f"{GATEWAY}/open/?format=json", method="POST", data=body,
-                        headers={"Content-Type": "application/x-www-form-urlencoded"})
+                        headers={"Content-Type": "application/x-www-form-urlencoded",
+                                 "Origin": GATEWAY_ORIGIN})
     if status != 200:
         raise SystemExit(f"gateway /open/ -> HTTP {status}: {raw[:300]!r}")
     return json.loads(raw)
 
 
 def gateway_json(url, method="GET", data=None):
-    status, raw = http(url, method=method, data=data)
+    headers = {"Origin": GATEWAY_ORIGIN} if method == "POST" else None
+    status, raw = http(url, method=method, data=data, headers=headers)
     try:
         return status, json.loads(raw)
     except Exception:

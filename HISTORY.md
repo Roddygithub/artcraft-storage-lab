@@ -1,5 +1,15 @@
 # HISTORY
 
+## 2026-10-22 — GPT-6.1 Sol remediation (local only)
+
+The unauthenticated direct `/open` route was closed. Token sessions are writable
+only with an explicit user-bound authorization hook, and saves require an
+atomic upstream CAS hook; the stock Seafile client therefore fails closed.
+WordCraft saves now carry and validate the original filename/type, with Save As
+and PDF export rejected. Deterministic unit coverage was added for the CAS race
+and refusal paths. The real Seafile Web DOCX and ONLYOFFICE checks remain
+**NOT VERIFIED**. Evidence: `docs/reviews/GPT-LUNA-REMEDIATION.md`.
+
 Running log. Newest first.
 
 ## 2026-10-22 — the fourth review, and the GR-012 proof hardened

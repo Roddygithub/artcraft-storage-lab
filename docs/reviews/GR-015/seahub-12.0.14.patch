@@ -1,0 +1,252 @@
+diff --git i/seahub/thirdparty_editor/urls.py w/seahub/thirdparty_editor/urls.py
+index d93791a..c15b60d 100644
+--- i/seahub/thirdparty_editor/urls.py
++++ w/seahub/thirdparty_editor/urls.py
+@@ -1,10 +1,12 @@
+ # Copyright (c) 2012-2016 Seafile Ltd.
+ from django.urls import path
+ 
+-from .views import ThirdpartyEditorFileInfoView, ThirdpartyEditorFileContentView
++from .views import (ThirdpartyEditorFileInfoView, ThirdpartyEditorFileContentView,
++                    ThirdpartyEditorFileSaveView)
+ 
+ urlpatterns = [
+     # RESTful API
+     path('file-info/', ThirdpartyEditorFileInfoView.as_view(), name='ThirdpartyEditorFileInfoView'),
+     path('file-content/', ThirdpartyEditorFileContentView.as_view(), name='ThirdpartyEditorFileContentView'),
++    path('file-save/', ThirdpartyEditorFileSaveView.as_view(), name='ThirdpartyEditorFileSaveView'),
+ ]
+diff --git i/seahub/thirdparty_editor/views.py w/seahub/thirdparty_editor/views.py
+index 0fa2ccc..8d40e13 100644
+--- i/seahub/thirdparty_editor/views.py
++++ w/seahub/thirdparty_editor/views.py
+@@ -4,12 +4,17 @@
+ import os
+ import json
+ import logging
++import io
++import zipfile
++import xml.etree.ElementTree as ElementTree
+ import urllib.request
+ import urllib.error
+ import urllib.parse
++import requests
+ 
+ from rest_framework.views import APIView
+ 
++from django.conf import settings
+ from django.http import HttpResponse
+ from django.core.cache import cache
+ 
+@@ -17,13 +22,38 @@ from pysearpc import SearpcError
+ from seaserv import seafile_api
+ 
+ from seahub.base.accounts import User, ANONYMOUS_EMAIL
+-from seahub.utils import gen_inner_file_get_url
++from seahub.utils import gen_inner_file_get_url, gen_inner_file_upload_url
++from seahub.utils.repo import parse_repo_perm
+ 
+ 
+ logger = logging.getLogger(__name__)
+ json_content_type = 'application/json; charset=utf-8'
+ 
+ 
++def _matches_file_type(file_path, content):
++    ext = os.path.splitext(file_path)[1].lower()
++    if ext == '.pdf':
++        return content.startswith(b'%PDF-')
++    if ext == '.svg':
++        try:
++            root = ElementTree.fromstring(content)
++        except ElementTree.ParseError:
++            return False
++        return root.tag.rsplit('}', 1)[-1].lower() == 'svg'
++    expected = {
++        '.docx': 'wordprocessingml.document',
++        '.xlsx': 'spreadsheet.sheet',
++        '.pptx': 'presentationml.presentation',
++    }.get(ext)
++    if expected:
++        try:
++            with zipfile.ZipFile(io.BytesIO(content)) as archive:
++                return expected in archive.read('[Content_Types].xml').decode('utf-8')
++        except (KeyError, UnicodeDecodeError, zipfile.BadZipFile):
++            return False
++    return True
++
++
+ def access_token_check(func):
+ 
+     def _decorated(view, request, *args, **kwargs):
+@@ -113,6 +143,11 @@ class ThirdpartyEditorFileInfoView(APIView):
+         result['file_name'] = os.path.basename(file_path)
+         result['file_size'] = file_size
+         result['file_path'] = file_path
++        result['file_id'] = obj_id
++        result['head_commit_id'] = repo.head_cmmt_id
++        result['permission'] = seafile_api.check_permission_by_path(
++            repo_id, os.path.dirname(file_path) or '/', request_user)
++        result['can_edit'] = parse_repo_perm(result['permission']).can_edit_on_web
+ 
+         return HttpResponse(json.dumps(result, ensure_ascii=False), status=200,
+                             content_type=json_content_type)
+@@ -130,7 +165,11 @@ class ThirdpartyEditorFileContentView(APIView):
+         repo_id = info_dict['repo_id']
+         file_path = info_dict['file_path']
+ 
++        expected_id = request.GET.get('expected_file_id')
+         obj_id = seafile_api.get_file_id_by_path(repo_id, file_path)
++        if expected_id and obj_id != expected_id:
++            return HttpResponse(json.dumps({'error': 'file changed'}), status=409,
++                                content_type=json_content_type)
+         file_name = os.path.basename(file_path)
+         try:
+             fileserver_token = seafile_api.get_fileserver_access_token(repo_id,
+@@ -155,3 +194,107 @@ class ThirdpartyEditorFileContentView(APIView):
+                                 content_type=json_content_type)
+ 
+         return HttpResponse(file_content, content_type="application/octet-stream")
++
++
++class ThirdpartyEditorFileSaveView(APIView):
++    """Save one third-party editor document as its current Seafile user."""
++
++    authentication_classes = []
++    permission_classes = []
++
++    def post(self, request, format=None):
++        token = request.GET.get('access_token')
++        if not token:
++            return HttpResponse(json.dumps({'error': 'invalid token'}), status=401,
++                                content_type=json_content_type)
++        info = cache.get('thirdparty_editor_access_token_' + token)
++        if not info:
++            return HttpResponse(json.dumps({'error': 'expired token'}), status=404,
++                                content_type=json_content_type)
++
++        user = info.get('request_user')
++        repo_id = info.get('repo_id')
++        file_path = info.get('file_path')
++        expected_id = request.headers.get('X-Seafile-File-ID')
++        expected_head = request.headers.get('X-Seafile-Head-ID')
++        if not user or user == ANONYMOUS_EMAIL or not repo_id or not file_path:
++            return HttpResponse(json.dumps({'error': 'invalid editor session'}), status=403,
++                                content_type=json_content_type)
++        try:
++            User.objects.get(email=user)
++        except User.DoesNotExist:
++            return HttpResponse(json.dumps({'error': 'user no longer exists'}), status=403,
++                                content_type=json_content_type)
++        if not expected_id or not expected_head or not request.body:
++            return HttpResponse(json.dumps({'error': 'missing save precondition or content'}),
++                                status=400, content_type=json_content_type)
++        if len(request.body) > getattr(settings, 'ARTCRAFT_MAX_FILE_SIZE', 50 * 1024 * 1024):
++            return HttpResponse(json.dumps({'error': 'file is too large'}), status=413,
++                                content_type=json_content_type)
++        submitted_name = urllib.parse.unquote(
++            request.headers.get('X-ArtCraft-Filename', ''))
++        if submitted_name != os.path.basename(file_path):
++            return HttpResponse(json.dumps({'error': 'Save As is not supported'}), status=400,
++                                content_type=json_content_type)
++        if not _matches_file_type(file_path, request.body):
++            return HttpResponse(json.dumps({'error': 'saved content has the wrong file type'}),
++                                status=400, content_type=json_content_type)
++
++        repo = seafile_api.get_repo(repo_id)
++        if not repo:
++            return HttpResponse(json.dumps({'error': 'library no longer exists'}), status=404,
++                                content_type=json_content_type)
++        parent_dir = os.path.dirname(file_path) or '/'
++        permission = seafile_api.check_permission_by_path(repo_id, parent_dir, user)
++        if not parse_repo_perm(permission).can_edit_on_web:
++            return HttpResponse(json.dumps({'error': 'write permission required'}), status=403,
++                                content_type=json_content_type)
++
++        if repo.head_cmmt_id != expected_head:
++            return HttpResponse(json.dumps({'error': 'library changed; reopen the file'}),
++                                status=409, content_type=json_content_type)
++        current_id = seafile_api.get_file_id_by_path(repo_id, file_path)
++        if current_id != expected_id:
++            return HttpResponse(json.dumps({'error': 'file changed; reopen it'}), status=409,
++                                content_type=json_content_type)
++
++        try:
++            update_token = seafile_api.get_fileserver_access_token(
++                repo_id, 'dummy', 'update', user, use_onetime=True)
++        except SearpcError as e:
++            logger.error(e)
++            return HttpResponse(json.dumps({'error': 'cannot authorize save'}), status=500,
++                                content_type=json_content_type)
++        if not update_token:
++            return HttpResponse(json.dumps({'error': 'cannot authorize save'}), status=500,
++                                content_type=json_content_type)
++
++        query = urllib.parse.urlencode({
++            'head': expected_head,
++            'expected_file_id': expected_id,
++        })
++        url = gen_inner_file_upload_url('update-api', update_token) + '?' + query
++        try:
++            response = requests.post(
++                url,
++                data={'target_file': file_path},
++                files={'file': (os.path.basename(file_path), request.body)},
++                timeout=60,
++            )
++        except requests.RequestException as e:
++            logger.error(e)
++            return HttpResponse(json.dumps({'error': 'Seafile save failed'}), status=502,
++                                content_type=json_content_type)
++        if response.status_code == 409:
++            return HttpResponse(json.dumps({'error': 'file changed; reopen it'}), status=409,
++                                content_type=json_content_type)
++        if response.status_code != 200 or not response.text.strip():
++            logger.error('Fileserver rejected third-party editor save: %s', response.status_code)
++            return HttpResponse(json.dumps({'error': 'Seafile save failed'}), status=502,
++                                content_type=json_content_type)
++
++        updated_repo = seafile_api.get_repo(repo_id)
++        return HttpResponse(json.dumps({
++            'file_id': response.text.strip(),
++            'head_commit_id': updated_repo.head_cmmt_id if updated_repo else '',
++        }), status=200, content_type=json_content_type)
+diff --git i/seahub/views/file.py w/seahub/views/file.py
+index 63b68e8..034624c 100644
+--- i/seahub/views/file.py
++++ w/seahub/views/file.py
+@@ -591,6 +591,35 @@ def view_lib_file(request, repo_id, path):
+ 
+         return HttpResponseRedirect(dl_or_raw_url)
+ 
++    # An allow-listed library can use the ArtCraft dispatcher without taking
++    # these file extensions away from ONLYOFFICE in other libraries.
++    artcraft_repo_ids = getattr(settings, 'ARTCRAFT_REPO_IDS', ())
++    artcraft_action_url = getattr(settings, 'ARTCRAFT_ACTION_URL', '')
++    artcraft_file_extensions = getattr(settings, 'ARTCRAFT_FILE_EXTENSIONS', ())
++    artcraft_token_expiration = getattr(settings, 'ARTCRAFT_ACCESS_TOKEN_EXPIRATION', 30 * 60)
++    if repo_id in artcraft_repo_ids and artcraft_action_url:
++        filetype, fileext = get_file_type_and_ext(filename)
++        if fileext in artcraft_file_extensions:
++            user_repo_path_info = {
++                'request_user': request.user.username,
++                'repo_id': repo_id,
++                'file_path': path,
++                'permission': {
++                    'can_edit': parse_repo_perm(permission).can_edit_on_web
++                }
++            }
++            access_token = uuid.uuid4().hex
++            cache.set('thirdparty_editor_access_token_' + access_token,
++                      user_repo_path_info,
++                      artcraft_token_expiration)
++            editor_dict = {
++                'filename': filename,
++                'action_url': artcraft_action_url,
++                'access_token': access_token,
++                'access_token_ttl': int(time.time()) + artcraft_token_expiration,
++            }
++            return render(request, 'view_file_thirdparty_editor.html', editor_dict)
++
+     if ENABLE_THIRDPARTY_EDITOR:
+ 
+         filename = os.path.basename(path)

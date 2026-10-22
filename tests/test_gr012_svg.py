@@ -28,6 +28,7 @@ import zipfile
 GATEWAY = os.environ.get("ARTCRAFT_GATEWAY", "http://127.0.0.1:8777").rstrip("/")
 SEAFILE = os.environ.get("ARTCRAFT_SEAFILE_URL", "").rstrip("/")
 TOKEN = os.environ.get("ARTCRAFT_SEAFILE_TOKEN", "")
+ACCESS_TOKEN = os.environ.get("ARTCRAFT_SEAFILE_ACCESS_TOKEN", "")
 PAGE_URL = "http://127.0.0.1:8777/open-test.html"
 
 FAILURES = []
@@ -81,6 +82,8 @@ def main():
     path = sys.argv[2] if sys.argv[2].startswith("/") else "/" + sys.argv[2]
     name = path.rsplit("/", 1)[-1]
     headed = "--headed" in sys.argv
+    if not ACCESS_TOKEN:
+        raise SystemExit("NOT VERIFIED: ARTCRAFT_SEAFILE_ACCESS_TOKEN is required; direct opening is disabled")
 
     try:
         from playwright.sync_api import sync_playwright
@@ -99,7 +102,7 @@ def main():
     before_count = history_count(repo_id, path)
 
     # 1. the session, and the host page it serves
-    body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
+    body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
     status, raw = http(f"{GATEWAY}/open/", method="POST", data=body,
                         headers={"Content-Type": "application/x-www-form-urlencoded"})
     if status != 200:
@@ -205,16 +208,21 @@ def main():
         saved_text = saved_blob.decode("utf-8", "replace")
         # VectorCraft writes the rectangle as a path too, so the meaningful
         # assertion is: a valid SVG document, with a path element in it.
-        check("7a. the new bytes are an SVG document that holds the drawn stroke",
-              "<svg" in saved_text and "<path" in saved_text,
-              f"a valid SVG with a path element: "
-              f"{'<svg' in saved_text and '<path' in saved_text}; {len(saved_text)} chars")
+        paths = __import__("re").findall(r"<path\b[^>]*\bd=[\"']([^\"']+)", saved_text)
+        coordinates = [float(value) for path in paths
+                       for value in __import__("re").findall(r"-?\d+(?:\.\d+)?", path)]
+        geometry_ok = ("<svg" in saved_text and paths and len(coordinates) >= 4
+                       and max(coordinates) - min(coordinates) >= 50)
+        check("7a. the new bytes contain the intended non-trivial stroke geometry",
+              bool(geometry_ok),
+              f"{len(paths)} path(s), coordinate span="
+              f"{(max(coordinates) - min(coordinates)) if coordinates else 0}")
 
         # 8. the host page took the bytes and stored them
         saved = False
         for _ in range(60):
             state = page.eval_on_selector("#state", "el => el.textContent")
-            if "Saved" in state or "Save failed" in state:
+            if state.startswith("Saved"):
                 saved = True
                 break
             time.sleep(0.5)
@@ -244,7 +252,7 @@ def main():
           f"{before_count} -> {after_count} version(s)")
 
     # 11. reopen: the bytes Seafile holds are the editor's bytes
-    body = urllib.parse.urlencode({"repo_id": repo_id, "path": path}).encode()
+    body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
     status, raw = http(f"{GATEWAY}/open/?format=json", method="POST", data=body,
                         headers={"Content-Type": "application/x-www-form-urlencoded"})
     reopened = json.loads(raw)
