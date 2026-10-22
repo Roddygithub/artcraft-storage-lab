@@ -1,7 +1,7 @@
 # STATUS
 
 ```text
-PHASE:      Phase 0 — OpenCode routing & bootstrap
+PHASE:      Phase 6-7 — WordCraft MVP, save protocol, conflicts, security
 BRANCH:     main
 SHA:        (see git log)
 
@@ -10,18 +10,20 @@ ARCHITECT:  artcraft-architect        (nvidia/z-ai/glm-5.3#thinking)
 IMPLEMENTER:artcraft-worker           (nvidia/z-ai/glm-5.3-flash#thinking)
 REVIEWER:   artcraft-reviewer         (nvidia/nvidia/nemotron-3-ultra-550b-a55b#high)
 
-FREE REVIEW: PENDING
+FREE REVIEW: PASS (2 rounds, both remediated) — see docs/reviews/REVIEW-0*.md
 GPT REVIEW:  PENDING
 
-CURRENT GR: GR-001 (research in progress)
+CURRENT GR: GR-006 (WordCraft DOCX MVP) — the WordCraft host bridge is built
+            and compiling; the browser build is being packaged.
 
 BLOCKERS:
-- none yet
+- none
 
 NEXT:
-- GR-001  research the real Seafile <-> ONLYOFFICE online-editor contract
-- GR-002  determine the correct Seafile integration point
-- GR-003  audit Web/WASM/host capabilities of the 13 Craft apps
+- GR-006  WordCraft DOCX MVP: the bridge is in, the build is running
+- GR-007  save protocol (docs/SAVE-PROTOCOL.md)
+- GR-009  security review (docs/SECURITY.md)
+- GR-013  the ArtCraft RFC (docs/RFC-DRAFT.md)
 ```
 
 ## Verification legend
@@ -37,40 +39,57 @@ NEXT:
 
 ## GR tracker
 
-| GR | Title | Free review | GPT review |
-| --- | --- | --- | --- |
-| GR-001 | Seafile online-editor integration contract | PENDING | PENDING |
-| GR-002 | Seafile integration point | PENDING | PENDING |
-| GR-003 | ArtCraft Web capability matrix | PENDING | PENDING |
-| GR-004 | Common Craft Web Host Contract | PENDING | PENDING |
-| GR-005 | First host-integration technical proof | PENDING | PENDING |
-| GR-006 | WordCraft Seafile MVP | PENDING | PENDING |
-| GR-007 | Save protocol | PENDING | PENDING |
-| GR-008 | Data integrity and conflicts | PENDING | PENDING |
-| GR-009 | Web integration security | PENDING | PENDING |
-| GR-010 | GridCraft Seafile integration | PENDING | PENDING |
-| GR-011 | DeckCraft Seafile integration | PENDING | PENDING |
-| GR-012 | Non-office Craft integration | PENDING | PENDING |
-| GR-013 | ArtCraft upstream RFC | PENDING | PENDING |
-| GR-014 | First ArtCraft upstream patch | PENDING | PENDING |
+| GR | Title | Artifact | Free review | GPT review |
+| --- | --- | --- | --- | --- |
+| GR-001 | Seafile online-editor integration contract | `docs/reviews/GR-001/DEPLOYED-INSTANCE-CONTRACT.md` | PASS (remediated, REVIEW-01) | PENDING |
+| GR-002 | Seafile integration point | `docs/SEAFILE-INTEGRATION-POINTS.md` | PASS (remediated, REVIEW-01) | PENDING |
+| GR-003 | ArtCraft Web capability matrix | `docs/ARTCRAFT-WEB-CAPABILITIES.md` | PASS (remediated, REVIEW-01) | PENDING |
+| GR-004 | Common Craft Web Host Contract | `docs/HOST-CONTRACT.md` | PASS (remediated, REVIEW-01) | PENDING |
+| GR-005 | First technical proof | `docs/reviews/GR-005/` | PASS (remediated, REVIEW-02) | PENDING |
+| GR-006 | WordCraft Seafile MVP | `docs/reviews/GR-006/` | PENDING | PENDING |
+| GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PENDING | PENDING |
+| GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | PASS (remediated, REVIEW-02) | PENDING |
+| GR-009 | Web integration security | `docs/SECURITY.md` | PENDING | PENDING |
+| GR-010 | GridCraft Seafile integration | `docs/reviews/GR-010/` | PENDING | PENDING |
+| GR-011 | DeckCraft Seafile integration | `docs/reviews/GR-011/` | PENDING | PENDING |
+| GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | PENDING | PENDING |
+| GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PENDING | PENDING |
+| GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | PENDING | PENDING |
+
+## What is already true
+
+| Claim | Evidence |
+| --- | --- |
+| Seafile ships a **generic, configuration-only** hook for third-party online editors | `docs/SEAFILE-INTEGRATION-POINTS.md` §2, `haiwen/seahub` `seahub/thirdparty_editor/` |
+| the contract Seafile expects from an external web editor | `docs/reviews/GR-001/DEPLOYED-INSTANCE-CONTRACT.md` |
+| Seafile has **no** compare-and-swap for a file update, so the conflict check must be ours | `docs/reviews/GR-008/SEAFILE-CONCURRENCY-PRIMITIVES.md` |
+| **all 13** ArtCraft apps have a browser build; **3** already have a `?host=parent` bridge | `docs/ARTCRAFT-WEB-CAPABILITIES.md` |
+| the Craft web apps' host seam is the `Services` struct, and WordCraft's is the richest | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §1 |
+| a real Craft web app, in a real browser, edits a Seafile file and saves a **new version** | `docs/reviews/GR-005/` (screenshot + test output) |
+| a stale save is **refused**, and the file is left alone | `tests/test_integration.py` §3 |
+| the WordCraft host bridge (the GR-014 patch) **compiles** | `docs/reviews/GR-014/` |
 
 ## Environment notes
 
 | Item | Value |
 | --- | --- |
-| OpenCode | v2.1.0 |
-| Agent definitions | `config/opencode/agents/` → installed to `~/.config/opencode/agents/` |
-| Seafile test host | `svc-seafile-host.tailb64fb1.ts.net` (read-only inspection so far) |
-| Seafile local install | none on this workstation — Seafile is remote |
-| ArtCraft apps on this machine | 13 `*-bin` AUR packages installed (native Rust/egui, **no webview**) |
-| Production ONLYOFFICE | **untouched** |
+| OpenCode | v2.1.0, V2 agent format (Markdown + frontmatter, `~/.config/opencode/agents/`) |
+| Agent definitions | `config/opencode/agents/` -> installed with `scripts/install-agents.sh` |
+| Seafile reference host | `svc-seafile-host.tailb64fb1.ts.net` (LXC 108, Pro 12.0.14) |
+| Reverse proxy | Nginx Proxy Manager, LXC 103 |
+| ONLYOFFICE | LXC 112, Document Server 24.04, **untouched** |
+| Test library | `c82cc792-389d-43e6-b963-0dab1a47a9a8` ("OnlyOffice"), folder `/artcraft-lab/` |
+| Gateway | `integration/gateway/`, running on `127.0.0.1:8777` for the tests |
+| Craft web builds | fetched with `scripts/fetch-craft-web.sh` into `integration/static/` (gitignored) |
+| Rust toolchain | 1.97.0 + `wasm32-unknown-unknown`; `trunk` 0.22.0 in `~/.local/bin` |
+| Browser test | Playwright chromium in `~/.cache/ms-playwright`; a Python venv with `playwright` |
+| Seafile config change | `ENABLE_THIRDPARTY_EDITOR` + one extension, backed up, documented in `docs/reviews/GR-005/` |
 
-## Key early findings
+## The two decisive early findings
 
-1. **ArtCraft is native, not web.** The baseline audit (`~/ArtCraft-Audit.md`) states
-   the 13 apps are **Rust only, egui/eframe + wgpu, explicitly not Tauri/Electron/webview**.
-   The CI gate mentions `wasm`, so some crates may already target WASM.
-   => Whether usable "Craft Web" editors exist **today** is the pivotal open
-   question of GR-003, and it may change the project plan.
-2. **Seafile reference is remote.** No local Seafile/Docker runtime on this
-   workstation; the integration test bed is the remote server.
+1. **The Craft web apps exist.** The baseline audit was about the desktop packages
+   and was silent about the browser builds. The project is therefore *"wire the
+   existing editors to a host protocol"*, not *"build editors"*.
+2. **A host bridge already exists in three of the thirteen apps**, with a consistent
+   vocabulary and a correct security model. The project is therefore *"generalise
+   and upstream what is there"*, not *"invent a host API"*.
