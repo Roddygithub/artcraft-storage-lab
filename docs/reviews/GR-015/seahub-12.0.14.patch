@@ -219,7 +219,7 @@ index 0fa2ccca3..5f96ecf5a 100644
 +        })
 +        # A dedicated route makes unsupported fileservers fail with 404 before
 +        # any unconditional update can happen. Never probe via update-api.
-+        url = gen_inner_file_upload_url('conditional-update-api', update_token) + '?' + query
++        url = gen_inner_file_upload_url('update-conditional-api', update_token) + '?' + query
 +        try:
 +            response = requests.post(
 +                url,

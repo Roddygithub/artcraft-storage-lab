@@ -42,7 +42,7 @@ index 528f3f6..b985382 100644
 +                        expected_file_id == NULL, TRUE, gc_id, error) < 0) {
          ret = -1;
 diff --git a/server/upload-file.c b/server/upload-file.c
-index 5316c6e..f247aa3 100755
+index 5316c6e..0593096 100755
 --- a/server/upload-file.c
 +++ b/server/upload-file.c
 @@ -49,2 +49,3 @@ enum UploadError {
@@ -72,8 +72,7 @@ index 5316c6e..f247aa3 100755
 +            } else if (error->code == SEAF_ERR_CONCURRENT_UPLOAD) {
 +                error_code = ERROR_CONFLICT;
              }
-@@ -1702,2 +1711,17 @@ format_update_json_ret (const char *filename, const char *file_id, gint64 size)
- 
+@@ -1712,2 +1727,17 @@ update_ajax_cb(evhtp_request_t *req, void *arg)
 +static void
 +conditional_update_api_cb(evhtp_request_t *req, void *arg)
 +{
@@ -90,15 +89,15 @@ index 5316c6e..f247aa3 100755
 +}
 +
  static void
+ update_ajax_cb(evhtp_request_t *req, void *arg)
 @@ -1793,2 +1817,3 @@ update_ajax_cb(evhtp_request_t *req, void *arg)
                                           head_id,
 +                                         NULL,
                                           mtime,
-@@ -2922,2 +2947,7 @@ upload_file_init (evhtp_t *htp, const char *http_temp_dir)
- 
+@@ -2923,1 +2948,6 @@ upload_file_init (evhtp_t *htp, const char *http_temp_dir)
 +    /* ArtCraft uses this unique route so patched Seahub fails closed against
 +     * stock/Go fileservers that do not implement conditional saves. */
-+    cb = evhtp_set_regex_cb (htp, "^/conditional-update-api/.*", conditional_update_api_cb, NULL);
++    cb = evhtp_set_regex_cb (htp, "^/update-conditional-api/.*", conditional_update_api_cb, NULL);
 +    evhtp_set_hook(&cb->hooks, evhtp_hook_on_headers, upload_headers_cb, NULL);
 +
      cb = evhtp_set_regex_cb (htp, "^/update-blks-api/.*", update_blks_api_cb, NULL);

@@ -174,16 +174,32 @@ save_post = next(node for node in save_view_node.body
                  if isinstance(node, ast.FunctionDef) and node.name == "post")
 route_constants = [node.value for node in ast.walk(save_post)
                    if isinstance(node, ast.Constant) and isinstance(node.value, str)]
-assert "conditional-update-api" in route_constants
+route_name = next(value for value in route_constants
+                   if value.endswith("-conditional-api"))
+assert route_name == "update-conditional-api"
 assert "update-api" not in route_constants
+token_calls = [node for node in ast.walk(save_post)
+               if isinstance(node, ast.Call)
+               and isinstance(node.func, ast.Attribute)
+               and node.func.attr == "get_fileserver_access_token"]
+assert len(token_calls) == 1
+assert any(isinstance(arg, ast.Constant) and arg.value == "update"
+           for arg in token_calls[0].args)
 server_source = Path(server_root)
 patched_c = (server_source / "server/upload-file.c").read_text(encoding="utf-8")
 go_router = (server_source / "fileserver/fileserver.go").read_text(encoding="utf-8")
-assert '"^/conditional-update-api/.*", conditional_update_api_cb' in patched_c
+assert f'"^/{route_name}/.*", conditional_update_api_cb' in patched_c
 wrapper = patched_c.split("conditional_update_api_cb(evhtp_request_t *req, void *arg)", 1)[1]
 assert "!head_id || !*head_id || !expected_file_id || !*expected_file_id" in wrapper
 assert "update_api_cb(req, arg);" in wrapper
-assert '"/conditional-update-api/{.*}"' not in go_router
+hook = patched_c.split("check_access_token (const char *token,", 1)[1].split("\n}", 1)[0]
+assert "strncmp (url_op, op, strlen(op)) != 0" in hook
+headers_cb = patched_c.split("upload_headers_cb (evhtp_request_t *req, evhtp_headers_t *hdr, void *arg)", 1)[1]
+assert "char *url_op = parts[0];" in headers_cb
+assert "check_access_token (token, url_op," in headers_cb
+assert route_name.startswith("update")
+assert route_name != "update-api"
+assert '"/update-conditional-api/{.*}"' not in go_router
 
 print("PASS: current read permission is checked on each request")
 print("PASS: revoked/non-preview/anonymous capability reads are refused")
