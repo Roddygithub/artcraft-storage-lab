@@ -14,7 +14,10 @@ GPT-6.1 Sol independently re-reviewed candidate
 report is `docs/reviews/GPT-SOL-REREVIEW-D9EF476.md`. The required DOCX MVP is
 not proven, and conditional-save, read-authorization, save-acknowledgement,
 GridCraft/SVG, licensing and security findings remain. No GPT PASS was granted;
-upstream remains locked. Remediation edits after that SHA are unreviewed.
+upstream remains locked. Luna's local remediation and reproduction report is
+`docs/reviews/GPT-LUNA-AUDIT.md`. The current clean `main` tip includes local
+remediation commits and is **not yet reviewed by Sol**. The live Seafile
+synthetic DOCX still opens ONLYOFFICE; no edit/save was made during recovery.
 
 ## 1. Repository
 

@@ -19,8 +19,9 @@ Upstream RFC/patch: NOT READY
 Upstream publication: LOCKED
 ```
 
-The candidate remains immutable. Luna remediation is in progress in the working
-tree; no remediation change is yet part of a newly frozen candidate.
+The failed candidate remains immutable. Luna has committed local remediation and
+recorded the audit in `docs/reviews/GPT-LUNA-AUDIT.md`. The current clean `main`
+tip is a new candidate awaiting a fresh Sol review; it is not deployed or pushed.
 
 ## Queue
 

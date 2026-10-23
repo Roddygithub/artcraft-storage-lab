@@ -4,7 +4,8 @@
 PHASE:      GPT-6.1 Sol FAIL; local Seafile connector work in progress
 BRANCH:     main
 REVIEWED SHA: d9ef476e6fbcb04c9a9e23cfe235812167d1f27c
-WORKTREE:   remediation in progress; uncommitted changes are not reviewed
+WORKTREE:   clean; local remediation commits after the reviewed SHA are not reviewed by Sol
+LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
             -- MiniMax free was RETIRED during GR-012; see docs/AI-ROUTING.md --
@@ -28,7 +29,7 @@ BLOCKERS:
 - 9 of 13 ArtCraft web apps still lack a ready browser host bridge or integration build
 
 NEXT:
-- remediate Sol findings and run checks that can be verified locally
+- send the current exact `main` tip for a fresh independent Sol review
 - build and exercise GR-015 only in an isolated synthetic Seafile deployment; do not install on the live LXC
 - validate the actual Seafile DOCX click/edit/save/version/close/reopen flow and ONLYOFFICE preservation before claiming MVP
 - extend the shared bridge to the remaining ArtCraft apps by capability, without routing unsupported files
