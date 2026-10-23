@@ -61,6 +61,26 @@ two-editor concurrent save/reopen was then reproduced and documented; Nemotron
 has not reviewed that later evidence. See
 `docs/reviews/REVIEW-NEMOTRON-A4ECC8E.md`.
 
+Nemotron then reviewed exact SHA `36c0bc0f2b534b34c52193519fbb422ac5c22948`
+and returned FAIL for candidate readiness. It accepted the separate-origin
+synthetic handoff/save evidence and retained blockers for ONLYOFFICE
+preservation, authorization edge cases, production security topology, and
+runtime validation against unsupported fileservers. Major findings remain for
+GridCraft/VectorCraft acknowledgement and semantic reopen, save crash/retry
+windows, and licensing. After that review, another fresh gateway session
+reported `Saved — new version`, `dirty=false`, `confirmedSave=true`; a fresh
+Seafile-backed WordCraft load read a valid DOCX with the edit marker. This
+strengthens the local DOCX evidence only. Full report:
+`docs/reviews/REVIEW-NEMOTRON-36C0BC0.md`.
+
+An additional Django-runtime guard now calls the pinned patched Seahub view:
+the ArtCraft allowlist selects the ArtCraft handoff, and a non-allowlisted DOCX
+falls through to Seahub's ONLYOFFICE view template. Storage and the OnlyOffice
+response builder are synthetic doubles, so actual Document Server
+edit/save/version/reopen remains unverified. See
+`tests/test_gr015_dispatch.py` and the reproduction command in the GR-015
+runtime report.
+
 ## 1. Repository
 
 | Item | Value |

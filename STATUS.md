@@ -24,7 +24,8 @@ CURRENT GR: GR-015 — per-library routing + user-bound conditional save (local 
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
-                    two-editor save race reproduced afterward, other findings open
+                    two-editor save race reproduced afterward; Nemotron also
+                    returned FAIL on `36c0bc0`; see review reports
 
 VERIFIED IN LOCAL REMEDIATION:
 - GR-015's synthetic DOCX file-list click → WordCraft edit → durable version →
@@ -37,10 +38,13 @@ VERIFIED IN LOCAL REMEDIATION:
   rendered only the committed edit
 - a follow-up used separate synthetic loopback origins for Seahub (`:18000`)
   and gateway/Craft (`:18777`); WordCraft saved `OriginCheck`, and a fresh
-  route load/readback preserved it. Synthetic Seahub config was restored.
+  route load/readback preserved it. A subsequent fresh gateway session reported
+  `Saved — new version`, `dirty=false`, `confirmedSave=true`; a later Seafile
+  content readback contained `AckConfirmed`. Synthetic Seahub config was restored.
 
 OPEN GAPS:
-- ONLYOFFICE edit/save/version/reopen regression remains NOT VERIFIED
+- ONLYOFFICE edit/save/version/reopen regression remains NOT VERIFIED; this is
+  a non-regression check, not a change to the ArtCraft target
 - GridCraft durable acknowledgement and XLSX semantic reopen are not verified
 - VectorCraft Seafile semantic reopen is not verified
 - the first E2E browser run used a same-origin proxy; a separate-origin loopback
@@ -50,11 +54,13 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- exercise isolated read-only/revocation and unsupported-fileserver cases; do not
-  install the patch on the live LXC
-- evaluate ONLYOFFICE preservation in a safe test configuration, then inspect
-  exact diffs and freeze a new candidate SHA before one cost-bounded independent
-  final review; no Sol call is being made now
+- the patched Seahub view now passes an isolated dispatch guard: ArtCraft for
+  the allowlisted DOCX and the ONLYOFFICE template for a non-allowlisted DOCX;
+  actual Document Server edit/save/version/reopen is still open
+- continue isolated permission revocation/read-only and unsupported-fileserver
+  tests; do not install the patch on the live LXC
+- once prototype-critical tests and exact diffs are recorded, freeze a new SHA
+  for one cost-bounded independent final review; no Sol call is being made now
 - keep upstream publication locked; GPT REVIEW remains FAIL
 ```
 

@@ -60,6 +60,21 @@ ONLYOFFICE regression, read-only/revocation cases, unsupported stock/Go
 fileserver behavior, and the other Craft apps remain unverified. Public
 deployment and upstream publication remain locked.
 
+Nemotron independently reviewed the separate-origin evidence at exact SHA
+`36c0bc0f2b534b34c52193519fbb422ac5c22948` and returned **FAIL for candidate
+readiness**. It accepted the separate-origin browser handoff and durable-save
+evidence but retained findings for ONLYOFFICE preservation, authorization edge
+cases, production security topology, unsupported fileserver behavior, other
+Crafts, concurrency windows, and licensing. After that review, a fresh gateway
+session exposed `Saved — new version` with `confirmedSave=true`; the next fresh
+Seafile-backed WordCraft load read a DOCX containing the edit. This is added
+prototype evidence, not a new immutable candidate or independent review. Full
+report: `docs/reviews/REVIEW-NEMOTRON-36C0BC0.md`.
+The exact patched Seahub handler was also exercised with synthetic storage and
+an ONLYOFFICE response double: allow-listed DOCX selected ArtCraft, while a
+non-allow-listed DOCX selected Seahub's existing ONLYOFFICE template. This is
+a routing guard only; Document Server edit/save/version/reopen remains untested.
+
 ## Queue
 
 ### GR-001 — Seafile online-editor integration contract

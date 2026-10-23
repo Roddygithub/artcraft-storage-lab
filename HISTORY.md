@@ -49,6 +49,27 @@
   remains FAIL and upstream remains locked. Evidence:
   `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`.
 
+## 2026-10-23 — independent review of separate-origin evidence
+
+* Nemotron reviewed exact SHA
+  `36c0bc0f2b534b34c52193519fbb422ac5c22948` and returned FAIL for candidate
+  readiness. It accepted the separate-origin synthetic handoff and persistent
+  DOCX evidence, while keeping ONLYOFFICE preservation, authorization edge
+  cases, production security topology, unsupported fileserver behavior,
+  GridCraft/VectorCraft semantic saves, and licensing open. Full report:
+  `docs/reviews/REVIEW-NEMOTRON-36C0BC0.md`.
+* After the review, another fresh gateway session saved `AckConfirmed` and
+  reported `Saved — new version`, `dirty=false`, and `confirmedSave=true`.
+  A subsequent Seafile-backed WordCraft document fetch returned a valid DOCX
+  whose XML contained `AckConfirmed`, `OriginCheck`, and the winning edit, and
+  omitted the losing edit. This improves local DOCX evidence but does not close
+  the review findings or make this tip a GPT candidate.
+* A runtime guard also called the patched Seahub view with synthetic storage
+  and ONLYOFFICE response doubles: allow-listed DOCX selected ArtCraft, and
+  non-allow-listed DOCX selected the existing ONLYOFFICE view template. This
+  confirms dispatch fallback only; Document Server save preservation is still
+  unverified. Reproduction: `tests/test_gr015_dispatch.py`.
+
 ## 2026-10-23 — isolated Seafile/WordCraft runtime E2E and conditional race
 
 * Starting from local tip `7f828a4c58f49de247ac71bc66e58d2f41bfa230`, applied

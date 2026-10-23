@@ -154,6 +154,26 @@ timed out on the canvas-heavy tab; the earlier same-origin run did observe it.
 This test does not establish production origin isolation through a reverse
 proxy, TLS, CSP, CSRF, or credential non-access from an adversarial Craft build.
 
+### Follow-up: host confirmation and another Seafile readback
+
+After the separate-origin save, a fresh gateway `/open/` session loaded the
+current DOCX. A second synthetic edit (`AckConfirmed`) followed by Ctrl+S
+changed the host status to `Saved — new version dd23f47ae94d0f74657b9eeda0e9b7924c8b8d52`;
+the host exposed `dirty=false`, `confirmedSave=true`, and
+`saveConfirmationPending=false`. The editor canvas was not captured, so this is
+the host's protocol acknowledgement, not a visual screenshot. A fresh Seafile
+file-view request then loaded WordCraft and its document endpoint returned a
+valid DOCX whose `word/document.xml` contained `AckConfirmed`, `OriginCheck`,
+and the winning concurrent edit, and omitted the losing edit. This closes the
+earlier gap for a visible host confirmation and a subsequent Seafile content
+readback, but it does **not** capture that confirmation inside the cross-origin
+Seahub iframe itself; production-proxy behavior remains unverified.
+
+The UI readback used the host document endpoint after the gateway returned
+success. The XML check establishes persisted semantic content. The follow-up
+fresh WordCraft route loaded that same response, but the canvas-heavy editor did
+not provide a capturable visual proof in this session.
+
 ## Conditional-route token check
 
 Using the patched fileserver's actual HTTP listener and tokens minted by its
@@ -170,6 +190,26 @@ This verifies the narrow route-name/header-hook correction at runtime without
 weakening token operation checks. The incomplete-request 400 is not a document
 save; the successful DOCX save above is the evidence for that.
 
+## ONLYOFFICE dispatch guard
+
+The synthetic stack has no ONLYOFFICE Document Server. To test the routing
+boundary without configuring the live service, `tests/test_gr015_dispatch.py`
+executes the patched Seahub `view_lib_file` handler in its Django runtime. With
+the storage API and ONLYOFFICE response builder replaced by synthetic doubles,
+it asserts that an allow-listed DOCX selects the ArtCraft handoff template and
+the same DOCX in a non-allow-listed library falls through to
+`onlyoffice_file_view_react.html`. This verifies the new per-library branch
+does not shadow Seahub's existing ONLYOFFICE route. It does **not** load
+Document Server or test ONLYOFFICE edit/save/version/reopen; that compatibility
+check remains open.
+
+Reproduction in the pinned runtime container:
+
+```sh
+podman cp tests/test_gr015_dispatch.py artcraft-seafile-dev:/tmp/test_gr015_dispatch.py
+podman exec artcraft-seafile-dev sh -lc 'PYTHONPATH=/usr/local/lib/python3.10/site-packages:/work/src/seafile-server/python:/work/src/seahub:/work/src/seahub/thirdpart SEAFILE_CENTRAL_CONF_DIR=/work/test-config SEAFILE_CONF_DIR=/work/test-data SEAFILE_DATA_DIR=/work/test-data CCNET_CONF_DIR=/work/test-config DJANGO_SETTINGS_MODULE=seahub.settings python3 /tmp/test_gr015_dispatch.py'
+```
+
 ## Limits still open
 
 | Area | Status |
@@ -179,7 +219,7 @@ save; the successful DOCX save above is the evidence for that.
 | Permission revocation, read-only bypass, expired/replayed capability | **NOT VERIFIED** end to end |
 | Unsupported stock C or Go fileserver fails closed | Source route absence is known; runtime deployment test **NOT RUN** |
 | ONLYOFFICE edit/save/version/reopen regression | **NOT RUN**; ONLYOFFICE was not configured in the scratch stack |
-| Separate Seahub/gateway origins and cross-origin handoff | **REPRODUCED** on distinct loopback ports; production TLS/proxy/CSP/CSRF and adversarial-frame testing remain **NOT VERIFIED** |
+| Separate Seahub/gateway origins and cross-origin handoff | **REPRODUCED** on distinct loopback ports; a fresh gateway session showed the host save acknowledgement and a following Seafile readback retained the edit. The acknowledgement was not captured inside the cross-origin Seahub iframe. Production TLS/proxy/CSP/CSRF and adversarial-frame testing remain **NOT VERIFIED** |
 | Production Seafile / LAN / Tailscale | **NOT TESTED or changed** |
 | GridCraft, VectorCraft, DeckCraft, PdfCraft | **NOT covered by this DOCX evidence** |
 | Upstream RFC/patch or publication | **NOT READY; locked** |
@@ -199,6 +239,7 @@ already installed Chromium build. No dependency was added to the repository.
 | `/tmp/artcraft-review-pw/bin/python tests/test_hostpage_protocol.py` | 0 | Synthetic save acknowledgement, dirty state, overlapping-ticket refusal and retry protocol |
 | `/tmp/artcraft-review-pw/bin/python tests/test_wordcraft_host_roundtrip.py` | 0 | Real WordCraft Web edit/serialize/ack/reopen against in-memory storage; not Seafile persistence |
 | `/tmp/artcraft-review-pw/bin/python tests/test_vectorcraft_svg_local.py` | 0 | Local VectorCraft editor semantics; not gateway or Seafile persistence |
+| `tests/test_gr015_dispatch.py` in `artcraft-seafile-dev` | 0 | Patched Django view selects ArtCraft for allow-listed DOCX and preserves the ONLYOFFICE template fallback elsewhere; test doubles do not exercise Document Server |
 | `python3 tests/test_gr012_svg_assertions.py` | 0 | SVG false-positive guards |
 | `python3 tests/test_xlsx_fixture.py` | 0 | Formula fixture includes an OOXML `<f>` element and cached value |
 | `ARTCRAFT_SEAHUB_SOURCE=/tmp/artcraft-seafile-dev/src/seahub ARTCRAFT_SEAFILE_SERVER_SOURCE=/tmp/artcraft-seafile-dev/src/seafile-server python3 tests/test_gr015_authorization.py` | 0 | Exact patched helper/decorator checks with synthetic dependencies; not Django authorization runtime |
