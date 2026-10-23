@@ -56,8 +56,8 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | 3.2 | Edit a cell value | value changes | [~] historical simulated editor run; not an accepted E2E result |
 | 3.3 | Edit a formula | formula recomputes | [ ] not yet exercised |
 | 3.4 | Minimal formatting | applied | [ ] not yet exercised |
-| 3.5 | Save | new Seafile version | [ ] NOT VERIFIED; GridCraft bridge cannot consume durable save acknowledgement |
-| 3.6 | Reopen | values and formulas preserved | [ ] NOT VERIFIED; previous assertion inspected bytes, not a reopened GridCraft editor |
+| 3.5 | Save | new Seafile version | [~] patched bridge waits for ticketed host result; real GridCraft browser smoke with synthetic parent confirms failure stays dirty and success clears it; no GridCraft→Seafile version E2E yet |
+| 3.6 | Reopen | values and formulas preserved | [ ] NOT VERIFIED; no GridCraft editor reopen or formula-semantic check after Seafile persistence |
 | 3.7 | Concurrent edit | conflict, no silent overwrite | [~] fake-CAS unit test only; Seafile fileserver behavior is NOT VERIFIED |
 
 ## 4. PPTX — DeckCraft (GR-011)

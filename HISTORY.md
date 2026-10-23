@@ -1,5 +1,30 @@
 # HISTORY
 
+## 2026-10-23 — GridCraft waits for a durable host save result
+
+* Prepared a patch against GridCraft `06920de8da609c19de7446945cfc62b844691efd`.
+  Save messages now carry a ticket and the exact immutable workbook snapshot;
+  GridCraft marks only that document snapshot clean after a successful host
+  `saveResult`. Edits made while saving remain dirty, and PDF/export callbacks
+  cannot mark the source workbook clean.
+* Added a focused engine test for an older acknowledged snapshot, document
+  switching, and a late acknowledgement after close. The test passed, and
+  `cargo check -p gridcraft-web --target wasm32-unknown-unknown` passed against
+  the pinned checkout. These checks do not prove the patch works in the
+  gateway/Seafile browser runtime or that XLSX formulas survive editor reopen.
+* Also built the optimized Web artifact and ran it in headless Chromium with a
+  synthetic parent/storage. A real cell edit serialized into valid XLSX bytes;
+  a failed save result kept GridCraft dirty, and a successful retry result
+  cleared it. This tests the editor bridge, not Seafile persistence or formula
+  recalculation. Full results and limits are in `docs/reviews/GR-010/README.md`.
+* A full `cargo test -p gridcraft-ui-egui` attempt hit the `/tmp` disk quota
+  compiling unrelated integration binaries. The two changed callback targets
+  were then run individually: `file_menu` 12/12 and `text_box_editing` 4/4.
+* The source patch and evidence limits are in `docs/reviews/GR-010/`. GridCraft
+  remains one step in the broader goal of connecting all ArtCraft web editors;
+  this does not complete or independently review GR-010. No upstream ArtCraft,
+  production Seafile, or public service was changed.
+
 ## 2026-10-23 — GR-015 read-only and revoked-save runtime guard
 
 * Added a focused Django URL-level test for the patched save view. It uses the

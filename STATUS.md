@@ -45,7 +45,9 @@ VERIFIED IN LOCAL REMEDIATION:
 OPEN GAPS:
 - ONLYOFFICE edit/save/version/reopen regression remains NOT VERIFIED; this is
   a non-regression check, not a change to the ArtCraft target
-- GridCraft durable acknowledgement and XLSX semantic reopen are not verified
+- GridCraft's ticketed acknowledgement patch passes a real-browser smoke test
+  with synthetic parent/storage; GridCraft→Seafile persistence and XLSX semantic
+  reopen are not verified
 - VectorCraft Seafile semantic reopen is not verified
 - the first E2E browser run used a same-origin proxy; a separate-origin loopback
   follow-up now verifies the handoff and durable save, but production TLS,
@@ -91,7 +93,7 @@ NEXT:
 | GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PASS (REVIEW-03) | PENDING |
 | GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | remediation required | FAIL (Sol) |
 | GR-009 | Web integration security | `docs/SECURITY.md` | remediation required | FAIL (Sol) |
-| GR-010 | GridCraft Seafile integration | `docs/reviews/GR-010/README.md` | PASS (remediated, REVIEW-02) | PENDING |
+| GR-010 | GridCraft Seafile integration | `docs/reviews/GR-010/README.md` | PASS (remediated, REVIEW-02; new bridge patch not independently reviewed) | FAIL on 0edbe52 |
 | GR-011 | DeckCraft Seafile integration | — (needs the upstream bridge) | not started | PENDING |
 | GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | PASS (remediated, REVIEW-04) | PENDING |
 | GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PASS (REVIEW-03) | PENDING |

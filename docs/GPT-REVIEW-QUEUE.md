@@ -287,11 +287,12 @@ Known risks:    CSP, a CSRF check on the state-changing endpoints, and a rate
 
 ### GR-010 — GridCraft Seafile integration
 
-Status: **GPT REVIEW FAIL** — durable save acknowledgement and semantic reopen
-are not established. See `docs/reviews/GR-010/README.md`.
+Status: **GPT REVIEW FAIL** — a pinned-source bridge patch now waits for
+ticketed host save results, but GridCraft→Seafile persistence and semantic
+reopen remain NOT VERIFIED. See `docs/reviews/GR-010/README.md`.
 
 ```text
-Status:     GPT REVIEW FAIL (Sol); bridge lacks durable save acknowledgement
+Status:     GPT REVIEW FAIL (Sol); local source patch adds ticketed durable-save acknowledgement, but runtime save/reopen remains unverified
 Branch/SHA: (filled at freeze time)
 
 Requirements:  .xlsx open/edit/save/reopen/conflict via GridCraft Web.

@@ -2,7 +2,9 @@
 
 Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; historical free-model PASS is
 provisional and its E2E claim is not accepted. GridCraft durable save is not
-verified with the current ticket/acknowledgement protocol.
+verified against Seafile. A source patch now adds a ticketed host acknowledgement;
+runtime integration and semantic reopen remain unverified.
+Independent review of this narrow patch: **PENDING**.
 Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` ·
 `/artcraft-lab/synthetic.xlsx` (synthetic) · GridCraft 0.10.0 web build
 
@@ -32,23 +34,57 @@ Two facts, both verified before anything was written:
 That combination is what made a **zero-risk** first proof possible on the real
 instance (`docs/reviews/GR-005/README.md` §1).
 
-## 2. The transport
+## 2. The historical transport and current patch
 
 The common contract, unmodified:
 
 ```text
 child -> host   gridcraft:ready   { version }
 host  -> child  gridcraft:open    { name, bytes }
-child -> host   gridcraft:save    { name, bytes }
+child -> host   gridcraft:save    { name, bytes, ticket }
+host  -> child  gridcraft:saveResult { ticket, ok, error }
 child -> host   gridcraft:dirty   { dirty }
 child -> host   gridcraft:failed  { error }
 ```
 
-**The one weakness of this application's bridge is documented and known:**
-`Services::download` in GridCraft has the type `Fn(&str, &[u8])` — **no `Result`** —
-so a failed save is only logged and the workbook is still marked saved
-(`docs/HOST-CONTRACT.md` §3.5). The host page therefore keeps its own "not
-persisted" state, and the upstream fix is A-3 in `docs/UPSTREAM-PLAN.md`.
+The pinned GridCraft bridge previously marked the active workbook clean as soon
+as it handed bytes to the host. The prepared source patch adds a unique ticket,
+keeps the exact immutable workbook snapshot with that ticket, and only updates
+the matching document's saved snapshot after a successful `gridcraft:saveResult`.
+An edit made while the save is pending remains dirty; exports carry no workbook
+snapshot and cannot mark the source clean. This behavior has a focused engine
+unit test and the patched web crate passes a WASM `cargo check`; the patch has
+not yet been exercised against the gateway/Seafile runtime.
+
+### Browser smoke of the patched bridge
+
+The patched release build was loaded as a real GridCraft Web application in
+headless Chromium with a temporary same-origin parent. The parent opened a
+synthetic XLSX, accepted the app's emitted bytes into in-memory test storage,
+and sent a failed result for the first save and a successful result for retry.
+GridCraft stayed dirty after the failure and became clean only after the success
+acknowledgement. The serialized XLSX was a valid ZIP package and contained the
+actual cell edit (`A3` changed from `sum` to `Bk`). The test parent/storage were
+synthetic: this did **not** call Seafile, create a Seafile version, or prove
+formula recalculation/reopen semantics. The fixture needed a minimal styles
+part for GridCraft to parse; that change was made only in the temporary harness.
+
+Commands/checks run against the pinned patched source checkout:
+
+| Command/check | Result | Scope |
+| --- | --- | --- |
+| `cargo test -p gridcraft-engine --lib` | **391 passed** | engine unit suite, including the exact-snapshot acknowledgement test |
+| `cargo test -p gridcraft-ui-egui --lib` | **151 passed** | UI library unit suite |
+| `cargo test -p gridcraft-ui-egui --test file_menu` | **12 passed** | integration target whose download callback signature changed |
+| `cargo test -p gridcraft-ui-egui --test text_box_editing` | **4 passed** | integration target whose download callback signature changed |
+| `cargo check -p gridcraft-web --target wasm32-unknown-unknown` | **PASS** | WASM target and bridge type-check |
+| `trunk build --release` | **PASS** | optimized patched GridCraft Web artifact |
+| Chromium edit → fail ack → retry → success ack | **PASS** | real GridCraft editor; synthetic parent and in-memory storage, not Seafile |
+
+`cargo test -p gridcraft-ui-egui` was also attempted as the full crate suite, but
+the environment hit `Disk quota exceeded` while compiling unrelated integration
+test binaries. The two integration targets affected by this API change passed
+individually; the full integration suite is therefore **NOT VERIFIED**.
 
 ## 3. Historical runs — evidence scope corrected by GPT Sol
 
@@ -108,16 +144,19 @@ the edited cell, and the host page's `Saved — new version …` line.
 | 3.2 edit a cell value | **SIMULATED** in the browser harness |
 | 3.3 edit a formula | not yet exercised |
 | 3.4 minimal formatting | not yet exercised |
-| 3.5 save → a new Seafile version | **NOT VERIFIED**; old host event did not prove durable editor acknowledgement |
+| 3.5 save → a new Seafile version | **NOT VERIFIED**; source patch adds ticketed durable acknowledgement, but the patched bridge has not run through a Seafile save |
 | 3.6 reopen, values and formulas preserved | **NOT VERIFIED**; earlier assertion inspected backend bytes, not a reopened editor |
 | 3.7 concurrent edit → conflict, no silent overwrite | **SIMULATED** by the gateway's fake compare-and-swap test |
 | 2.4 a double save | **NOT VERIFIED** against Seafile; identical-content shortcut is not evidence of a committed version |
 | 2.12 an unsupported format | **PASS** for the gateway extension lookup unit check only |
 
-GridCraft's upstream bridge has no save-result handler and marks its workbook
-saved when handing bytes to the parent. It cannot currently satisfy the host's
-durable acknowledgement contract. Formula semantics and editor reopen must be
-tested after that bridge is repaired.
+The patch is recorded in `gridcraft-0.10.0-durable-save-ack.patch`, targeting
+GridCraft `06920de8da609c19de7446945cfc62b844691efd`. It corrects the bridge's
+early-clean behavior at source level. The E2E evidence above is historical and
+does not exercise this patched bridge. Formula recalculation, a durable
+acknowledgement tied to an actual Seafile commit, Seafile version creation, and
+GridCraft editor reopen must still be tested before GR-010 can claim a
+round-trip.
 
 ## 5. What GR-010 adds beyond GR-005
 
