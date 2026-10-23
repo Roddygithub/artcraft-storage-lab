@@ -54,6 +54,7 @@ OPEN GAPS:
   reproduced in the isolated synthetic stack; formula recalculation, GridCraft
   conflict behavior, and deployment security remain NOT VERIFIED.
 - GR-012 VectorCraft SVG now has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. PdfCraft and the remaining Craft apps are not covered.
+- Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium test passes with a deterministic collision pair. The Seafile-backed VectorCraft flow has not yet been rerun against this change.
 - the first E2E browser run used a same-origin proxy; a separate-origin loopback
   follow-up now verifies the handoff and durable save, but production TLS,
   reverse-proxy behavior, CSP, CSRF, rate limits and adversarial-frame isolation

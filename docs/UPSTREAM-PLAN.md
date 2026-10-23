@@ -27,9 +27,10 @@ reopen proof, and licensing/provenance packaging. Keep publication locked.
   already have, plus the **save confirmation** they are missing.
 * What it reuses: `crates/ui-egui/src/async_saves.rs` — the ticket mechanism the
   suite already has.
-* Verified: the patch compiles and has a local WordCraft browser harness with
-  synthetic storage. The real Seafile DOCX edit/save/version/close/reopen flow is
-  **NOT VERIFIED** (`docs/reviews/GPT-SOL-REREVIEW-AFEC19E.md`).
+* Verified: the patch compiles; the local browser harness passes; and an
+  isolated synthetic Seafile runtime reproduced DOCX click/edit/save/version/
+  reopen. Production deployment and the remaining security/regression cases
+  are **NOT VERIFIED**. See `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`.
 
 ### 1.1 The follow-ups, in order
 
@@ -38,7 +39,7 @@ reopen proof, and licensing/provenance packaging. Keep publication locked.
 | A-1 | the shared crate: the message types, the transport, the origin and source checks | **new crate in `storytold/craft-libs`** | three copies of the same 200 lines have already drifted |
 | A-2 | move GridCraft, PdfCraft and CADCraft onto it | their `apps/*-web` crates | one vocabulary instead of three |
 | A-3 | give GridCraft's host bridge a **durable save acknowledgement** | `gridcraft/apps/gridcraft-web/src/host.rs` and `crates/ui-egui` | issue a ticket for each save, wait for the host's result, and mark only the exact saved workbook snapshot clean after success; exports must not mark the source workbook saved |
-| A-4 | the bridge for the ten applications that have none | `apps/<app>-web` | one per app, each a few lines once A-1 exists |
+| A-4 | add the bridge to apps that lack it, after inspecting each app's actual save/serialization seam | `apps/<app>-web` | per-app effort is not estimated; transport reuse does not provide editor lifecycle, serializers, asset packaging, or project persistence |
 | A-5 | the browser-shaped services for the four that have none | `figcraft` (`NoServices`), `filmcraft`, `effectcraft` (`FsServices`), and the others | the seam has to exist before a bridge can be wired to it |
 | A-6 | the **desktop** control protocol in the shared crate | `docs/control-protocol.md`, 12 of 13 apps | a later phase; the browser and the desktop speaking one vocabulary |
 

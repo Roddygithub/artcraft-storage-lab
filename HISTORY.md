@@ -1,5 +1,16 @@
 # HISTORY
 
+## 2026-10-23 — VectorCraft polling collision guard
+
+* Sol 6.1 low's interim architecture review found a collision risk in the
+  VectorCraft host poll's 32-bit fingerprint and corrected an inaccurate claim
+  that identical-byte saves were detectable. The host now compares exact byte
+  sequences and treats equal output as a no-op, not a save event.
+* The focused synthetic Chromium test passes with two distinct, equal-length
+  byte strings that collide under the old FNV-1a check; it confirms changed
+  bytes reach storage once and unchanged bytes do not create duplicate saves.
+  A fresh Seafile-backed VectorCraft run after this code change remains pending.
+
 ## 2026-10-23 — VectorCraft SVG round-trip in isolated Seafile
 
 * Clicked a synthetic SVG in the isolated Seahub file list, edited it in the
@@ -325,12 +336,15 @@ Running log. Newest first.
   *sizes*, so an identical re-save was invisible; there was no `beforeunload`
   guard and no dirty state for VectorCraft; and `dispatch.json` claimed
   `?host=parent` for an application that does not speak it.
-* The fixes: the test now reads the **bytes the editor produced** and asserts
-  they differ from the original and form a valid SVG with a path element; the
-  poll compares a **content fingerprint** and only a *stored* save becomes the
-  new baseline; the host page warns on unload while a save is in flight; the
+* The initial fixes: the test now reads the **bytes the editor produced** and
+  asserts they differ from the original and form a valid SVG with a path
+  element; the poll compared a **content fingerprint** and only a *stored* save
+  became the new baseline; the host page warned on unload while a save was in flight; the
   dispatch entry no longer claims a contract VectorCraft does not implement; the
   adapter verifies the frame's **origin** before it drives it.
+  A later Sol low review found the 32-bit fingerprint could collide; it has
+  since been replaced by exact byte comparison (see the 2026-10-23 entry at the
+  top of this file).
 * Two bugs the remediation itself found: `api.readFile` is **synchronous** (it
   throws, it does not return a promise), and VectorCraft's SVG export writes a
   rectangle as a `<path>`, so an assertion looking for `<rect>` failed on a

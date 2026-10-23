@@ -79,8 +79,9 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | 5.4 | Reopen the PDF | the change is preserved | [ ] |
 | 5.5 | Open a synthetic SVG | VectorCraft Web opens inline | [x] Real Seahub file-list click in isolated synthetic Seafile; VectorCraft Web loaded; see `docs/reviews/GR-012/VECTORCRAFT-SEAFILE-E2E-20261023.md` |
 | 5.6 | Edit the SVG | the change is applied | [x] Real VectorCraft pencil API drew a path; fresh editor inspect showed expected geometry |
-| 5.7 | Save the SVG | new Seafile version | [x] Editor output 609 B; gateway readback hash matched; content ID changed; Seafile History UI showed 270 B → 609 B |
+| 5.7 | Save the SVG | new Seafile version | [x] Historical runtime run: editor output 609 B; gateway readback hash matched; content ID changed; Seafile History UI showed 270 B → 609 B. This run predates the exact-byte poll fix. |
 | 5.8 | Reopen the SVG | the change is preserved | [x] Fresh Seahub click/reopen in VectorCraft parsed the saved path; common host-contract coverage remains unproven |
+| 5.9 | Poll changed serialized bytes despite a 32-bit hash collision | exact changed bytes reach host storage once; identical output does not create duplicate saves | [x] Synthetic Chromium test uses two distinct equal-length values with the same old FNV-1a hash; actual VectorCraft/Seafile retest after the fix remains pending |
 
 ## 6. Dispatcher and platform
 

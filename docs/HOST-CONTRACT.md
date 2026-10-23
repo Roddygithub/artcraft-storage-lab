@@ -355,7 +355,7 @@ saved. **The integration layer must never pretend a save succeeded.**
 | designcraft | no | `download` present, `open_async` present, no `async_saves` | port the bridge; check the save hook's signature |
 | photocraft | no | `inbox` present, no `download` | port the bridge; the save hook may not exist yet |
 | figcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
-| cadcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
+| cadcraft | yes | existing bridge replaces the engine delivery hook | migrate to the shared crate and verify durable save-result semantics |
 | filmcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
 | lightcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
 | effectcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |

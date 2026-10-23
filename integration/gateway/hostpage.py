@@ -77,7 +77,7 @@ function toCraft(type, extra) {
 // polls the saved files instead.
 // ---------------------------------------------------------------------------
 const VECTORCRAFT = (APP === "vectorcraft");
-let lastSavedHash = null;      // the content we last stored, not its size
+let lastSavedBytes = null;     // exact bytes from Seafile or the last committed save
 let saving = false;
 window.__lastDirty = false;
 window.__editorConfirmedSave = false;
@@ -110,17 +110,17 @@ function waitForApi() {
   });
 }
 
-// A cheap content fingerprint. VectorCraft's page API has no save event and no
-// dirty signal, so the only way to notice a save that produced the same bytes as
-// the last one is to look at the bytes themselves.
-function fingerprint(bytes) {
-  let h = 2166136261 >>> 0;
-  const view = new Uint8Array(bytes);
-  for (let i = 0; i < view.length; i++) {
-    h ^= view[i];
-    h = Math.imul(h, 16777619) >>> 0;
-  }
-  return view.length + ":" + h.toString(16);
+function copyBytes(bytes) {
+  return new Uint8Array(bytes).slice();
+}
+
+function sameBytes(left, right) {
+  if (!right) return false;
+  const a = new Uint8Array(left);
+  const b = new Uint8Array(right);
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
 }
 
 async function openThroughApi(api) {
@@ -128,7 +128,7 @@ async function openThroughApi(api) {
   const resp = await fetch("/session/" + SID + "/document", { credentials: "same-origin" });
   if (!resp.ok) throw new Error("HTTP " + resp.status);
   const buf = await resp.arrayBuffer();
-  lastSavedHash = fingerprint(buf);
+  lastSavedBytes = copyBytes(buf);
   api.captureDownloads(true);
   if (!api.openFile(FILE_NAME, new Uint8Array(buf))) throw new Error("the editor refused the file");
   say(FILE_NAME + " opened", "ok");
@@ -150,9 +150,8 @@ function pollSaved(api) {
       saving = false;
       return;
     }
-    const hash = fingerprint(bytes);
-    if (hash === lastSavedHash) {
-      window.__lastDirty = false;
+    if (sameBytes(bytes, lastSavedBytes)) {
+      // Equal output is a no-op, not evidence of an editor dirty/save event.
       saving = false;
       return;
     }
@@ -170,10 +169,10 @@ function pollSaved(api) {
       // Only a stored save becomes the new baseline: a refused one is retried on
       // the next poll, which is what makes a failed save visible instead of lost.
       if (ok) {
-        lastSavedHash = hash;
+        lastSavedBytes = copyBytes(bytes);
         try {
           const current = await api.readFile(FILE_NAME);
-          window.__lastDirty = fingerprint(current) !== lastSavedHash;
+          window.__lastDirty = !sameBytes(current, lastSavedBytes);
         } catch (err) {
           window.__lastDirty = true;
         }

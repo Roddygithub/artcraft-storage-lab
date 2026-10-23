@@ -22,7 +22,11 @@ from integration.gateway.hostpage import render  # noqa: E402
 class State:
     first_save_started = threading.Event()
     release_first_save = threading.Event()
+    vector_save_started = threading.Event()
     save_count = 0
+    vector_save_count = 0
+    vector_saved_bytes = None
+    document_bytes = b"original bytes"
 
 
 EDITOR = """<!doctype html><script>
@@ -46,6 +50,25 @@ setTimeout(() => parent.postMessage({type: 'wordcraft:ready'}, location.origin),
 </script>"""
 
 
+VECTOR_EDITOR = """<!doctype html><script>
+window.vectorcraft = {
+  bytes: new Uint8Array(),
+  openFile(_name, bytes) { this.bytes = new Uint8Array(bytes); return true; },
+  captureDownloads() {},
+  files() { return Promise.resolve([{path:'synthetic.svg', size:this.bytes.length}]); },
+  readFile() { return Promise.resolve(this.bytes.slice()); },
+  replace(bytes) { this.bytes = new Uint8Array(bytes); }
+};
+</script>"""
+
+
+def fnv1a32(data):
+    value = 2166136261
+    for byte in data:
+        value = ((value ^ byte) * 16777619) & 0xFFFFFFFF
+    return value
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *_args):
         pass
@@ -61,19 +84,30 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/":
             page = render("test-session", "wordcraft", "/editor", "synthetic.docx", True)
             return self._send(200, page.encode(), "text/html; charset=utf-8")
+        if self.path == "/vector-host":
+            page = render("test-session", "vectorcraft", "/vector-editor", "synthetic.svg", True)
+            return self._send(200, page.encode(), "text/html; charset=utf-8")
         if self.path == "/editor":
             return self._send(200, EDITOR.encode(), "text/html; charset=utf-8")
+        if self.path == "/vector-editor":
+            return self._send(200, VECTOR_EDITOR.encode(), "text/html; charset=utf-8")
         if self.path == "/session/test-session/document":
-            return self._send(200, b"original bytes", "application/octet-stream")
+            return self._send(200, State.document_bytes, "application/octet-stream")
         return self._send(404, b"{}")
 
     def do_POST(self):
         size = int(self.headers.get("Content-Length", "0"))
-        self.rfile.read(size)
+        body = self.rfile.read(size)
         if self.path == "/session/test-session/dirty":
             return self._send(200, b'{"ok":true}')
         if self.path != "/session/test-session/save":
             return self._send(404, b"{}")
+
+        if self.headers.get("X-ArtCraft-Filename") == "synthetic.svg":
+            State.vector_save_count += 1
+            State.vector_saved_bytes = body
+            State.vector_save_started.set()
+            return self._send(200, b'{"ok":true,"version":"vector-version"}')
 
         State.save_count += 1
         if State.save_count == 1:
@@ -89,7 +123,11 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     State.first_save_started.clear()
     State.release_first_save.clear()
+    State.vector_save_started.clear()
     State.save_count = 0
+    State.vector_save_count = 0
+    State.vector_saved_bytes = None
+    State.document_bytes = b"original bytes"
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -134,6 +172,27 @@ def main():
             page.wait_for_function("() => document.getElementById('frame').contentWindow.lastSaveResult")
             assert page.evaluate("() => window.__lastDirty === true"), "failed save must stay dirty"
             assert page.evaluate("() => window.__editorConfirmedSave === false")
+            page.goto(url.rstrip("/") + "/vector-host")
+            page.wait_for_function("() => document.getElementById('frame').contentWindow?.vectorcraft")
+
+            original = bytes.fromhex("46e9bb16c707a921")
+            changed = bytes.fromhex("33d4b4702b82e0e2")
+            assert len(original) == len(changed)
+            assert original != changed
+            assert fnv1a32(original) == fnv1a32(changed), "fixture must collide under the old FNV-1a check"
+
+            # The unchanged initial document must not be spuriously saved.
+            page.wait_for_timeout(900)
+            assert State.vector_save_count == 0
+
+            # These distinct same-length byte sequences collided in the prior
+            # 32-bit fingerprint implementation. Exact comparison must save B.
+            page.evaluate("bytes => document.getElementById('frame').contentWindow.vectorcraft.replace(bytes)", list(changed))
+            assert State.vector_save_started.wait(5), "changed VectorCraft bytes were skipped"
+            page.wait_for_function("() => window.__lastSave?.ok === true")
+            assert State.vector_saved_bytes == changed, "host must persist the exact changed bytes"
+            page.wait_for_timeout(900)
+            assert State.vector_save_count == 1, "identical post-save bytes must not create duplicate versions"
             browser.close()
     finally:
         State.release_first_save.set()
@@ -144,6 +203,8 @@ def main():
     print("PASS: earlier acknowledgement cannot clear a later dirty revision")
     print("PASS: retry after prior save completes is durably confirmed")
     print("PASS: failed save cannot be cleared by the synthetic editor's dirty=false")
+    print("PASS: distinct equal-length VectorCraft bytes with a 32-bit FNV-1a collision are persisted")
+    print("PASS: unchanged VectorCraft bytes do not save and persisted bytes do not save twice")
     print("NOTE: synthetic local protocol test; not a Craft/Seafile E2E")
 
 

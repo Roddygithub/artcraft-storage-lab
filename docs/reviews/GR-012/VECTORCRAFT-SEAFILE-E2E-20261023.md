@@ -56,6 +56,11 @@ listing; a separate history API request returned 403 and is not used as proof.
 - VectorCraft has no dirty signal or save event. The host polls the saved-file
   API; this run proves this successful save only, not unsaved-edit warnings,
   failure retry behavior, concurrent saves, or unload safety.
+- A later source review found that the then-current poll used a 32-bit content
+  fingerprint, which could collide. The current working-tree remediation uses
+  exact byte comparison and has a synthetic Chromium regression test using a
+  deterministic collision pair. The historical runtime run above predates that
+  change; the actual VectorCraft/Seafile flow has not yet been rerun afterward.
 - PDF/PdfCraft and all other Craft apps are outside this evidence.
 - The temporary upload proxy and SVG dispatch settings were restored in the
   isolated container after the run. Seahub login returned HTTP 200 after

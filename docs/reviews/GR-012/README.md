@@ -69,9 +69,14 @@ application name. The postMessage path is unchanged.
 three of them):
 
 1. the page API has **no save event and no dirty signal**. The host page polls
-   `files()` every 700 ms and compares a **content fingerprint**, so a save that
-   produced the same bytes as the last one is still noticed; and only a **stored**
-   save becomes the new baseline, so a refused save is retried instead of lost;
+   `files()` every 700 ms and compares the serialized bytes exactly. It can
+   observe changed output, but cannot observe a save event that produces bytes
+   identical to the last committed output. Only a **stored** save becomes the
+   new baseline, so a refused save is retried instead of lost. The earlier
+   32-bit content fingerprint could collide; the local browser regression test
+   now uses a deterministic collision pair to guard the exact-byte comparison.
+   This synthetic test does not replace a fresh Seafile-backed VectorCraft run
+   after the code change;
 2. because there is no dirty signal, the host page cannot warn about unsaved
    *edits*. It warns on `beforeunload` **while a save is in flight**. The editor
    itself keeps unsaved work in **recovery copies** in the browser: *"Your unsaved
