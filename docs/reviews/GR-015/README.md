@@ -58,7 +58,7 @@ runtime test.
 | Exact-source patch application | PASS for both patches against clean recorded base SHAs; source tree diff matches the patch artifact |
 | License/provenance inventory | PASS for exact source SHAs and license-file references; legal compatibility/distribution is **NOT VERIFIED** (`THIRD-PARTY-NOTICES.md`) |
 | Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness, including capability audience/grant/allowlist and route-prefix source checks; actual C header-hook and Django/Seafile runtime are **NOT VERIFIED** |
-| Seafile Server C build | **NOT VERIFIED**; the attempted isolated configure failed on missing `libargon2`; the live server was not touched |
+| Seafile Server C build | **NOT VERIFIED**; isolated configure stops because `libsearpc` is absent (and `intltoolize` is unavailable); no C compilation occurred |
 | Seahub deployment/import test | **NOT RUN** |
 | Synthetic Seafile save and conflict test against patched binaries | **NOT RUN** |
 | Browser click from the Seafile file list | **REPRODUCED: current route opens ONLYOFFICE**, observed on the synthetic library; ArtCraft gateway is not installed/configured |

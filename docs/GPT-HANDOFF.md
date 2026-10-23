@@ -17,7 +17,10 @@ Sol found that the GR-015 route `conditional-update-api` fails Seafile's existin
 `op=update` prefix token check. Commit `0da898f` changes it to
 `update-conditional-api` and adds a source-level guard test; the exact header
 hook and a built isolated runtime still need verification. The route/prefix
-assertions pass against pinned source but are not a C runtime test. GR-006's historical
+assertions pass against pinned source but are not a C runtime test. Nemotron
+independently passed this single route/prefix finding at medium effort; that
+narrow result is in `docs/reviews/GR-015/ROUTE-TOKEN-REVIEW.md` and does not
+replace Sol's overall FAIL. GR-006's historical
 free PASS claim and the RFC's capability handoff wording were also corrected.
 The required Seafile DOCX file-list click/edit/version/close/reopen and
 ONLYOFFICE save regression remain **NOT VERIFIED**. No GPT PASS was granted;

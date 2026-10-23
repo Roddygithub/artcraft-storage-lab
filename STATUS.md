@@ -28,7 +28,8 @@ BLOCKERS:
 - real Seafile Web → WordCraft DOCX edit/save/version/close/reopen is NOT VERIFIED
 - GR-015 conditional-save endpoint previously failed the existing `op=update`
   route-prefix token check; current local patch renames it `update-conditional-api`
-  and source assertions pass, but the C hook and built isolated runtime are unverified
+  (commit `0da898f`); a narrow Nemotron static review passed, but the C hook and
+  built isolated runtime are unverified
 - ONLYOFFICE edit/save/version/reopen preservation remains NOT VERIFIED
 - GridCraft durable acknowledgement and XLSX semantic reopen are not verified
 - VectorCraft Seafile semantic reopen is not yet run; only the local editor round-trip is reproduced

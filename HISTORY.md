@@ -28,6 +28,12 @@
 * Blockers remain: real Seafile DOCX version/reopen and ONLYOFFICE regression are
   unverified. Public deployment and upstream publication remain locked.
 
+* A bounded, independent Nemotron review returned **PASS for the route-prefix
+  finding only**. It confirmed that `update-conditional-api` preserves the
+  existing token-operation check. The reviewer classified the evidence as
+  static/source-only; no C/Django/runtime behavior was tested. See
+  `docs/reviews/GR-015/ROUTE-TOKEN-REVIEW.md`.
+
 ### Reproduction record for the local route remediation
 
 Reviewed base SHA: `0edbe524b4fa321b0f73f8601afef390e7f785e6`. The commands below
@@ -44,6 +50,7 @@ were pinned to the Seahub and Seafile SHAs listed in `docs/reviews/GR-015/README
 | `git diff --check` plus pinned-source `git apply --check` for each GR-015 patch | 0 | Whitespace and applicability against clean source trees; no build/runtime |
 | `python3 tests/test_gr012_svg.py` without its required Seafile URL/token, gateway, repository and path | 2 | Not run; the script printed its invocation and stopped |
 | `python3 tests/test_gr010_xlsx.py` | 2 | Not run; no such test file exists (`tests/test_xlsx_fixture.py` is the fixture check) |
+| `./autogen.sh && ./configure --disable-fuse --disable-python --enable-httpserver` in the pinned patched Seafile Server source clone | 1 | Configure stopped because `libsearpc` is unavailable; `intltoolize` is also missing, so no C compilation occurred |
 
 Environment: Python 3 on the local workstation; Playwright is unavailable in the
 system Python and the old temporary browser-test environment is absent. No
