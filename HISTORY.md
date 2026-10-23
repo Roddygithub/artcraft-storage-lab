@@ -68,6 +68,10 @@ were pinned to the Seahub and Seafile SHAs listed in `docs/reviews/GR-015/README
 | `make -C lib libseafile_common.la` and `make -C common/cdc libcdc.la` with temporary dependency paths | 0 | Built required local static dependencies in the pinned source clone |
 | `git apply --check` then `git apply` for both GR-015 patches on the pinned Seahub and Seafile Server clones | 0 | Confirms both exact patch artifacts apply to the recorded upstream source commits; the Seafile Server worktree contains the patch during the build below |
 | `make -C server -j2` with `CPPFLAGS` for staged libjwt/libsearpc/evhtp headers, `CFLAGS='-std=gnu11 -g -O2'`, and temporary `LDFLAGS`/runtime library paths | 0 | Rebuilt and linked the complete fileserver subproject, including patched `upload-file.c`, against the pinned patched source; not runtime or integration evidence |
+| `env ARTCRAFT_SEAHUB_SOURCE=/tmp/artcraft-seahub-sol-next ARTCRAFT_SEAFILE_SERVER_SOURCE=/tmp/artcraft-seafile-server-sol-next python3 tests/test_gr015_authorization.py` after applying both patches | 0 | Synthetic decorator/helper execution and route source assertions against the exact patched sources; Django and C request runtime remain untested |
+| `python3 tests/test_gateway_unit.py` | 0 | All gateway unit checks passed, including malformed-response redaction and fake concurrent CAS; upstream is simulated |
+| `python3 tests/test_gr012_svg_assertions.py && python3 tests/test_xlsx_fixture.py` | 0 | SVG false-positive checks and OOXML formula fixture check passed; no editor or Seafile persistence |
+| `python3 -m py_compile integration/gateway/*.py tests/*.py tests/fixtures/make_fixtures.py && git diff --check` | 0 | Python syntax and whitespace checks passed |
 
 Environment: Python 3 on the local workstation; Playwright is unavailable in the
 system Python and the old temporary browser-test environment is absent. No
