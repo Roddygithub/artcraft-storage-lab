@@ -1,10 +1,10 @@
 # STATUS
 
 ```text
-PHASE:      GPT-6.1 Sol FAIL on 0edbe52; focused local remediation in progress
+PHASE:      GPT-6.1 Sol FAIL on 0edbe52; isolated GR-015 runtime remediation evidence recorded
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
-CURRENT CANDIDATE: local remediation after 0edbe52; exact SHA recorded at next freeze
+CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
 WORKTREE:   remediation commits are not reviewed by Sol
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
@@ -24,21 +24,27 @@ CURRENT GR: GR-015 — per-library routing + user-bound conditional save (local 
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 
-BLOCKERS:
-- real Seafile Web → WordCraft DOCX edit/save/version/close/reopen is NOT VERIFIED
-- GR-015 conditional-save endpoint previously failed the existing `op=update`
-  route-prefix token check; current local patch renames it `update-conditional-api`
-  (commit `0da898f`); a narrow Nemotron static review passed, but the C hook and
-  built isolated runtime are unverified
-- ONLYOFFICE edit/save/version/reopen preservation remains NOT VERIFIED
+VERIFIED IN LOCAL REMEDIATION:
+- GR-015's synthetic DOCX file-list click → WordCraft edit → durable version →
+  close/reopen is REPRODUCED against isolated patched Seahub and C fileserver;
+  evidence: `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`
+- a real simultaneous conditional-save request race returned one 200 and one
+  409; a fresh WordCraft open rendered the winning writer
+
+OPEN GAPS:
+- ONLYOFFICE edit/save/version/reopen regression remains NOT VERIFIED
 - GridCraft durable acknowledgement and XLSX semantic reopen are not verified
-- VectorCraft Seafile semantic reopen is not yet run; only the local editor round-trip is reproduced
-- CSP/rate limiting are absent; public deployment is NOT READY
+- VectorCraft Seafile semantic reopen is not verified
+- the E2E browser used a test-only same-origin local proxy; separate-origin
+  isolation, TLS, CSP, CSRF, rate limits and proxy trust remain NOT VERIFIED
+- public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- build and exercise GR-015 only in an isolated synthetic Seafile deployment; do not install on the live LXC
-- after material blockers have evidence and tests, freeze a new candidate for a cost-bounded Sol review
-- validate the actual Seafile DOCX click/edit/save/version/close/reopen flow and ONLYOFFICE preservation before claiming MVP
+- exercise isolated read-only/revocation and unsupported-fileserver cases; do not
+  install the patch on the live LXC
+- evaluate ONLYOFFICE preservation in a safe test configuration, then inspect
+  exact diffs and freeze a new candidate SHA before one cost-bounded independent
+  final review; no Sol call is being made now
 - keep upstream publication locked; GPT REVIEW remains FAIL
 ```
 
@@ -71,7 +77,7 @@ NEXT:
 | GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | PASS (remediated, REVIEW-04) | PENDING |
 | GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PASS (REVIEW-03) | PENDING |
 | GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | PASS (REVIEW-03) | PENDING |
-| GR-015 | Per-library routing and conditional Seafile save | `docs/reviews/GR-015/` | Sol FAIL; route/token mismatch found; local remediation underway | FAIL |
+| GR-015 | Per-library routing and conditional Seafile save | `docs/reviews/GR-015/` | runtime DOCX path and conditional conflict reproduced locally; remaining security/compatibility gaps | FAIL (0edbe52 candidate) |
 
 ## What is already true
 

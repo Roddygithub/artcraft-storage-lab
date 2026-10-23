@@ -1,5 +1,36 @@
 # HISTORY
 
+## 2026-10-23 — isolated Seafile/WordCraft runtime E2E and conditional race
+
+* Starting from local tip `7f828a4c58f49de247ac71bc66e58d2f41bfa230`, applied
+  the recorded GR-015 patches to the exact pinned Seahub and Seafile Server
+  sources, built the C server, ran Django checks/migrations, and started the
+  stack in a rootless Podman container. No production guest or upstream repo
+  was modified.
+* The synthetic Seahub file-list click opened the actual WordCraft Web/WASM
+  build. A real UI text edit was saved; the editor reported `Saved — new
+  version` after the patched server committed a new head/file ID. Independent
+  content readback confirmed a valid DOCX with the sentence in document XML.
+  Navigating away and clicking the file again created a new WordCraft session
+  that rendered the saved sentence. Full values and limits are recorded in
+  `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`.
+* A stale second WordCraft session received 409 and remained dirty. A separate
+  pair of concurrent HTTP saves through the same Seahub view and C conditional
+  route returned one 200 and one 409. Seafile history advanced to one winning
+  head; a fresh WordCraft open rendered Writer A's paragraph, with Writer B's
+  paragraph absent. This tests the actual patched runtime, but the two direct
+  race requests were not concurrent keystroke-driven editor saves.
+* Runtime token test: `op=update` passed the existing header hook on
+  `update-conditional-api`; an `op=view` token was rejected with HTTP 403.
+  This resolves the narrow route-prefix behavior, not the remaining Sol review
+  findings.
+* The browser used a test-only same-origin loopback reverse proxy. This proved
+  the local functional flow while leaving the intended separated-origin
+  security topology unverified. ONLYOFFICE regression, permissions/revocation,
+  unsupported Go/stock server behavior, and other Craft apps remain open.
+  The current worktree tip is not frozen or reviewed; GPT remains FAIL and
+  upstream remains locked.
+
 ## 2026-10-23 — Sol re-review of 0edbe52 and route-token remediation
 
 * GPT-6.1 Sol reviewed exact SHA

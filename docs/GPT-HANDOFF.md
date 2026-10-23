@@ -23,11 +23,30 @@ narrow result is in `docs/reviews/GR-015/ROUTE-TOKEN-REVIEW.md` and does not
 replace Sol's overall FAIL. GR-006's historical
 free PASS claim and the RFC's capability handoff wording were also corrected.
 The required Seafile DOCX file-list click/edit/version/close/reopen and
-ONLYOFFICE save regression remain **NOT VERIFIED**. No GPT PASS was granted;
-upstream is locked. No service was changed during review or remediation.
+ONLYOFFICE save regression had not been reproduced at the time of that review.
+No GPT PASS was granted; upstream is locked. No production service was changed
+during that review.
 
 The local remediation after `0edbe52` is not yet frozen for Sol. Record the exact
 next review SHA after the final status/evidence commit.
+
+### Isolated runtime update — 2026-10-23
+
+The statements above about unbuilt/unrun patches and an unverified DOCX E2E are
+historical and superseded for the local remediation by
+`docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`. The exact GR-015 patches
+were built/run in an isolated synthetic rootless Podman stack; Seahub checks and
+migrations passed. The browser clicked the synthetic file in Seahub, opened the
+real WordCraft Web/WASM app, edited and saved, received a committed new Seafile
+head/file ID, and reopened the saved sentence in a fresh WordCraft session.
+Two concurrent conditional writes yielded one 200 and one 409, and the fresh
+editor rendered the winner.
+
+This does not change Sol's FAIL on `0edbe52` and does not mark a new SHA reviewed.
+The local browser test used a same-origin loopback proxy, so separate-origin
+security remains unverified. ONLYOFFICE regression, permission revocation,
+read-only bypass, stock/Go fileserver rejection, and GridCraft/VectorCraft E2E
+remain open. Production services were not changed; upstream is still locked.
 
 ## 1. Repository
 
@@ -66,9 +85,10 @@ upload, no desktop application.
   gateway stores it server-side and binds one document session. The local GR-015
   draft scopes write capability to ArtCraft, one repository and extension, then
   rechecks current user permission and calls a dedicated conditional-save route.
-* The GR-015 Seahub and Seafile Server patches are **not built, installed, or
-  runtime-tested**. The live instance has no ArtCraft route or gateway. The
-  current deployed click on the synthetic DOCX still opens ONLYOFFICE.
+* The GR-015 Seahub and Seafile Server patches were built and run only in the
+  isolated local test container. They are **not installed in production**. The
+  live instance has no ArtCraft route; its synthetic DOCX still opens
+  ONLYOFFICE. The isolated synthetic browser flow is documented separately.
 
 ### 3.1 The two integration points
 
@@ -185,9 +205,9 @@ in isolation. The local browser and engine tests use synthetic storage only.
 6. The user edits; the app posts <app>:dirty.
 7. The user saves; the app posts <app>:save with the bytes and a ticket.
 8. The host page POSTs the bytes to the gateway.
-9. Patched Seahub calls the dedicated `update-conditional-api`; stock and Go
-   fileservers do not expose this route and must fail before writing. The C patch
-   is unbuilt and runtime behavior is **NOT VERIFIED**.
+9. Patched Seahub calls the dedicated `update-conditional-api`; the patched C
+   route was built and exercised in the isolated runtime. Stock and Go
+   fileserver rejection remain **NOT VERIFIED** at runtime.
 10. The host/editor becomes clean only after durable version confirmation.
 11. Close and reopen the file in the editor; verify the semantic edit.
 ```
@@ -213,11 +233,11 @@ The full list, with what is still open, is in `docs/SECURITY.md`.
 
 | # | Limitation | Where |
 | --- | --- | --- |
-| 1 | user attribution is proposed by the local patch but not runtime-verified | `docs/reviews/GR-015/README.md` |
-| 2 | stock Seafile has no user-bound conditional save; patched C behavior is not built or tested | `docs/reviews/GR-015/README.md` |
+| 1 | positive user-bound save was exercised on the synthetic local Seahub stack; revocation/read-only behavior still needs runtime tests | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
+| 2 | patched C conditional route built and ran; unsupported stock/Go server fail-closed behavior needs runtime verification | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
 | 3 | **share links** are not covered by the hook | `docs/SEAFILE-INTEGRATION-POINTS.md` L7 |
-| 4 | the click in the Seafile file list is not driven by the automated test | `docs/reviews/GR-006/README.md` §5 |
-| 5 | the gateway runs on the owner's workstation for the proof | `docs/DEPLOYMENT.md` |
+| 4 | the synthetic file-list click and DOCX save/reopen are reproduced in the isolated test; the production instance still routes to ONLYOFFICE | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
+| 5 | the gateway ran in the isolated local container for the proof; no production deployment was made | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
 | 5b | a **leave-page warning about unsaved edits** is impossible for VectorCraft without an upstream dirty signal; the editor itself keeps unsaved work in recovery copies in the browser | `docs/reviews/GR-012/README.md` §2 |
 | 6 | the local dispatcher draft lists `.pdf`, `.svg`, `.xlsx` and `.docx`; GridCraft/SVG save readiness is not verified | `docs/FILE-DISPATCH.md` |
 | 7 | the other ten Craft applications have no bridge; **VectorCraft is driven by its own page API instead** | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
@@ -231,7 +251,7 @@ The full list, with what is still open, is in `docs/SECURITY.md`.
 | Patch | Where | State |
 | --- | --- | --- |
 | the WordCraft `?host=parent` bridge | `docs/reviews/GR-014/DIFF.patch` (in this repository; the target is Apache-2.0) | compiles and has a local browser harness; durable Seafile E2E not verified |
-| per-library routing and conditional save | `docs/reviews/GR-015/` | patch artifacts apply to exact source revisions; not built or executed against Seahub/fileserver |
+| per-library routing and conditional save | `docs/reviews/GR-015/` | exact patches built/run in isolated stack; synthetic DOCX E2E reproduced; security, compatibility and regression gaps remain |
 
 **Neither has been published.** No issue, no PR, no comment, no branch push, no
 RFC sent anywhere.

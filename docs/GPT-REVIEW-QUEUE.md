@@ -13,19 +13,37 @@ Candidate: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 Reviewer: GPT-6.1 Sol
 Verdict: FAIL
 Report: docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md
-Prototype: operator-only local investigation; Seafile MVP not ready
+Prototype at review time: operator-only investigation; local DOCX E2E remediation is recorded below and awaits review
 Public deployment: NOT READY
 Upstream RFC/patch: NOT READY
 Upstream publication: LOCKED
 ```
 
-The failed candidate remains immutable. A new source-level defect was found in
-the conditional route: its name did not satisfy Seafile's existing `op=update`
-prefix check. Commit `0da898f` renames the route, but still requires exact hook
-verification and an isolated runtime; source assertions alone do not verify the
-hook. The mandatory real DOCX E2E remains
-unverified. Earlier failures remain in their separate reports. The current
-worktree after this review is not yet frozen or reviewed.
+The failed candidate remains immutable. At review time, Sol found a defect in
+the conditional route name: it did not satisfy Seafile's existing `op=update`
+prefix check. Commit `0da898f` renames the route. Later isolated runtime work
+verified the header hook and DOCX E2E; that work is recorded below and does not
+change the reviewed candidate's verdict. Earlier failures remain in their
+separate reports. The current worktree is not yet frozen or reviewed.
+
+## Remediation evidence — 2026-10-23
+
+After the reviewed `0edbe52` SHA, the exact pinned GR-015 Seahub and C server
+patches were applied and run in a synthetic rootless Podman environment. Django
+checks/migrations and the patched fileserver startup passed. The real synthetic
+Seahub file-list click opened WordCraft Web/WASM; a text edit was saved, the
+fileserver committed a new head/file ID, WordCraft confirmed success, and a
+fresh Seafile click reopened the edit. A simultaneous pair of conditional
+Seahub save requests produced one HTTP 200 and one HTTP 409; a fresh WordCraft
+open showed the winning paragraph only. Detailed evidence and limits are in
+`docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`.
+
+This is remediation evidence on the current local tip, not a new frozen GPT
+candidate and not a Sol PASS. The isolated browser test used a same-origin
+loopback proxy; separate-origin security, production/ONLYOFFICE regression,
+read-only/revocation cases, unsupported stock/Go fileserver behavior, and the
+other Craft apps remain unverified. Public deployment and upstream publication
+remain locked.
 
 ## Queue
 
@@ -148,20 +166,22 @@ Requirements:  The 12-step MVP checklist of ROADMAP.md, VERIFIED END-TO-END on
                synthetic DOCX files. Must cover: simple DOCX, text edit, simple
                formatting, save, reopen, Seafile version, read-only, save
                failure, editor close, concurrent modification.
-Decision:       The WordCraft ?host=parent bridge (the GR-014 patch) makes the
-               DOCX MVP technically possible. The required Seafile Web →
-               WordCraft edit → durable Seafile version → editor acknowledgement
-               → close/reopen flow is NOT VERIFIED. The latest browser recovery
-               opened the synthetic DOCX in ONLYOFFICE, not WordCraft. A local
-               WordCraft harness uses in-memory storage and is not an E2E pass.
+Decision:       The WordCraft `?host=parent` bridge (the GR-014 patch) makes the
+               DOCX MVP technically possible. The required synthetic local
+               Seafile Web → WordCraft edit → durable version → editor
+               acknowledgement → close/reopen flow is now REPRODUCED against
+               patched isolated Seahub/C fileserver. It has not been accepted by
+               Sol on a new candidate; production ONLYOFFICE regression and
+               separate-origin security remain unverified.
 Files:          docs/reviews/GR-006/, docs/reviews/GR-014/
-Tests:          test_gateway_unit.py and local host round-trip are synthetic;
-               Seafile browser E2E is NOT VERIFIED
+Tests:          See `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`;
+               isolated real browser/Seafile E2E reproduced, broader security
+               and regression cases remain open
 Free review:    historical review-03 PASS is provisional and superseded by Sol FAIL
 Evidence:       docs/reviews/GR-006/ and docs/reviews/GPT-SOL-REREVIEW-D9EF476.md
-Known risks:    The real Seafile Web click/close/save flow is NOT VERIFIED;
-               the GR-015 C and Seahub patches are local drafts, unbuilt and
-               undeployed; ONLYOFFICE preservation after routing is NOT VERIFIED.
+Known risks:    Test used a local same-origin proxy; production origins,
+               ONLYOFFICE preservation, permission revocation/read-only, public
+               security controls and live deployment remain NOT VERIFIED.
 ```
 
 ### GR-007 — Save protocol

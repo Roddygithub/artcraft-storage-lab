@@ -1,6 +1,6 @@
 # GR-015 — Per-library ArtCraft routing and conditional Seafile save
 
-Status: **Sol FAIL on `0edbe524b4fa321b0f73f8601afef390e7f785e6`; route-name remediation is committed as `0da898f` and the pinned patched fileserver now builds locally, but runtime behavior and the full save workflow remain unverified and the finding has not had a full Sol re-review**.
+Status: **Sol FAIL on `0edbe524b4fa321b0f73f8601afef390e7f785e6`; after that reviewed SHA, the route-token correction and full synthetic DOCX click/edit/save/version/close/reopen flow were exercised against patched Seahub and a patched C fileserver in an isolated local container. The later tip has not had a full Sol re-review.** See [`ISOLATED-RUNTIME-E2E-20261023.md`](ISOLATED-RUNTIME-E2E-20261023.md).
 
 This is the server-side work needed to make the gateway usable without taking
 Office formats away from ONLYOFFICE globally.
@@ -12,7 +12,7 @@ Office formats away from ONLYOFFICE globally.
 | Seahub | 12.0.14 Pro | `1e9bde801b4360c14d784d9681d4261abc233a8b` | [`seahub-12.0.14.patch`](seahub-12.0.14.patch) |
 | Seafile Server | 12.0.14 | `32ed9c69594c9faa5cea28024403fcde362589ec` | [`seafile-server-12.0.14.patch`](seafile-server-12.0.14.patch) |
 
-## Proposed behavior (not achieved by the current draft)
+## Draft behavior and runtime evidence
 
 1. Seahub only dispatches to ArtCraft for repositories in an explicit
    `ARTCRAFT_REPO_IDS` allowlist, and only for configured extensions. This
@@ -20,9 +20,10 @@ Office formats away from ONLYOFFICE globally.
 2. The existing third-party-editor capability provides the user, repository
    and path. The current local patch rechecks `can_preview` for the capability's
    user on each info/content request and binds content reads to the expected
-   file id. `tests/test_gr015_authorization.py` executes the exact decorator
-   with synthetic Seafile state; Django/Seafile runtime behavior remains
-   **NOT VERIFIED**.
+   file id. The patched Django app passed checks and migrations in the isolated
+   Seafile runtime, and the synthetic browser flow opened through this
+   capability. Permission revocation, read-only bypass, and expiry/replay
+   behavior remain **NOT VERIFIED** end to end.
 3. A save accepts no arbitrary repository or path. Seahub requires an
    `audience=artcraft` capability, its cached `permission.can_edit` grant, an
    allow-listed repository and extension, and the user's current web-edit
@@ -30,13 +31,14 @@ Office formats away from ONLYOFFICE globally.
    then mints an update token for that same user.
 4. The fileserver receives the opened file id and repository head. Seahub calls
    the dedicated `update-conditional-api` route. Its name starts with `update`
-   so the existing Seafile `op=update` token check accepts it; the proposed C
-   fileserver maps this distinct route to its conditional handler. The stock C and Go routers do not
-   expose that route, so the request must fail with 404 before an unconditional
+   so the existing Seafile `op=update` token check accepts it; the patched C
+   fileserver maps this distinct route to its conditional handler. The stock C
+   and Go routers do not expose that route, so the request must fail with 404 before an unconditional
    update can happen. The C handler also rejects requests missing either
-   precondition. The exact patched fileserver source now builds locally, but is
-   **not installed or runtime-tested**; route behavior, proxy path preservation,
-   and stale-save races still need runtime tests.
+   precondition. The exact patched fileserver now runs in an isolated container.
+   Runtime token-prefix and concurrent conditional-save results are recorded in
+   `ISOLATED-RUNTIME-E2E-20261023.md`. Stock/Go server rejection,
+   external-writer races, and production proxy behavior remain **NOT VERIFIED**.
 5. A successful response is returned only after the fileserver returns a new
    file id and Seahub reads back the committed repository head.
 
@@ -58,12 +60,12 @@ runtime test.
 | Gateway unit checks after the client-side changes | PASS; `python3 tests/test_gateway_unit.py` |
 | Exact-source patch application | PASS for both patches against clean recorded base SHAs; source tree diff matches the patch artifact |
 | License/provenance inventory | PASS for exact source SHAs and license-file references; legal compatibility/distribution is **NOT VERIFIED** (`THIRD-PARTY-NOTICES.md`) |
-| Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness, including capability audience/grant/allowlist and route-prefix source checks; actual C header-hook and Django/Seafile runtime are **NOT VERIFIED** |
-| Seafile Server C build | PASS for configure, the modified `upload-file.o`, and the complete `server` subproject at the pinned patched source SHA. Built in `/tmp` with locally staged dependencies and GNU C11 flags; no runtime or installation was performed. Reproduction details are in `HISTORY.md`. |
-| Seahub deployment/import test | **NOT RUN** |
-| Synthetic Seafile save and conflict test against patched binaries | **NOT RUN** |
-| Browser click from the Seafile file list | **REPRODUCED: current route opens ONLYOFFICE**, observed on the synthetic library; ArtCraft gateway is not installed/configured |
-| ArtCraft DOCX edit/save/reopen and ONLYOFFICE regression | **NOT VERIFIED**; no ArtCraft route is active and no document edit was made during this observation |
+| Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness. Django checks and migrations also passed in the isolated runtime. Permission revocation/read-only end-to-end tests remain **NOT RUN**. |
+| Seafile Server C build and runtime | PASS for the pinned patched source build and an isolated running C fileserver. The actual `upload_headers_cb` accepts `op=update` on `update-conditional-api` and rejects `op=view` with 403. |
+| Synthetic conditional save and conflict test | PASS for a real browser DOCX save and two simultaneous Seahub conditional writes: one committed 200 and one refused 409; a fresh WordCraft reopen rendered the committed writer. External writers and Go/stock server behavior remain **NOT VERIFIED**. |
+| Browser click from the Seafile file list | **REPRODUCED in isolated synthetic Seahub:** the allow-listed DOCX opened the real WordCraft Web/WASM app. The production instance still routes its synthetic DOCX to ONLYOFFICE. |
+| ArtCraft DOCX edit/save/version/reopen | **REPRODUCED in isolated local stack** with the new head/file ID, semantic content readback, WordCraft post-save confirmation, and fresh editor reopen recorded in `ISOLATED-RUNTIME-E2E-20261023.md`. |
+| ONLYOFFICE regression | **NOT RUN**. ONLYOFFICE was not configured in the isolated stack; the production integration was not changed. |
 
 The live Seahub config was backed up at
 `/root/seahub_settings.py.artcraft-rollback-20261022` on LXC 108. Its former
@@ -75,7 +77,9 @@ inspection of LXC 108 shows Seahub, Nginx and `seaf-server` active on ports 8000
 through the Seafile browser file list opened the existing ONLYOFFICE editor
 iframe and loaded `/onlyoffice/9.4.0-…` assets. No bytes were edited or saved.
 
-Do not install these patches or enable ArtCraft routing until the current C
-source builds, Seahub imports/routes, user-bound save, conflict behavior, and
-ONLYOFFICE preservation are verified against the synthetic library with a
-rollback plan. No patch was copied to or installed on Proxmox.
+The isolated test does not authorize installation on the live instance. The
+production Seafile/ONLYOFFICE services remain untouched. Before any deployment,
+verify the intended separate-origin topology and security controls, permission
+revocation/read-only behavior, unsupported fileserver rejection, ONLYOFFICE
+edit/save/version/reopen preservation, rollback, and resource limits. Upstream
+publication remains locked.
