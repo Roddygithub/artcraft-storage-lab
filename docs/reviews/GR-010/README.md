@@ -1,15 +1,16 @@
 # GR-010 — GridCraft: an `.xlsx` round-trips
 
-Status: **PROVISIONAL — FREE REVIEW PASS** (reviewed with GR-005 in REVIEW-02)
-· GPT REVIEW: PENDING
+Status: **GPT-6.1 Sol FAIL** on candidate `afec19e`; historical free-model PASS is
+provisional and its E2E claim is not accepted. GridCraft durable save is not
+verified with the current ticket/acknowledgement protocol.
 Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` ·
 `/artcraft-lab/synthetic.xlsx` (synthetic) · GridCraft 0.10.0 web build
 
 ## 0. The verdict
 
-> An `.xlsx` was opened from Seafile in **GridCraft Web**, a cell was edited in the
-> browser, the editor's own Save command produced the bytes, and Seafile recorded a
-> **new version**; the file reopened from Seafile held the edited value.
+> Historical claim, rejected by independent GPT review: this bundle does not
+> prove a durable GridCraft save or semantic editor reopen. Its host simulation
+> accepts emitted bytes independently of GridCraft's save result.
 
 This is the proof the project was built around, and it is the one that answered the
 pivotal question early: **the Craft web builds exist, and one of them already spoke
@@ -49,11 +50,12 @@ so a failed save is only logged and the workbook is still marked saved
 (`docs/HOST-CONTRACT.md` §3.5). The host page therefore keeps its own "not
 persisted" state, and the upstream fix is A-3 in `docs/UPSTREAM-PLAN.md`.
 
-## 3. The runs
+## 3. Historical runs — evidence scope corrected by GPT Sol
 
 ### 3.1 The Seafile side, without a browser
 
-`tests/test_integration.py` — 20 checks, **ALL CHECKS PASSED**:
+`tests/test_integration.py` uses fake in-memory storage. Its PASS result checks
+gateway behavior only; it is **not a Seafile integration test**:
 
 ```text
 1. the host page is rendered
@@ -77,9 +79,12 @@ persisted" state, and the upstream fix is A-3 in `docs/UPSTREAM-PLAN.md`.
 7. a symlink out of the static root is refused  HTTP 400
 ```
 
-### 3.2 In a real browser
+### 3.2 Browser host simulation
 
-`tests/test_browser.py` — the editor's own **Ctrl+S**:
+`tests/test_browser.py` injects a gateway page in a browser. It does not perform
+the Seafile file-list click, commit a real Seafile version, or reopen GridCraft
+from Seafile. Its earlier PASS transcript is preserved as historical evidence,
+not an E2E result.
 
 ```text
 [PASS] 1. the Craft app loaded and the document was delivered  -- synthetic.xlsx opened
@@ -99,20 +104,20 @@ the edited cell, and the host page's `Saved — new version …` line.
 
 | Test-matrix row | State |
 | --- | --- |
-| 3.1 open an `.xlsx` inline | **PASS** |
-| 3.2 edit a cell value | **PASS** (`4242` typed into a cell) |
+| 3.1 open an `.xlsx` inline | **SIMULATED** in the browser harness; Seafile route not verified |
+| 3.2 edit a cell value | **SIMULATED** in the browser harness |
 | 3.3 edit a formula | not yet exercised |
 | 3.4 minimal formatting | not yet exercised |
-| 3.5 save → a new Seafile version | **PASS** |
-| 3.6 reopen, values and formulas preserved | **PASS** (the file Seafile holds contains the typed value) |
-| 3.7 concurrent edit → conflict, no silent overwrite | **PASS** (HTTP 409) |
-| 2.4 a double save | **PASS** (identical content creates no new version) |
-| 2.12 an unsupported format | **PASS** (the gateway refuses an extension with no editor) |
+| 3.5 save → a new Seafile version | **NOT VERIFIED**; old host event did not prove durable editor acknowledgement |
+| 3.6 reopen, values and formulas preserved | **NOT VERIFIED**; earlier assertion inspected backend bytes, not a reopened editor |
+| 3.7 concurrent edit → conflict, no silent overwrite | **SIMULATED** by the gateway's fake compare-and-swap test |
+| 2.4 a double save | **NOT VERIFIED** against Seafile; identical-content shortcut is not evidence of a committed version |
+| 2.12 an unsupported format | **PASS** for the gateway extension lookup unit check only |
 
-The two rows that are not exercised (3.3, 3.4) are **editor features**, not
-integration features: the round trip is proven, and driving GridCraft's formula
-bar and formatting controls would need the same deterministic surface VectorCraft
-already has.
+GridCraft's upstream bridge has no save-result handler and marks its workbook
+saved when handing bytes to the parent. It cannot currently satisfy the host's
+durable acknowledgement contract. Formula semantics and editor reopen must be
+tested after that bridge is repaired.
 
 ## 5. What GR-010 adds beyond GR-005
 

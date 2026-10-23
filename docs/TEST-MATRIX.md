@@ -52,13 +52,13 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 
 | # | Test | Expected | Result |
 | --- | --- | --- | --- |
-| 3.1 | Open a synthetic XLSX from Seafile Web | GridCraft Web opens inline | [x] GR-005 |
-| 3.2 | Edit a cell value | value changes | [x] GR-005 (typed `4242` into a cell) |
+| 3.1 | Open a synthetic XLSX from Seafile Web | GridCraft Web opens inline | [~] historical browser simulation; no current Seafile dispatch evidence |
+| 3.2 | Edit a cell value | value changes | [~] historical simulated editor run; not an accepted E2E result |
 | 3.3 | Edit a formula | formula recomputes | [ ] not yet exercised |
 | 3.4 | Minimal formatting | applied | [ ] not yet exercised |
-| 3.5 | Save | new Seafile version | [~] historical GR-005 report; not reproduced on the current candidate, and current gateway fails closed without the GR-015 server endpoint |
-| 3.6 | Reopen | values and formulas preserved | [~] historical GR-005 report; current candidate has no editor semantic reopen verification |
-| 3.7 | Concurrent edit | conflict, no silent overwrite | [~] historical GR-005 report; current fake-CAS unit test does not exercise Seafile's fileserver |
+| 3.5 | Save | new Seafile version | [ ] NOT VERIFIED; GridCraft bridge cannot consume durable save acknowledgement |
+| 3.6 | Reopen | values and formulas preserved | [ ] NOT VERIFIED; previous assertion inspected bytes, not a reopened GridCraft editor |
+| 3.7 | Concurrent edit | conflict, no silent overwrite | [~] fake-CAS unit test only; Seafile fileserver behavior is NOT VERIFIED |
 
 ## 4. PPTX — DeckCraft (GR-011)
 

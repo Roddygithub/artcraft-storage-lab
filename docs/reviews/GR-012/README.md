@@ -1,15 +1,17 @@
 # GR-012 — a non-Office format round-trips
 
-Status: **PROVISIONAL — FREE REVIEW PENDING** · GPT REVIEW: PENDING
+Status: **GPT-6.1 Sol FAIL** on candidate `afec19e`; previous free-model PASS is
+provisional and the historical E2E claim is not accepted.
 Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` · File
 `/artcraft-lab/synthetic.svg` (synthetic) · VectorCraft 0.14.0 web build
 
 ## 0. The verdict
 
-> **Seafile ↔ Craft Web is not reserved to Office formats.**
-> An SVG was opened from Seafile in VectorCraft Web, modified with the editor's
-> own pencil tool in the browser, saved, and Seafile recorded a **new version**;
-> the document reopened from Seafile is the edited one.
+> Historical claim rejected by GPT Sol: the old test omitted the required
+> `Origin`, accepted a rectangle path as the drawn stroke, and called byte
+> equality a reopen. The test now checks the pencil path and reopens VectorCraft,
+> but this revised test has not yet run against Seafile. GR-012 remains **NOT
+> VERIFIED**.
 
 ## 1. Why VectorCraft, and why not PdfCraft
 
@@ -89,16 +91,16 @@ The adapter also checks the frame before it drives it: `frameIsOurs()` verifies
 the frame's **origin** (REVIEW-04, G9) — a direct property read crosses no
 boundary that `postMessage` would have checked, so the check is made here.
 
-## 3. The run (after REVIEW-04's remediation)
+## 3. Historical run (not accepted as E2E)
 
-The assertions are about the **content**, not about proxies: the bytes the editor
-produced, a valid SVG holding a path element, a content id that changed against
-the one captured **before** the edit, a version count that grew, and — the
-strongest one — the bytes Seafile holds being **byte-identical** to what the
-editor produced.
+The old run recorded changed bytes, a content id, and history growth. It did not
+prove that the expected pencil stroke was present or that VectorCraft parsed and
+rendered the bytes after reopening. The transcript below is preserved only as
+historical output.
 
 ```sh
 export ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=...
+export ARTCRAFT_SEAFILE_ACCESS_TOKEN=... # synthetic document capability; never commit it
 export ARTCRAFT_GATEWAY=http://127.0.0.1:8777
 export ARTCRAFT_SCREENSHOT=docs/reviews/GR-012/browser-proof-svg.png
 python3 tests/test_gr012_svg.py c82cc792-389d-43e6-b963-0dab1a47a9a8 /artcraft-lab/synthetic.svg
@@ -175,10 +177,11 @@ so.
 
 | Claim | Status |
 | --- | --- |
-| a non-Office format round-trips through a Craft web editor, from Seafile, in a browser, with a real modification and a new Seafile version | **PROVEN** |
+| a non-Office format round-trips through Seafile and a Craft web editor, with semantic reopen | **NOT VERIFIED**; the updated test has not run against Seafile |
 | the **common contract** (`?host=parent`) covers non-Office formats | **NOT PROVEN** — VectorCraft has no bridge; CADCraft has one but its web build exposes no automation surface |
 | PdfCraft handles a PDF round-trip | **NOT PROVEN** — the modification could not be driven; see §1 |
-| the page API is a second, supported transport | **implemented**, and documented as a gap in the common contract |
+| VectorCraft's page API can edit and serialize the synthetic SVG locally | **REPRODUCED** with the pinned local web bundle; this is not Seafile persistence evidence |
+| the page API is a second, supported transport | **implemented**, but lacks editor dirty/commit acknowledgement and is not the common contract |
 
 ## 7. The follow-ups
 

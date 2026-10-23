@@ -20,16 +20,18 @@ applications speak.
 import io
 import json
 import os
+import re
 import sys
-import time
 import urllib.parse
 import zipfile
+import math
+import xml.etree.ElementTree as ET
 
 GATEWAY = os.environ.get("ARTCRAFT_GATEWAY", "http://127.0.0.1:8777").rstrip("/")
 SEAFILE = os.environ.get("ARTCRAFT_SEAFILE_URL", "").rstrip("/")
 TOKEN = os.environ.get("ARTCRAFT_SEAFILE_TOKEN", "")
 ACCESS_TOKEN = os.environ.get("ARTCRAFT_SEAFILE_ACCESS_TOKEN", "")
-PAGE_URL = "http://127.0.0.1:8777/open-test.html"
+PAGE_URL = f"{GATEWAY}/open-test.html"
 
 FAILURES = []
 
@@ -74,6 +76,39 @@ def history_count(repo_id, path):
     return len(commits)
 
 
+def has_expected_stroke(snapshot):
+    """Find VectorCraft's reopened, unfilled pencil path at the expected bounds."""
+    for layer in snapshot.get("layers", []):
+        for item in layer.get("children", []):
+            bounds = item.get("bounds", {})
+            if (item.get("kind") == "Path" and item.get("fill") == "None"
+                    and item.get("stroke") == "#000000"
+                    and math.isclose(bounds.get("x", -1), 60, abs_tol=1)
+                    and math.isclose(bounds.get("y", -1), 60, abs_tol=1)
+                    and math.isclose(bounds.get("width", -1), 120, abs_tol=1)
+                    and math.isclose(bounds.get("height", -1), 60, abs_tol=1)):
+                return True
+    return False
+
+
+def has_serialized_stroke(svg_bytes):
+    """Reject the original rectangle-only SVG; require the pencil path itself."""
+    try:
+        root = ET.fromstring(svg_bytes)
+    except ET.ParseError:
+        return False
+    for item in root.iter():
+        if item.tag.rsplit("}", 1)[-1] != "path":
+            continue
+        if item.get("fill") != "none" or not item.get("stroke"):
+            continue
+        values = [float(value) for value in re.findall(r"-?\d+(?:\.\d+)?", item.get("d", ""))]
+        if len(values) >= 4 and all(math.isclose(a, b, abs_tol=1)
+                                    for a, b in zip(values[:4], (60, 60, 180, 120))):
+            return True
+    return False
+
+
 def main():
     if len(sys.argv) < 3:
         print(__doc__)
@@ -104,7 +139,8 @@ def main():
     # 1. the session, and the host page it serves
     body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
     status, raw = http(f"{GATEWAY}/open/", method="POST", data=body,
-                        headers={"Content-Type": "application/x-www-form-urlencoded"})
+                        headers={"Content-Type": "application/x-www-form-urlencoded",
+                                 "Origin": GATEWAY})
     if status != 200:
         raise SystemExit(f"gateway /open/ -> HTTP {status}: {raw[:300]!r}")
     host_page = raw.decode()
@@ -124,13 +160,11 @@ def main():
         page.goto(PAGE_URL, wait_until="load")
 
         # 2. the host page opened the document through VectorCraft's own API
-        opened = False
-        for _ in range(120):
-            state = page.eval_on_selector("#state", "el => el.textContent")
-            if "opened" in state or "Could not" in state or "Could not start" in state:
-                opened = True
-                break
-            time.sleep(0.5)
+        page.wait_for_function(
+            "() => /opened|Could not/.test(document.getElementById('state')?.textContent || '')",
+            timeout=60000)
+        state = page.eval_on_selector("#state", "el => el.textContent")
+        opened = "opened" in state
         check("1. the host page opened the document through the page API", opened,
               page.eval_on_selector("#state", "el => el.textContent"))
 
@@ -205,27 +239,16 @@ def main():
         check("7. the editor produced NEW bytes",
               len(saved_blob) > 0 and saved_blob != original,
               f"{len(original)} -> {len(saved_blob)} bytes")
-        saved_text = saved_blob.decode("utf-8", "replace")
-        # VectorCraft writes the rectangle as a path too, so the meaningful
-        # assertion is: a valid SVG document, with a path element in it.
-        paths = __import__("re").findall(r"<path\b[^>]*\bd=[\"']([^\"']+)", saved_text)
-        coordinates = [float(value) for path in paths
-                       for value in __import__("re").findall(r"-?\d+(?:\.\d+)?", path)]
-        geometry_ok = ("<svg" in saved_text and paths and len(coordinates) >= 4
-                       and max(coordinates) - min(coordinates) >= 50)
+        geometry_ok = has_serialized_stroke(saved_blob)
         check("7a. the new bytes contain the intended non-trivial stroke geometry",
-              bool(geometry_ok),
-              f"{len(paths)} path(s), coordinate span="
-              f"{(max(coordinates) - min(coordinates)) if coordinates else 0}")
+              geometry_ok, "unfilled pencil path from (60, 60) to (180, 120)")
 
         # 8. the host page took the bytes and stored them
-        saved = False
-        for _ in range(60):
-            state = page.eval_on_selector("#state", "el => el.textContent")
-            if state.startswith("Saved"):
-                saved = True
-                break
-            time.sleep(0.5)
+        page.wait_for_function(
+            "() => /^(Saved|Save failed|Could not)/.test(document.getElementById('state')?.textContent || '')",
+            timeout=30000)
+        state = page.eval_on_selector("#state", "el => el.textContent")
+        saved = state.startswith("Saved")
         check("8. the host page took the bytes and stored them", saved,
               page.eval_on_selector("#state", "el => el.textContent"))
 
@@ -240,27 +263,46 @@ def main():
         if shot:
             page.wait_for_timeout(500)
             page.screenshot(path=shot)
+        # 9. the server side, against the state captured before the edit
+        after_id = seafile_json(f"/api2/repos/{repo_id}/file/detail/?p={urllib.parse.quote(path)}")["id"]
+        check("9. a NEW Seafile version exists", after_id != before_id,
+              f"{before_id[:12]}... -> {after_id[:12]}...")
+
+        after_count = history_count(repo_id, path)
+        check("10. the history grew", after_count > before_count,
+              f"{before_count} -> {after_count} version(s)")
+
+        # 11. confirm exact persistence, then reopen through a fresh VectorCraft
+        #     page so the editor must parse the bytes read back from Seafile.
+        stored = download(repo_id, path)
+        check("11. Seafile download contains exactly the bytes VectorCraft produced",
+              stored == saved_blob, f"{len(stored)} bytes; equal={stored == saved_blob}")
+
+        body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
+        status, reopen_html = http(f"{GATEWAY}/open/", method="POST", data=body,
+                                   headers={"Content-Type": "application/x-www-form-urlencoded",
+                                            "Origin": GATEWAY})
+        if status != 200:
+            raise SystemExit(f"gateway reopen -> HTTP {status}: {reopen_html[:300]!r}")
+        reopen_page = context.new_page()
+        reopen_page.route("**/open-test.html", lambda route: route.fulfill(
+            status=200, content_type="text/html; charset=utf-8", body=reopen_html.decode()))
+        reopen_page.goto(PAGE_URL, wait_until="load")
+        reopen_page.wait_for_function(
+            "() => /opened|Could not/.test(document.getElementById('state')?.textContent || '')",
+            timeout=120000)
+        check("12a. the fresh editor reports a successful open",
+              "opened" in reopen_page.locator("#state").inner_text(),
+              reopen_page.locator("#state").inner_text())
+        reopened_api = reopen_page.evaluate_handle(
+            "() => document.getElementById('frame').contentWindow.vectorcraft")
+        reopened_snapshot = reopen_page.evaluate(
+            "api => api.request('document.inspect', {}).then(r => JSON.parse(JSON.stringify(r)))",
+            reopened_api)
+        check("12. a fresh VectorCraft editor parsed the saved SVG and shows the pencil stroke",
+              has_expected_stroke(reopened_snapshot),
+              json.dumps(reopened_snapshot.get("layers", []))[:240])
         browser.close()
-
-    # 9. the server side, against the state captured before the edit
-    after_id = seafile_json(f"/api2/repos/{repo_id}/file/detail/?p={urllib.parse.quote(path)}")["id"]
-    check("9. a NEW Seafile version exists", after_id != before_id,
-          f"{before_id[:12]}... -> {after_id[:12]}...")
-
-    after_count = history_count(repo_id, path)
-    check("10. the history grew", after_count > before_count,
-          f"{before_count} -> {after_count} version(s)")
-
-    # 11. reopen: the bytes Seafile holds are the editor's bytes
-    body = urllib.parse.urlencode({"access_token": ACCESS_TOKEN}).encode()
-    status, raw = http(f"{GATEWAY}/open/?format=json", method="POST", data=body,
-                        headers={"Content-Type": "application/x-www-form-urlencoded"})
-    reopened = json.loads(raw)
-    status, blob = http(f"{GATEWAY}/session/{reopened['sid']}/document")
-    check("11. the document reopened from Seafile is the edited one",
-          status == 200 and blob == saved_blob,
-          f"the stored bytes are the editor's bytes ({len(blob)} bytes, "
-          f"same as the editor's: {blob == saved_blob})")
 
     if console:
         print("\n--- browser console (first 12) ---")
@@ -271,6 +313,7 @@ def main():
     if FAILURES:
         print(f"FAILED: {len(FAILURES)} check(s): {', '.join(FAILURES)}")
         return 1
+    print("NOTE: this is a real Seafile persistence/editor-reopen test only when run against the configured synthetic Seafile instance; the host page is supplied directly, not reached from Seahub's file-list click")
     print("ALL CHECKS PASSED")
     return 0
 

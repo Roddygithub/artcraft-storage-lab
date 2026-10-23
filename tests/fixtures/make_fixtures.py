@@ -148,10 +148,13 @@ def write_xlsx(path):
             return f'<c r="{ref}" t="inlineStr"><is><t>{value}</t></is></c>'
         return f'<c r="{ref}"><v>{value}</v></c>'
 
+    def formula_cell(ref, formula, cached_value):
+        return f'<c r="{ref}"><f>{formula}</f><v>{cached_value}</v></c>'
+
     rows = [
         '<row r="1">' + cell("A1", "ArtCraft Storage Lab") + cell("B1", "Synthetic") + "</row>",
         '<row r="2">' + cell("A2", "value") + cell("B2", "42", kind="n") + "</row>",
-        '<row r="3">' + cell("A3", "sum") + cell("B3", "=SUM(B2:B2)", kind="str") + "</row>",
+        '<row r="3">' + cell("A3", "sum") + formula_cell("B3", "SUM(B2:B2)", "42") + "</row>",
     ]
     sheet = (
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
