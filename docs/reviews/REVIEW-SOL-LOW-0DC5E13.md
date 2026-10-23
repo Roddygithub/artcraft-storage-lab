@@ -43,9 +43,11 @@ mark the source document clean. Do not imply this completes all ArtCraft apps.
 
 The VectorCraft poll now compares exact serialized bytes, and
 `/tmp/artcraft-review-pw/bin/python tests/test_hostpage_protocol.py` passes a
-synthetic Chromium regression using the colliding pair above. This does not
-reproduce the actual VectorCraft editor or Seafile persistence after the code
-change; that runtime retest remains pending.
+synthetic Chromium regression using the colliding pair above. The actual
+VectorCraft/Seafile flow was subsequently rerun in the isolated container:
+changed SVG bytes were saved, read back byte-identically, and parsed on a fresh
+route load. See `docs/reviews/GR-012/VECTORCRAFT-SEAFILE-E2E-20261023.md`. The
+exact collision itself remains a synthetic Chromium regression case.
 
 This report records an interim review only. It does not supersede the prior Sol
 FAIL, establish GPT candidate readiness, or unlock upstream publication.

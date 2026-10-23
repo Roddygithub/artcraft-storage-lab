@@ -75,8 +75,8 @@ three of them):
    new baseline, so a refused save is retried instead of lost. The earlier
    32-bit content fingerprint could collide; the local browser regression test
    now uses a deterministic collision pair to guard the exact-byte comparison.
-   This synthetic test does not replace a fresh Seafile-backed VectorCraft run
-   after the code change;
+   A post-fix Seafile-backed VectorCraft run is recorded in the runtime report;
+   the exact collision pair remains a synthetic regression case;
 2. because there is no dirty signal, the host page cannot warn about unsaved
    *edits*. It warns on `beforeunload` **while a save is in flight**. The editor
    itself keeps unsaved work in **recovery copies** in the browser: *"Your unsaved

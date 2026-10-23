@@ -57,10 +57,8 @@ listing; a separate history API request returned 403 and is not used as proof.
   API; this run proves this successful save only, not unsaved-edit warnings,
   failure retry behavior, concurrent saves, or unload safety.
 - A later source review found that the then-current poll used a 32-bit content
-  fingerprint, which could collide. The current working-tree remediation uses
-  exact byte comparison and has a synthetic Chromium regression test using a
-  deterministic collision pair. The historical runtime run above predates that
-  change; the actual VectorCraft/Seafile flow has not yet been rerun afterward.
+  fingerprint, which could collide. The follow-up below records a runtime rerun
+  after replacing the hash with exact byte comparison.
 - PDF/PdfCraft and all other Craft apps are outside this evidence.
 - The temporary upload proxy and SVG dispatch settings were restored in the
   isolated container after the run. Seahub login returned HTTP 200 after
@@ -79,4 +77,27 @@ The browser session was attached to `artcraft-seafile-dev`. The sequence was:
    exact readback hash, and History UI entry.
 6. Return to the folder, click the file again, and verify the path in a fresh
    VectorCraft inspect snapshot.
+
+## Post-fix runtime retest — 2026-10-23
+
+After replacing the poll's 32-bit fingerprint with exact byte comparison, I
+temporarily enabled SVG dispatch in the **same isolated synthetic container**
+and copied the candidate `integration/gateway/hostpage.py` into its mounted test
+checkout. I then opened `synthetic.svg` from Seahub's file list in a fresh
+VectorCraft session.
+
+| Check | Observed evidence |
+| --- | --- |
+| Candidate host code loaded | Rendered host script contained `lastSavedBytes`; it did not contain `function fingerprint`. |
+| Before edit | 609 B; SHA-256 `fad9b3e60c2e76e29214dccdd6edfeb00b5edc9be605aaefddaed8372d3497f2`. |
+| Real editor change | VectorCraft's pencil page API drew document-space points `(300,100) → (350,125) → (400,150)`; the editor's `app.save` serialized a 695-byte SVG. |
+| Durable save | Host status: `Saved — new version 34a666b260fc2e4ac825139ea17b44c64e432b2e`; returned Seafile file ID `dcd78cbc1c2d7cfd2dcdb5a933827fbdcf0539bc`. |
+| Readback | Editor bytes and a fresh gateway document read were both 695 B with SHA-256 `e5cd9d2e39f80ef3194d5c2ae08b45cd7180046f35604c9035b41fa827c2ef23`; byte-for-byte comparison passed. The bytes parsed as SVG and contained `M300 100 L400 150`. |
+| Reopen | A fresh load of the Seafile file route opened VectorCraft with the exact-byte host code; `document.inspect` found the unfilled pencil path with bounds `{x:300,y:100,width:100,height:50}`. |
+| Seafile History UI | Current 695 B at 17:33:53; prior 609 B at 17:10:14; prior 270 B at 17:07:02. |
+
+This retest reproduces the VectorCraft-specific Seafile path after the polling
+fix. It does not establish the common Rust host contract, other apps, or
+deployment security. The temporary SVG dispatch setting was restored from its
+pre-test backup; production Seafile was not accessed.
 

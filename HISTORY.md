@@ -9,7 +9,10 @@
 * The focused synthetic Chromium test passes with two distinct, equal-length
   byte strings that collide under the old FNV-1a check; it confirms changed
   bytes reach storage once and unchanged bytes do not create duplicate saves.
-  A fresh Seafile-backed VectorCraft run after this code change remains pending.
+* A fresh VectorCraft run in isolated synthetic Seafile passed after the fix:
+  695 B editor output was durably versioned, read back byte-identically and
+  reopened with the new path; Seafile History showed 695 B → 609 B → 270 B.
+  The exact collision pair itself is covered by the synthetic Chromium test.
 
 ## 2026-10-23 — VectorCraft SVG round-trip in isolated Seafile
 
