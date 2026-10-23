@@ -33,13 +33,15 @@ window.addEventListener('message', (event) => {
   }
   if (msg?.type === 'wordcraft:saveResult') {
     window.lastSaveResult = msg;
+    (window.saveResults ||= []).push(msg);
     parent.postMessage({type: 'wordcraft:dirty', dirty: !msg.ok}, location.origin);
   }
 });
-window.requestSave = () => parent.postMessage({
-  type: 'wordcraft:save', name: 'synthetic.docx',
-  bytes: new TextEncoder().encode('edited bytes').buffer, ticket: 'ticket-1'
-}, location.origin) || parent.postMessage({type: 'wordcraft:dirty', dirty: false}, location.origin);
+window.requestSave = (ticket, text) => {
+  parent.postMessage({type: 'wordcraft:dirty', dirty: true}, location.origin);
+  parent.postMessage({type: 'wordcraft:save', name: 'synthetic.docx',
+    bytes: new TextEncoder().encode(text).buffer, ticket}, location.origin);
+};
 setTimeout(() => parent.postMessage({type: 'wordcraft:ready'}, location.origin), 50);
 </script>"""
 
@@ -79,6 +81,8 @@ class Handler(BaseHTTPRequestHandler):
             if not State.release_first_save.wait(5):
                 return self._send(504, b'{"ok":false}')
             return self._send(200, b'{"ok":true,"version":"version-2"}')
+        if State.save_count == 2:
+            return self._send(200, b'{"ok":true,"version":"version-3"}')
         return self._send(500, b'{"ok":false,"error":"synthetic failure"}')
 
 
@@ -98,18 +102,34 @@ def main():
             page.wait_for_function("() => document.getElementById('frame').contentWindow?.requestSave")
             page.wait_for_function("() => window.__lastDirty === true")
 
-            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave()")
+            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-a', 'first edit')")
             assert State.first_save_started.wait(5), "first save request did not reach the host"
             page.wait_for_function("() => window.__saveInFlight === true")
             print("first save in flight:", page.evaluate("() => ({dirty:window.__lastDirty,saving:window.__saveInFlight})"))
             assert page.evaluate("() => window.__lastDirty === true")
             assert page.evaluate("() => window.__editorConfirmedSave === false")
 
+            # A later editor snapshot arrives before A's durable acknowledgement.
+            # It must be rejected locally and must not cause A's acknowledgement
+            # to clear the newer dirty revision.
+            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-b', 'later edit')")
+            page.wait_for_function("() => document.getElementById('frame').contentWindow.saveResults?.some(x => x.ticket === 'ticket-b' && !x.ok)")
+            assert State.save_count == 1, "overlapping save must not reach storage"
+
             State.release_first_save.set()
+            page.wait_for_function("() => document.getElementById('frame').contentWindow.saveResults?.some(x => x.ticket === 'ticket-a' && x.ok)")
+            page.wait_for_function("() => window.__saveInFlight === false && window.__saveConfirmationPending === false")
+            assert page.evaluate("() => window.__lastDirty === true"), "A acknowledgement must not clear B's later edit"
+            assert page.evaluate("() => window.__editorConfirmedSave === false")
+            assert "Saved" not in page.locator("#state").inner_text()
+
+            # Once A has completed, retrying B is allowed and can be confirmed.
+            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-c', 'later edit')")
+            page.wait_for_function("() => document.getElementById('frame').contentWindow.saveResults?.some(x => x.ticket === 'ticket-c' && x.ok)")
             page.wait_for_function("() => window.__editorConfirmedSave === true")
             assert page.evaluate("() => window.__lastDirty === false")
 
-            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave()")
+            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-d', 'failed edit')")
             page.wait_for_function("() => window.__lastSave?.ok === false")
             page.wait_for_function("() => document.getElementById('frame').contentWindow.lastSaveResult")
             assert page.evaluate("() => window.__lastDirty === true"), "failed save must stay dirty"
@@ -120,8 +140,9 @@ def main():
         server.shutdown()
         thread.join(timeout=3)
         server.server_close()
-    print("PASS: pre-save dirty=false is ignored while durable save is in flight")
-    print("PASS: host dirty state clears only after durable response and editor confirmation")
+    print("PASS: overlapping save is rejected without reaching storage")
+    print("PASS: earlier acknowledgement cannot clear a later dirty revision")
+    print("PASS: retry after prior save completes is durably confirmed")
     print("PASS: failed save cannot be cleared by the synthetic editor's dirty=false")
     print("NOTE: synthetic local protocol test; not a Craft/Seafile E2E")
 

@@ -238,6 +238,24 @@ window.addEventListener("message", async (event) => {
       const bytes = data.bytes instanceof ArrayBuffer ? new Uint8Array(data.bytes) : data.bytes;
       // The ticket the app gave this save, if it uses one (WordCraft's async_saves).
       const ticket = data.ticket;
+      // The host's state is document-wide, while editor save tickets are
+      // independent. Refuse overlapping writes so an older acknowledgement
+      // cannot mark newer bytes clean or race Seafile's compare-and-swap.
+      if (window.__saveInFlight) {
+        dirtyRevision += 1;
+        window.__lastDirty = true;
+        window.__editorConfirmedSave = false;
+        window.__saveConfirmationPending = false;
+        fetch("/session/" + SID + "/dirty", {
+          method: "POST", credentials: "same-origin",
+          headers: { "Content-Type": "text/plain" }, body: "true",
+        }).catch(() => {});
+        if (ticket !== undefined && ticket !== null) {
+          toCraft("saveResult", { ticket: ticket, ok: false, error: "another save is still in progress" });
+        }
+        say("Save not started; wait for the current save, then retry", "busy");
+        break;
+      }
       say("Saving…", "busy");
       window.__saveInFlight = true;
       window.__lastDirty = true;
