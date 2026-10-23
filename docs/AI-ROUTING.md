@@ -177,6 +177,16 @@ The OpenCode binary exposes model IDs `openai/gpt-5.6-luna` and
 and `gpt-6.1-sol`); do not substitute the inherited `gpt-6-luna` for either
 requested role.
 
+### Cost-bounded final review
+
+Use the lowest reasoning effort that still meets the independent-review
+requirement, with the default service tier. The 2026-10-23 Sol review of
+`0edbe52` used medium/default; a prior max/priority attempt hit the provider
+usage limit before returning a verdict. Use Nemotron for narrow interim checks
+and reserve a fresh Sol call for a materially remediated, immutable candidate.
+Do not spend another Sol review on documentation-only changes or while the
+mandatory Seafile DOCX workflow remains unproven.
+
 ## Fallback review policy
 
 * Primary reviewer: `artcraft-reviewer` (Nemotron 3 Ultra 550B A55B).

@@ -1,8 +1,8 @@
 # GPT-6.1 Sol Final Re-review
 
-Candidate: `afec19e63a6a4faec8a94f93651363dbe007e526`  
-Reviewer: GPT-6.1 Sol (`codex`, `gpt-6.1-sol`, max reasoning, priority)  
-Date: 2026-10-23  
+Candidate: `afec19e63a6a4faec8a94f93651363dbe007e526`
+Reviewer: GPT-6.1 Sol (`codex`, `gpt-6.1-sol`, max reasoning, priority)
+Date: 2026-10-23
 Delegated task: `node:delegated-task:command%3Amcp%3Ae88d48d8-e62d-44d6-a39b-f433b7eaa818%3Adelegate-task%3Aartcraft-sol-final-rereview-afec19e63-20261023`
 
 ## Verdict

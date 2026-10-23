@@ -10,19 +10,21 @@ independently verified, it says so.
 ## Latest review event — 2026-10-23
 
 GPT-6.1 Sol reviewed exact candidate
-`afec19e63a6a4faec8a94f93651363dbe007e526` and returned **FAIL**. The full
-report is `docs/reviews/GPT-SOL-REREVIEW-AFEC19E.md`; the prior `d9ef476e`
-FAIL remains in `docs/reviews/GPT-SOL-REREVIEW-D9EF476.md`. Local remediation
-commits after `afec19e` address overlapping-save state, gateway error leakage
-and response bounds, the cross-origin handoff, conditional-save routing, and
-false-positive SVG/XLSX evidence. They have not yet been reviewed by Sol. The
-required Seafile DOCX file-list click/edit/version/close/reopen and ONLYOFFICE
-save regression remain **NOT VERIFIED**. No GPT PASS was granted; upstream is
-locked. No service was changed during the latest review or remediation.
+`0edbe524b4fa321b0f73f8601afef390e7f785e6` at medium effort/default service
+tier and returned **FAIL**. The report is `docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md`;
+the earlier `afec19e` and `d9ef476e` FAILs remain preserved in their reports.
+Sol found that the GR-015 route `conditional-update-api` fails Seafile's existing
+`op=update` prefix token check. Commit `0da898f` changes it to
+`update-conditional-api` and adds a source-level guard test; the exact header
+hook and a built isolated runtime still need verification. The route/prefix
+assertions pass against pinned source but are not a C runtime test. GR-006's historical
+free PASS claim and the RFC's capability handoff wording were also corrected.
+The required Seafile DOCX file-list click/edit/version/close/reopen and
+ONLYOFFICE save regression remain **NOT VERIFIED**. No GPT PASS was granted;
+upstream is locked. No service was changed during review or remediation.
 
-The local candidate currently contains remediation commits through the entries
-in `HISTORY.md`; it is not yet frozen for Sol. Record the exact next review SHA
-after the final status/evidence commit.
+The local remediation after `0edbe52` is not yet frozen for Sol. Record the exact
+next review SHA after the final status/evidence commit.
 
 ## 1. Repository
 
@@ -180,7 +182,7 @@ in isolation. The local browser and engine tests use synthetic storage only.
 6. The user edits; the app posts <app>:dirty.
 7. The user saves; the app posts <app>:save with the bytes and a ticket.
 8. The host page POSTs the bytes to the gateway.
-9. Patched Seahub calls the dedicated `conditional-update-api`; stock and Go
+9. Patched Seahub calls the dedicated `update-conditional-api`; stock and Go
    fileservers do not expose this route and must fail before writing. The C patch
    is unbuilt and runtime behavior is **NOT VERIFIED**.
 10. The host/editor becomes clean only after durable version confirmation.
@@ -287,9 +289,9 @@ Only GPT REVIEW PASS may unlock upstream publication.
 
 ### 13.1 Where to look first
 
-1. `docs/reviews/GR-006/README.md` — is the "VERIFIED END-TO-END" claim honest?
-   (Two of the twelve steps are marked *partly*: the click in the Seafile file
-   list, and the user-facing close.)
+1. `docs/reviews/GR-006/README.md` — the historical free-review “VERIFIED
+   END-TO-END” claim is superseded; Sol found no accepted real Seafile DOCX E2E
+   evidence. See `docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md`.
 2. `.work/wordcraft-patch` — is the ticket flow right? (The application claims the
    ticket the bridge started; the bridge finishes it. If they are not the same
    ticket, the document never gets marked saved. REVIEW-03 verified this.)

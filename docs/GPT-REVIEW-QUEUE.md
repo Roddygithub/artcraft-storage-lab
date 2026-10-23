@@ -9,20 +9,23 @@ Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 ## Latest candidate result — 2026-10-23
 
 ```text
-Candidate: afec19e63a6a4faec8a94f93651363dbe007e526
+Candidate: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 Reviewer: GPT-6.1 Sol
 Verdict: FAIL
-Report: docs/reviews/GPT-SOL-REREVIEW-AFEC19E.md
+Report: docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md
 Prototype: operator-only local investigation; Seafile MVP not ready
 Public deployment: NOT READY
 Upstream RFC/patch: NOT READY
 Upstream publication: LOCKED
 ```
 
-The failed candidate remains immutable. Focused local remediation commits now
-exist after it, but the resulting candidate has not yet received a fresh Sol
-review and has not been deployed or pushed. Earlier failures remain in their
-separate reports.
+The failed candidate remains immutable. A new source-level defect was found in
+the conditional route: its name did not satisfy Seafile's existing `op=update`
+prefix check. Commit `0da898f` renames the route, but still requires exact hook
+verification and an isolated runtime; source assertions alone do not verify the
+hook. The mandatory real DOCX E2E remains
+unverified. Earlier failures remain in their separate reports. The current
+worktree after this review is not yet frozen or reviewed.
 
 ## Queue
 

@@ -1,6 +1,6 @@
 # GR-015 — Per-library ArtCraft routing and conditional Seafile save
 
-Status: **local draft; not built, not deployed, not reviewed, not published**.
+Status: **Sol FAIL on `0edbe524b4fa321b0f73f8601afef390e7f785e6`; route-name remediation is committed as `0da898f` but not runtime-verified or re-reviewed**.
 
 This is the server-side work needed to make the gateway usable without taking
 Office formats away from ONLYOFFICE globally.
@@ -29,8 +29,9 @@ Office formats away from ONLYOFFICE globally.
    permission. It validates the original filename and basic file signature,
    then mints an update token for that same user.
 4. The fileserver receives the opened file id and repository head. Seahub calls
-   the dedicated `conditional-update-api` route; the proposed C fileserver maps
-   this route to its conditional handler. The stock C and Go routers do not
+   the dedicated `update-conditional-api` route. Its name starts with `update`
+   so the existing Seafile `op=update` token check accepts it; the proposed C
+   fileserver maps this distinct route to its conditional handler. The stock C and Go routers do not
    expose that route, so the request must fail with 404 before an unconditional
    update can happen. The C handler also rejects requests missing either
    precondition. The patch remains **unbuilt/uninstalled**; route behavior,
@@ -56,7 +57,7 @@ runtime test.
 | Gateway unit checks after the client-side changes | PASS; `python3 tests/test_gateway_unit.py` |
 | Exact-source patch application | PASS for both patches against clean recorded base SHAs; source tree diff matches the patch artifact |
 | License/provenance inventory | PASS for exact source SHAs and license-file references; legal compatibility/distribution is **NOT VERIFIED** (`THIRD-PARTY-NOTICES.md`) |
-| Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness, including capability audience/grant/allowlist and dedicated route checks; Django/Seafile runtime is **NOT VERIFIED** |
+| Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness, including capability audience/grant/allowlist and route-prefix source checks; actual C header-hook and Django/Seafile runtime are **NOT VERIFIED** |
 | Seafile Server C build | **NOT VERIFIED**; the attempted isolated configure failed on missing `libargon2`; the live server was not touched |
 | Seahub deployment/import test | **NOT RUN** |
 | Synthetic Seafile save and conflict test against patched binaries | **NOT RUN** |

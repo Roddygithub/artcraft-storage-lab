@@ -1,10 +1,10 @@
 # STATUS
 
 ```text
-PHASE:      GPT-6.1 Sol FAIL on afec19e; focused local remediation in progress
+PHASE:      GPT-6.1 Sol FAIL on 0edbe52; focused local remediation in progress
 BRANCH:     main
-LAST REVIEWED SHA: afec19e63a6a4faec8a94f93651363dbe007e526
-CURRENT CANDIDATE: local commits after afec19e; exact SHA recorded at freeze
+LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
+CURRENT CANDIDATE: local remediation after 0edbe52; exact SHA recorded at next freeze
 WORKTREE:   remediation commits are not reviewed by Sol
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
@@ -17,7 +17,8 @@ REVIEWER:   artcraft-reviewer         (nvidia/nvidia/nemotron-3-ultra-550b-a55b#
 FREE REVIEW: PASS (2 rounds, both remediated) — see docs/reviews/REVIEW-0*.md
 GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a97863,
              d9ef476e6fbcb04c9a9e23cfe235812167d1f27c, and
-             afec19e63a6a4faec8a94f93651363dbe007e526)
+             afec19e63a6a4faec8a94f93651363dbe007e526, and
+             0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
 CURRENT GR: GR-015 — per-library routing + user-bound conditional save (local draft)
 
@@ -25,15 +26,17 @@ FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 
 BLOCKERS:
 - real Seafile Web → WordCraft DOCX edit/save/version/close/reopen is NOT VERIFIED
-- conditional-save route and authorization patches are not built or runtime-tested
+- GR-015 conditional-save endpoint previously failed the existing `op=update`
+  route-prefix token check; current local patch renames it `update-conditional-api`
+  and source assertions pass, but the C hook and built isolated runtime are unverified
 - ONLYOFFICE edit/save/version/reopen preservation remains NOT VERIFIED
 - GridCraft durable acknowledgement and XLSX semantic reopen are not verified
 - VectorCraft Seafile semantic reopen is not yet run; only the local editor round-trip is reproduced
 - CSP/rate limiting are absent; public deployment is NOT READY
 
 NEXT:
-- freeze the exact local remediation candidate and request a fresh Sol review
 - build and exercise GR-015 only in an isolated synthetic Seafile deployment; do not install on the live LXC
+- after material blockers have evidence and tests, freeze a new candidate for a cost-bounded Sol review
 - validate the actual Seafile DOCX click/edit/save/version/close/reopen flow and ONLYOFFICE preservation before claiming MVP
 - keep upstream publication locked; GPT REVIEW remains FAIL
 ```
@@ -67,7 +70,7 @@ NEXT:
 | GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | PASS (remediated, REVIEW-04) | PENDING |
 | GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PASS (REVIEW-03) | PENDING |
 | GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | PASS (REVIEW-03) | PENDING |
-| GR-015 | Per-library routing and conditional Seafile save | `docs/reviews/GR-015/` | not reviewed | PENDING |
+| GR-015 | Per-library routing and conditional Seafile save | `docs/reviews/GR-015/` | Sol FAIL; route/token mismatch found; local remediation underway | FAIL |
 
 ## What is already true
 

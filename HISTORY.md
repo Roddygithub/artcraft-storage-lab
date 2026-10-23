@@ -1,5 +1,55 @@
 # HISTORY
 
+## 2026-10-23 — Sol re-review of 0edbe52 and route-token remediation
+
+* GPT-6.1 Sol reviewed exact SHA
+  `0edbe524b4fa321b0f73f8601afef390e7f785e6` at medium effort/default tier and
+  returned **FAIL**. Full report: `docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md`.
+* Sol independently found the dedicated C path `conditional-update-api` did not
+  begin with `update`, while the existing `upload_headers_cb` passes the first
+  path component to `check_access_token`, which enforces the `op=update` prefix.
+  Thus the proposed save route would reject the minted update token before the
+  conditional handler. The route is now named `update-conditional-api`, keeping
+  the route distinct while preserving the existing operation check. The GR-015
+  source harness passes against pinned Seahub/Seafile sources with both patches
+  applied, and both patches pass applicability checks. The harness confirms the
+  route begins with `update` and the existing hook still enforces the token
+  operation; it is source-level evidence, not actual hook execution. C/Django
+  runtime behavior remains **NOT VERIFIED**.
+* The GR-006 historical free-model “VERIFIED END-TO-END” claim is explicitly
+  marked superseded, and the RFC now documents the browser-mediated capability
+  handoff to the gateway. These changes correct claims; they do not add Seafile
+  E2E evidence.
+* System Python has no Playwright module and the prior temporary Playwright
+  environment is gone, so the host/WordCraft/VectorCraft Chromium suites could
+  not be rerun during this pass. Gateway unit, SVG assertion, XLSX fixture,
+  Python compilation, patch applicability and GR-015 source checks were rerun;
+  no production files were altered.
+* Blockers remain: real Seafile DOCX version/reopen and ONLYOFFICE regression are
+  unverified. Public deployment and upstream publication remain locked.
+
+### Reproduction record for the local route remediation
+
+Reviewed base SHA: `0edbe524b4fa321b0f73f8601afef390e7f785e6`. The commands below
+ran on 2026-10-23 against the working tree after that SHA; the source clones
+were pinned to the Seahub and Seafile SHAs listed in `docs/reviews/GR-015/README.md`.
+
+| Command | Exit | What it establishes |
+| --- | ---: | --- |
+| `env ARTCRAFT_SEAHUB_SOURCE=/tmp/artcraft-seahub-sol-next ARTCRAFT_SEAFILE_SERVER_SOURCE=/tmp/artcraft-seafile-server-sol-next python3 tests/test_gr015_authorization.py` | 0 | Synthetic helper checks plus source assertions for the update token, route, callback, path operation extraction and existing prefix check; no C/Django runtime |
+| `python3 tests/test_gateway_unit.py` | 0 | Gateway tests against fake upstream/CAS; not real Seafile |
+| `python3 tests/test_gr012_svg_assertions.py` | 0 | Offline SVG assertion unit checks; not an editor/Seafile round trip |
+| `python3 tests/test_xlsx_fixture.py` | 0 | Fixture has a formula element and cached value; no GridCraft recalculation/reopen |
+| `python3 -m py_compile integration/gateway/*.py tests/*.py tests/fixtures/make_fixtures.py` | 0 | Python syntax only |
+| `git diff --check` plus pinned-source `git apply --check` for each GR-015 patch | 0 | Whitespace and applicability against clean source trees; no build/runtime |
+| `python3 tests/test_gr012_svg.py` without its required Seafile URL/token, gateway, repository and path | 2 | Not run; the script printed its invocation and stopped |
+| `python3 tests/test_gr010_xlsx.py` | 2 | Not run; no such test file exists (`tests/test_xlsx_fixture.py` is the fixture check) |
+
+Environment: Python 3 on the local workstation; Playwright is unavailable in the
+system Python and the old temporary browser-test environment is absent. No
+production service or upstream artifact was changed. These checks do not resolve
+Sol's real-Seafile E2E blocker.
+
 ## 2026-10-23 — Sol final re-review and focused remediation (local only)
 
 * GPT-6.1 Sol reviewed exact candidate

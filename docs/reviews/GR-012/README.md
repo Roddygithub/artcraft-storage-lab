@@ -1,6 +1,6 @@
 # GR-012 — a non-Office format round-trips
 
-Status: **GPT-6.1 Sol FAIL** on candidate `afec19e`; previous free-model PASS is
+Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; previous free-model PASS is
 provisional and the historical E2E claim is not accepted.
 Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` · File
 `/artcraft-lab/synthetic.svg` (synthetic) · VectorCraft 0.14.0 web build

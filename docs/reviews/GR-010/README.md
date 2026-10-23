@@ -1,6 +1,6 @@
 # GR-010 — GridCraft: an `.xlsx` round-trips
 
-Status: **GPT-6.1 Sol FAIL** on candidate `afec19e`; historical free-model PASS is
+Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; historical free-model PASS is
 provisional and its E2E claim is not accepted. GridCraft durable save is not
 verified with the current ticket/acknowledgement protocol.
 Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` ·

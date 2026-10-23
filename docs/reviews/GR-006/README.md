@@ -1,45 +1,48 @@
-# GR-006 — the WordCraft DOCX MVP
+# GR-006 — historical WordCraft DOCX evidence (not accepted as MVP proof)
 
-Status: **PROVISIONAL — FREE REVIEW PASS** (pending an independent review of this bundle)
-· GPT REVIEW: PENDING
-Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` ("OnlyOffice") ·
-File `/artcraft-lab/synthetic.docx` (synthetic)
+Status: **GPT-6.1 SOL FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`.
+The earlier free-model PASS and recorded PASS output below are historical
+evidence only; the required Seafile Web DOCX workflow remains **NOT VERIFIED**.
+Date of historical run: 2026-10-22 · Synthetic file: `/artcraft-lab/synthetic.docx`
 
 ## 0. The verdict, against the mission's twelve steps
 
 | # | Step | Status | Evidence |
 | --- | --- | --- | --- |
-| 1 | the user is in Seafile Web | **partly** | the hook is configured and live in the running Seahub; the *click* itself was not driven by the test (see §5) |
-| 2 | they click a DOCX | **partly** | the hook maps `.docx` to the host page; the test opens the host page the way the hook does |
-| 3 | WordCraft Web opens it, with no manual download | **PROVEN** | the app loaded, rendered, and received the document over the bridge — no download, no upload, no desktop app |
-| 4 | the document is loaded | **PROVEN** | the app's title became `synthetic - WordCraft` |
-| 5 | the user modifies the document | **PROVEN** | the test typed `ARTCRAFTPROOF` into the page; the app reported `dirty = true` |
-| 6 | they save from WordCraft | **PROVEN** | the test pressed **Ctrl+S** — the editor's own Save command |
-| 7 | no manual upload is needed | **PROVEN** | the bytes went to the gateway and to Seafile by themselves |
-| 8 | Seafile records a new version | **PROVEN** | the content id changed and the file history grew, checked through the Seafile API |
-| 9 | the editor confirms the save | **PROVEN** | the host page showed `Saved — new version 2026-10-22T13:00:30+00:00`; the app's own log said `saved synthetic.docx` |
-| 10 | the document is closed | **partly** | the browser was closed; the *user-facing* close path was not exercised |
-| 11 | it is reopened from Seafile | **PROVEN** | a fresh session fetched the bytes Seafile holds now |
-| 12 | the modification is present | **PROVEN** | the reopened document contains `ARTCRAFTPROOF` |
+| 1 | the user is in Seafile Web | **NOT REPRODUCED** | the browser harness does not start from a Seahub file list |
+| 2 | they click a DOCX | **NOT REPRODUCED** | the test injects the gateway host page directly |
+| 3 | WordCraft Web opens it, with no manual download | **LOCAL HARNESS ONLY** | local app/bridge behavior was reported; it is not a Seafile file-list launch |
+| 4 | the document is loaded | **LOCAL HARNESS ONLY** | title and canvas assertions do not establish a real Seahub launch |
+| 5 | the user modifies the document | **LOCAL HARNESS ONLY** | editor input and dirty state were reported in the harness |
+| 6 | they save from WordCraft | **LOCAL HARNESS ONLY** | Ctrl+S was driven in the harness; it is not accepted as durable Seafile save proof |
+| 7 | no manual upload is needed | **NOT REPRODUCED** | the recorded flow starts by posting a capability directly to the gateway |
+| 8 | Seafile records a new version | **NOT REPRODUCED** | prior API/history assertions were not reproduced for this review |
+| 9 | the editor confirms the save | **NOT ACCEPTED** | reported host status and dirty=false are not linked to a verified committed revision |
+| 10 | the document is closed | **NOT VERIFIED** | the user-facing close path was not exercised |
+| 11 | it is reopened from Seafile | **BYTES FETCH ONLY** | the harness fetches bytes; it does not reopen them in WordCraft |
+| 12 | the modification is present | **NOT VERIFIED IN EDITOR** | byte/XML checks do not establish that WordCraft parses and displays the saved edit |
 
-> **The mechanism is VERIFIED END-TO-END.** Two steps are only partly proven
-> because the test cannot log into Seahub (it has no password, only an account
-> token): the *click* in the Seafile file list, and the user-facing *close*.
-> Both are the plumbing around the flow, not the flow.
+> The old bundle's “VERIFIED END-TO-END” statement is withdrawn as a conclusion.
+> Sol found no accepted evidence for Seafile file-list click, durable version,
+> editor confirmation, close and semantic WordCraft reopen. See
+> `docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md`.
 
-## 1. The evidence
+## 1. Historical output from the unaccepted run
+
+The lines below are preserved for audit history. They were not reproduced in
+Sol's review and must not be read as verified Seafile MVP evidence.
 
 ```text
-[PASS] 1. the Craft app loaded and the document was delivered  -- synthetic.docx opened
-[PASS] 2. the Craft app rendered a canvas  -- {"framed": true, "canvas": true, "w": 1280, "h": 686}
-[PASS] 3a. the editor reported unsaved changes after the edit  -- dirty = True
-[PASS] 3. the editor's own Save reached the host and was persisted  -- Saved - new version 2026-10-22T13:00:30+00:00
-[PASS] 4. a NEW Seafile version exists  -- 718001d8... -> 1c526786...
-[PASS] 4. the history grew  -- 2 -> 3 versions
-[PASS] 5. the typed text is in the file Seafile now holds  -- 5305 bytes; the document contains 'ARTCRAFTPROOF': True
-[PASS] 6. the document reopened from Seafile still has the edit  -- 5305 bytes; it contains 'ARTCRAFTPROOF': True
+[HISTORICAL] 1. the Craft app loaded and the document was delivered  -- synthetic.docx opened
+[HISTORICAL] 2. the Craft app rendered a canvas  -- {"framed": true, "canvas": true, "w": 1280, "h": 686}
+[HISTORICAL] 3a. the editor reported unsaved changes after the edit  -- dirty = True
+[HISTORICAL] 3. the editor's own Save reached the host and was persisted  -- Saved - new version 2026-10-22T13:00:30+00:00
+[HISTORICAL] 4. a NEW Seafile version exists  -- 718001d8... -> 1c526786...
+[HISTORICAL] 4. the history grew  -- 2 -> 3 versions
+[HISTORICAL] 5. the typed text is in the file Seafile now holds  -- 5305 bytes; the document contains 'ARTCRAFTPROOF': True
+[HISTORICAL] 6. the document reopened from Seafile still has the edit  -- 5305 bytes; it contains 'ARTCRAFTPROOF': True
 
-ALL CHECKS PASSED
+HISTORICAL OUTPUT: ALL CHECKS PASSED (NOT REPRODUCED; NOT ACCEPTED AS E2E)
 ```
 
 The browser console, which is the application's own account of what happened:

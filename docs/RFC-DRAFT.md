@@ -203,10 +203,14 @@ refuses the write".
 
 ## Authentication
 
-None crosses the boundary.
+The ArtCraft frame receives document bytes and an opaque gateway session id. A
+short-lived Seafile third-party-editor capability is submitted by the browser to
+the gateway, which stores it server-side; it is not exposed to the Craft frame.
+No Seafile account token or fileserver access token is sent to the editor.
 
-* The **host** holds the platform credential, on its server. The browser never
-  sees a platform token of any kind.
+* The **gateway** holds the capability after the browser-mediated Seahub form
+  handoff. The browser participates in that handoff, so origin isolation and
+  redaction are part of the security boundary.
 * The **application** never knows what platform it is in. It receives bytes and
   gives bytes back.
 * The **session** between them is the host's own, opaque, single-document and

@@ -1,6 +1,6 @@
 # Security
 
-Status: **GPT REVIEW FAIL** (Sol, candidate `d9ef476e6fbcb04c9a9e23cfe235812167d1f27c`)
+Status: **GPT REVIEW FAIL** (Sol, latest reviewed candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`)
 GR-009 · Independent free review: `docs/reviews/REVIEW-01.md`, `REVIEW-02.md`
 
 ## Current implementation correction — 2026-10-23
@@ -14,11 +14,12 @@ This note supersedes older statements below when they conflict:
   capability by form navigation. The gateway and Seahub must use distinct
   origins; behavior through Nginx Proxy Manager is not yet verified.
 * Stock Seafile has no user-bound conditional-save endpoint. The gateway fails
-  closed on the deployed version. The local GR-015 patch now sends same-content
-  conditional saves through a dedicated `conditional-update-api` route. Stock
-  C and Go fileservers do not expose this route, so the intended behavior is a
-  fail-closed 404; patches are not built or installed, and runtime behavior is
-  **NOT VERIFIED**.
+  closed on the deployed version. The local GR-015 patch proposes a dedicated
+  `update-conditional-api` route. Its `update-` prefix preserves the existing
+  `op=update` token check while keeping the endpoint distinct from `update-api`.
+  Stock C and Go fileservers do not expose it. The patches remain unbuilt and
+  runtime behavior is **NOT VERIFIED**; see the latest Sol finding and local
+  remediation in `docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md`.
 * The local Seahub patch rechecks current `can_preview` permission for each
   capability-backed read. The exact decorator passes a synthetic AST harness;
   Django/Seafile runtime authorization remains **NOT VERIFIED**.

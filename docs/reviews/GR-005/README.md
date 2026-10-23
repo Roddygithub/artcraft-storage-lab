@@ -1,17 +1,24 @@
-# GR-005 — First host-integration technical proof
+# GR-005 — historical host-integration prototype evidence
 
-Status: **PROVISIONAL — FREE REVIEW PASS** (the Seafile side) · GPT REVIEW: PENDING
+Status: **GPT-6.1 SOL FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`.
+The prior free-review PASS and “proven” labels below are historical claims, not
+reproduced or accepted as end-to-end evidence. The former `.xlsx` routing change
+was removed; live Seahub has no ArtCraft route, and the synthetic DOCX opens
+ONLYOFFICE. See `docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md`.
+All following commands, screenshots, API outputs, and PASS lines are preserved
+as historical records of a 2026-10-22 prototype run. They are not evidence that
+the current candidate or the required WordCraft DOCX workflow works end to end.
 Date: 2026-10-22 · Library: `c82cc792-389d-43e6-b963-0dab1a47a9a8` ("OnlyOffice", an
 empty library on the reference instance) · Folder `/artcraft-lab/`
 
-## 0. What is proven, and what is not
+## 0. Historical claims, and current verification status
 
 | | Status |
 | --- | --- |
-| Seafile -> gateway -> document bytes -> Craft app -> saved bytes -> **a new Seafile version** | **PROVEN**, end to end, against the real instance |
-| The **conflict** behaviour: a stale save is refused and the file is left alone | **PROVEN** |
-| **A real Craft web application, running in a real browser, editing the Seafile document and saving it back** | **PROVEN** — see §2 |
-| The user flow *starting from a click in Seafile Web* | **PROVEN for the mechanics**, but the click itself was not driven (the browser test opens the host page the way Seahub's hook does) |
+| Seafile -> gateway -> document bytes -> Craft app -> saved bytes -> **a new Seafile version** | **HISTORICAL CLAIM; NOT REPRODUCED** for this review |
+| The **conflict** behaviour: a stale save is refused and the file is left alone | **HISTORICAL CLAIM; NOT REPRODUCED** |
+| **A real Craft web application, running in a real browser, editing the Seafile document and saving it back** | **HISTORICAL CLAIM; NOT ACCEPTED as proof of the required WordCraft DOCX MVP** |
+| The user flow *starting from a click in Seafile Web* | **NOT VERIFIED** — the historical browser test opened an injected host page, not a file from Seahub |
 
 ## 1. Why GridCraft and `.xlsx` for the first proof
 
@@ -39,7 +46,7 @@ GridCraft was chosen because it **already ships the `?host=parent` bridge**
 publishes its browser build in its GitHub release
 (`gridcraft-web-0.10.0.zip`, 7 MB).
 
-## 2. The configuration change on the reference instance
+## 2. Historical configuration change on the reference instance
 
 One additive block in `/opt/seafile/conf/seahub_settings.py`:
 
@@ -233,7 +240,7 @@ which writes unconditionally (`docs/reviews/GR-008/SEAFILE-CONCURRENCY-PRIMITIVE
 
 | # | Limitation |
 | --- | --- |
-| L1 | The **click in Seafile Web** was not driven by the test (the browser test opens the host page the way Seahub's hook does). The mechanics from there on are proven in a real browser. The hook itself is exercised by the configuration, and the extension it claims (`.xlsx`) exists in no other library. |
+| L1 | The **click in Seafile Web** was not driven; the browser test opened an injected host page. The reported mechanics are historical and are not accepted as current end-to-end proof. |
 | L2 | The gateway's `action_url` is `http://127.0.0.1:8777`, which only works for a browser on this machine. The production design puts the gateway on its own host. It also means the browser test could not be driven through Seahub itself, since Seahub is on https and the gateway on http. |
 | L3 | The write is attributed to the **service account**, not the user who edited. The upstream patch (option A in `docs/SEAFILE-INTEGRATION-POINTS.md`) fixes this by writing inside Seahub as the user. |
 | L4 | The host page does not yet model "the Craft app believes it saved but the host failed" (the Craft app marks the document clean when the bytes leave the frame). The host page keeps its own state and shows the failure, but the Craft app does not know. This is the open question Q-5 in `docs/HOST-CONTRACT.md`. |
