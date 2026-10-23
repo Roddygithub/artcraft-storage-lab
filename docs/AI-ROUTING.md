@@ -179,15 +179,19 @@ The OpenCode binary exposes model IDs `openai/gpt-5.6-luna` and
 and `gpt-6.1-sol`); do not substitute the inherited `gpt-6-luna` for either
 requested role.
 
-### Cost-bounded final review
+### Cost-bounded GPT reviews
 
-Use the lowest reasoning effort that still meets the independent-review
-requirement, with the default service tier. The 2026-10-23 Sol review of
-`0edbe52` used medium/default; a prior max/priority attempt hit the provider
-usage limit before returning a verdict. Use Nemotron for narrow interim checks
-and reserve a fresh Sol call for a materially remediated, immutable candidate.
-Do not spend another Sol review on documentation-only changes or while the
-mandatory Seafile DOCX workflow remains unproven.
+The user authorized GPT-6.1 Sol for interim reviews **at low effort** alongside
+free-model review lanes. T3 Code's exact model ID is `gpt-6.1-sol`; use
+`reasoningEffort=low` and `serviceTier=default`. The parallel all-app audit
+started on 2026-10-23 is an interim architecture review, not a candidate gate.
+
+Use free reviewers for bounded per-app/source checks, then one low-effort Sol
+review for the consolidated architecture or substantive Rust change when useful.
+Do not launch redundant Sol calls per app. A separate fresh Sol review is still
+required on the exact immutable candidate SHA before any `GPT REVIEW PASS`.
+The 2026-10-23 review of `0edbe52` used medium/default; an earlier max/priority
+attempt hit the provider usage limit before returning a verdict.
 
 ## Fallback review policy
 
