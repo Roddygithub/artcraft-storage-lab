@@ -1,5 +1,15 @@
 # HISTORY
 
+## 2026-10-23 — GR-015 read-only and revoked-save runtime guard
+
+* Added a focused Django URL-level test for the patched save view. It uses the
+  actual Seahub route, DRF view, and Seafile permission parser with a valid
+  synthetic DOCX. Both a read-only save and a cached edit capability revoked
+  from `rw` to `r` returned 403 before update-token minting/fileserver access.
+* Recorded the command, result and evidence limits in the GR-015 bundle; the
+  cache, user lookup and Seafile RPC permission response are test doubles, so
+  live permission-revocation propagation remains unverified.
+
 ## 2026-10-23 — concurrent real WordCraft saves
 
 * In the isolated synthetic Seafile/WordCraft stack, opened the same current

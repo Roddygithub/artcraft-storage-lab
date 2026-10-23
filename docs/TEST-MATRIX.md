@@ -4,7 +4,7 @@ Every row is a test that must exist and have a **recorded result** before the
 project may claim the MVP. Synthetic files only — no personal documents, no
 production data.
 
-Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
+Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
 ## 1. DOCX — WordCraft (GR-006, mandatory MVP)
@@ -19,7 +19,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 1.6 | The editor confirms the save | the editor reports success **only** after Seafile accepted the write | [x] Real WordCraft UI showed `Saved — new version` after Seahub received fileserver response and read committed head |
 | 1.7 | Close the editor and reopen the file from Seafile | the modification is present | [x] Navigated away and clicked the file again; fresh WordCraft session rendered saved sentence |
 | 1.8 | A new Seafile version exists | the file history shows one more version | [x] Head and file ID changed; history listed the new committed revision; details in isolated runtime evidence |
-| 1.9 | Read-only file | the editor opens in view mode, save is refused server-side | [ ] the gateway enforces it; the browser path is not driven yet |
+| 1.9 | Read-only file | the editor opens in view mode, save is refused server-side | [~] patched Django save route refused current `r` permission (403 before update token/fileserver); browser view-mode UX is not tested |
 | 1.10 | Save failure (editor server error / network) | the editor stays dirty, the UI does **not** claim success | [ ] the HTTP path is covered (409/404); the browser path is not driven yet |
 | 1.11 | Editor closed with unsaved changes | the user is warned, no version is created | [ ] not yet exercised |
 | 1.12 | Concurrent modification (user B saves first) | stale save is **refused** with a conflict, nothing is overwritten | [x] Two edited real WordCraft sessions sent Ctrl+S concurrently: one committed and showed a new version; the other returned 409 and stayed dirty; fresh Seahub click/reopen rendered only the winning change. External writers not covered; see isolated runtime evidence |
@@ -34,7 +34,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 2.4 | Double save / overlapping editor tickets | no lost update or false clean state | [x] Two real WordCraft editors saved concurrently through the bridge; one got a durable version, the loser got 409 and stayed dirty; fresh editor reopen confirmed the winner. This is separate tabs, not two overlapping tickets in one editor. See isolated runtime evidence |
 | 2.5 | Expired session | the save is refused with an explicit "session expired", not a generic error | [ ] |
 | 2.6 | Invalid / forged token | the request is rejected; nothing is read or written | [ ] |
-| 2.7 | Permission revoked while editing | the save is refused | [ ] |
+| 2.7 | Permission revoked while editing | the save is refused | [~] patched Django save route refused a cached edit capability after current permission changed from `rw` to `r`; Seafile RPC/storage were synthetic |
 | 2.8 | File deleted while editing | the save is refused with "file no longer exists" | [ ] |
 | 2.9 | File renamed while editing | the save is refused or explicitly re-targeted, never silently written elsewhere | [ ] |
 | 2.10 | Large file | either handled within a documented limit, or refused with a clear message | [ ] |
@@ -45,7 +45,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 2.15 | Cross-user access attempt (user B's session token used for user A's file) | rejected | [ ] not yet exercised |
 | 2.16 | `postMessage` from an unexpected origin | ignored and logged | [ ] |
 | 2.17 | Save forgery (crafted callback) | rejected: the callback is bound to a server-side session | [ ] |
-| 2.18 | Read-only bypass attempt (craft a save request) | rejected server-side | [ ] |
+| 2.18 | Read-only bypass attempt (craft a save request) | rejected server-side | [~] direct POST through actual Django URL returned 403; no update token or fileserver call; Seafile RPC/storage were synthetic |
 | 2.19 | Share-link session without write permission | save refused | [ ] |
 
 ## 3. XLSX — GridCraft (GR-010)

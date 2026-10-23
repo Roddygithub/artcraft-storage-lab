@@ -56,7 +56,7 @@ candidate and not a Sol PASS. The initial browser test used a same-origin
 loopback proxy; a follow-up on separate Seahub and gateway/Craft loopback origins
 verified a WordCraft edit, durable save, and persisted content after a fresh
 route load. Production TLS/proxy/CSP/CSRF, adversarial-frame isolation,
-ONLYOFFICE regression, read-only/revocation cases, unsupported stock/Go
+ONLYOFFICE regression, live read-only/revocation propagation, unsupported stock/Go
 fileserver behavior, and the other Craft apps remain unverified. Public
 deployment and upstream publication remain locked.
 
@@ -74,6 +74,14 @@ The exact patched Seahub handler was also exercised with synthetic storage and
 an ONLYOFFICE response double: allow-listed DOCX selected ArtCraft, while a
 non-allow-listed DOCX selected Seahub's existing ONLYOFFICE template. This is
 a routing guard only; Document Server edit/save/version/reopen remains untested.
+
+A further isolated Django runtime check posts a valid synthetic DOCX through the
+actual patched `thirdparty-editor/file-save` URL. A read-only permission and an
+edit capability whose current permission changed from `rw` to `r` both returned
+403 before update-token minting or fileserver transport. The test uses synthetic
+Seafile RPC/cache/user dependencies; live revocation propagation and persisted
+state remain NOT VERIFIED. See `tests/test_gr015_save_authorization_runtime.py`
+and the GR-015 isolated runtime evidence.
 
 ## Queue
 

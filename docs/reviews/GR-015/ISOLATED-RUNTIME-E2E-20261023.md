@@ -238,6 +238,33 @@ already installed Chromium build. No dependency was added to the repository.
 | `python3 tests/test_gateway_unit.py` | 0 | Gateway unit checks, including fake CAS, permission handling and error redaction; upstream is simulated |
 | `/tmp/artcraft-review-pw/bin/python tests/test_hostpage_protocol.py` | 0 | Synthetic save acknowledgement, dirty state, overlapping-ticket refusal and retry protocol |
 | `/tmp/artcraft-review-pw/bin/python tests/test_wordcraft_host_roundtrip.py` | 0 | Real WordCraft Web edit/serialize/ack/reopen against in-memory storage; not Seafile persistence |
+
+### Permission revocation and read-only save refusal
+
+Added `tests/test_gr015_save_authorization_runtime.py` and ran it on
+2026-10-23 in the isolated `artcraft-seafile-dev` container against the patched
+Seahub Django URL resolver and real `ThirdpartyEditorFileSaveView`. The test
+uses the deployed `parse_repo_perm` implementation and a valid synthetic DOCX.
+For a read-only permission, and for an edit capability issued while permission
+was `rw` then revoked to `r` before the POST, the route returned HTTP 403. In
+both cases it made no update-token request and no fileserver POST. The route,
+Django middleware, DRF view, and permission parser are real; the cache, user
+lookup, Seafile RPC permission result, and file transport are controlled test
+doubles. This verifies the view's fail-closed ordering; it does not verify that
+a live Seafile share revocation propagates into RPC results, nor persisted
+state.
+
+Command (script and fixture copied into the container):
+
+```sh
+podman cp tests/test_gr015_save_authorization_runtime.py artcraft-seafile-dev:/tmp/test_gr015_save_authorization_runtime.py
+podman cp tests/fixtures/synthetic.docx artcraft-seafile-dev:/tmp/synthetic.docx
+podman exec artcraft-seafile-dev sh -lc 'PYTHONPATH=/usr/local/lib/python3.10/site-packages:/work/src/seafile-server/python:/work/src/seahub:/work/src/seahub/thirdpart SEAFILE_CENTRAL_CONF_DIR=/work/test-config SEAFILE_CONF_DIR=/work/test-data SEAFILE_DATA_DIR=/work/test-data CCNET_CONF_DIR=/work/test-config DJANGO_SETTINGS_MODULE=seahub.settings python3 /tmp/test_gr015_save_authorization_runtime.py'
+```
+
+Result: exit 0; both denial cases returned 403 before update-token minting or
+fileserver transport. This is a focused Django runtime test, not a live Seafile
+permission-revocation E2E.
 | `/tmp/artcraft-review-pw/bin/python tests/test_vectorcraft_svg_local.py` | 0 | Local VectorCraft editor semantics; not gateway or Seafile persistence |
 | `tests/test_gr015_dispatch.py` in `artcraft-seafile-dev` | 0 | Patched Django view selects ArtCraft for allow-listed DOCX and preserves the ONLYOFFICE template fallback elsewhere; test doubles do not exercise Document Server |
 | `python3 tests/test_gr012_svg_assertions.py` | 0 | SVG false-positive guards |

@@ -57,8 +57,11 @@ NEXT:
 - the patched Seahub view now passes an isolated dispatch guard: ArtCraft for
   the allowlisted DOCX and the ONLYOFFICE template for a non-allowlisted DOCX;
   actual Document Server edit/save/version/reopen is still open
-- continue isolated permission revocation/read-only and unsupported-fileserver
-  tests; do not install the patch on the live LXC
+- a Django runtime save-route test rejects read-only and revoked cached edit
+  capabilities before update-token minting/fileserver access; its Seafile RPC
+  permission result is synthetic, so live revocation propagation is not verified
+- unsupported stock/Go fileserver rejection and broader authorization tests
+  remain open; do not install the patch on the live LXC
 - once prototype-critical tests and exact diffs are recorded, freeze a new SHA
   for one cost-bounded independent final review; no Sol call is being made now
 - keep upstream publication locked; GPT REVIEW remains FAIL
