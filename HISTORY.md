@@ -35,6 +35,16 @@
   this does not complete or independently review GR-010. No upstream ArtCraft,
   production Seafile, or public service was changed.
 
+## 2026-10-23 — independent review of the GridCraft acknowledgement patch
+
+* Nemotron independently reviewed the eight changed GridCraft files and the
+  pinned-source patch: narrow **PASS**, no blocker or major finding.
+* Recorded three minor follow-ups: pending-save cleanup if the host vanishes,
+  protocol-version negotiation, and a low-risk Save/Save As title race.
+* This review does not prove GridCraft→Seafile persistence, version creation,
+  formula semantics, or editor reopen. The prior GPT FAIL remains unchanged;
+  upstream publication remains locked.
+
 ## 2026-10-23 — GR-015 read-only and revoked-save runtime guard
 
 * Added a focused Django URL-level test for the patched save view. It uses the

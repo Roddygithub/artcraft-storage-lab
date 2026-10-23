@@ -289,10 +289,12 @@ Known risks:    CSP, a CSRF check on the state-changing endpoints, and a rate
 
 Status: **GPT REVIEW FAIL** — a pinned-source bridge patch now waits for
 ticketed host save results, but GridCraft→Seafile persistence and semantic
-reopen remain NOT VERIFIED. See `docs/reviews/GR-010/README.md`.
+reopen remain NOT VERIFIED. The narrow bridge patch received an independent
+Nemotron PASS with three minor follow-ups; see
+`docs/reviews/GR-010/GRIDCRAFT-ACK-REVIEW-20261023.md`.
 
 ```text
-Status:     GPT REVIEW FAIL (Sol); local source patch adds ticketed durable-save acknowledgement, but runtime save/reopen remains unverified
+Status:     GPT REVIEW FAIL (Sol on 0edbe52); narrow bridge patch independently reviewed PASS, but runtime Seafile save/reopen remains unverified
 Branch/SHA: (filled at freeze time)
 
 Requirements:  .xlsx open/edit/save/reopen/conflict via GridCraft Web.

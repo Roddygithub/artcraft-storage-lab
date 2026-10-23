@@ -4,7 +4,10 @@ Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f78
 provisional and its E2E claim is not accepted. GridCraft durable save is not
 verified against Seafile. A source patch now adds a ticketed host acknowledgement;
 runtime integration and semantic reopen remain unverified.
-Independent review of this narrow patch: **PENDING**.
+Independent review of the ticketed acknowledgement patch: **PASS** for the
+narrow bridge change, with three minor follow-ups; see
+`GRIDCRAFT-ACK-REVIEW-20261023.md`. This does not verify GridCraft→Seafile
+persistence or complete GR-010.
 Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` ·
 `/artcraft-lab/synthetic.xlsx` (synthetic) · GridCraft 0.10.0 web build
 
@@ -157,6 +160,13 @@ does not exercise this patched bridge. Formula recalculation, a durable
 acknowledgement tied to an actual Seafile commit, Seafile version creation, and
 GridCraft editor reopen must still be tested before GR-010 can claim a
 round-trip.
+
+The independent review found no blocker or major issue in this narrow patch.
+It flagged pending-ticket cleanup if a host disappears, the lack of protocol
+version negotiation with older hosts, and a low-risk Save/Save As title race.
+These are recorded as minor follow-ups; an old host fails safely by leaving the
+workbook dirty. None changes the unverified Seafile persistence/reopen status or
+the prior GPT FAIL.
 
 ## 5. What GR-010 adds beyond GR-005
 
