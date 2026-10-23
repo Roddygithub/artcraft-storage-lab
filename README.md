@@ -4,27 +4,23 @@
 > exploring direct browser-based editing integration between self-hosted file platforms
 > and ArtCraft Web editors.
 
-Seafile is the primary real-world reference integration. The target experience is
-comparable to Seafile's integrated online editing workflow with office document servers:
-open, edit and save directly from Seafile Web without local filesystem mounts.
+Seafile is the first real-world integration. The target architecture supports
+multiple self-hosted file platforms and every ArtCraft Web editor through one
+platform-neutral host contract and a file-type dispatcher.
 
 ```text
-Seafile Web
-   |
-   | click rapport.docx
-   v
-WordCraft Web  (iframe)
-   |
-   | edit in the browser
-   v
-Save
-   |
-   v
-Seafile
-   |
-   v
-new version of the file
+Seafile ───────┐
+Nextcloud ─────┼──> platform adapter ──> Common Craft Host Contract
+ownCloud ──────┘                                │
+                                      extension dispatcher
+                                  ┌─────────────┼────────────┐
+                                  ▼             ▼            ▼
+                              WordCraft      GridCraft    other Craft Web apps
 ```
+
+The current runtime work is Seafile-first. Nextcloud and ownCloud adapters, and
+complete coverage of all Craft apps, are target scope—not implemented or
+verified yet.
 
 No SeaDrive. No manual download. No manual upload. No desktop application required.
 
@@ -52,7 +48,7 @@ No SeaDrive. No manual download. No manual upload. No desktop application requir
 
 | In scope | Out of scope |
 | --- | --- |
-| Seafile/Seahub online-editor integration contract | Mounting Seafile as a local filesystem |
+| File-platform adapters (Seafile first; Nextcloud/ownCloud later) | Mounting a platform as a local filesystem |
 | ArtCraft Web/WASM capability audit | SeaDrive-based workflows |
 | A reusable Craft **host contract** | 13 independent per-app Seafile plugins |
 | Save protocol, conflicts, auth, security | Replacing the existing ONLYOFFICE integration |

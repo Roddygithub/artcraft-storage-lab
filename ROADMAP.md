@@ -53,3 +53,18 @@ independent free review passed, and its evidence bundle is committed.
   host ourselves" — that is a valid, documented outcome.
 * Phase 4 must not block Phase 6: a single-Craft, single-file contract is
   acceptable for the MVP as long as the shape is compatible with a common one.
+
+## Target beyond the first Seafile MVP
+
+The initial phases prove the shared editor boundary through Seafile. The product
+target then extends the same contract and dispatcher in two directions:
+
+| Expansion | Planned work | Current status |
+| --- | --- | --- |
+| All ArtCraft Web apps | Add or adapt each app's web bridge and durable save acknowledgement according to `docs/ARTCRAFT-WEB-CAPABILITIES.md`; do not assume one patch fits every engine | not complete; only a subset has host bridges |
+| Nextcloud | Add a platform adapter for its web entry point, authorization, file identity, versioning, and save API, reusing the Craft contract | not implemented or verified |
+| ownCloud | Add a platform adapter for its web entry point, authorization, file identity, versioning, and save API, reusing the Craft contract | not implemented or verified |
+
+The goal remains one platform-neutral Craft contract and one extension
+dispatcher. Provider-specific APIs stay inside their adapters; host work is not
+duplicated in each ArtCraft app.

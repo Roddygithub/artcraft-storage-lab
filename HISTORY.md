@@ -1,5 +1,15 @@
 # HISTORY
 
+## 2026-10-23 — clarified the multi-platform, all-Craft target
+
+* Documented the target as Seafile/Nextcloud/ownCloud adapters feeding one
+  platform-neutral Craft host contract and extension dispatcher, then all
+  ArtCraft Web editors. Seafile remains the first adapter under test.
+* Added an explicit long-term roadmap for adapting all Craft apps according to
+  their individual Web/save capabilities. Nextcloud, ownCloud, and full app
+  coverage remain unimplemented and unverified; the GridCraft patch is one
+  focused fix, not the product scope.
+
 ## 2026-10-23 — GridCraft waits for a durable host save result
 
 * Prepared a patch against GridCraft `06920de8da609c19de7446945cfc62b844691efd`.

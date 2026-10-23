@@ -170,8 +170,23 @@ The host is responsible for:
 * **acknowledging** the save and reporting a failure to the user;
 * the **session**, the credentials and the browser's own state.
 
-This split is exactly the mission's §26 requirement: *Craft Web ↔ generic host
-contract ↔ Seafile integration layer ↔ Seafile*.
+This is the boundary between the platform adapter and the Craft editor. The
+platform adapter owns provider-specific authentication, permissions, file
+identity, versioning, and API calls; the Craft host contract carries only the
+document bytes, filename, dirty state, and save outcome.
+
+```text
+Seafile adapter ────┐
+Nextcloud adapter ──┼──> common browser host/session ──> extension dispatcher
+ownCloud adapter ───┘                                      │
+                                           ┌───────────────┼─────────────┐
+                                           ▼               ▼             ▼
+                                       WordCraft         GridCraft    other Craft Web apps
+```
+
+Seafile is the first adapter under test. Nextcloud and ownCloud are target
+platforms, but their web entry points, authorization, version semantics, and
+save APIs are **NOT VERIFIED**. This project has not implemented those adapters.
 
 ---
 
@@ -270,7 +285,7 @@ they need.
 | --- | --- | --- | --- |
 | **WordCraft** | `Services::download` + `Services::async_saves` | `Fn(&str, &[u8]) -> Result<(), String>` | **Yes, and asynchronously.** The host calls `AsyncSaves::start()` to get a ticket, and later `AsyncSaves::finish(ticket, Saved \| Cancelled \| Failed(error))`. On `Failed` the app sets `session.dirty = true` again and shows *"Couldn't download {name}: {error}"*. |
 | **PdfCraft** | `Services::host_save` (`HostSaveFn`) | `Fn(&str, &[u8], bool) -> Result<(), String>` | **Yes, but synchronously.** On `Err` the app does not mark the document saved and shows the error. |
-| **GridCraft** | `Services::download` | `Fn(&str, &[u8])` — **no `Result`** | **No.** The bridge logs a failed `postMessage` and the app still marks the workbook saved. |
+| **GridCraft upstream baseline** | `Services::download` | `Fn(&str, &[u8])` — **no `Result`** | **No.** Upstream at the inspected revision marks the workbook saved optimistically. A prepared patch in `docs/reviews/GR-010/` adds a ticketed host result and exact-snapshot dirty handling; synthetic-browser evidence does not prove Seafile persistence. |
 
 Sources:
 
@@ -308,15 +323,17 @@ HOST  -> CRAFT
   <app>:saveResult  { ok: false, error: "..." }     (the host refused or failed)
 ```
 
-The Craft app keeps the document dirty until it receives `ok: true`. For
-WordCraft this maps directly onto the existing `AsyncSaves` ticket
-(`start()` / `finish(ticket, Saved | Failed(error))`); for PdfCraft onto the
-`Result` of `host_save`; for GridCraft it requires the `Services::download`
-signature to gain a `Result` — a small but real change.
+The Craft app keeps the document dirty until it receives `ok: true`, tied to the
+exact serialized document snapshot. For WordCraft this maps directly onto the
+existing `AsyncSaves` ticket (`start()` / `finish(ticket, Saved | Failed(error))`);
+for PdfCraft the current synchronous `Result` is not sufficient for a durable
+remote write and needs an asynchronous outcome; for GridCraft the prepared
+GR-010 patch uses a ticketed `saveResult` and records the exact workbook snapshot
+without changing the callback into a synchronous `Result`.
 
-> This extension is **our proposal**, not something the Craft apps implement
-> today. It is part of the upstream RFC (GR-013) and the first upstream patch
-> (GR-014).
+> This extension is **our proposal**. WordCraft's bridge patch (GR-014) and the
+> prepared GridCraft patch (GR-010) implement parts of it locally; neither is
+> upstreamed, and the broader suite has not adopted one shared implementation.
 
 Until it exists, the host page must keep **its own** "not persisted" state and
 warn on close, because a GridCraft-style app will believe the document is
@@ -328,7 +345,7 @@ saved. **The integration layer must never pretend a save succeeded.**
 
 | App | `?host=parent` bridge | The save hook it has | What is needed |
 | --- | --- | --- | --- |
-| gridcraft | **yes** | `download: Fn(&str, &[u8])` — **no `Result`** | reference for the open/dirty part; the save part must gain a `Result` |
+| gridcraft | **yes** | upstream baseline: `download: Fn(&str, &[u8])`; prepared GR-010 patch adds ticketed `saveResult` and snapshot tracking | patch exists locally; runtime Seafile save and semantic reopen remain unverified |
 | pdfcraft | **yes** | `host_save: Fn(&str, &[u8], bool) -> Result<(), String>` — synchronous | reference for the save-failure part; would need to become asynchronous to match WordCraft |
 | wordcraft | no | `download: Fn(...) -> Result<(), String>` **+ `async_saves`** | **the MVP blocker** — port the bridge, and wire `AsyncSaves::start`/`finish` to the save outcome |
 | deckcraft | no | not surveyed in detail | port the bridge |
