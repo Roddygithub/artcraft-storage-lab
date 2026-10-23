@@ -21,6 +21,9 @@ import xml.etree.ElementTree as ElementTree
 source_root = os.environ.get("ARTCRAFT_SEAHUB_SOURCE")
 if not source_root:
     raise SystemExit("ARTCRAFT_SEAHUB_SOURCE must point to patched Seahub source")
+server_root = os.environ.get("ARTCRAFT_SEAFILE_SERVER_SOURCE")
+if not server_root:
+    raise SystemExit("ARTCRAFT_SEAFILE_SERVER_SOURCE must point to Seafile Server source")
 source_path = Path(source_root) / "seahub/thirdparty_editor/views.py"
 module = ast.parse(source_path.read_text(encoding="utf-8"))
 decorator_node = next(node for node in module.body
@@ -29,6 +32,12 @@ decorator_node = next(node for node in module.body
 signature_node = next(node for node in module.body
                       if isinstance(node, ast.FunctionDef)
                       and node.name == "_matches_file_type")
+capability_node = next(node for node in module.body
+                       if isinstance(node, ast.FunctionDef)
+                       and node.name == "_artcraft_capability_allows_save")
+save_view_node = next(node for node in module.body
+                      if isinstance(node, ast.ClassDef)
+                      and node.name == "ThirdpartyEditorFileSaveView")
 
 
 class Response:
@@ -100,7 +109,7 @@ namespace = {
     "parse_repo_perm": lambda permission: SimpleNamespace(
         can_preview=permission in {"r", "rw", "admin", "preview", "preview-edit"}),
 }
-exec(compile(ast.Module(body=[signature_node, decorator_node], type_ignores=[]),
+exec(compile(ast.Module(body=[signature_node, capability_node, decorator_node], type_ignores=[]),
              str(source_path), "exec"), namespace)
 
 calls = []
@@ -140,9 +149,44 @@ with zipfile.ZipFile(oversized_types, "w", compression=zipfile.ZIP_DEFLATED) as 
     archive.writestr("[Content_Types].xml", b"<Types>" + b" " * (1024 * 1024) + b"</Types>")
 assert not namespace["_matches_file_type"]("synthetic.xlsx", oversized_types.getvalue())
 
+artcraft_settings = SimpleNamespace(ARTCRAFT_REPO_IDS=("repo-id",),
+                                    ARTCRAFT_FILE_EXTENSIONS=("docx", "xlsx"))
+capability = {
+    "audience": "artcraft", "repo_id": "repo-id", "file_path": "/folder/doc.docx",
+    "permission": {"can_edit": True},
+}
+assert namespace["_artcraft_capability_allows_save"](
+    capability, artcraft_settings, capability["file_path"])
+for change in (
+    {"audience": "thirdparty-preview"},
+    {"permission": {"can_edit": False}},
+    {"repo_id": "other-repo"},
+):
+    denied = {**capability, **change}
+    assert not namespace["_artcraft_capability_allows_save"](
+        denied, artcraft_settings, denied["file_path"])
+assert not namespace["_artcraft_capability_allows_save"](
+    capability, artcraft_settings, "/folder/doc.pdf")
+
+# The Seahub save view must use a dedicated route so a stock/Go fileserver's
+# normal update-api cannot silently ignore the conditional parameters.
+save_post = next(node for node in save_view_node.body
+                 if isinstance(node, ast.FunctionDef) and node.name == "post")
+route_constants = [node.value for node in ast.walk(save_post)
+                   if isinstance(node, ast.Constant) and isinstance(node.value, str)]
+assert "conditional-update-api" in route_constants
+assert "update-api" not in route_constants
+server_source = Path(server_root)
+patched_c = (server_source / "server/upload-file.c").read_text(encoding="utf-8")
+go_router = (server_source / "fileserver/fileserver.go").read_text(encoding="utf-8")
+assert '"^/conditional-update-api/.*"' in patched_c
+assert '"/conditional-update-api/{.*}"' not in go_router
+
 print("PASS: current read permission is checked on each request")
 print("PASS: revoked/non-preview/anonymous capability reads are refused")
 print("PASS: invalid capability is not written to the Seahub log")
 print("PASS: patched Seahub accepts ordinary XLSX MIME and rejects DOCX content as XLSX")
 print("PASS: patched Seahub rejects oversized expanded OOXML type metadata")
+print("PASS: save capability requires ArtCraft audience, edit grant, allowed repository, and extension")
+print("PASS: conditional saves use a patched-C-only route absent from the Go router")
 print("NOTE: exact decorator executed with synthetic dependencies; Django/Seafile integration unverified")

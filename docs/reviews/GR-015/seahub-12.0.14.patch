@@ -1,53 +1,42 @@
-diff --git c/seahub/thirdparty_editor/urls.py w/seahub/thirdparty_editor/urls.py
-index d93791acb1e3c11afb6208bd1d451c252ff36b88..c15b60d5b8619f62252f9ff289d0e6e0415234cc 100644
---- c/seahub/thirdparty_editor/urls.py
-+++ w/seahub/thirdparty_editor/urls.py
-@@ -1,10 +1,12 @@
- # Copyright (c) 2012-2016 Seafile Ltd.
- from django.urls import path
+diff --git a/seahub/thirdparty_editor/urls.py b/seahub/thirdparty_editor/urls.py
+index d93791acb..c15b60d5b 100644
+--- a/seahub/thirdparty_editor/urls.py
++++ b/seahub/thirdparty_editor/urls.py
+@@ -3,3 +3,4 @@ from django.urls import path
  
 -from .views import ThirdpartyEditorFileInfoView, ThirdpartyEditorFileContentView
 +from .views import (ThirdpartyEditorFileInfoView, ThirdpartyEditorFileContentView,
 +                    ThirdpartyEditorFileSaveView)
  
- urlpatterns = [
-     # RESTful API
-     path('file-info/', ThirdpartyEditorFileInfoView.as_view(), name='ThirdpartyEditorFileInfoView'),
+@@ -9,2 +10,3 @@ urlpatterns = [
      path('file-content/', ThirdpartyEditorFileContentView.as_view(), name='ThirdpartyEditorFileContentView'),
 +    path('file-save/', ThirdpartyEditorFileSaveView.as_view(), name='ThirdpartyEditorFileSaveView'),
  ]
-diff --git c/seahub/thirdparty_editor/views.py w/seahub/thirdparty_editor/views.py
-index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce468c6c118 100644
---- c/seahub/thirdparty_editor/views.py
-+++ w/seahub/thirdparty_editor/views.py
-@@ -4,12 +4,17 @@
- import os
- import json
+diff --git a/seahub/thirdparty_editor/views.py b/seahub/thirdparty_editor/views.py
+index 0fa2ccca3..5f96ecf5a 100644
+--- a/seahub/thirdparty_editor/views.py
++++ b/seahub/thirdparty_editor/views.py
+@@ -6,2 +6,5 @@ import json
  import logging
 +import io
 +import zipfile
 +import xml.etree.ElementTree as ElementTree
  import urllib.request
- import urllib.error
+@@ -9,2 +12,3 @@ import urllib.error
  import urllib.parse
 +import requests
  
- from rest_framework.views import APIView
+@@ -12,2 +16,3 @@ from rest_framework.views import APIView
  
 +from django.conf import settings
  from django.http import HttpResponse
- from django.core.cache import cache
- 
-@@ -17,11 +22,45 @@ from pysearpc import SearpcError
- from seaserv import seafile_api
- 
+@@ -19,3 +24,4 @@ from seaserv import seafile_api
  from seahub.base.accounts import User, ANONYMOUS_EMAIL
 -from seahub.utils import gen_inner_file_get_url
 +from seahub.utils import gen_inner_file_get_url, gen_inner_file_upload_url
 +from seahub.utils.repo import parse_repo_perm
  
- 
- logger = logging.getLogger(__name__)
+@@ -24,2 +30,47 @@ logger = logging.getLogger(__name__)
  json_content_type = 'application/json; charset=utf-8'
 +MAX_CONTENT_TYPES_XML_BYTES = 1024 * 1024
 +
@@ -82,21 +71,25 @@ index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce4
 +        except (KeyError, OSError, RuntimeError, UnicodeDecodeError, zipfile.BadZipFile):
 +            return False
 +    return True
++
++
++def _artcraft_capability_allows_save(info, settings_obj, file_path):
++    """Preserve the narrow write authority granted by the ArtCraft route."""
++    extension = os.path.splitext(file_path)[1].lower().lstrip('.')
++    permission = info.get('permission') or {}
++    return (
++        info.get('audience') == 'artcraft'
++        and permission.get('can_edit') is True
++        and info.get('repo_id') in getattr(settings_obj, 'ARTCRAFT_REPO_IDS', ())
++        and extension in getattr(settings_obj, 'ARTCRAFT_FILE_EXTENSIONS', ())
++    )
  
- 
- def access_token_check(func):
-@@ -36,7 +75,7 @@ def access_token_check(func):
- 
-         info_dict = cache.get('thirdparty_editor_access_token_' + token)
+@@ -38,3 +89,3 @@ def access_token_check(func):
          if not info_dict:
 -            logger.error('Get thirdparty editor cache value failed, access token is %s.' % token)
 +            logger.error('Get third-party editor cache value failed.')
              return HttpResponse(json.dumps({}), status=404, content_type=json_content_type)
- 
-         request_user = info_dict['request_user']
-@@ -52,6 +91,12 @@ def access_token_check(func):
-             return HttpResponse(json.dumps({}), status=404,
-                                 content_type=json_content_type)
+@@ -54,2 +105,8 @@ def access_token_check(func):
  
 +        # Anonymous share-link editing is not part of this integration. Recheck
 +        # the current user's read permission on every capability-backed request.
@@ -105,11 +98,7 @@ index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce4
 +                                content_type=json_content_type)
 +
          if request_user != ANONYMOUS_EMAIL:
-             try:
-                 User.objects.get(email=request_user)
-@@ -66,6 +111,12 @@ def access_token_check(func):
-             return HttpResponse(json.dumps({}), status=404,
-                                 content_type=json_content_type)
+@@ -68,2 +125,8 @@ def access_token_check(func):
  
 +        parent_dir = os.path.dirname(file_path) or '/'
 +        permission = seafile_api.check_permission_by_path(repo_id, parent_dir, request_user)
@@ -118,11 +107,7 @@ index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce4
 +                                content_type=json_content_type)
 +
          obj_id = seafile_api.get_file_id_by_path(repo_id, file_path)
-         if not obj_id:
-             logger.error('File %s not found.' % file_path)
-@@ -113,6 +164,11 @@ class ThirdpartyEditorFileInfoView(APIView):
-         result['file_name'] = os.path.basename(file_path)
-         result['file_size'] = file_size
+@@ -115,2 +178,7 @@ class ThirdpartyEditorFileInfoView(APIView):
          result['file_path'] = file_path
 +        result['file_id'] = obj_id
 +        result['head_commit_id'] = repo.head_cmmt_id
@@ -130,15 +115,11 @@ index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce4
 +            repo_id, os.path.dirname(file_path) or '/', request_user)
 +        result['can_edit'] = parse_repo_perm(result['permission']).can_edit_on_web
  
-         return HttpResponse(json.dumps(result, ensure_ascii=False), status=200,
-                             content_type=json_content_type)
-@@ -127,16 +183,21 @@ class ThirdpartyEditorFileContentView(APIView):
- 
-         token = request.GET.get('access_token', None)
+@@ -129,2 +197,3 @@ class ThirdpartyEditorFileContentView(APIView):
          info_dict = cache.get('thirdparty_editor_access_token_' + token)
 +        request_user = info_dict['request_user']
          repo_id = info_dict['repo_id']
-         file_path = info_dict['file_path']
+@@ -132,3 +201,7 @@ class ThirdpartyEditorFileContentView(APIView):
  
 +        expected_id = request.GET.get('expected_file_id')
          obj_id = seafile_api.get_file_id_by_path(repo_id, file_path)
@@ -146,18 +127,12 @@ index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce4
 +            return HttpResponse(json.dumps({'error': 'file changed'}), status=409,
 +                                content_type=json_content_type)
          file_name = os.path.basename(file_path)
-         try:
-             fileserver_token = seafile_api.get_fileserver_access_token(repo_id,
-                                                                        obj_id,
+@@ -138,3 +211,3 @@ class ThirdpartyEditorFileContentView(APIView):
                                                                         'view',
 -                                                                       '',
 +                                                                       request_user,
                                                                         use_onetime=False)
-         except SearpcError as e:
-             logger.error(e)
-@@ -155,3 +216,107 @@ class ThirdpartyEditorFileContentView(APIView):
-                                 content_type=json_content_type)
- 
+@@ -157 +230,111 @@ class ThirdpartyEditorFileContentView(APIView):
          return HttpResponse(file_content, content_type="application/octet-stream")
 +
 +
@@ -175,6 +150,10 @@ index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce4
 +        info = cache.get('thirdparty_editor_access_token_' + token)
 +        if not info:
 +            return HttpResponse(json.dumps({'error': 'expired token'}), status=404,
++                                content_type=json_content_type)
++        if not _artcraft_capability_allows_save(
++                info, settings, info.get('file_path', '')):
++            return HttpResponse(json.dumps({'error': 'invalid editor capability'}), status=403,
 +                                content_type=json_content_type)
 +
 +        user = info.get('request_user')
@@ -238,7 +217,9 @@ index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce4
 +            'head': expected_head,
 +            'expected_file_id': expected_id,
 +        })
-+        url = gen_inner_file_upload_url('update-api', update_token) + '?' + query
++        # A dedicated route makes unsupported fileservers fail with 404 before
++        # any unconditional update can happen. Never probe via update-api.
++        url = gen_inner_file_upload_url('conditional-update-api', update_token) + '?' + query
 +        try:
 +            response = requests.post(
 +                url,
@@ -263,13 +244,11 @@ index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce4
 +            'file_id': response.text.strip(),
 +            'head_commit_id': updated_repo.head_cmmt_id if updated_repo else '',
 +        }), status=200, content_type=json_content_type)
-diff --git c/seahub/views/file.py w/seahub/views/file.py
-index 63b68e8166d043755d8db05bd5c6ae08f2074a26..034624c36d28af7694197891d9c665513a481bf4 100644
---- c/seahub/views/file.py
-+++ w/seahub/views/file.py
-@@ -591,6 +591,35 @@ def view_lib_file(request, repo_id, path):
- 
-         return HttpResponseRedirect(dl_or_raw_url)
+diff --git a/seahub/views/file.py b/seahub/views/file.py
+index 63b68e816..e3fe44c7c 100644
+--- a/seahub/views/file.py
++++ b/seahub/views/file.py
+@@ -593,2 +593,32 @@ def view_lib_file(request, repo_id, path):
  
 +    # An allow-listed library can use the ArtCraft dispatcher without taking
 +    # these file extensions away from ONLYOFFICE in other libraries.
@@ -286,7 +265,8 @@ index 63b68e8166d043755d8db05bd5c6ae08f2074a26..034624c36d28af7694197891d9c66551
 +                'file_path': path,
 +                'permission': {
 +                    'can_edit': parse_repo_perm(permission).can_edit_on_web
-+                }
++                },
++                'audience': 'artcraft',
 +            }
 +            access_token = uuid.uuid4().hex
 +            cache.set('thirdparty_editor_access_token_' + access_token,
@@ -301,5 +281,3 @@ index 63b68e8166d043755d8db05bd5c6ae08f2074a26..034624c36d28af7694197891d9c66551
 +            return render(request, 'view_file_thirdparty_editor.html', editor_dict)
 +
      if ENABLE_THIRDPARTY_EDITOR:
- 
-         filename = os.path.basename(path)

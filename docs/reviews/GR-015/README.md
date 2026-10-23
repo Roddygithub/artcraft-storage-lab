@@ -23,16 +23,17 @@ Office formats away from ONLYOFFICE globally.
    file id. `tests/test_gr015_authorization.py` executes the exact decorator
    with synthetic Seafile state; Django/Seafile runtime behavior remains
    **NOT VERIFIED**.
-3. A save accepts no arbitrary repository or path. Seahub derives both from the
-   cached user-bound token, checks the current user's web-edit permission,
-   validates the original filename and basic file signature, and mints an
-   update token for that same user.
-4. The fileserver receives the opened file id and repository head. The current
-   local C patch disables the identical-content shortcut for conditional saves,
-   then uses branch compare-and-update without auto-merging a newer head. The Go
-   fileserver route still ignores `expected_file_id`; the deployed Nginx route
-   is verified to use the C `seaf-server` listener. The patch remains
-   **unbuilt/uninstalled** and needs a runtime stale-save test.
+3. A save accepts no arbitrary repository or path. Seahub requires an
+   `audience=artcraft` capability, its cached `permission.can_edit` grant, an
+   allow-listed repository and extension, and the user's current web-edit
+   permission. It validates the original filename and basic file signature,
+   then mints an update token for that same user.
+4. The fileserver receives the opened file id and repository head. Seahub calls
+   the dedicated `conditional-update-api` route; the proposed C fileserver maps
+   this route to its conditional handler. The stock C and Go routers do not
+   expose that route, so the request must fail with 404 before an unconditional
+   update can happen. The patch remains **unbuilt/uninstalled**; route behavior,
+   proxy path preservation, and stale-save races need runtime tests.
 5. A successful response is returned only after the fileserver returns a new
    file id and Seahub reads back the committed repository head.
 
@@ -53,7 +54,7 @@ runtime test.
 | Exact deployed release sources checked out | PASS; SHAs above |
 | Gateway unit checks after the client-side changes | PASS; `python3 tests/test_gateway_unit.py` |
 | Exact-source patch application | PASS for both patches against clean recorded base SHAs; source tree diff matches the patch artifact |
-| Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness; Django/Seafile runtime is **NOT VERIFIED** |
+| Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness, including capability audience/grant/allowlist and dedicated route checks; Django/Seafile runtime is **NOT VERIFIED** |
 | Seafile Server C build | **NOT VERIFIED**; the attempted isolated configure failed on missing `libargon2`; the live server was not touched |
 | Seahub deployment/import test | **NOT RUN** |
 | Synthetic Seafile save and conflict test against patched binaries | **NOT RUN** |
