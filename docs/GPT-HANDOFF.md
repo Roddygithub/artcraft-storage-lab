@@ -7,6 +7,15 @@ Everything here can be checked against the repository, the upstream sources and
 the reference instance. Where a claim was made by a free model and not
 independently verified, it says so.
 
+## Latest review event — 2026-10-23
+
+GPT-6.1 Sol independently re-reviewed candidate
+`d9ef476e6fbcb04c9a9e23cfe235812167d1f27c` and returned **FAIL**. The full
+report is `docs/reviews/GPT-SOL-REREVIEW-D9EF476.md`. The required DOCX MVP is
+not proven, and conditional-save, read-authorization, save-acknowledgement,
+GridCraft/SVG, licensing and security findings remain. No GPT PASS was granted;
+upstream remains locked. Remediation edits after that SHA are unreviewed.
+
 ## 1. Repository
 
 | Item | Value |
@@ -40,23 +49,26 @@ upload, no desktop application.
   bridge patch (`docs/reviews/GR-014/`). It knows nothing about Seafile.
 * the **host page** is served by the gateway and frames the Craft app **from the
   same origin** (the `?host=parent` bridge requires it).
-* the **gateway** holds the Seafile credential and performs every authorisation
-  check. The browser holds **one opaque session id** and nothing else.
-* the **seafhttp write** goes through the file server's `update-api`, which
-  creates a normal Seafile version.
+* The browser receives a short-lived third-party editor capability from Seahub;
+  the gateway uses it to bind one document session. The local GR-015 draft adds
+  per-request read authorization and a Seahub save endpoint that rechecks the
+  current user's write permission before asking the fileserver to commit.
+* The GR-015 Seahub and Seafile Server patches are **not built, installed, or
+  runtime-tested**. The live instance has no ArtCraft route or gateway. The
+  current deployed click on the synthetic DOCX still opens ONLYOFFICE.
 
 ### 3.1 The two integration points
 
 | Point | Where | What it does |
 | --- | --- | --- |
 | the file-type dispatcher | Seafile's `seahub/thirdparty_editor/` hook, configured by `THIRDPARTY_EDITOR_ACTION_URL_DICT` | maps an extension to the host page's URL, mints the access token, serves the bytes |
-| the save | the gateway | the conflict check and the write, with the gateway's credential |
+| the save | proposed Seahub endpoint + conditional fileserver update | reauthorize the Seafile user, check opened file ID and repository head, then commit |
 
-**The Seafile hook is read-only by design** (`can_edit: False`), so the write is
-done by the gateway. The consequence — the new version is attributed to the
-**service account**, not to the user — is stated in
-`docs/SEAFILE-INTEGRATION-POINTS.md` §Q4, and the upstream fix is prepared
-outside this repository (`~/Projects/seafile-thirdparty-save-patch/`).
+The original gateway service-account write design was rejected. The current
+local draft proposes a user-bound Seahub save endpoint plus a conditional
+fileserver update. Its authorization, CAS behavior, and version attribution
+remain unverified until built and exercised on an isolated synthetic Seafile
+deployment. Do not treat the draft as deployed behavior.
 
 ## 4. The GR list
 
@@ -67,7 +79,7 @@ outside this repository (`~/Projects/seafile-thirdparty-save-patch/`).
 | GR-003 | ArtCraft Web capability matrix | `docs/ARTCRAFT-WEB-CAPABILITIES.md` | PASS (remediated) | PENDING |
 | GR-004 | Common Craft Web Host Contract | `docs/HOST-CONTRACT.md` | PASS (remediated) | PENDING |
 | GR-005 | First technical proof | `docs/reviews/GR-005/` | PASS (remediated) | PENDING |
-| GR-006 | WordCraft DOCX MVP | `docs/reviews/GR-006/` | PASS (REVIEW-03) | PENDING |
+| GR-006 | WordCraft DOCX MVP | `docs/reviews/GR-006/` | provisional PASS (REVIEW-03; superseded) | FAIL (Sol) |
 | GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PASS (REVIEW-03) | PENDING |
 | GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | PASS (remediated) | PENDING |
 | GR-009 | Web integration security | `docs/SECURITY.md` | PASS (remediated) | PENDING |

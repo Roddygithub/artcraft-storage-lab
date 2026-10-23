@@ -1,22 +1,29 @@
 # Security
 
-Status: **PROVISIONAL — FREE REVIEW PENDING** · GPT REVIEW: PENDING
+Status: **GPT REVIEW FAIL** (Sol, candidate `d9ef476e6fbcb04c9a9e23cfe235812167d1f27c`)
 GR-009 · Independent free review: `docs/reviews/REVIEW-01.md`, `REVIEW-02.md`
 
-## Current implementation correction — 2026-10-22
+## Current implementation correction — 2026-10-23
 
 This note supersedes older statements below when they conflict:
 
-* The current gateway no longer requires a broad Seafile account token for
-  reads or writes. It uses the third-party-editor capability server-side.
+* The gateway uses the third-party-editor capability server-side; a stock
+  Seafile account token is not required by the current path.
 * The gateway now rejects state-changing POSTs unless `Origin` matches the
   request host and forwarded scheme. The unit test covers same-origin success
   flow and cross-origin refusal; behavior through Nginx Proxy Manager is not yet
   verified.
-* Stock Seafile still has no user-bound conditional-save endpoint. The gateway
-  therefore cannot save against the live server until the unbuilt GR-015 Seahub
-  and Seafile Server patches are installed. The candidate gateway is read-only
-  on the deployed Seafile version.
+* Stock Seafile has no user-bound conditional-save endpoint. The gateway fails
+  closed on the deployed version. The local GR-015 patch now sends same-content
+  conditional saves through the branch compare-and-update path; that patch is
+  not built or installed, and the Go route remains unpatched.
+* The local Seahub patch rechecks current `can_preview` permission for each
+  capability-backed read. The exact decorator passes a synthetic AST harness;
+  Django/Seafile runtime authorization remains **NOT VERIFIED**.
+* Capability-bearing URLs are redacted from gateway-facing errors in the local
+  worktree and covered by a synthetic HTTP test. The WordCraft host now waits
+  for durable storage and a post-result editor dirty=false acknowledgement;
+  a real local WordCraft browser test passes with in-memory storage only.
 * CSP and rate limiting are still missing. The system is not approved for
   public Internet deployment.
 
@@ -65,7 +72,7 @@ Everything below follows from that.
 | --- | --- | --- |
 | a Seafile account token | **no** | it would give the whole account |
 | a seafhttp access token | **no** | an update token is library-wide; a download token is a URL the browser could leak |
-| a Seahub session cookie | **no** | the browser is on a different origin from Seahub |
+| a Seahub session cookie | not used by the gateway | the gateway does not read or forward it; browser cookie scope depends on deployment origin |
 | the ONLYOFFICE JWT secret | **no** | it is a server-side secret |
 | **an opaque session id** | **yes** | it is the *only* thing the browser holds |
 
@@ -84,9 +91,9 @@ The session id is:
 | --- | --- | --- | --- |
 | 1 | the session exists, is not expired, is not idle | `sessions.SessionStore.get` | 404 |
 | 2 | the request is for the session's own document | the path comes from the session, never from the request | — |
-| 3 | the editing user still has write permission | a user-bound Seafile authorization primitive | 403; stock gateway fails closed |
-| 4 | the file still exists | the user-bound authorization result | 404 |
-| 5 | the file has not changed since it was opened | an upstream atomic CAS save, not a gateway read-then-write | 409; stock gateway fails closed |
+| 3 | current read/write permission | local Seahub patch checks current `can_preview` on capability reads and current edit permission on saves | synthetic source harness only; runtime **NOT VERIFIED**; stock writes fail closed |
+| 4 | the file still exists | local patch binds reads/saves to the opened file id | deletion/revocation runtime **NOT VERIFIED** |
+| 5 | the file has not changed since it was opened | local C patch checks the file id and uses branch compare-and-update even for same-content saves | exact source patch only; build/runtime **NOT VERIFIED**; Go route remains unpatched |
 | 6 | the document is not too large | `ARTCRAFT_MAX_BYTES` | 413 |
 | 7 | the request body is the document, not something else | the length limit and the content type | 413 |
 
@@ -143,16 +150,16 @@ browser *without an error* while the document showed as saved.
 | **targetOrigin "*"** | never used | addressed |
 | **same-origin / cross-origin isolation** | the host page and the Craft app are same-origin; the app needs no `SharedArrayBuffer`, so **no COOP/COEP** is required | addressed |
 | **token leakage** | the browser holds only an opaque gateway session id; the gateway does not need a broad account token; file-server update tokens never leave Seahub | intended; live Seafile endpoint not deployed |
-| **replay** | a session id is single-document and short-lived; a save replays the same bytes, which is idempotent (identical content creates no new version) | addressed |
+| **replay** | a session id is single-document and short-lived; the local C patch routes conditional saves through the branch precondition | **not runtime verified; stock writes fail closed** |
 | **session fixation** | the session id is generated by the gateway with 192 bits of entropy and is not derived from anything the client sends | addressed |
 | **SSRF** | the gateway fetches the file content from Seafile, whose URL it derives itself. It never fetches a URL a client supplied. (The ONLYOFFICE callback in Seafile *does* fetch a client-supplied URL — our design deliberately does not.) | addressed, and a design win |
-| **malicious document** | the document bytes go to the Craft app, which is the thing that has to survive them. The gateway treats them as opaque bytes with a size limit | partially addressed — the Craft app's own robustness is its business |
+| **malicious document** | the gateway treats payload bytes as opaque except for basic file-signature validation; Craft's parser processes the document | partially addressed — parser expansion/resource limits remain unverified |
 | **oversized document** | `ARTCRAFT_MAX_BYTES` (50 MB default) on both the open and the save | addressed |
-| **ZIP bomb** | the DOCX/XLSX/PPTX formats are zips. The gateway does not unpack them; the Craft app does. A limit on the *compressed* size is not a limit on the *expanded* size | **open** — the Craft app must bound its own expansion; this is an upstream concern |
+| **ZIP bomb** | gateway bounds expanded `[Content_Types].xml` reads; Craft parser has separate expansion risks | gateway bound has a synthetic test; parser limits remain **NOT VERIFIED** |
 | **path traversal** | the path comes from the session, which the gateway filled from Seafile's own answer. The static file handler resolves symlinks and refuses anything outside the static root | addressed |
-| **save forgery** | a save must name a session that exists; the session is bound to one document; the content id is checked | addressed |
+| **save forgery** | a save names a session bound to one document; local Seahub/fileserver patches check permission, file id and branch head | **NOT VERIFIED** against patched runtime |
 | **cross-user document access** | direct repo/path opening is disabled; saves require current-user authorization from the GR-015 endpoint | blocked; endpoint not built or deployed |
-| **read-only bypass** | stock server saves are disabled; the planned endpoint re-checks current user permission on every save | blocked pending GR-015 |
+| **read-only bypass** | stock server saves are disabled; local Seahub patch rechecks current write permission | blocked pending GR-015 build and runtime tests |
 | **share-link permissions** | **out of scope for the MVP**: the third-party-editor hook only exists in `view_lib_file`, so a share link never reaches it. A read-only share link keeps working exactly as before | scoped out, documented |
 | **expired sessions** | 30 minutes absolute, 15 minutes idle; an expired session id gets 404 | addressed |
 | **symlink escape from the static root** | `os.path.realpath` on both the file and the root | addressed (REVIEW-02 G1) |

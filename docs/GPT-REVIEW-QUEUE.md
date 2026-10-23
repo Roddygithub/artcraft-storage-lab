@@ -6,6 +6,22 @@ and does not trust the free-model verdicts.
 Nothing may be published upstream (issue, PR, RFC in `storytold/*`, Seafile or
 Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 
+## Latest candidate result — 2026-10-23
+
+```text
+Candidate: d9ef476e6fbcb04c9a9e23cfe235812167d1f27c
+Reviewer: GPT-6.1 Sol
+Verdict: FAIL
+Report: docs/reviews/GPT-SOL-REREVIEW-D9EF476.md
+Prototype: restricted synthetic development only
+Public deployment: NOT READY
+Upstream RFC/patch: NOT READY
+Upstream publication: LOCKED
+```
+
+The candidate remains immutable. Luna remediation is in progress in the working
+tree; no remediation change is yet part of a newly frozen candidate.
+
 ## Queue
 
 ### GR-001 — Seafile online-editor integration contract
@@ -128,15 +144,19 @@ Requirements:  The 12-step MVP checklist of ROADMAP.md, VERIFIED END-TO-END on
                formatting, save, reopen, Seafile version, read-only, save
                failure, editor close, concurrent modification.
 Decision:       The WordCraft ?host=parent bridge (the GR-014 patch) makes the
-               DOCX MVP possible; the MVP is VERIFIED END TO END in a real browser
-               against a real Seafile: open, edit, the editor's own Ctrl+S, a new
-               Seafile version, and the reopened document has the edit.
+               DOCX MVP technically possible. The required Seafile Web →
+               WordCraft edit → durable Seafile version → editor acknowledgement
+               → close/reopen flow is NOT VERIFIED. The latest browser recovery
+               opened the synthetic DOCX in ONLYOFFICE, not WordCraft. A local
+               WordCraft harness uses in-memory storage and is not an E2E pass.
 Files:          docs/reviews/GR-006/, docs/reviews/GR-014/
-Tests:          tests/test_gateway_unit.py; browser test is NOT VERIFIED
-Free review:    pending (review 03 in flight)
-Evidence:       docs/reviews/GR-006/ (with browser-proof.png)
+Tests:          test_gateway_unit.py and local host round-trip are synthetic;
+               Seafile browser E2E is NOT VERIFIED
+Free review:    historical review-03 PASS is provisional and superseded by Sol FAIL
+Evidence:       docs/reviews/GR-006/ and docs/reviews/GPT-SOL-REREVIEW-D9EF476.md
 Known risks:    The real Seafile Web click/close/save flow is NOT VERIFIED;
-                stock Seafile lacks user-bound authorization and atomic CAS.
+               the GR-015 C and Seahub patches are local drafts, unbuilt and
+               undeployed; ONLYOFFICE preservation after routing is NOT VERIFIED.
 ```
 
 ### GR-007 — Save protocol

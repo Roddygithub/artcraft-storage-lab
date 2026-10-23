@@ -1,6 +1,6 @@
-diff --git i/common/rpc-service.c w/common/rpc-service.c
-index b86dbbe..8f6027f 100644
---- i/common/rpc-service.c
+diff --git c/common/rpc-service.c w/common/rpc-service.c
+index b86dbbe3aceff6086bc525be83bd1a07f6e23730..8f6027fc6f3825f59d86e86c651ddf152fcff421 100644
+--- c/common/rpc-service.c
 +++ w/common/rpc-service.c
 @@ -2609,6 +2609,7 @@ seafile_put_file (const char *repo_id, const char *temp_file_path,
      seaf_repo_manager_put_file (seaf->repo_mgr, repo_id,
@@ -10,9 +10,9 @@ index b86dbbe..8f6027f 100644
                                  0,
                                  &new_file_id, error);
  
-diff --git i/server/repo-mgr.h w/server/repo-mgr.h
-index 66269dc..d6936fd 100644
---- i/server/repo-mgr.h
+diff --git c/server/repo-mgr.h w/server/repo-mgr.h
+index 66269dcfd62eff671c0d185534f596dad3b41b03..d6936fd9c3607a91813cc9d6992926eca7d673df 100644
+--- c/server/repo-mgr.h
 +++ w/server/repo-mgr.h
 @@ -407,6 +407,7 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
                              const char *file_name,
@@ -22,9 +22,9 @@ index 66269dc..d6936fd 100644
                              gint64 mtime,
                              char **new_file_id,                            
                              GError **error);
-diff --git i/server/repo-op.c w/server/repo-op.c
-index 528f3f6..a151cc1 100644
---- i/server/repo-op.c
+diff --git c/server/repo-op.c w/server/repo-op.c
+index 528f3f6c8bfc46a7979eb7c77369de6b817f6c67..b985382fb4f651f2ed5c960e794929a8d113a228 100644
+--- c/server/repo-op.c
 +++ w/server/repo-op.c
 @@ -4308,6 +4308,7 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
                              const char *file_name,
@@ -34,10 +34,11 @@ index 528f3f6..a151cc1 100644
                              gint64 mtime,
                              char **new_file_id,
                              GError **error)
-@@ -4404,6 +4405,14 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
+@@ -4404,7 +4405,15 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
                                                    head_commit->root_id,
                                                    fullpath, NULL, NULL);
  
+-    if (g_strcmp0(old_file_id, new_dent->id) == 0) {
 +    /* Conditional editor saves bind both the file id and branch head. */
 +    if (expected_file_id && g_strcmp0 (old_file_id, expected_file_id) != 0) {
 +        g_set_error (error, SEAFILE_DOMAIN, SEAF_ERR_CONCURRENT_UPLOAD,
@@ -46,9 +47,10 @@ index 528f3f6..a151cc1 100644
 +        goto out;
 +    }
 +
-     if (g_strcmp0(old_file_id, new_dent->id) == 0) {
++    if (g_strcmp0(old_file_id, new_dent->id) == 0 && !expected_file_id) {
          if (new_file_id)
              *new_file_id = g_strdup(new_dent->id);
+         goto out;
 @@ -4422,7 +4431,8 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
  
      /* Commit. */
@@ -59,9 +61,9 @@ index 528f3f6..a151cc1 100644
          ret = -1;
          goto out;       
      }
-diff --git i/server/upload-file.c w/server/upload-file.c
-index 5316c6e..9fea912 100755
---- i/server/upload-file.c
+diff --git c/server/upload-file.c w/server/upload-file.c
+index 5316c6e9ac92e894dbbe9ebcb5f58932db8bc5d4..9fea912421f9ee47a92dcf27750be98917126080 100755
+--- c/server/upload-file.c
 +++ w/server/upload-file.c
 @@ -47,6 +47,7 @@ enum UploadError {
      ERROR_RECV,

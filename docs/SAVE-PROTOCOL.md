@@ -187,35 +187,42 @@ edit.** That is the whole point of the ticket.
 
 ## 5. The same content twice
 
-The file server compares the content id of the new bytes with the existing one and
-**creates no new commit** when they are the same. So a second save of an unchanged
-document is accepted and changes nothing:
+The local GR-015 fileserver patch now disables the same-content fast path for
+conditional saves. Such saves proceed through `gen_new_commit()` with automatic
+concurrent-update handling disabled, so a changed branch returns a conflict.
+The source patch applies to the recorded source SHA, but the C server has not
+been built or installed. The current gateway therefore still refuses writes
+against the live stock server.
 
 ```text
-[PASS] 3. a second save of the same content is accepted (same content, no new version)
+UNVERIFIED: an unchanged save must check the current branch before returning;
+whether it should create a new version is a separate product decision.
 ```
 
-This is why the "no changes" case needs no special handling: the platform already
-has it.
+The no-change case remains part of the fileserver acceptance tests.
 
-## 6. The race we cannot close
+## 6. Conditional-save race — unresolved
 
-The check and the write are two requests. A write that lands between them wins.
-Seafile has no compare-and-swap, so closing the window needs a file-server patch.
-See `docs/CONFLICTS.md` §2.1. **The protocol does not pretend the window does not
-exist; it states it.**
+Stock Seafile's standard editor hook does not provide the required file-id plus
+branch-head conditional write. The local C patch carries the precondition
+through the branch compare-and-update path, including same-content saves. The
+Go route still does not consume that precondition. Read-only inspection
+confirmed that live Nginx routes `/seafhttp` to the C `seaf-server` listener,
+but the patch is not installed and no conditional save has been exercised
+against it. See `docs/CONFLICTS.md` §2.1 and the Sol report for the original
+candidate.
 
 ## 7. What is tested, and what is not
 
 | Case | Test | Result |
 | --- | --- | --- |
-| a save creates a new version | `tests/test_integration.py` §2, `tests/test_browser.py` §4 | **PASS** |
-| the content is what was saved | `tests/test_integration.py` §2, `tests/test_browser.py` §5 | **PASS** |
-| the document reopened from Seafile has the edit | `tests/test_browser.py` §6 | **PASS** |
-| the editor confirms only after the write | `tests/test_browser.py` §3 + the application's own log line | **PASS** |
-| the same content twice creates no new version | `tests/test_integration.py` §3 | **PASS** |
-| a stale save is refused and the file is left alone | `tests/test_integration.py` §3 | **PASS** |
-| a file that is gone is refused | `tests/test_integration.py` §6 | **PASS** |
+| a save creates a new version | local WordCraft test uses an in-memory storage adapter | **NOT VERIFIED against Seafile** |
+| the content is what was saved | local WordCraft test compares its serialized bytes with the in-memory adapter | **NOT VERIFIED against Seafile** |
+| the document reopened from Seafile has the edit | local WordCraft test reopens from the in-memory adapter | **NOT VERIFIED against Seafile** |
+| the editor confirms only after the write | real local WordCraft browser + host, in-memory storage | **PASS locally; real Seafile unverified** |
+| the same content twice creates no new version | conditional server patch source only | **NOT VERIFIED against Seafile** |
+| a stale save is refused and the file is left alone | fake CAS only; fileserver patch not running | **NOT VERIFIED against Seafile** |
+| a file that is gone is refused | mocked response path only | **NOT VERIFIED against Seafile** |
 | the editor stays dirty when the save is refused | — | **not tested in the browser** (the code path is the app's own, and the HTTP test covers the refusal) |
 | the browser's leave-page guard warns about unsaved work | — | **not tested** |
 | a save interrupted by a network failure | — | **not tested** |

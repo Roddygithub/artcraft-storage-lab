@@ -1,6 +1,6 @@
-diff --git i/seahub/thirdparty_editor/urls.py w/seahub/thirdparty_editor/urls.py
-index d93791a..c15b60d 100644
---- i/seahub/thirdparty_editor/urls.py
+diff --git c/seahub/thirdparty_editor/urls.py w/seahub/thirdparty_editor/urls.py
+index d93791acb1e3c11afb6208bd1d451c252ff36b88..c15b60d5b8619f62252f9ff289d0e6e0415234cc 100644
+--- c/seahub/thirdparty_editor/urls.py
 +++ w/seahub/thirdparty_editor/urls.py
 @@ -1,10 +1,12 @@
  # Copyright (c) 2012-2016 Seafile Ltd.
@@ -16,9 +16,9 @@ index d93791a..c15b60d 100644
      path('file-content/', ThirdpartyEditorFileContentView.as_view(), name='ThirdpartyEditorFileContentView'),
 +    path('file-save/', ThirdpartyEditorFileSaveView.as_view(), name='ThirdpartyEditorFileSaveView'),
  ]
-diff --git i/seahub/thirdparty_editor/views.py w/seahub/thirdparty_editor/views.py
-index 0fa2ccc..8d40e13 100644
---- i/seahub/thirdparty_editor/views.py
+diff --git c/seahub/thirdparty_editor/views.py w/seahub/thirdparty_editor/views.py
+index 0fa2ccca3f0854f3e8f7f359c813ce9a002b67f7..ad5607b11a4c822729e0e23e63695ce468c6c118 100644
+--- c/seahub/thirdparty_editor/views.py
 +++ w/seahub/thirdparty_editor/views.py
 @@ -4,12 +4,17 @@
  import os
@@ -38,7 +38,7 @@ index 0fa2ccc..8d40e13 100644
  from django.http import HttpResponse
  from django.core.cache import cache
  
-@@ -17,13 +22,38 @@ from pysearpc import SearpcError
+@@ -17,11 +22,45 @@ from pysearpc import SearpcError
  from seaserv import seafile_api
  
  from seahub.base.accounts import User, ANONYMOUS_EMAIL
@@ -49,8 +49,9 @@ index 0fa2ccc..8d40e13 100644
  
  logger = logging.getLogger(__name__)
  json_content_type = 'application/json; charset=utf-8'
- 
- 
++MAX_CONTENT_TYPES_XML_BYTES = 1024 * 1024
++
++
 +def _matches_file_type(file_path, content):
 +    ext = os.path.splitext(file_path)[1].lower()
 +    if ext == '.pdf':
@@ -63,22 +64,63 @@ index 0fa2ccc..8d40e13 100644
 +        return root.tag.rsplit('}', 1)[-1].lower() == 'svg'
 +    expected = {
 +        '.docx': 'wordprocessingml.document',
-+        '.xlsx': 'spreadsheet.sheet',
++        '.xlsx': 'spreadsheetml.sheet',
 +        '.pptx': 'presentationml.presentation',
 +    }.get(ext)
 +    if expected:
 +        try:
 +            with zipfile.ZipFile(io.BytesIO(content)) as archive:
-+                return expected in archive.read('[Content_Types].xml').decode('utf-8')
-+        except (KeyError, UnicodeDecodeError, zipfile.BadZipFile):
++                entry = archive.getinfo('[Content_Types].xml')
++                if entry.file_size > MAX_CONTENT_TYPES_XML_BYTES:
++                    return False
++                with archive.open(entry) as stream:
++                    raw_types = stream.read(MAX_CONTENT_TYPES_XML_BYTES + 1)
++                if len(raw_types) > MAX_CONTENT_TYPES_XML_BYTES:
++                    return False
++                types = raw_types.decode('utf-8')
++                return expected in types
++        except (KeyError, OSError, RuntimeError, UnicodeDecodeError, zipfile.BadZipFile):
 +            return False
 +    return True
-+
-+
- def access_token_check(func):
  
-     def _decorated(view, request, *args, **kwargs):
-@@ -113,6 +143,11 @@ class ThirdpartyEditorFileInfoView(APIView):
+ 
+ def access_token_check(func):
+@@ -36,7 +75,7 @@ def access_token_check(func):
+ 
+         info_dict = cache.get('thirdparty_editor_access_token_' + token)
+         if not info_dict:
+-            logger.error('Get thirdparty editor cache value failed, access token is %s.' % token)
++            logger.error('Get third-party editor cache value failed.')
+             return HttpResponse(json.dumps({}), status=404, content_type=json_content_type)
+ 
+         request_user = info_dict['request_user']
+@@ -52,6 +91,12 @@ def access_token_check(func):
+             return HttpResponse(json.dumps({}), status=404,
+                                 content_type=json_content_type)
+ 
++        # Anonymous share-link editing is not part of this integration. Recheck
++        # the current user's read permission on every capability-backed request.
++        if request_user == ANONYMOUS_EMAIL:
++            return HttpResponse(json.dumps({}), status=403,
++                                content_type=json_content_type)
++
+         if request_user != ANONYMOUS_EMAIL:
+             try:
+                 User.objects.get(email=request_user)
+@@ -66,6 +111,12 @@ def access_token_check(func):
+             return HttpResponse(json.dumps({}), status=404,
+                                 content_type=json_content_type)
+ 
++        parent_dir = os.path.dirname(file_path) or '/'
++        permission = seafile_api.check_permission_by_path(repo_id, parent_dir, request_user)
++        if not permission or not parse_repo_perm(permission).can_preview:
++            return HttpResponse(json.dumps({}), status=403,
++                                content_type=json_content_type)
++
+         obj_id = seafile_api.get_file_id_by_path(repo_id, file_path)
+         if not obj_id:
+             logger.error('File %s not found.' % file_path)
+@@ -113,6 +164,11 @@ class ThirdpartyEditorFileInfoView(APIView):
          result['file_name'] = os.path.basename(file_path)
          result['file_size'] = file_size
          result['file_path'] = file_path
@@ -90,7 +132,11 @@ index 0fa2ccc..8d40e13 100644
  
          return HttpResponse(json.dumps(result, ensure_ascii=False), status=200,
                              content_type=json_content_type)
-@@ -130,7 +165,11 @@ class ThirdpartyEditorFileContentView(APIView):
+@@ -127,16 +183,21 @@ class ThirdpartyEditorFileContentView(APIView):
+ 
+         token = request.GET.get('access_token', None)
+         info_dict = cache.get('thirdparty_editor_access_token_' + token)
++        request_user = info_dict['request_user']
          repo_id = info_dict['repo_id']
          file_path = info_dict['file_path']
  
@@ -102,7 +148,14 @@ index 0fa2ccc..8d40e13 100644
          file_name = os.path.basename(file_path)
          try:
              fileserver_token = seafile_api.get_fileserver_access_token(repo_id,
-@@ -155,3 +194,107 @@ class ThirdpartyEditorFileContentView(APIView):
+                                                                        obj_id,
+                                                                        'view',
+-                                                                       '',
++                                                                       request_user,
+                                                                        use_onetime=False)
+         except SearpcError as e:
+             logger.error(e)
+@@ -155,3 +216,107 @@ class ThirdpartyEditorFileContentView(APIView):
                                  content_type=json_content_type)
  
          return HttpResponse(file_content, content_type="application/octet-stream")
@@ -210,9 +263,9 @@ index 0fa2ccc..8d40e13 100644
 +            'file_id': response.text.strip(),
 +            'head_commit_id': updated_repo.head_cmmt_id if updated_repo else '',
 +        }), status=200, content_type=json_content_type)
-diff --git i/seahub/views/file.py w/seahub/views/file.py
-index 63b68e8..034624c 100644
---- i/seahub/views/file.py
+diff --git c/seahub/views/file.py w/seahub/views/file.py
+index 63b68e8166d043755d8db05bd5c6ae08f2074a26..034624c36d28af7694197891d9c665513a481bf4 100644
+--- c/seahub/views/file.py
 +++ w/seahub/views/file.py
 @@ -591,6 +591,35 @@ def view_lib_file(request, repo_id, path):
  

@@ -13,6 +13,8 @@ owner's decision, it is marked `OWNER DECISION REQUIRED`.
 | --- | --- | --- | --- |
 | Seafile Server — **Professional** edition (the deployed instance) | proprietary (Seafile Ltd.) | the deployed tree ships `pro-data/` and Pro-only modules (`IsProVersion` permission class, `repo_office_suite` endpoint) | **We must not copy its code.** Reading it and documenting its interfaces is fine. |
 | Seafile / Seahub — inspected upstream revisions | **Apache-2.0** (Seahub `c01d46bc`) / **AGPLv3 with OpenSSL exception** (Seafile Server `a652460e`) | [Seahub LICENSE](https://raw.githubusercontent.com/haiwen/seahub/c01d46bcaa0b2ce24c71561c6c61d15fea808d1a/LICENSE.txt), [Seafile Server LICENSE](https://raw.githubusercontent.com/haiwen/seafile-server/a652460e9d4314d5e67c82e0ebe9aa48e8ea1212/LICENSE.txt) | Do not copy code; re-verify the exact target revision before deriving or contributing. |
+| GR-015 Seafile Server 12.0.14 patch context | **AGPLv3 with OpenSSL exception** at source SHA `32ed9c69594c9faa5cea28024403fcde362589ec` | [`seafile-server-12.0.14.patch`](reviews/GR-015/seafile-server-12.0.14.patch); [source LICENSE](https://raw.githubusercontent.com/haiwen/seafile-server/32ed9c69594c9faa5cea28024403fcde362589ec/LICENSE) | The diff contains upstream context lines. Preserve provenance and applicable notices; compatibility/distribution treatment is **NOT LEGALLY REVIEWED**. |
+| GR-015 Seahub 12.0.14 patch context | **Apache-2.0** at source SHA `1e9bde801b4360c14d784d9681d4261abc233a8b` | [`seahub-12.0.14.patch`](reviews/GR-015/seahub-12.0.14.patch); [source LICENSE](https://raw.githubusercontent.com/haiwen/seahub/1e9bde801b4360c14d784d9681d4261abc233a8b/LICENSE.txt) | The diff contains upstream context lines. Preserve provenance and applicable notices; compatibility/distribution treatment is **NOT LEGALLY REVIEWED**. |
 | ONLYOFFICE Document Server | proprietary (Ascensio System SIA) | `local.json`, container labels, `api.js` copyright header ("Copyright (C) Ascensio System SIA, 2009-2026") | We study its **behaviour**, never its code. |
 | ArtCraft apps (`storytold/*`) | to be confirmed per repo — **NOT VERIFIED yet** | each repo's licence file | must be checked before any ArtCraft code is vendored or derived from |
 | `storytold/craft-libs` | **MIT OR Apache-2.0** | `LICENSE-MIT` + `LICENSE-APACHE` in the repository root | compatible |
@@ -32,8 +34,13 @@ whether the *upstream maintainers* accept a contribution under those terms (L-3)
   verification.
 * This repository is dual-licensed MIT / Apache-2.0.
 
-Therefore, **no Seafile or Seahub code is linked into or vendored into this
-repository**, regardless of upstream edition or revision.
+The gateway itself remains separate and talks to Seafile over HTTP. However,
+the GR-015 patch artifacts do contain context copied from the exact Seahub and
+Seafile Server revisions listed above. They are review/patch material, not
+vendored runtime components, but they still require explicit upstream
+provenance, notices and a legal compatibility check before redistribution or
+submission. Do not describe this repository as containing no upstream source
+context.
 
 ### Architectural consequence
 
@@ -84,12 +91,11 @@ If we ever quote Seafile or ONLYOFFICE code or identifiers in this repository
 * keep the quotation short enough to be a reference, not a substitute for the
   original.
 
-Currently the only such material is in
-`docs/reviews/GR-001/DEPLOYED-INSTANCE-CONTRACT.md` and
-`docs/DEPLOYMENT.md`: it documents **interfaces, parameter names and behaviour**,
-not code. Where a short snippet is quoted for clarity, it is attributed and is
-from upstream/proprietary material — it is documentation, not a derived work of the
-kind that would infect this repository.
+The GR-015 patch files are additional source-context material. Their source
+repositories, exact revisions and license files are listed in §1. The patches
+must retain enough provenance for reviewers to identify the upstream context;
+this document does not decide whether the proposed combined distribution is
+legally compatible.
 
 ## 6. Decisions to confirm
 

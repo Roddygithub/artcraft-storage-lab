@@ -11,7 +11,9 @@ back — the same bridge **GridCraft, PdfCraft and CADCraft already have**.
 
 * Target: `storytold/wordcraft`, branch `main` at
   `00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d` (2026-10-22).
-* The patch: [`DIFF.patch`](DIFF.patch) — 4 files, +261 / −4.
+* The local prepared branch is at `9d46a47e4624546e9d193ef59e2939edcd47b40f`;
+  [`DIFF.patch`](DIFF.patch) is the full diff from the target base — 4 files,
+  +259 / −4.
 * The branch in this workspace: `feature/host-bridge` in a local clone
   (`.work/wordcraft-patch`, gitignored).
 
@@ -99,12 +101,18 @@ path cannot offer (a browser cannot tell a page whether the user kept the file).
 
 ## 3. How it was verified
 
+The editor reports `dirty=false` when it starts serialization, before the host
+has written bytes. On `saveResult`, the bridge now clears its deduplication
+state and re-emits the final dirty state. This gives the host an explicit
+post-write event to confirm only after Seafile/storage has answered. The host
+keeps its dirty guard set while the write is in flight.
+
 | Check | Result |
 | --- | --- |
 | `cargo build --target wasm32-unknown-unknown -p wordcraft-web --release` | **compiles**, no new warning |
 | `cargo clippy` on the new file | the crate's `deny` list (`unwrap_used`, `expect_used`, `panic`, …) is respected — the code uses `unwrap_or_else` on the poisoned inbox lock, like the rest of the file |
 | `trunk build --release` | **done** — the site builds with the bridge |
-| the bridge in a real browser | **done** — see `docs/reviews/GR-006/` |
+| the bridge in a real browser | **PASS** — `tests/test_wordcraft_host_roundtrip.py` edits the real local WordCraft Web build, verifies changed DOCX bytes and the post-save dirty acknowledgement, then reopens the saved DOCX. Storage is an in-memory synthetic adapter, not Seafile. |
 | the same bridge on the other apps | GridCraft and PdfCraft were exercised in a browser (GR-005); CADCraft was not |
 
 ## 4. What is NOT in this patch

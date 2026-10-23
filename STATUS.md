@@ -3,7 +3,8 @@
 ```text
 PHASE:      GPT-6.1 Sol FAIL; local Seafile connector work in progress
 BRANCH:     main
-SHA:        (see git log)
+REVIEWED SHA: d9ef476e6fbcb04c9a9e23cfe235812167d1f27c
+WORKTREE:   remediation in progress; uncommitted changes are not reviewed
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
             -- MiniMax free was RETIRED during GR-012; see docs/AI-ROUTING.md --
@@ -12,24 +13,26 @@ IMPLEMENTER:artcraft-worker           (nvidia/z-ai/glm-5.3-flash#thinking)
 REVIEWER:   artcraft-reviewer         (nvidia/nvidia/nemotron-3-ultra-550b-a55b#high)
 
 FREE REVIEW: PASS (2 rounds, both remediated) — see docs/reviews/REVIEW-0*.md
-GPT REVIEW:  FAIL (Sol; candidate c76a7594cc43ba2a6cf56de2232836f008a97863)
+GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a97863
+             and re-review candidate d9ef476e6fbcb04c9a9e23cfe235812167d1f27c)
 
 CURRENT GR: GR-015 — per-library routing + user-bound conditional save (local draft)
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 
 BLOCKERS:
-- the conditional-save patches for Seahub and Seafile Server are not built or deployed
-- the ArtCraft gateway is not installed on the Seafile container and has no reverse-proxy route
-- real Seafile Web DOCX click/edit/save/version/reopen and ONLYOFFICE browser preservation are NOT VERIFIED
+- real Seafile Web → WordCraft DOCX edit/save/version/close/reopen is NOT VERIFIED
+- the local C draft closes Sol's same-content shortcut finding, but is unbuilt and has no fileserver runtime test; the Go route remains unsupported for conditional saves
+- read authorization, browser-safe error redaction, and save/dirty acknowledgement fixes have local tests only; the Seahub/Django and live Craft flows remain NOT VERIFIED
+- ONLYOFFICE file open was observed on the synthetic DOCX after recovery; edit/save/version/reopen preservation remains NOT VERIFIED
 - 9 of 13 ArtCraft web apps still lack a ready browser host bridge or integration build
 
 NEXT:
-- build and test GR-015 against the exact Seafile 12.0.14 sources in isolation
-- deploy the gateway behind the Seafile HTTPS origin with the synthetic library as the only allow-listed repository
-- validate DOCX click/edit/save/new version/close/reopen and confirm ONLYOFFICE remains unchanged
+- remediate Sol findings and run checks that can be verified locally
+- build and exercise GR-015 only in an isolated synthetic Seafile deployment; do not install on the live LXC
+- validate the actual Seafile DOCX click/edit/save/version/close/reopen flow and ONLYOFFICE preservation before claiming MVP
 - extend the shared bridge to the remaining ArtCraft apps by capability, without routing unsupported files
-- keep upstream publication locked until GPT REVIEW PASS
+- keep upstream publication locked; GPT REVIEW remains FAIL
 ```
 
 ## Verification legend

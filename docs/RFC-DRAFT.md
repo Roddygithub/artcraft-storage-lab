@@ -91,23 +91,28 @@ rather than the services.
 
 ## Seafile reference integration
 
-The bridge was validated end to end against a real Seafile Server 12.0.14
-(Professional):
+The reference implementation is still a prototype and has **not** passed its
+required Seafile Web → WordCraft DOCX end-to-end acceptance test. Earlier GR
+bundles report browser edits and saves, but Sol's independent review found that
+the current tests inject a gateway page and inspect output bytes rather than
+reopening the file in WordCraft. Patched Seahub/fileserver integration and the
+ONLYOFFICE regression are also not run (`docs/reviews/GR-015/README.md`). Treat
+those earlier reports as unverified leads, not proof.
 
-* Seafile already ships a **generic, configuration-only** hook for third-party
-  online editors (`seahub/thirdparty_editor/`), present in the open-source
-  upstream and in the Professional build. It maps file extensions to a URL, mints
-  an access token for the document, and serves the bytes back to the editor.
-* The Craft editor opened a synthetic `.xlsx` and a synthetic `.docx` **from
-  Seafile**, edited them in the browser, and saved them back; Seafile created a
-  **new version** each time, and the document reopened with the edit intact.
-* A **stale** save — one based on a version that is no longer current — is
-  **refused**, and the file on the server is left alone. Seafile's own
-  integration does not do this; it writes unconditionally.
+The repository contains a gateway, draft Seahub/Seafile patches and synthetic
+tests. The current deployed Seafile has not received those patches, and the
+gateway writes fail closed until user-bound authorization and atomic
+compare-and-swap are available. This RFC describes a proposal; it does not
+claim that the integration or a reusable contract has been validated end to
+end.
 
-The reference implementation is small: a host page, a service that holds the
-platform credential, and a file-type table. It is **not** part of this RFC: it
-proves the contract, it does not define it.
+An adjacent upstream proposal, [Suite-wide Host Mode, issue #2420](https://github.com/storytold/artcraft/issues/2420),
+describes a native Craft application as the authoritative host for remote UI
+surfaces. This RFC addresses a different flow: Seafile remains the document
+authority, a browser editor serializes document bytes, and the storage adapter
+commits a new Seafile version. Any upstream contract proposal should state this
+scope difference and coordinate with issue #2420 rather than duplicate its
+native remote-surface work.
 
 ## Proposed common host contract
 
@@ -262,9 +267,19 @@ Each step is independent and shippable.
 * end to end, against a real platform: open, edit, save, a new version, a
   refused stale save, and a read-only document.
 
-The end-to-end test that drove this proposal is in the reference project
-(`docs/reviews/GR-006/`): a real WordCraft in a real browser, editing a real
-document in a real Seafile, saving, and a new version appearing.
+The historical GR-006 bundle is not accepted as reproducible end-to-end
+evidence for this candidate. The current tests do not demonstrate the complete
+Seafile click → WordCraft edit → durable save/version → close/reopen path. That
+test remains a release gate, along with an ONLYOFFICE regression.
+
+## Adjacent upstream work
+
+ArtCraft issue [#2420 — Suite-wide Host Mode](https://github.com/storytold/artcraft/issues/2420)
+proposes a native Craft application as an authoritative remote UI/session host.
+This RFC instead concerns browser/WASM editors embedded in an external file
+platform, with Seafile authorizing and versioning document bytes. The scopes
+are adjacent but not equivalent; any upstream proposal should explain that
+boundary and check for shared protocol requirements before publication.
 
 ## Upstream split
 

@@ -10,10 +10,10 @@ index 9152db3..47746ad 100644
 +web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "HtmlIFrameElement", "Blob", "BlobPropertyBag", "Url", "Location", "CssStyleDeclaration", "Event", "EventTarget", "BeforeUnloadEvent", "ClipboardEvent", "DataTransfer", "FileList", "File", "DomStringList", "MessageEvent", "UrlSearchParams", "IdbFactory", "IdbOpenDbRequest", "IdbRequest", "IdbDatabase", "IdbObjectStore", "IdbTransaction", "IdbTransactionMode", "MediaQueryList", "Storage"] }
 diff --git a/apps/wordcraft-web/src/host.rs b/apps/wordcraft-web/src/host.rs
 new file mode 100644
-index 0000000..9679219
+index 0000000..aa8b103
 --- /dev/null
 +++ b/apps/wordcraft-web/src/host.rs
-@@ -0,0 +1,225 @@
+@@ -0,0 +1,223 @@
 +//! The `postMessage` bridge to a same-origin parent page (`?host=parent`), for pages that embed
 +//! WordCraft in an `<iframe>`. Messages are plain objects with a `type`:
 +//!
@@ -38,9 +38,9 @@ index 0000000..9679219
 +use std::cell::Cell;
 +use std::rc::Rc;
 +
-+use wasm_bindgen::closure::Closure;
 +use wasm_bindgen::JsCast as _;
 +use wasm_bindgen::JsValue;
++use wasm_bindgen::closure::Closure;
 +use wordcraft_ui_egui::async_saves::{AsyncSaves, SaveOutcome};
 +use wordcraft_ui_egui::{Inbox, Services};
 +
@@ -119,10 +119,7 @@ index 0000000..9679219
 +    }
 +
 +    pub fn post_ready(&self) {
-+        self.send(&[
-+            ("type", "wordcraft:ready".into()),
-+            ("version", env!("CARGO_PKG_VERSION").into()),
-+        ]);
++        self.send(&[("type", "wordcraft:ready".into()), ("version", env!("CARGO_PKG_VERSION").into())]);
 +    }
 +
 +    pub fn post_failed(&self, error: &str) {
@@ -162,6 +159,7 @@ index 0000000..9679219
 +        let parent = self.parent.clone();
 +        let origin = self.origin.clone();
 +        let saves = self.saves.clone();
++        let reported = self.reported.clone();
 +        let on_message = Closure::<dyn FnMut(web_sys::MessageEvent)>::new(move |event: web_sys::MessageEvent| {
 +            if event.origin() != origin || !event.source().is_some_and(|s| js_sys::Object::is(&s, &parent)) {
 +                return;
@@ -179,10 +177,13 @@ index 0000000..9679219
 +                    let outcome = if bool(&data, "ok") {
 +                        SaveOutcome::Saved
 +                    } else {
-+                        SaveOutcome::Failed(
-+                            string(&data, "error").unwrap_or_else(|| "the host couldn't save the file".to_string()),
-+                        )
++                        SaveOutcome::Failed(string(&data, "error").unwrap_or_else(|| "the host couldn't save the file".to_string()))
 +                    };
++                    // The editor may already have reported clean when it began
++                    // serializing the save. Re-emit the resulting state so the
++                    // host can distinguish durable acknowledgement from that
++                    // early dirty=false transition.
++                    reported.set(None);
 +                    saves.finish(ticket as u64, outcome);
 +                }
 +                _ => {}
@@ -202,10 +203,7 @@ index 0000000..9679219
 +
 +/// The name a file is saved under: the last component of its path.
 +fn file_name(path: &str) -> String {
-+    std::path::Path::new(path)
-+        .file_name()
-+        .map(|n| n.to_string_lossy().to_string())
-+        .unwrap_or_else(|| "document.docx".to_string())
++    std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| "document.docx".to_string())
 +}
 +
 +fn message(fields: &[(&str, JsValue)]) -> Option<js_sys::Object> {
