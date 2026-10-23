@@ -1,10 +1,11 @@
 # STATUS
 
 ```text
-PHASE:      GPT-6.1 Sol FAIL; local Seafile connector work in progress
+PHASE:      GPT-6.1 Sol FAIL on afec19e; focused local remediation in progress
 BRANCH:     main
-REVIEWED SHA: d9ef476e6fbcb04c9a9e23cfe235812167d1f27c
-WORKTREE:   clean; local remediation commits after the reviewed SHA are not reviewed by Sol
+LAST REVIEWED SHA: afec19e63a6a4faec8a94f93651363dbe007e526
+CURRENT CANDIDATE: local commits after afec19e; exact SHA recorded at freeze
+WORKTREE:   remediation commits are not reviewed by Sol
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -14,8 +15,9 @@ IMPLEMENTER:artcraft-worker           (nvidia/z-ai/glm-5.3-flash#thinking)
 REVIEWER:   artcraft-reviewer         (nvidia/nvidia/nemotron-3-ultra-550b-a55b#high)
 
 FREE REVIEW: PASS (2 rounds, both remediated) — see docs/reviews/REVIEW-0*.md
-GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a97863
-             and re-review candidate d9ef476e6fbcb04c9a9e23cfe235812167d1f27c)
+GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a97863,
+             d9ef476e6fbcb04c9a9e23cfe235812167d1f27c, and
+             afec19e63a6a4faec8a94f93651363dbe007e526)
 
 CURRENT GR: GR-015 — per-library routing + user-bound conditional save (local draft)
 
@@ -23,16 +25,16 @@ FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 
 BLOCKERS:
 - real Seafile Web → WordCraft DOCX edit/save/version/close/reopen is NOT VERIFIED
-- the local C draft closes Sol's same-content shortcut finding, but is unbuilt and has no fileserver runtime test; the Go route remains unsupported for conditional saves
-- read authorization, browser-safe error redaction, and save/dirty acknowledgement fixes have local tests only; the Seahub/Django and live Craft flows remain NOT VERIFIED
-- ONLYOFFICE file open was observed on the synthetic DOCX after recovery; edit/save/version/reopen preservation remains NOT VERIFIED
-- 9 of 13 ArtCraft web apps still lack a ready browser host bridge or integration build
+- conditional-save route and authorization patches are not built or runtime-tested
+- ONLYOFFICE edit/save/version/reopen preservation remains NOT VERIFIED
+- GridCraft durable acknowledgement and XLSX semantic reopen are not verified
+- VectorCraft Seafile semantic reopen is not yet run; only the local editor round-trip is reproduced
+- CSP/rate limiting are absent; public deployment is NOT READY
 
 NEXT:
-- send the current exact `main` tip for a fresh independent Sol review
+- freeze the exact local remediation candidate and request a fresh Sol review
 - build and exercise GR-015 only in an isolated synthetic Seafile deployment; do not install on the live LXC
 - validate the actual Seafile DOCX click/edit/save/version/close/reopen flow and ONLYOFFICE preservation before claiming MVP
-- extend the shared bridge to the remaining ArtCraft apps by capability, without routing unsupported files
 - keep upstream publication locked; GPT REVIEW remains FAIL
 ```
 

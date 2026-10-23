@@ -9,15 +9,20 @@ independently verified, it says so.
 
 ## Latest review event — 2026-10-23
 
-GPT-6.1 Sol independently re-reviewed candidate
-`d9ef476e6fbcb04c9a9e23cfe235812167d1f27c` and returned **FAIL**. The full
-report is `docs/reviews/GPT-SOL-REREVIEW-D9EF476.md`. The required DOCX MVP is
-not proven, and conditional-save, read-authorization, save-acknowledgement,
-GridCraft/SVG, licensing and security findings remain. No GPT PASS was granted;
-upstream remains locked. Luna's local remediation and reproduction report is
-`docs/reviews/GPT-LUNA-AUDIT.md`. The current clean `main` tip includes local
-remediation commits and is **not yet reviewed by Sol**. The live Seafile
-synthetic DOCX still opens ONLYOFFICE; no edit/save was made during recovery.
+GPT-6.1 Sol reviewed exact candidate
+`afec19e63a6a4faec8a94f93651363dbe007e526` and returned **FAIL**. The full
+report is `docs/reviews/GPT-SOL-REREVIEW-AFEC19E.md`; the prior `d9ef476e`
+FAIL remains in `docs/reviews/GPT-SOL-REREVIEW-D9EF476.md`. Local remediation
+commits after `afec19e` address overlapping-save state, gateway error leakage
+and response bounds, the cross-origin handoff, conditional-save routing, and
+false-positive SVG/XLSX evidence. They have not yet been reviewed by Sol. The
+required Seafile DOCX file-list click/edit/version/close/reopen and ONLYOFFICE
+save regression remain **NOT VERIFIED**. No GPT PASS was granted; upstream is
+locked. No service was changed during the latest review or remediation.
+
+The local candidate currently contains remediation commits through the entries
+in `HISTORY.md`; it is not yet frozen for Sol. Record the exact next review SHA
+after the final status/evidence commit.
 
 ## 1. Repository
 
@@ -42,8 +47,8 @@ upload, no desktop application.
 ```text
    the browser                    the gateway                    Seafile
   ┌───────────────┐             ┌────────────────┐          ┌──────────────┐
-  │  the Craft    │  postMessage │  the host page  │ account  │  Seahub      │
-  │  app (wasm)   │ ──────────► │  + the service  │ token ─► │  + seafhttp  │
+  │  the Craft    │  postMessage │  the host page  │ capability│ Seahub      │
+  │  app (wasm)   │ ──────────► │  + the service  │ ───────► │ + seafhttp  │
   │  in an iframe │ ◄────────── │                 │ ◄─────── │              │
   └───────────────┘             └────────────────┘          └──────────────┘
 ```
@@ -52,10 +57,10 @@ upload, no desktop application.
   bridge patch (`docs/reviews/GR-014/`). It knows nothing about Seafile.
 * the **host page** is served by the gateway and frames the Craft app **from the
   same origin** (the `?host=parent` bridge requires it).
-* The browser receives a short-lived third-party editor capability from Seahub;
-  the gateway uses it to bind one document session. The local GR-015 draft adds
-  per-request read authorization and a Seahub save endpoint that rechecks the
-  current user's write permission before asking the fileserver to commit.
+* Seahub posts a short-lived third-party-editor capability to the gateway; the
+  gateway stores it server-side and binds one document session. The local GR-015
+  draft scopes write capability to ArtCraft, one repository and extension, then
+  rechecks current user permission and calls a dedicated conditional-save route.
 * The GR-015 Seahub and Seafile Server patches are **not built, installed, or
   runtime-tested**. The live instance has no ArtCraft route or gateway. The
   current deployed click on the synthetic DOCX still opens ONLYOFFICE.
@@ -82,13 +87,13 @@ deployment. Do not treat the draft as deployed behavior.
 | GR-003 | ArtCraft Web capability matrix | `docs/ARTCRAFT-WEB-CAPABILITIES.md` | PASS (remediated) | PENDING |
 | GR-004 | Common Craft Web Host Contract | `docs/HOST-CONTRACT.md` | PASS (remediated) | PENDING |
 | GR-005 | First technical proof | `docs/reviews/GR-005/` | PASS (remediated) | PENDING |
-| GR-006 | WordCraft DOCX MVP | `docs/reviews/GR-006/` | provisional PASS (REVIEW-03; superseded) | FAIL (Sol) |
+| GR-006 | WordCraft DOCX MVP | `docs/reviews/GR-006/` | provisional PASS (superseded) | FAIL (Sol) |
 | GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PASS (REVIEW-03) | PENDING |
 | GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | PASS (remediated) | PENDING |
 | GR-009 | Web integration security | `docs/SECURITY.md` | PASS (remediated) | PENDING |
-| GR-010 | GridCraft (`.xlsx`) | `docs/reviews/GR-010/README.md` | PASS (remediated) | PENDING |
+| GR-010 | GridCraft (`.xlsx`) | `docs/reviews/GR-010/README.md` | provisional PASS (superseded) | FAIL (Sol) |
 | GR-011 | DeckCraft | — | not started (needs the upstream bridge) | PENDING |
-| GR-012 | Non-Office Craft integration (SVG/VectorCraft) | `docs/reviews/GR-012/` | PASS (remediated, REVIEW-04) | PENDING |
+| GR-012 | Non-Office Craft integration (SVG/VectorCraft) | `docs/reviews/GR-012/` | provisional PASS (superseded) | FAIL (Sol) |
 | GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PASS (REVIEW-03) | PENDING |
 | GR-014 | First ArtCraft upstream patch | `docs/reviews/GR-014/` | PASS (REVIEW-03) | PENDING |
 
@@ -121,29 +126,13 @@ anywhere.**
 | test library | `c82cc792-389d-43e6-b963-0dab1a47a9a8` ("OnlyOffice"), folder `/artcraft-lab/` |
 | the real data | library `46ea6c3c-8df3-48b6-bf95-fdc300dcf65c` ("Google Drive") — **never touched** |
 
-### 6.1 The ONE change made to the instance
+### 6.1 Historical Seafile configuration and current state
 
-`/opt/seafile/conf/seahub_settings.py`, appended:
-
-```python
-ENABLE_THIRDPARTY_EDITOR = True
-THIRDPARTY_EDITOR_ACTION_URL_DICT = {
-    "xlsx": "http://127.0.0.1:8777/open/",
-}
-```
-
-* **Backup:** `/opt/seafile/conf/seahub_settings.py.bak-artcraft-20261022-123134`
-* **Rollback:** restore it and `systemctl restart seahub`.
-* **Blast radius:** one extension that **no file in any other library uses**, and
-  that the deployed ONLYOFFICE configuration does not claim. **No existing file
-  changed behaviour.**
-* Seahub was restarted **once**, right after the edit; `seahub` and `seafile`
-  both came back `active`.
-* The ONLYOFFICE block in the same file is **unchanged**.
-
-The `127.0.0.1` in the URL is the address of the gateway **on the owner's
-workstation** — it works because the browser is there. The production design puts
-the gateway on its own host.
+An earlier `.xlsx` third-party-editor mapping was removed. ArtCraft is not
+currently configured in live Seahub; the synthetic DOCX click opens ONLYOFFICE.
+The ONLYOFFICE setting and extension list were left unchanged. The backup and
+rollback details are in `docs/DEPLOYMENT.md`. No gateway or conditional-save
+patch is installed on the live instance.
 
 ## 7. The commands
 
@@ -167,20 +156,23 @@ ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=... \
 cd integration && ARTCRAFT_SEAFILE_URL=... ARTCRAFT_SEAFILE_TOKEN=... \
   python3 -m gateway --host 127.0.0.1 --port 8777
 
-# the tests
+# gateway simulation only; not a real Seafile integration test
 ARTCRAFT_GATEWAY=http://127.0.0.1:8777 \
   python3 tests/test_integration.py <repo_id> /artcraft-lab/synthetic.xlsx
 ARTCRAFT_GATEWAY=http://127.0.0.1:8777 \
   python3 tests/test_browser.py <repo_id> /artcraft-lab/synthetic.docx
 ```
 
+The real Seafile tests also need a synthetic library, account token, a live
+third-party-editor capability, the gateway, and the GR-015 server patches built
+in isolation. The local browser and engine tests use synthetic storage only.
+
 ## 8. The integration flow
 
 ```text
-1. The user clicks a .xlsx in Seafile.
-2. Seahub's view_lib_file finds the extension in THIRDPARTY_EDITOR_ACTION_URL_DICT,
-   mints an access token (12 h, cached), and renders a page that POSTs the token
-   to the gateway.
+1. Intended: the user clicks a supported file in an allow-listed Seafile library.
+2. Patched Seahub renders a form that POSTs an ArtCraft-audience capability to
+   the separate gateway origin; this route is not deployed.
 3. The gateway reads file-info and file-content, creates a session, and serves the
    host page.
 4. The host page frames the Craft app (same origin, ?host=parent).
@@ -188,17 +180,17 @@ ARTCRAFT_GATEWAY=http://127.0.0.1:8777 \
 6. The user edits; the app posts <app>:dirty.
 7. The user saves; the app posts <app>:save with the bytes and a ticket.
 8. The host page POSTs the bytes to the gateway.
-9. The gateway re-reads the file's content id, compares it with the one from the
-   session, and either refuses (409) or writes through seafhttp update-api.
-10. The host page answers <app>:saveResult; the app marks the document saved, or
-    puts it back in its dirty state and says why.
-11. Seafile has a new version.
+9. Patched Seahub calls the dedicated `conditional-update-api`; stock and Go
+   fileservers do not expose this route and must fail before writing. The C patch
+   is unbuilt and runtime behavior is **NOT VERIFIED**.
+10. The host/editor becomes clean only after durable version confirmation.
+11. Close and reopen the file in the editor; verify the semantic edit.
 ```
 
 ## 9. The security assumptions
 
-* the browser holds **no** Seafile credential of any kind, only an opaque session
-  id;
+* the Craft frame holds only an opaque one-document gateway session id; Seahub
+  must use a separate origin from the gateway and Craft frame;
 * an `op=update` file-server token is **library-wide**, so it is never given to
   the browser; the gateway's checks are the only defence;
 * the host page and the Craft app are **same-origin**, and both check the origin
@@ -207,8 +199,8 @@ ARTCRAFT_GATEWAY=http://127.0.0.1:8777 \
   absolute, 15 min idle);
 * the path, the library and the user come from the **session**, never from the
   request;
-* the conflict check is a **read-then-write**: a write inside that one-round-trip
-  window wins. Seafile has no compare-and-swap.
+* stock Seafile has no user-bound conditional file save; writes remain disabled
+  unless the dedicated patched fileserver route is built and runtime-tested.
 
 The full list, with what is still open, is in `docs/SECURITY.md`.
 
@@ -216,25 +208,25 @@ The full list, with what is still open, is in `docs/SECURITY.md`.
 
 | # | Limitation | Where |
 | --- | --- | --- |
-| 1 | the new version is attributed to the **service account**, not the user | `docs/SEAFILE-INTEGRATION-POINTS.md` §Q4 |
-| 2 | the conflict check has a one-round-trip race window | `docs/CONFLICTS.md` §2.1 |
+| 1 | user attribution is proposed by the local patch but not runtime-verified | `docs/reviews/GR-015/README.md` |
+| 2 | stock Seafile has no user-bound conditional save; patched C behavior is not built or tested | `docs/reviews/GR-015/README.md` |
 | 3 | **share links** are not covered by the hook | `docs/SEAFILE-INTEGRATION-POINTS.md` L7 |
 | 4 | the click in the Seafile file list is not driven by the automated test | `docs/reviews/GR-006/README.md` §5 |
 | 5 | the gateway runs on the owner's workstation for the proof | `docs/DEPLOYMENT.md` |
 | 5b | a **leave-page warning about unsaved edits** is impossible for VectorCraft without an upstream dirty signal; the editor itself keeps unsaved work in recovery copies in the browser | `docs/reviews/GR-012/README.md` §2 |
-| 6 | only `.pdf`, `.svg`, `.xlsx` and `.docx` are dispatched | `docs/FILE-DISPATCH.md` |
+| 6 | the local dispatcher draft lists `.pdf`, `.svg`, `.xlsx` and `.docx`; GridCraft/SVG save readiness is not verified | `docs/FILE-DISPATCH.md` |
 | 7 | the other ten Craft applications have no bridge; **VectorCraft is driven by its own page API instead** | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
 | 7b | VectorCraft's page API has **no dirty signal and no save event**; the host page polls `files()` with a content fingerprint | `docs/reviews/GR-012/README.md` §2 |
 | 7c | VectorCraft keeps at most **16** saved files in the page | upstream: `apps/vectorcraft-web/src/saved_files.rs` |
 | 8 | GridCraft's own bridge cannot report a failed save | `docs/HOST-CONTRACT.md` §3.5 |
-| 9 | no CSP, no CSRF check on the state-changing endpoints, no rate limit yet | `docs/SECURITY.md` §7 |
+| 9 | CSP and rate limiting are missing; origin enforcement is only locally tested, not verified behind the proxy | `docs/SECURITY.md` §7 |
 
 ## 11. The prepared upstream patches
 
 | Patch | Where | State |
 | --- | --- | --- |
-| the WordCraft `?host=parent` bridge | `docs/reviews/GR-014/DIFF.patch` (in this repository; the target is Apache-2.0) | compiles, builds, **runs in a browser** |
-| a write path in Seafile's third-party-editor hook | `~/Projects/seafile-thirdparty-save-patch/seahub.patch` (outside this repository; the target is GPLv2) | written, **not executed** against a running Seahub |
+| the WordCraft `?host=parent` bridge | `docs/reviews/GR-014/DIFF.patch` (in this repository; the target is Apache-2.0) | compiles and has a local browser harness; durable Seafile E2E not verified |
+| per-library routing and conditional save | `docs/reviews/GR-015/` | patch artifacts apply to exact source revisions; not built or executed against Seahub/fileserver |
 
 **Neither has been published.** No issue, no PR, no comment, no branch push, no
 RFC sent anywhere.

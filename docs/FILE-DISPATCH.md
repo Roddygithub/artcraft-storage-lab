@@ -1,6 +1,7 @@
 # File dispatch
 
-Status: **PROVISIONAL — FREE REVIEW PENDING** · GPT REVIEW: PENDING
+Status: **GPT-6.1 Sol FAIL** on candidate `afec19e`; this table is a local draft,
+not a verified production dispatcher.
 
 ## 0. The rule
 
@@ -31,7 +32,7 @@ The gateway uses the same rule (`server.py`: `filename.rsplit(".", 1)[-1].lower(
 
 ## 2. The table
 
-The **live** table, in `integration/config/dispatch.json`:
+The local prototype table, in `integration/config/dispatch.json`:
 
 | Extension | Craft application | The host URL |
 | --- | --- | --- |
@@ -39,13 +40,13 @@ The **live** table, in `integration/config/dispatch.json`:
 | `xlsx` | GridCraft | `/artcraft/gridcraft/?host=parent` |
 | `docx` | WordCraft | `/artcraft/wordcraft/?host=parent` |
 
-The **Seafile** side is configured separately, in
-`seahub_settings.py`:
+The live Seafile side is currently **not configured for ArtCraft**. A former
+global `.xlsx` mapping was removed, and ONLYOFFICE is unchanged. Per-library
+settings are only in the GR-015 patch.
 
 ```python
-THIRDPARTY_EDITOR_ACTION_URL_DICT = {
-    "xlsx": "http://127.0.0.1:8777/open/",
-}
+ARTCRAFT_REPO_IDS = ("<synthetic-library-id>",)
+ARTCRAFT_FILE_EXTENSIONS = ("docx",)
 ```
 
 Only the extensions that **exist in the Craft app's own web build** and that
@@ -55,7 +56,7 @@ bridge would load the application and then never receive the document.
 | Application | Has a bridge? | In the table? |
 | --- | --- | --- |
 | PdfCraft | **yes** | yes (`pdf`) |
-| GridCraft | **yes** | yes (`xlsx`) |
+| GridCraft | yes, but no durable save-result handling | draft entry only; not ready to route |
 | WordCraft | **yes, with our patch** (GR-014) | yes (`docx`) |
 | CADCraft | **yes** | not yet — the formats it owns are not in the table |
 | DeckCraft | no | no |
@@ -106,8 +107,9 @@ exists**, so no existing file changed behaviour, and the deployed ONLYOFFICE
 configuration was not touched. The production answer is the per-library
 `artcraft` office-suite id upstream (`docs/UPSTREAM-PLAN.md`).
 
-The `.docx` MVP was verified through the gateway's **direct** open, which does
-not go through the hook at all.
+The required `.docx` Seafile file-list click → WordCraft save/version/reopen
+workflow is **NOT VERIFIED**. The earlier direct-open/browser harness did not
+go through Seahub's file-list hook and is not an MVP proof.
 
 ## 5. What the dispatcher must never do
 

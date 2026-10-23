@@ -9,19 +9,20 @@ Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 ## Latest candidate result — 2026-10-23
 
 ```text
-Candidate: d9ef476e6fbcb04c9a9e23cfe235812167d1f27c
+Candidate: afec19e63a6a4faec8a94f93651363dbe007e526
 Reviewer: GPT-6.1 Sol
 Verdict: FAIL
-Report: docs/reviews/GPT-SOL-REREVIEW-D9EF476.md
-Prototype: restricted synthetic development only
+Report: docs/reviews/GPT-SOL-REREVIEW-AFEC19E.md
+Prototype: operator-only local investigation; Seafile MVP not ready
 Public deployment: NOT READY
 Upstream RFC/patch: NOT READY
 Upstream publication: LOCKED
 ```
 
-The failed candidate remains immutable. Luna has committed local remediation and
-recorded the audit in `docs/reviews/GPT-LUNA-AUDIT.md`. The current clean `main`
-tip is a new candidate awaiting a fresh Sol review; it is not deployed or pushed.
+The failed candidate remains immutable. Focused local remediation commits now
+exist after it, but the resulting candidate has not yet received a fresh Sol
+review and has not been deployed or pushed. Earlier failures remain in their
+separate reports.
 
 ## Queue
 
@@ -115,7 +116,7 @@ Decision/Files/Tests/Free review/Evidence/Known risks: (filled at freeze time)
 ### GR-005 — First host-integration technical proof
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); gateway simulation is not Seafile E2E
 Branch/SHA: (filled at freeze time)
 
 Requirements:  Smallest end-to-end proof: Seafile host -> Craft Web -> open ->
@@ -163,7 +164,7 @@ Known risks:    The real Seafile Web click/close/save flow is NOT VERIFIED;
 ### GR-007 — Save protocol
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); overlapping saves produced a false clean state
 Branch/SHA: (filled at freeze time)
 
 Requirements:  Exact save semantics: dirty state -> serialization -> host
@@ -203,7 +204,7 @@ Known risks:    External-writer concurrency is NOT VERIFIED until an upstream
 ### GR-009 — Web integration security
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); capability scope, origin isolation and resource controls
 Branch/SHA: (filled at freeze time)
 
 Requirements:  XSS, CSRF, CSP, iframe sandbox, postMessage origin validation,
@@ -225,8 +226,11 @@ Known risks:    CSP, a CSRF check on the state-changing endpoints, and a rate
 
 ### GR-010 — GridCraft Seafile integration
 
+Status: **GPT REVIEW FAIL** — durable save acknowledgement and semantic reopen
+are not established. See `docs/reviews/GR-010/README.md`.
+
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); bridge lacks durable save acknowledgement
 Branch/SHA: (filled at freeze time)
 
 Requirements:  .xlsx open/edit/save/reopen/conflict via GridCraft Web.
@@ -236,7 +240,7 @@ Decision/Files/Tests/Free review/Evidence/Known risks: (filled at freeze time)
 ### GR-011 — DeckCraft Seafile integration
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     NOT IMPLEMENTED — deferred for the upstream DeckCraft host-bridge capability gap
 Branch/SHA: (filled at freeze time)
 
 Requirements:  .pptx open/edit slide/save/reopen via DeckCraft Web.
@@ -245,8 +249,12 @@ Decision/Files/Tests/Free review/Evidence/Known risks: (filled at freeze time)
 
 ### GR-012 — Non-office Craft integration
 
+Status: **GPT REVIEW FAIL** — the historical SVG run did not prove the intended
+stroke after editor reopen. Revised local assertions are present; Seafile E2E is
+not verified. See `docs/reviews/GR-012/README.md`.
+
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); Seafile persistence and dirty/commit acknowledgement remain unverified
 Branch/SHA: (filled at freeze time)
 
 Requirements:  .pdf via PdfCraft Web and .svg via VectorCraft Web, proving the
@@ -257,12 +265,12 @@ Decision/Files/Tests/Free review/Evidence/Known risks: (filled at freeze time)
 ### GR-013 — ArtCraft upstream RFC
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); stale E2E and credential claims must be corrected
 Branch/SHA: (filled at freeze time)
 
-Requirements:  An RFC titled around "Reusable ArtCraft Web host integration for
-               embedded editors, validated end-to-end with Seafile", with the
-               mission's required sections. NOT PUBLISHED.
+Requirements:  A reusable ArtCraft Web host-integration RFC with the mission's
+               required sections. Do not claim Seafile end-to-end validation
+               until the required live acceptance flow is proven. NOT PUBLISHED.
 Decision:       One shared crate in craft-libs; the message vocabulary three apps
                already use; the ticket and the saveResult answer added; a
                four-step rollout that changes nothing for a person using the app.
@@ -276,7 +284,7 @@ Known risks:    The maintainers may prefer a different home than craft-libs.
 ### GR-014 — First ArtCraft upstream patch
 
 ```text
-Status:     GPT REVIEW PENDING
+Status:     GPT REVIEW FAIL (Sol); packaging/provenance and runtime evidence incomplete
 Branch/SHA: (filled at freeze time)
 
 Requirements:  The smallest justified upstream contribution (e.g. a common host

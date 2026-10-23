@@ -58,9 +58,10 @@ the project.
 
 ### Status
 
-> **PROVISIONAL — FREE REVIEW PENDING.** The licences are now **verified** for
-> every `storytold/*` repository (see the table). What is *not* verified is the
-> upstream contribution's acceptance (L-3).
+> **GPT-6.1 Sol FAIL** on candidate `afec19e`. GR-015 now has an artifact-level
+> provenance/notice inventory in `docs/reviews/GR-015/THIRD-PARTY-NOTICES.md`.
+> Distribution compatibility and acceptance under the upstream contribution
+> process remain **NOT VERIFIED**; upstream publication stays locked.
 
 ## 3. What we will never do
 

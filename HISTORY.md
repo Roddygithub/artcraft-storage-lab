@@ -1,5 +1,43 @@
 # HISTORY
 
+## 2026-10-23 — Sol final re-review and focused remediation (local only)
+
+* GPT-6.1 Sol reviewed exact candidate
+  `afec19e63a6a4faec8a94f93651363dbe007e526` and returned **FAIL**. The full
+  findings are preserved in `docs/reviews/GPT-SOL-REREVIEW-AFEC19E.md`; the
+  previous `d9ef476e` FAIL remains unchanged.
+* The confirmed overlapping-save defect now rejects a second host save while
+  another is in flight. The Chromium protocol test proves the first save's
+  acknowledgement cannot clear the later dirty revision; retry succeeds after
+  the first save completes.
+* Gateway save errors no longer expose arbitrary upstream bodies, and document
+  downloads are bounded while reading. Unit tests cover a malformed HTTP-200
+  page echoing the capability URL and an oversized content response.
+* `POST /open/` now accepts a foreign Origin only when it matches configured
+  `ARTCRAFT_SEAFILE_ORIGIN`; session mutations remain gateway-origin-only. The
+  deployment docs now require Seahub and ArtCraft to be separate origins.
+* GR-015 draft patches now scope save capabilities to the ArtCraft audience,
+  original edit grant, repo allowlist and extension. Seahub uses a distinct
+  `conditional-update-api` route exposed only by the proposed C patch; stock/Go
+  route absence and source patches are checked, but binaries are not built or
+  runtime-tested.
+* SVG/XLSX evidence was corrected. The old GR-010/GR-012 PASS claims are marked
+  superseded; the XLSX fixture now has a real `<f>` formula element. The local
+  VectorCraft web bundle edited and reopened the expected pencil stroke in a
+  browser (270 → 609 bytes); this is local editor evidence, not Seafile E2E.
+* Reproduced local checks: `tests/test_gateway_unit.py`,
+  `tests/test_hostpage_protocol.py`, `tests/test_gr015_authorization.py`,
+  `tests/test_wordcraft_host_roundtrip.py`, `tests/test_gr012_svg_assertions.py`,
+  `tests/test_vectorcraft_svg_local.py`, `tests/test_xlsx_fixture.py`, Python
+  compilation, and both patch-application checks pass. `git diff --check` exits 2
+  because the generated server patch contains one unified-diff context line
+  flagged as trailing whitespace; patch applicability passes.
+  `tests/test_integration.py` was not run because no Seafile URL/token, editor
+  capability, or isolated patched Seafile deployment is available in the shell.
+* No production Seafile, Proxmox service, ONLYOFFICE, or upstream repository was
+  modified. Public deployment and upstream publication remain locked. A fresh
+  Sol review is required on the new exact candidate SHA.
+
 ## 2026-10-22 — GPT-6.1 Sol remediation (local only)
 
 The unauthenticated direct `/open` route was closed. Token sessions are writable

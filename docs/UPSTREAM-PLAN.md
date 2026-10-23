@@ -6,7 +6,7 @@ holds: nothing goes to `storytold/*` or to Seafile before `GPT REVIEW PASS`.
 | Contribution | Target | Licence of the target | Where the patch lives |
 | --- | --- | --- | --- |
 | the Craft Web host bridge | `storytold/wordcraft` (+ the other apps) | MIT OR Apache-2.0 | **in this repository**: `docs/reviews/GR-014/DIFF.patch` |
-| a write path in the third-party-editor hook | `haiwen/seahub` | **verify at target revision** (inspected Seahub `c01d46bc` is Apache-2.0) | **outside this repository** |
+| per-library dispatch and conditional-save route | `haiwen/seahub` + `haiwen/seafile-server` | **verify at target revision** | **in this repository**: `docs/reviews/GR-015/` |
 
 The split is a repository-boundary and maintenance constraint: this repository
 does not copy or vendor Seafile/Seahub code. The exact target licence must be
@@ -17,7 +17,8 @@ verified at the revision selected for any upstream contribution
 
 ## 1. ArtCraft — the host bridge
 
-**Ready.** `docs/reviews/GR-014/` holds the README and the diff.
+**Not ready for upstream.** Sol found incomplete runtime evidence, semantic
+reopen proof, and licensing/provenance packaging. Keep publication locked.
 
 * Target: `storytold/wordcraft`, branch `main` at
   `00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d`.
@@ -26,9 +27,9 @@ verified at the revision selected for any upstream contribution
   already have, plus the **save confirmation** they are missing.
 * What it reuses: `crates/ui-egui/src/async_saves.rs` — the ticket mechanism the
   suite already has.
-* Verified: it compiles for `wasm32-unknown-unknown`, it builds with Trunk, and it
-  runs in a real browser where a real Seafile document was edited and saved back
-  (`docs/reviews/GR-006/`).
+* Verified: the patch compiles and has a local WordCraft browser harness with
+  synthetic storage. The real Seafile DOCX edit/save/version/close/reopen flow is
+  **NOT VERIFIED** (`docs/reviews/GPT-SOL-REREVIEW-AFEC19E.md`).
 
 ### 1.1 The follow-ups, in order
 

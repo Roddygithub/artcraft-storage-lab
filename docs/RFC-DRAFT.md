@@ -2,8 +2,8 @@
 
 Status: **DRAFT — NOT PUBLISHED** (the upstream hard gate: no RFC, issue or PR in
 `storytold/*` before `GPT REVIEW PASS`)
-Angle: **Reusable ArtCraft Web host integration for embedded editors, validated
-end-to-end with Seafile.**
+Angle: **Reusable ArtCraft Web host integration for embedded editors.** Seafile
+end-to-end validation is not yet complete; the mandatory DOCX flow is NOT VERIFIED.
 
 ## Problem
 
