@@ -51,8 +51,28 @@ used Seahub and gateway/Craft on separate loopback ports, saved a real WordCraft
 edit, reloaded the file route, and verified the saved DOCX content from Seafile.
 Production TLS/proxy/CSP/CSRF and adversarial-frame isolation remain unverified.
 ONLYOFFICE regression, permission revocation, read-only bypass, stock/Go
-fileserver rejection, and GridCraft/VectorCraft E2E remain open. Production
+fileserver rejection, and VectorCraft E2E remain open. GridCraft now has a
+separate synthetic Seafile runtime result, documented below. Production
 services were not changed; upstream is still locked.
+
+### GridCraft synthetic Seafile runtime update — 2026-10-23
+
+On repository revision `e6c559e7d7ea6e207f9d539f996eade4f1dc6334`, a real
+Seahub click opened the patched GridCraft Web/WASM app in the isolated
+synthetic Seafile stack. A3 was edited to `GridCraftSeafileRoundTrip`, Ctrl+S
+received a committed file/head acknowledgement, Seafile readback returned a
+valid changed XLSX, and a fresh Seahub click/reopen rendered the edited cell.
+Exact hashes, screenshots, and limits are in
+`docs/reviews/GR-010/GRIDCRAFT-SEAFILE-E2E-20261023.md`. The history-list API
+was not independently verified in that run (the browser request returned 403);
+the host's committed-head acknowledgement and Seafile readback were verified.
+
+The XLSX fixture was missing `xl/styles.xml`, which made GridCraft show a
+warning. The generator/check now include a minimal styles part. The corrected
+fixture opened in a new GridCraft session without that warning, but its
+edit/save/reopen cycle has not yet been repeated. Formula recalculation,
+GridCraft concurrency and the other Craft apps remain open. This runtime
+result does not change the old Sol FAIL or authorize upstream publication.
 
 Nemotron independently reviewed SHA `a4ecc8e1d0da44a12f7bd9c4e529ed4accdb4a0e`
 and returned FAIL for candidate readiness, chiefly because ONLYOFFICE
@@ -272,11 +292,11 @@ The full list, with what is still open, is in `docs/SECURITY.md`.
 | 4 | the synthetic file-list click and DOCX save/reopen are reproduced in the isolated test; the production instance still routes to ONLYOFFICE | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
 | 5 | the gateway ran in the isolated local container for the proof; no production deployment was made | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
 | 5b | a **leave-page warning about unsaved edits** is impossible for VectorCraft without an upstream dirty signal; the editor itself keeps unsaved work in recovery copies in the browser | `docs/reviews/GR-012/README.md` §2 |
-| 6 | the local dispatcher draft lists `.pdf`, `.svg`, `.xlsx` and `.docx`; GridCraft/SVG save readiness is not verified | `docs/FILE-DISPATCH.md` |
-| 7 | the other ten Craft applications have no bridge; **VectorCraft is driven by its own page API instead** | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
+| 6 | GridCraft `.xlsx` save/reopen is reproduced in the synthetic stack; formula recalculation/conflicts remain open. VectorCraft SVG still needs its own reviewed round-trip evidence. | GR-010 and GR-012 bundles |
+| 7 | The inspected upstream baseline still lacks host integration in most Craft apps; local WordCraft/GridCraft patches do not complete the all-app contract. **VectorCraft is driven by its own page API.** | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
 | 7b | VectorCraft's page API has **no dirty signal and no save event**; the host page polls `files()` with a content fingerprint | `docs/reviews/GR-012/README.md` §2 |
 | 7c | VectorCraft keeps at most **16** saved files in the page | upstream: `apps/vectorcraft-web/src/saved_files.rs` |
-| 8 | GridCraft's own bridge cannot report a failed save | `docs/HOST-CONTRACT.md` §3.5 |
+| 8 | GridCraft's upstream baseline cannot report a failed save; the local GR-010 ticketed patch addresses it and has an isolated runtime save/reopen proof | `docs/HOST-CONTRACT.md` §3.5 |
 | 9 | CSP and rate limiting are missing; origin enforcement is only locally tested, not verified behind the proxy | `docs/SECURITY.md` §7 |
 
 ## 11. The prepared upstream patches

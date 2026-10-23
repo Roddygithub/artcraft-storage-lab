@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-015 — per-library routing + user-bound conditional save (local draft)
+CURRENT GR: GR-010 — GridCraft runtime round-trip follow-up; GR-015 supplies the local Seafile conditional-save stack
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -41,14 +41,18 @@ VERIFIED IN LOCAL REMEDIATION:
   route load/readback preserved it. A subsequent fresh gateway session reported
   `Saved — new version`, `dirty=false`, `confirmedSave=true`; a later Seafile
   content readback contained `AckConfirmed`. Synthetic Seahub config was restored.
+- GR-010 now has a real GridCraft Web/WASM → isolated Seafile save → new
+  committed head acknowledgement → Seahub click/reopen reproduction for a
+  synthetic XLSX; the reopened editor showed the saved cell value. Exact hashes,
+  screenshot and limitations: `docs/reviews/GR-010/GRIDCRAFT-SEAFILE-E2E-20261023.md`.
 
 OPEN GAPS:
 - ONLYOFFICE edit/save/version/reopen regression remains NOT VERIFIED; this is
   a non-regression check, not a change to the ArtCraft target
 - GridCraft's ticketed acknowledgement patch received an independent narrow
-  review PASS with three minor follow-ups; its real-browser smoke used synthetic
-  parent/storage. GridCraft→Seafile persistence and XLSX semantic reopen remain
-  NOT VERIFIED (`docs/reviews/GR-010/GRIDCRAFT-ACK-REVIEW-20261023.md`)
+  review PASS with three minor follow-ups. Its Seafile runtime path is now
+  reproduced in the isolated synthetic stack; formula recalculation, GridCraft
+  conflict behavior, and deployment security remain NOT VERIFIED.
 - VectorCraft Seafile semantic reopen is not verified
 - the first E2E browser run used a same-origin proxy; a separate-origin loopback
   follow-up now verifies the handoff and durable save, but production TLS,
@@ -57,9 +61,13 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- the patched Seahub view now passes an isolated dispatch guard: ArtCraft for
-  the allowlisted DOCX and the ONLYOFFICE template for a non-allowlisted DOCX;
-  actual Document Server edit/save/version/reopen is still open
+- continue from the GridCraft runtime result by checking formula behavior and
+  failure cases, then complete the app-by-app Web bridge/save capability matrix;
+  the target remains one platform adapter and one common host contract serving
+  all ArtCraft Web editors, not a GridCraft-only feature
+- preserve the existing file-type dispatch behavior for out-of-scope libraries;
+  that is a compatibility guard, while the product work remains the ArtCraft
+  editor integration
 - a Django runtime save-route test rejects read-only and revoked cached edit
   capabilities before update-token minting/fileserver access; its Seafile RPC
   permission result is synthetic, so live revocation propagation is not verified
@@ -94,7 +102,7 @@ NEXT:
 | GR-007 | Save protocol | `docs/SAVE-PROTOCOL.md` | PASS (REVIEW-03) | PENDING |
 | GR-008 | Data integrity and conflicts | `docs/CONFLICTS.md` + `docs/reviews/GR-008/` | remediation required | FAIL (Sol) |
 | GR-009 | Web integration security | `docs/SECURITY.md` | remediation required | FAIL (Sol) |
-| GR-010 | GridCraft Seafile integration | `docs/reviews/GR-010/README.md` | narrow bridge patch PASS (Nemotron; 3 minor follow-ups); Seafile E2E NOT VERIFIED | FAIL on 0edbe52 |
+| GR-010 | GridCraft Seafile integration | `docs/reviews/GR-010/README.md` | synthetic Seafile edit/save/version-ack/reopen reproduced; formula recalculation and conflict cases open | FAIL on 0edbe52 |
 | GR-011 | DeckCraft Seafile integration | — (needs the upstream bridge) | not started | PENDING |
 | GR-012 | Non-office Craft integration | `docs/reviews/GR-012/` | PASS (remediated, REVIEW-04) | PENDING |
 | GR-013 | ArtCraft upstream RFC | `docs/RFC-DRAFT.md` | PASS (REVIEW-03) | PENDING |

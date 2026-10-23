@@ -1,6 +1,6 @@
 # The Craft Web Host Contract
 
-Status: **PROVISIONAL — FREE REVIEW PENDING** · GPT REVIEW: PENDING
+Status: **PROVISIONAL — local proposal** · GPT REVIEW: FAIL on the frozen `0edbe524` candidate; current remediation tip is not frozen or reviewed
 Owner: artcraft-owner · Architecture input: artcraft-architect (GR-003) ·
 Feasibility: artcraft-owner · Independent review: artcraft-reviewer (pending)
 
@@ -148,7 +148,7 @@ CRAFT -> HOST
 | R6 | The Craft app reports `dirty`; it never decides that a save succeeded | the host owns persistence |
 | R7 | The Craft app reports `failed` when it cannot start | the host must be able to show the error |
 | R8 | The host must be able to detect **stale** documents | the contract carries the document name; the *version* is the host's business (GR-008) |
-| R9 | **The host tells the Craft app whether the save succeeded** | the Craft app must not believe a save succeeded when the host refused it (§3.5). Not implemented upstream yet (§3.7) — until it is, the host keeps its own "not persisted" state. |
+| R9 | **The host tells the Craft app whether the save succeeded** | the Craft app must not believe a save succeeded when the host refused it (§3.5). Ticketed local patches now implement this for WordCraft and GridCraft, with isolated synthetic Seafile runtime evidence; the shared behavior is not adopted upstream (§3.7). |
 
 ### 2.2 Deliberately **not** in the contract
 
@@ -285,7 +285,7 @@ they need.
 | --- | --- | --- | --- |
 | **WordCraft** | `Services::download` + `Services::async_saves` | `Fn(&str, &[u8]) -> Result<(), String>` | **Yes, and asynchronously.** The host calls `AsyncSaves::start()` to get a ticket, and later `AsyncSaves::finish(ticket, Saved \| Cancelled \| Failed(error))`. On `Failed` the app sets `session.dirty = true` again and shows *"Couldn't download {name}: {error}"*. |
 | **PdfCraft** | `Services::host_save` (`HostSaveFn`) | `Fn(&str, &[u8], bool) -> Result<(), String>` | **Yes, but synchronously.** On `Err` the app does not mark the document saved and shows the error. |
-| **GridCraft upstream baseline** | `Services::download` | `Fn(&str, &[u8])` — **no `Result`** | **No.** Upstream at the inspected revision marks the workbook saved optimistically. A prepared patch in `docs/reviews/GR-010/` adds a ticketed host result and exact-snapshot dirty handling; synthetic-browser evidence does not prove Seafile persistence. |
+| **GridCraft upstream baseline** | `Services::download` | `Fn(&str, &[u8])` — **no `Result`** | **No.** Upstream at the inspected revision marks the workbook saved optimistically. The local GR-010 patch adds ticketed exact-snapshot dirty handling and has an isolated synthetic Seafile save/reopen proof; formula recalculation, conflicts and upstream adoption remain open. |
 
 Sources:
 
@@ -314,7 +314,7 @@ That is good news, and it changes the shape of the upstream proposal:
 * The existing five-message vocabulary is **not sufficient on its own** to
   guarantee it: it has no message for the save outcome.
 
-### 3.7 The proposed extension to the contract (PROPOSED — not implemented upstream)
+### 3.7 The save-result extension (local patches; not adopted upstream)
 
 ```text
 HOST  -> CRAFT
@@ -331,9 +331,11 @@ remote write and needs an asynchronous outcome; for GridCraft the prepared
 GR-010 patch uses a ticketed `saveResult` and records the exact workbook snapshot
 without changing the callback into a synchronous `Result`.
 
-> This extension is **our proposal**. WordCraft's bridge patch (GR-014) and the
-> prepared GridCraft patch (GR-010) implement parts of it locally; neither is
-> upstreamed, and the broader suite has not adopted one shared implementation.
+> This extension remains a proposal for a shared upstream contract. WordCraft's
+> bridge patch (GR-014) and the GridCraft ticketed patch (GR-010) implement it
+> locally. Real-browser saves and fresh editor reopens were reproduced against
+> the isolated synthetic Seafile stack for both apps; neither patch is
+> upstreamed and the broader suite has not adopted one shared implementation.
 
 Until it exists, the host page must keep **its own** "not persisted" state and
 warn on close, because a GridCraft-style app will believe the document is
@@ -345,9 +347,9 @@ saved. **The integration layer must never pretend a save succeeded.**
 
 | App | `?host=parent` bridge | The save hook it has | What is needed |
 | --- | --- | --- | --- |
-| gridcraft | **yes** | upstream baseline: `download: Fn(&str, &[u8])`; prepared GR-010 patch adds ticketed `saveResult` and snapshot tracking | patch exists locally; runtime Seafile save and semantic reopen remain unverified |
+| gridcraft | **yes** | upstream baseline: `download: Fn(&str, &[u8])`; local GR-010 patch adds ticketed `saveResult` and snapshot tracking | synthetic Seafile save acknowledgement and fresh editor reopen reproduced; formula recalculation and GridCraft conflict behavior remain open |
 | pdfcraft | **yes** | `host_save: Fn(&str, &[u8], bool) -> Result<(), String>` — synchronous | reference for the save-failure part; would need to become asynchronous to match WordCraft |
-| wordcraft | no | `download: Fn(...) -> Result<(), String>` **+ `async_saves`** | **the MVP blocker** — port the bridge, and wire `AsyncSaves::start`/`finish` to the save outcome |
+| wordcraft | upstream baseline: no | `download: Fn(...) -> Result<(), String>` **+ `async_saves`** | local GR-014 bridge patch and isolated synthetic Seafile edit/save/version/reopen are reproduced; upstream adoption and broader failure/security coverage remain open |
 | deckcraft | no | not surveyed in detail | port the bridge |
 | vectorcraft | no | has a *different* mechanism (`window.vectorcraft`, a promise API) — see §6 | decide whether to port the bridge or adapt the page API |
 | designcraft | no | `download` present, `open_async` present, no `async_saves` | port the bridge; check the save hook's signature |

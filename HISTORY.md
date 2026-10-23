@@ -1,5 +1,24 @@
 # HISTORY
 
+## 2026-10-23 — GridCraft saves and reopens through synthetic Seafile
+
+* Reproduced a real Seahub file-list click → patched GridCraft Web/WASM edit →
+  Ctrl+S → Seafile committed-head acknowledgement → fresh Seahub click/reopen
+  in the isolated synthetic stack. The reopened editor displayed the saved A3
+  marker; Seafile readback was a valid XLSX containing that marker and the B3
+  formula plus cached value. Full hashes, screenshot and limits are recorded
+  in `docs/reviews/GR-010/GRIDCRAFT-SEAFILE-E2E-20261023.md`.
+* The XLSX fixture used for that run was missing `xl/styles.xml`, which caused
+  a real GridCraft warning. Added a minimal styles part, its workbook
+  relationship/content type, and assertions to the fixture check. That new
+  fixture was then opened from the Seahub list in a fresh GridCraft session;
+  it loaded without the warning. The edited save/reopen sequence has not yet
+  been repeated with this corrected fixture.
+* This advances GR-010 runtime evidence only. Formula recalculation, GridCraft
+  conflict/failure cases, remaining Craft apps, other storage platforms,
+  public deployment, and the prior GPT Sol FAIL remain open. Production
+  Seafile and upstream repositories were not changed.
+
 ## 2026-10-23 — clarified the multi-platform, all-Craft target
 
 * Documented the target as Seafile/Nextcloud/ownCloud adapters feeding one

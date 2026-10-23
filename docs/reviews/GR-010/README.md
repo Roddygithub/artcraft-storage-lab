@@ -1,19 +1,24 @@
 # GR-010 — GridCraft: an `.xlsx` round-trips
 
-Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; historical free-model PASS is
-provisional and its E2E claim is not accepted. GridCraft durable save is not
-verified against Seafile. A source patch now adds a ticketed host acknowledgement;
-runtime integration and semantic reopen remain unverified.
+Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; the failure remains in force.
+The patched GridCraft Web build has now completed a synthetic local Seafile
+click/edit/save/version-ack/reopen run. It is runtime evidence for this path,
+not final GPT approval, full GR-010 completion, or verification of all Craft
+apps/platforms.
 Independent review of the ticketed acknowledgement patch: **PASS** for the
 narrow bridge change, with three minor follow-ups; see
-`GRIDCRAFT-ACK-REVIEW-20261023.md`. This does not verify GridCraft→Seafile
-persistence or complete GR-010.
-Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` ·
-`/artcraft-lab/synthetic.xlsx` (synthetic) · GridCraft 0.10.0 web build
+`GRIDCRAFT-ACK-REVIEW-20261023.md`. That review is narrow and does not complete
+GR-010 by itself. Runtime evidence and limits:
+`GRIDCRAFT-SEAFILE-E2E-20261023.md`.
+An independent review of this fixture/runtime-evidence update also returned
+**PASS** with no blocker or major finding; its history API and full-suite limits
+are recorded in `GRIDCRAFT-EVIDENCE-REVIEW-20261023.md`.
+Date: 2026-10-23 · Isolated synthetic library · `synthetic.xlsx` · GridCraft
+0.10.0 web build from the pinned patched source
 
 ## 0. The verdict
 
-> Historical claim, rejected by independent GPT review: this bundle does not
+> Original claim, rejected by independent GPT review: this bundle did not
 > prove a durable GridCraft save or semantic editor reopen. Its host simulation
 > accepts emitted bytes independently of GridCraft's save result.
 
@@ -70,7 +75,11 @@ acknowledgement. The serialized XLSX was a valid ZIP package and contained the
 actual cell edit (`A3` changed from `sum` to `Bk`). The test parent/storage were
 synthetic: this did **not** call Seafile, create a Seafile version, or prove
 formula recalculation/reopen semantics. The fixture needed a minimal styles
-part for GridCraft to parse; that change was made only in the temporary harness.
+part for GridCraft to parse; the committed fixture generator now emits that
+minimal styles part. A fresh Seahub click opened the regenerated fixture in
+GridCraft without a missing-styles warning; see
+`gridcraft-styled-fixture-open.png`. The corrected fixture has not yet repeated
+the edit/save/reopen sequence.
 
 Commands/checks run against the pinned patched source checkout:
 
@@ -139,27 +148,38 @@ not an E2E result.
 Screenshot: `docs/reviews/GR-005/browser-proof.png` — GridCraft with its ribbon,
 the edited cell, and the host page's `Saved — new version …` line.
 
-## 4. What is covered, and what is not
+## 4. Seafile runtime round-trip
+
+The earlier evidence below is historical and simulated. A subsequent run used
+the actual Seahub file list, patched local Seafile fileserver, gateway and real
+GridCraft Web/WASM, then saved and reopened the synthetic workbook through a new
+Seahub click. The editor showed the saved edit, and the fetched XLSX bytes
+contained it. See `GRIDCRAFT-SEAFILE-E2E-20261023.md` and
+`gridcraft-seafile-reopen.png` for captured details and limits. This was a
+local synthetic stack, not production Seafile. Formula recalculation, GridCraft
+concurrency, deployment security, and other Craft apps remain unverified.
+
+## 5. What is covered, and what is not
 
 | Test-matrix row | State |
 | --- | --- |
-| 3.1 open an `.xlsx` inline | **SIMULATED** in the browser harness; Seafile route not verified |
-| 3.2 edit a cell value | **SIMULATED** in the browser harness |
+| 3.1 open an `.xlsx` inline | **REPRODUCED** in isolated synthetic Seafile; real Seahub click opened GridCraft Web |
+| 3.2 edit a cell value | **REPRODUCED** in GridCraft Web; saved cell displayed after a fresh Seahub click/reopen |
 | 3.3 edit a formula | not yet exercised |
 | 3.4 minimal formatting | not yet exercised |
-| 3.5 save → a new Seafile version | **NOT VERIFIED**; source patch adds ticketed durable acknowledgement, but the patched bridge has not run through a Seafile save |
-| 3.6 reopen, values and formulas preserved | **NOT VERIFIED**; earlier assertion inspected backend bytes, not a reopened editor |
+| 3.5 save → a new Seafile version | **PARTIALLY REPRODUCED** in isolated synthetic Seafile; patched route returned a committed head/file ID and host acknowledged the version, but the history-list increment was not independently queried |
+| 3.6 reopen, values and formulas preserved | **PARTIALLY REPRODUCED**; fresh GridCraft session displayed the edit; formula XML/cached value survived, but recalculation after input change is unverified |
 | 3.7 concurrent edit → conflict, no silent overwrite | **SIMULATED** by the gateway's fake compare-and-swap test |
 | 2.4 a double save | **NOT VERIFIED** against Seafile; identical-content shortcut is not evidence of a committed version |
 | 2.12 an unsupported format | **PASS** for the gateway extension lookup unit check only |
 
 The patch is recorded in `gridcraft-0.10.0-durable-save-ack.patch`, targeting
 GridCraft `06920de8da609c19de7446945cfc62b844691efd`. It corrects the bridge's
-early-clean behavior at source level. The E2E evidence above is historical and
-does not exercise this patched bridge. Formula recalculation, a durable
-acknowledgement tied to an actual Seafile commit, Seafile version creation, and
-GridCraft editor reopen must still be tested before GR-010 can claim a
-round-trip.
+early-clean behavior at source level. The isolated Seafile runtime E2E now
+exercises this patched bridge through a durable acknowledgement and fresh
+editor reopen. Formula recalculation, GridCraft conflict behavior, deployment
+hardening and the broader Craft/platform scope remain open before release or
+GPT PASS.
 
 The independent review found no blocker or major issue in this narrow patch.
 It flagged pending-ticket cleanup if a host disappears, the lack of protocol
@@ -168,7 +188,7 @@ These are recorded as minor follow-ups; an old host fails safely by leaving the
 workbook dirty. None changes the unverified Seafile persistence/reopen status or
 the prior GPT FAIL.
 
-## 5. What GR-010 adds beyond GR-005
+## 6. What GR-010 adds beyond GR-005
 
 Nothing new was built for this GR: the `.xlsx` path **is** the first technical
 proof. This bundle exists so that the GR tracker names the format, and so that
@@ -179,11 +199,25 @@ the two are distinguishable when someone reads the queue:
 * **GR-010** is about the *format*: an Office spreadsheet, round-tripped, with the
   conflict behaviour that Office documents actually need.
 
-## 6. The follow-ups
+## 7. The follow-ups
 
 | # | Item | Where |
 | --- | --- | --- |
-| 1 | GridCraft's bridge cannot report a failed save | upstream A-3 (`docs/UPSTREAM-PLAN.md`) |
-| 2 | the shared host crate, so GridCraft's bridge is not its own copy | upstream A-1 |
-| 3 | a formula and a formatting round-trip | needs a deterministic surface in GridCraft's web build |
-| 4 | a concurrent edit driven from two real browsers | the HTTP test covers the conflict; the browser path does not |
+| 1 | Upstream GridCraft baseline still has optimistic save; local ticketed patch is not upstream | upstream A-3 (`docs/UPSTREAM-PLAN.md`) |
+| 2 | A shared Craft host crate/implementation is not upstream | upstream A-1 |
+| 3 | Recalculate a formula after editing an input and verify formatting round-trip | needs deterministic GridCraft Web interaction |
+| 4 | Exercise a GridCraft concurrent save conflict through real editor sessions and Seafile | current runtime conflict test is fake-CAS only |
+
+## 8. Independent evidence-review findings and disposition
+
+| Finding | Disposition |
+| --- | --- |
+| Browser history-list request returned HTTP 403; no version-count comparison was captured. | GR-010 rows 3.5 are marked `[~]`; committed-head acknowledgement plus changed persisted bytes are recorded, with the history-query limit explicit. |
+| Reviewer flagged styles XML indentation. | Checked `tests/fixtures/make_fixtures.py:125`; the entry has two leading spaces, matching adjacent entries. No correction was needed. |
+| Full `gridcraft-ui-egui` integration suite was blocked by disk quota. | Kept explicitly NOT VERIFIED at lines 93–96; the two affected integration targets passed individually. |
+
+The independent review returned PASS with no blocker or major finding. Its narrow
+scope does not complete GR-010 or the full all-Craft/multi-platform project.
+Formula recalculation, GridCraft conflicts, full integration-suite execution,
+and the history-list count remain open. Sol's prior FAIL and the upstream lock
+remain unchanged.

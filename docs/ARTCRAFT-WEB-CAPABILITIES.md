@@ -1,6 +1,6 @@
 # ArtCraft Web / WASM / host-bridge capability matrix
 
-Status: **PROVISIONAL — FREE REVIEW PASS** (remediated) · GPT REVIEW: PENDING
+Status: **PROVISIONAL — upstream capability inventory** · GPT REVIEW: FAIL on frozen candidate `0edbe524`; current remediation tip is not frozen or reviewed
 GR-003 · Inspected 2026-10-22 against the live `storytold/*` repositories on `main`
 
 ## 0. Evidence base
@@ -53,6 +53,10 @@ GR-003 · Inspected 2026-10-22 against the live `storytold/*` repositories on `m
 
 **Reading the table**
 
+The app rows describe the inspected upstream revisions, not every local patch.
+GR-010 and GR-014 add local bridges/save-result handling and have synthetic
+Seafile runtime evidence; those changes are not upstream releases.
+
 * **All 13 have a browser build.** Every one runs the *same* application as the desktop
   app, through eframe's web runner (wgpu: WebGPU where available, WebGL2 otherwise).
 * **3 of 13 have a host bridge today**: GridCraft, PdfCraft, CADCraft. All three use
@@ -91,9 +95,11 @@ evidence.
 * `gridcraft:ready` / `:open` / `:save` / `:dirty` / `:failed`.
 * The origin **and** the source window are checked on every incoming message; the
   outgoing `targetOrigin` is the page's own origin, never `"*"`.
-* **The save is optimistic**: `Services::download` has the type `Fn(&str, &[u8])` —
-  **no `Result`** — so a failed `postMessage` is only logged and the workbook is still
-  marked saved. This is the gap the common contract has to close.
+* **Upstream baseline save is optimistic**: `Services::download` has the type
+  `Fn(&str, &[u8])` — **no `Result`** — so a failed `postMessage` is only logged and
+  the workbook is still marked saved. The local GR-010 patch adds ticketed durable
+  acknowledgements and has an isolated synthetic Seafile edit/save/reopen runtime
+  proof; formula recalculation, conflicts and upstream adoption remain open.
 
 ### 2.3 pdfcraft — the reference for a save that can fail
 
@@ -182,8 +188,10 @@ From `packaging/web/README.md` (present in all 13):
 
 ## 6. The recommendation
 
-1. **WordCraft first.** It has the richest seam, it is the mandatory MVP, and the
-   bridge is a small, self-contained addition to one crate.
+1. **WordCraft is the MVP already exercised.** It has the richest seam, and the
+   local bridge has an isolated synthetic Seafile open/edit/save/reopen proof.
+   Continue app-by-app through the other Craft editors; this does not complete the
+   full suite.
 2. **The contract is the `?host=parent` bridge**, generalised from the three existing
    implementations, with **one addition**: the host must be able to tell the app
    how a save ended (`docs/HOST-CONTRACT.md` §3.7).

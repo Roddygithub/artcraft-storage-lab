@@ -238,8 +238,10 @@ Files:          docs/SAVE-PROTOCOL.md
 Tests:          the ticket loop is closed by the application's own log line
 Free review:    pending
 Evidence:       docs/reviews/GR-006/, docs/reviews/GR-005/
-Known risks:    GridCraft's bridge (not ours) cannot report a failed save; the
-                upstream patch has to fix that.
+Known risks:    Upstream GridCraft still has optimistic save semantics. The
+                local GR-010 patch adds ticketed save results and now has an
+                isolated synthetic Seafile save/reopen proof; formula
+                recalculation, conflict testing and upstream adoption remain.
 ```
 
 ### GR-008 — Data integrity and conflicts
@@ -287,17 +289,19 @@ Known risks:    CSP, a CSRF check on the state-changing endpoints, and a rate
 
 ### GR-010 — GridCraft Seafile integration
 
-Status: **GPT REVIEW FAIL** — a pinned-source bridge patch now waits for
-ticketed host save results, but GridCraft→Seafile persistence and semantic
-reopen remain NOT VERIFIED. The narrow bridge patch received an independent
-Nemotron PASS with three minor follow-ups; see
-`docs/reviews/GR-010/GRIDCRAFT-ACK-REVIEW-20261023.md`.
+Status: **GPT REVIEW FAIL** on the earlier candidate; the pinned-source bridge
+patch now has a reproduced GridCraft Web → isolated synthetic Seafile
+save/version acknowledgement → fresh editor reopen path. The narrow bridge
+patch received an independent Nemotron PASS with three minor follow-ups; the
+runtime evidence does not complete GR-010 or the all-Craft/multi-platform
+scope. See `docs/reviews/GR-010/README.md` and
+`docs/reviews/GR-010/GRIDCRAFT-SEAFILE-E2E-20261023.md`.
 
 ```text
-Status:     GPT REVIEW FAIL (Sol on 0edbe52); narrow bridge patch independently reviewed PASS, but runtime Seafile save/reopen remains unverified
+Status:     GPT REVIEW FAIL (Sol on 0edbe52); GridCraft runtime save/reopen now reproduced in synthetic Seafile, but formula recalculation, conflicts and broader app/platform coverage remain open
 Branch/SHA: (filled at freeze time)
 
-Requirements:  .xlsx open/edit/save/reopen/conflict via GridCraft Web.
+Requirements:  .xlsx open/edit/save/reopen/conflict via GridCraft Web; all Craft apps remain in the overall product scope.
 Decision/Files/Tests/Free review/Evidence/Known risks: (filled at freeze time)
 ```
 

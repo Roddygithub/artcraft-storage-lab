@@ -52,12 +52,12 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 
 | # | Test | Expected | Result |
 | --- | --- | --- | --- |
-| 3.1 | Open a synthetic XLSX from Seafile Web | GridCraft Web opens inline | [~] historical browser simulation; no current Seafile dispatch evidence |
-| 3.2 | Edit a cell value | value changes | [~] historical simulated editor run; not an accepted E2E result |
+| 3.1 | Open a synthetic XLSX from Seafile Web | GridCraft Web opens inline | [x] real Seahub file-list click in isolated synthetic Seafile opened GridCraft Web/WASM; see `docs/reviews/GR-010/GRIDCRAFT-SEAFILE-E2E-20261023.md` |
+| 3.2 | Edit a cell value | value changes | [x] real GridCraft edit; saved value appeared in a fresh GridCraft session after a Seahub click |
 | 3.3 | Edit a formula | formula recomputes | [ ] not yet exercised |
 | 3.4 | Minimal formatting | applied | [ ] not yet exercised |
-| 3.5 | Save | new Seafile version | [~] patched bridge waits for ticketed host result; real GridCraft browser smoke with synthetic parent confirms failure stays dirty and success clears it; no GridCraft→Seafile version E2E yet |
-| 3.6 | Reopen | values and formulas preserved | [ ] NOT VERIFIED; no GridCraft editor reopen or formula-semantic check after Seafile persistence |
+| 3.5 | Save | new Seafile version | [~] patched bridge received a committed head/file ID from isolated Seafile; host showed `Stored — new version`; readback bytes/hash recorded, but history-list count was not independently queried (browser API returned 403) |
+| 3.6 | Reopen | values and formulas preserved | [~] fresh GridCraft session displayed the saved A3 edit; valid XLSX retained the B3 formula and cached value, but recalculation after changing an input is NOT VERIFIED |
 | 3.7 | Concurrent edit | conflict, no silent overwrite | [~] fake-CAS unit test only; Seafile fileserver behavior is NOT VERIFIED |
 
 ## 4. PPTX — DeckCraft (GR-011)
