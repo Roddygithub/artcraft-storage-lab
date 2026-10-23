@@ -42,7 +42,7 @@ index 528f3f6..b985382 100644
 +                        expected_file_id == NULL, TRUE, gc_id, error) < 0) {
          ret = -1;
 diff --git a/server/upload-file.c b/server/upload-file.c
-index 5316c6e..82a54b2 100755
+index 5316c6e..f247aa3 100755
 --- a/server/upload-file.c
 +++ b/server/upload-file.c
 @@ -49,2 +49,3 @@ enum UploadError {
@@ -72,15 +72,33 @@ index 5316c6e..82a54b2 100755
 +            } else if (error->code == SEAF_ERR_CONCURRENT_UPLOAD) {
 +                error_code = ERROR_CONFLICT;
              }
-@@ -1793,2 +1802,3 @@ update_ajax_cb(evhtp_request_t *req, void *arg)
+@@ -1702,2 +1711,17 @@ format_update_json_ret (const char *filename, const char *file_id, gint64 size)
+ 
++static void
++conditional_update_api_cb(evhtp_request_t *req, void *arg)
++{
++    const char *head_id = evhtp_kv_find (req->uri->query, "head");
++    const char *expected_file_id = evhtp_kv_find (req->uri->query, "expected_file_id");
++
++    if (evhtp_request_get_method(req) != htp_method_OPTIONS &&
++        (!head_id || !*head_id || !expected_file_id || !*expected_file_id)) {
++        send_error_reply (req, EVHTP_RES_BADREQ,
++                          "Conditional update requires head and file id.\n");
++        return;
++    }
++    update_api_cb(req, arg);
++}
++
+ static void
+@@ -1793,2 +1817,3 @@ update_ajax_cb(evhtp_request_t *req, void *arg)
                                           head_id,
 +                                         NULL,
                                           mtime,
-@@ -2922,2 +2932,7 @@ upload_file_init (evhtp_t *htp, const char *http_temp_dir)
+@@ -2922,2 +2947,7 @@ upload_file_init (evhtp_t *htp, const char *http_temp_dir)
  
 +    /* ArtCraft uses this unique route so patched Seahub fails closed against
 +     * stock/Go fileservers that do not implement conditional saves. */
-+    cb = evhtp_set_regex_cb (htp, "^/conditional-update-api/.*", update_api_cb, NULL);
++    cb = evhtp_set_regex_cb (htp, "^/conditional-update-api/.*", conditional_update_api_cb, NULL);
 +    evhtp_set_hook(&cb->hooks, evhtp_hook_on_headers, upload_headers_cb, NULL);
 +
      cb = evhtp_set_regex_cb (htp, "^/update-blks-api/.*", update_blks_api_cb, NULL);

@@ -32,7 +32,8 @@ Office formats away from ONLYOFFICE globally.
    the dedicated `conditional-update-api` route; the proposed C fileserver maps
    this route to its conditional handler. The stock C and Go routers do not
    expose that route, so the request must fail with 404 before an unconditional
-   update can happen. The patch remains **unbuilt/uninstalled**; route behavior,
+   update can happen. The C handler also rejects requests missing either
+   precondition. The patch remains **unbuilt/uninstalled**; route behavior,
    proxy path preservation, and stale-save races need runtime tests.
 5. A successful response is returned only after the fileserver returns a new
    file id and Seahub reads back the committed repository head.
@@ -54,6 +55,7 @@ runtime test.
 | Exact deployed release sources checked out | PASS; SHAs above |
 | Gateway unit checks after the client-side changes | PASS; `python3 tests/test_gateway_unit.py` |
 | Exact-source patch application | PASS for both patches against clean recorded base SHAs; source tree diff matches the patch artifact |
+| License/provenance inventory | PASS for exact source SHAs and license-file references; legal compatibility/distribution is **NOT VERIFIED** (`THIRD-PARTY-NOTICES.md`) |
 | Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness, including capability audience/grant/allowlist and dedicated route checks; Django/Seafile runtime is **NOT VERIFIED** |
 | Seafile Server C build | **NOT VERIFIED**; the attempted isolated configure failed on missing `libargon2`; the live server was not touched |
 | Seahub deployment/import test | **NOT RUN** |

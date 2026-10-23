@@ -179,7 +179,10 @@ assert "update-api" not in route_constants
 server_source = Path(server_root)
 patched_c = (server_source / "server/upload-file.c").read_text(encoding="utf-8")
 go_router = (server_source / "fileserver/fileserver.go").read_text(encoding="utf-8")
-assert '"^/conditional-update-api/.*"' in patched_c
+assert '"^/conditional-update-api/.*", conditional_update_api_cb' in patched_c
+wrapper = patched_c.split("conditional_update_api_cb(evhtp_request_t *req, void *arg)", 1)[1]
+assert "!head_id || !*head_id || !expected_file_id || !*expected_file_id" in wrapper
+assert "update_api_cb(req, arg);" in wrapper
 assert '"/conditional-update-api/{.*}"' not in go_router
 
 print("PASS: current read permission is checked on each request")
