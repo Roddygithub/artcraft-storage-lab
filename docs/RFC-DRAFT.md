@@ -123,12 +123,12 @@ crates.
 HOST  -> CRAFT
 
   <app>:open        { name, bytes }        open this document
-  <app>:saveResult  { ticket, ok, error }  how the host's write ended
+  <app>:saveResult  { ticket: "...", ok, error }  how the host's write ended
 
 CRAFT -> HOST
 
   <app>:ready       { version }            the app is listening
-  <app>:save        { name, bytes, ticket }  the app wants the bytes stored
+  <app>:save        { name, bytes, ticket: "..." }  the app wants the bytes stored
   <app>:openRequest { purpose }            File > Open was asked for
   <app>:dirty       { dirty }              unsaved changes appeared or went away
   <app>:failed      { error }              the app could not start
@@ -138,6 +138,11 @@ The vocabulary is the one three applications already use. Two things are added:
 
 1. **the ticket** on the save, and
 2. **`saveResult`**, the host's answer.
+
+The common JSON wire ticket is an opaque string and the host echoes it exactly.
+Apps may use numeric counters internally, but adapters convert them to strings
+before posting; this keeps tickets safe from JavaScript number precision loss
+and lets hosts correlate saves without app-specific numeric conventions.
 
 ### Why the ticket and the answer matter
 
@@ -184,7 +189,7 @@ The application starts with an **empty document** in host mode, not a sample.
 ```text
 1. The user saves in the application.
 2. The application hands the bytes to the host, with a ticket.
-3. The host stores them, and answers <app>:saveResult { ticket, ok }.
+3. The host stores them, and answers <app>:saveResult { ticket: "...", ok }.
 4. The application marks the document saved — or puts it back in its dirty state
    and says why.
 ```
@@ -236,14 +241,19 @@ application learns about it as a failed save.
 
 ## Incremental rollout
 
-1. **A shared crate** in `craft-libs` with the message types and the transport,
-   and **no behaviour change** anywhere.
+1. **A shared browser transport** in `craft-libs`, after checking whether the
+   existing `craft-platform` browser feature is the right home or a narrowly
+   scoped crate is better. Normalize save tickets to opaque strings and keep
+   app serialization/snapshot policy in each app.
 2. **WordCraft** gains the bridge — it already has the richest set of services
    and the `async_saves` machinery the save answer needs. *(This is the patch
    prepared in `docs/reviews/GR-014/`, 4 files, +261/-4.)*
-3. **PdfCraft, GridCraft and CADCraft** move to the shared crate, and GridCraft's
-   copy gains the save answer it is missing.
-4. The applications whose services are not browser-shaped yet — FigCraft
+3. **GridCraft** moves to the shared transport while retaining its exact-workbook
+   snapshot tracking; together with WordCraft, this validates two different
+   save lifecycles before broader adoption.
+4. **PdfCraft and CADCraft** migrate after their current bridge and persistence
+   semantics are checked against the shared asynchronous acknowledgement.
+5. The applications whose services are not browser-shaped yet — FigCraft
    (`NoServices`), FilmCraft and EffectCraft (`FsServices`) — get their seam
    first, then the bridge.
 
@@ -255,11 +265,12 @@ Each step is independent and shippable.
   is off unless the page says `?host=parent`.
 * **Nothing changes for the desktop application.** The bridge lives in
   `apps/<app>-web`.
-* **The three existing bridges keep working.** Their message vocabulary is the
-  one the shared crate implements; a host written against GridCraft works
-  unchanged.
-* **No new dependency.** The crate would use `wasm-bindgen` and `web-sys`, which
-  the browser builds already use.
+* **Existing bridges require a compatibility plan.** Keep their namespaced
+  message vocabulary where possible, but do not claim wire compatibility until
+  the current save/result differences and string-ticket migration are tested.
+* **No app-specific storage dependency.** The shared browser layer should use
+  the suite's existing `wasm-bindgen`/`web-sys` stack; the exact crate boundary
+  remains to be validated against `craft-libs` conventions.
 * **No second UI, no second document model.**
 
 ## Testing
@@ -297,7 +308,8 @@ boundary and check for shared protocol requirements before publication.
 
 ## Open questions for the maintainers
 
-1. Is `craft-libs` the right home, or should the bridge be a new repository?
+1. Should the browser transport extend `craft-platform`'s existing browser
+   feature, or live in a focused `craft-host` crate inside `craft-libs`?
 2. Should the message vocabulary keep the per-application namespace
    (`wordcraft:open`) or become common (`artcraft:open`)? *Recommendation: keep it
    — it lets a host frame several applications, and it is what exists.*

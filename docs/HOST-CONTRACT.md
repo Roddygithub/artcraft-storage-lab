@@ -319,23 +319,31 @@ That is good news, and it changes the shape of the upstream proposal:
 ```text
 HOST  -> CRAFT
 
-  <app>:saveResult  { ok: true }                    (the host persisted it)
-  <app>:saveResult  { ok: false, error: "..." }     (the host refused or failed)
+  <app>:saveResult  { ticket: "...", ok: true }                 (the host persisted it)
+  <app>:saveResult  { ticket: "...", ok: false, error: "..." }  (the host refused or failed)
+
+CRAFT -> HOST
+
+  <app>:save        { name, bytes, ticket: "..." }
 ```
 
-The Craft app keeps the document dirty until it receives `ok: true`, tied to the
-exact serialized document snapshot. For WordCraft this maps directly onto the
-existing `AsyncSaves` ticket (`start()` / `finish(ticket, Saved | Failed(error))`);
-for PdfCraft the current synchronous `Result` is not sufficient for a durable
-remote write and needs an asynchronous outcome; for GridCraft the prepared
-GR-010 patch uses a ticketed `saveResult` and records the exact workbook snapshot
-without changing the callback into a synchronous `Result`.
+The proposed common wire ticket is an **opaque string**, echoed unchanged in
+`saveResult`; do not put a JavaScript number on the wire. Each app may keep its
+own internal ticket and snapshot type, adapting it at the boundary. This avoids
+the current local WordCraft patch's numeric ticket and GridCraft patch's string
+ticket from becoming two incompatible host protocols. WordCraft's internal
+`AsyncSaves` ticket (`start()` / `finish(ticket, Saved | Failed(error))`) stays
+app-owned; GridCraft's exact workbook snapshot also stays app-owned. PdfCraft's
+current synchronous `Result` is not sufficient for a durable remote write and
+needs an asynchronous outcome.
 
 > This extension remains a proposal for a shared upstream contract. WordCraft's
 > bridge patch (GR-014) and the GridCraft ticketed patch (GR-010) implement it
 > locally. Real-browser saves and fresh editor reopens were reproduced against
 > the isolated synthetic Seafile stack for both apps; neither patch is
 > upstreamed and the broader suite has not adopted one shared implementation.
+> Their current ticket encodings differ and must be normalized when they migrate
+> to a shared transport.
 
 Until it exists, the host page must keep **its own** "not persisted" state and
 warn on close, because a GridCraft-style app will believe the document is

@@ -23,8 +23,9 @@ reopen proof, and licensing/provenance packaging. Keep publication locked.
 * Target: `storytold/wordcraft`, branch `main` at
   `00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d`.
 * Size: 4 files, +261 / −4.
-* What it adds: the `?host=parent` bridge that GridCraft, PdfCraft and CADCraft
-  already have, plus the **save confirmation** they are missing.
+* What it adds: the `?host=parent` bridge for WordCraft and a durable save
+  acknowledgement. GridCraft, PdfCraft and CADCraft already have distinct
+  bridge implementations; their save semantics are not yet uniform.
 * What it reuses: `crates/ui-egui/src/async_saves.rs` — the ticket mechanism the
   suite already has.
 * Verified: the patch compiles; the local browser harness passes; and an
@@ -36,11 +37,11 @@ reopen proof, and licensing/provenance packaging. Keep publication locked.
 
 | # | Change | Target | Why |
 | --- | --- | --- | --- |
-| A-1 | the shared crate: the message types, the transport, the origin and source checks | **new crate in `storytold/craft-libs`** | three copies of the same 200 lines have already drifted |
-| A-2 | move GridCraft, PdfCraft and CADCraft onto it | their `apps/*-web` crates | one vocabulary instead of three |
-| A-3 | give GridCraft's host bridge a **durable save acknowledgement** | `gridcraft/apps/gridcraft-web/src/host.rs` and `crates/ui-egui` | issue a ticket for each save, wait for the host's result, and mark only the exact saved workbook snapshot clean after success; exports must not mark the source workbook saved |
+| A-1 | define one browser transport and wire contract, including exact origin/source checks and opaque string save tickets | inspect `craft-platform`'s existing optional browser module at pinned `craft-libs` HEAD `f180fc0d35d521c5d18e118c881d3efde1ec1eee`; decide whether to extend it or add a narrowly scoped crate | reuse the existing platform lifecycle layer if it is the right home; do not duplicate browser helpers or invent a second crate without evidence |
+| A-2 | migrate only WordCraft and GridCraft onto the shared transport first | `apps/wordcraft-web` and `apps/gridcraft-web` | they exercise different existing save lifecycles (`AsyncSaves` u64 internally versus GridCraft's snapshot ticket); retain app-owned serialization and dirty-state logic while using one string ticket on the JSON wire |
+| A-3 | after the first two migrations, adapt PdfCraft and CADCraft | their `apps/*-web` crates | inspect their current bridge hooks and synchronous failure semantics; do not assume the adapters are interchangeable |
 | A-4 | add the bridge to apps that lack it, after inspecting each app's actual save/serialization seam | `apps/<app>-web` | per-app effort is not estimated; transport reuse does not provide editor lifecycle, serializers, asset packaging, or project persistence |
-| A-5 | the browser-shaped services for the four that have none | `figcraft` (`NoServices`), `filmcraft`, `effectcraft` (`FsServices`), and the others | the seam has to exist before a bridge can be wired to it |
+| A-5 | establish browser-shaped services where an app lacks the needed open/serialize/save seam | app-specific `apps/*-web` and service modules, based on the parallel capability audits | transport reuse cannot supply serializers, assets, document identity, or project persistence |
 | A-6 | the **desktop** control protocol in the shared crate | `docs/control-protocol.md`, 12 of 13 apps | a later phase; the browser and the desktop speaking one vocabulary |
 
 ### 1.2 What would make the maintainers say no, and the answer

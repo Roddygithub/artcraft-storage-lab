@@ -1,6 +1,6 @@
 # GR-012 — a non-Office format round-trips
 
-Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; later local runtime evidence is not an independent review.
+Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; the later exact-byte remediation received a bounded Nemotron PASS, not an overall project review.
 Date: 2026-10-23 · See `VECTORCRAFT-SEAFILE-E2E-20261023.md` for the reproduced run.
 
 ## 0. The verdict
@@ -148,6 +148,18 @@ editor bytes; the Seafile History UI showed both the 270-byte and 609-byte
 versions; and a fresh Seahub click opened VectorCraft with the path parsed.
 This is a VectorCraft-specific transport proof, not proof of the common host
 contract or support across Craft apps.
+
+## 3.2 Bounded independent review of the polling fix
+
+Nemotron returned **PASS for the exact-byte remediation only**. It independently
+checked the deliberate FNV collision pair, synthetic browser regression, and
+post-fix Seafile readback/reopen evidence. It also recorded remaining minor
+gaps: VectorCraft cannot signal all dirty edits, save-failure retry and
+concurrent saves remain untested, and iframe sandbox/CSP controls are absent.
+The complete bounded review is in
+[`REVIEW-NEMOTRON-VECTORCRAFT-EXACT-BYTES.md`](../REVIEW-NEMOTRON-VECTORCRAFT-EXACT-BYTES.md).
+This result does not clear the historical GPT FAIL or establish common-contract
+coverage.
 
 ## 4. The screenshot
 

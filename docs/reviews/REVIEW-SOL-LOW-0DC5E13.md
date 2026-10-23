@@ -29,6 +29,15 @@ Review mode: read-only interim review; not a final candidate gate.
    JavaScript. Python owns Seafile-facing persistence; Rust/WASM should own
    editor lifecycle and serialization. Stock Seafile still lacks the
    conditional-save endpoint required by this prototype.
+6. Follow-up read-only inspection of `storytold/craft-libs` at
+   `f180fc0d35d521c5d18e118c881d3efde1ec1eee` found `craft-platform` already
+   has an optional `browser` feature (`crates/platform/Cargo.toml`), a WASM
+   browser download module (`crates/platform/src/browser.rs`), and browser WASM
+   tests (`crates/platform/tests/browser_downloads.rs`), but the searched
+   source contains no matching host/postMessage transport. Extending that
+   module is a candidate home; the shared crate-versus-existing-crate choice
+   stays open pending the required craftrules review and the app capability
+   audits.
 
 ## Bounded recommendation
 
@@ -48,6 +57,11 @@ VectorCraft/Seafile flow was subsequently rerun in the isolated container:
 changed SVG bytes were saved, read back byte-identically, and parsed on a fresh
 route load. See `docs/reviews/GR-012/VECTORCRAFT-SEAFILE-E2E-20261023.md`. The
 exact collision itself remains a synthetic Chromium regression case.
+
+Nemotron independently reviewed this bounded fix and returned PASS for the
+collision handling and post-fix isolated runtime evidence. Its review also
+keeps VectorCraft dirty-state, retry/concurrency, sandbox and CSP gaps open;
+see `docs/reviews/REVIEW-NEMOTRON-VECTORCRAFT-EXACT-BYTES.md`.
 
 This report records an interim review only. It does not supersede the prior Sol
 FAIL, establish GPT candidate readiness, or unlock upstream publication.

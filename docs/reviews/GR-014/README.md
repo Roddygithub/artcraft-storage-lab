@@ -62,6 +62,11 @@ CRAFT -> HOST
 The vocabulary follows the three existing bridges. The two additions are the
 **ticket** on the save and the **`saveResult`** answer, and they are the point of
 the patch: without them the app cannot know whether the host stored the file.
+The prepared WordCraft patch currently encodes its internal `u64` ticket as a
+JSON number, while the GridCraft patch encodes a namespaced string. These local
+patches therefore do not yet share one ticket wire type; the common transport
+proposal requires opaque strings and the WordCraft adapter must convert at its
+boundary before the implementations are described as interoperable.
 
 ### 2.2 The security model, unchanged from the existing bridges
 
@@ -117,12 +122,12 @@ keeps its dirty guard set while the write is in flight.
 
 ## 4. What is NOT in this patch
 
-* **the `craft-libs` crate.** The three existing bridges are three separate files
-  that have already drifted (PdfCraft adds `saveAs`; GridCraft cannot report a
-  failed save). The right upstream shape is **one** shared crate in
-  `storytold/craft-libs`, used by all 13 web apps. That is a bigger change and a
-  separate conversation with the maintainers — it is proposed in
-  `docs/RFC-DRAFT.md`, not smuggled into this patch.
+* **the shared browser transport.** The existing upstream bridges have already
+  drifted (PdfCraft adds `saveAs`; GridCraft cannot report a failed save). A
+  shared layer in `storytold/craft-libs` is proposed in `docs/RFC-DRAFT.md`; the
+  exact home (the current `craft-platform` browser module or a focused crate)
+  and staged migration are still under review. This WordCraft patch remains a
+  separate app adapter, not a shared transport implementation.
 * **any mention of Seafile.** The patch is platform-agnostic on purpose.
 
 ## 5. The upstream hard gate

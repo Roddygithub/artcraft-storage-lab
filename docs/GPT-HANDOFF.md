@@ -187,7 +187,7 @@ deployment. Do not treat the draft as deployed behavior.
 | `storytold/pdfcraft` | `main` | the reference save-failure bridge |
 | `storytold/cadcraft` | `main` | the third bridge |
 | `storytold/vectorcraft` | `main` | the `window.vectorcraft` page API |
-| `storytold/craft-libs` | `main` | where a shared host crate would go |
+| `storytold/craft-libs` | `f180fc0d35d521c5d18e118c881d3efde1ec1eee` | current `craft-platform` already has an optional WASM browser feature; candidate home for shared host transport, not yet decided |
 | the other eight `storytold/*` apps | `main` | the capability matrix |
 
 All of them are **public** and were read read-only. **Nothing was published

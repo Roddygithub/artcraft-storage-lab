@@ -55,6 +55,7 @@ OPEN GAPS:
   conflict behavior, and deployment security remain NOT VERIFIED.
 - GR-012 VectorCraft SVG now has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. PdfCraft and the remaining Craft apps are not covered.
 - Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium collision test passes, and the isolated Seafile-backed VectorCraft flow was rerun successfully after the fix (695 B saved/read back byte-identically and reopened with the new path). See the GR-012 post-fix runtime report.
+- Nemotron independently returned a bounded PASS for that exact-byte fix. This does not cover VectorCraft's missing dirty signal, retry/concurrency, CSP/sandbox, common-contract support, or the overall project.
 - the first E2E browser run used a same-origin proxy; a separate-origin loopback
   follow-up now verifies the handoff and durable save, but production TLS,
   reverse-proxy behavior, CSP, CSRF, rate limits and adversarial-frame isolation
@@ -62,10 +63,14 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- continue by auditing each ArtCraft Web app's actual open/edit/serialize/save
-  seam against the common host contract; prioritize an app with an existing
-  bridge and a deterministic synthetic format path, then record app-specific
-  gaps instead of implying universal compatibility
+- finish the parallel read-only audits of each ArtCraft Web app's actual
+  open/edit/serialize/save seam; several initial provider runs timed out, and
+  fast-model retries were launched for those apps
+- after their findings, implement a shared Rust/WASM transport in or beside
+  `craft-platform` and migrate WordCraft + GridCraft first, preserving their
+  distinct save lifecycles and using opaque string tickets on the wire
+- keep Seafile/provider persistence in the connector and editor lifecycle in
+  Rust/WASM; do not publish upstream before GPT PASS
 - preserve the existing file-type dispatch behavior for out-of-scope libraries;
   that is a compatibility guard, while the product work remains the ArtCraft
   editor integration

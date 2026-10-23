@@ -1,5 +1,19 @@
 # HISTORY
 
+## 2026-10-23 — Common Rust host transport plan clarified
+
+* The Sol low interim review identified the ticket-format mismatch between the
+  WordCraft and GridCraft save adapters and recommended extracting a shared
+  Rust/WASM transport, then migrating those two different lifecycles first.
+* Read-only inspection of `storytold/craft-libs` at
+  `f180fc0d35d521c5d18e118c881d3efde1ec1eee` found an existing optional browser
+  module in `craft-platform`, but no common host/postMessage transport. The
+  RFC now leaves open whether to extend that module or add a focused crate.
+* The proposed common JSON ticket is an opaque string echoed unchanged. Local
+  WordCraft/GridCraft patches still differ and must be normalized before they
+  are presented as one implementation. Thirteen per-app capability audits are
+  running; no upstream source was modified or published.
+
 ## 2026-10-23 — VectorCraft polling collision guard
 
 * Sol 6.1 low's interim architecture review found a collision risk in the
@@ -13,6 +27,10 @@
   695 B editor output was durably versioned, read back byte-identically and
   reopened with the new path; Seafile History showed 695 B → 609 B → 270 B.
   The exact collision pair itself is covered by the synthetic Chromium test.
+* Nemotron independently reviewed this bounded exact-byte fix and returned
+  PASS for the collision regression and post-fix Seafile evidence. It recorded
+  dirty-warning, retry/concurrency, iframe sandbox and CSP gaps. This does not
+  change the project-level GPT FAIL.
 
 ## 2026-10-23 — VectorCraft SVG round-trip in isolated Seafile
 
