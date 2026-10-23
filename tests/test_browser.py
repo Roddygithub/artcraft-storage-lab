@@ -186,15 +186,15 @@ def main():
         state = page.eval_on_selector("#state", "el => el.textContent")
         check("3. the editor's own Save reached the host and was persisted", saved, state)
 
-        # The application must have confirmed the save itself. It does that by
-        # telling the host the document is no longer dirty, which the host page
-        # records; the app's own log line is the second signal.
+        # A stored response is not editor confirmation. The host records this
+        # flag only after it sends saveResult and later receives the editor's
+        # dirty=false message.
         confirmed = False
         try:
-            page.wait_for_function("() => window.__lastDirty === false", timeout=15000)
+            page.wait_for_function("() => window.__editorConfirmedSave === true", timeout=15000)
             confirmed = True
         except Exception:
-            confirmed = page.evaluate("() => window.__lastDirty === false")
+            confirmed = page.evaluate("() => window.__editorConfirmedSave === true")
         logged = next((line[:120] for line in console if "saved" in line), "")
         check("3b. the editor confirmed the save itself", confirmed, logged or "no dirty=false")
 

@@ -79,6 +79,11 @@ function toCraft(type, extra) {
 const VECTORCRAFT = (APP === "vectorcraft");
 let lastSavedHash = null;      // the content we last stored, not its size
 let saving = false;
+window.__lastDirty = false;
+window.__editorConfirmedSave = false;
+window.__saveConfirmationPending = false;
+let dirtyRevision = 0;
+let saveRevision = -1;
 
 // The frame we are about to drive must be the one we created, on our own
 // origin. A direct property read crosses no boundary that postMessage would
@@ -123,6 +128,7 @@ async function openThroughApi(api) {
   const resp = await fetch("/session/" + SID + "/document", { credentials: "same-origin" });
   if (!resp.ok) throw new Error("HTTP " + resp.status);
   const buf = await resp.arrayBuffer();
+  lastSavedHash = fingerprint(buf);
   api.captureDownloads(true);
   if (!api.openFile(FILE_NAME, new Uint8Array(buf))) throw new Error("the editor refused the file");
   say(FILE_NAME + " opened", "ok");
@@ -145,7 +151,12 @@ function pollSaved(api) {
       return;
     }
     const hash = fingerprint(bytes);
-    if (hash === lastSavedHash) { saving = false; return; }
+    if (hash === lastSavedHash) {
+      window.__lastDirty = false;
+      saving = false;
+      return;
+    }
+    window.__lastDirty = true;
     try {
       say("Saving…", "busy");
       window.__saveInFlight = true;
@@ -158,12 +169,22 @@ function pollSaved(api) {
       const ok = !!resp.ok && result.ok === true;
       // Only a stored save becomes the new baseline: a refused one is retried on
       // the next poll, which is what makes a failed save visible instead of lost.
-      if (ok) lastSavedHash = hash;
-      window.__lastDirty = !ok;
+      if (ok) {
+        lastSavedHash = hash;
+        try {
+          const current = await api.readFile(FILE_NAME);
+          window.__lastDirty = fingerprint(current) !== lastSavedHash;
+        } catch (err) {
+          window.__lastDirty = true;
+        }
+      } else {
+        window.__lastDirty = true;
+      }
       const version = ok ? (result.version ? " — new version " + result.version : "") : "";
       say(ok ? ("Saved" + version) : ("Save failed: " + (result.error || resp.status)),
           ok ? "ok" : "err");
     } catch (err) {
+      window.__lastDirty = true;
       say("Save failed: " + err.message, "err");
     } finally {
       window.__saveInFlight = false;
@@ -219,6 +240,10 @@ window.addEventListener("message", async (event) => {
       const ticket = data.ticket;
       say("Saving…", "busy");
       window.__saveInFlight = true;
+      window.__lastDirty = true;
+      window.__editorConfirmedSave = false;
+      window.__saveConfirmationPending = false;
+      saveRevision = dirtyRevision;
       let ok = false;
       let error = "the save did not happen";
       try {
@@ -236,14 +261,19 @@ window.addEventListener("message", async (event) => {
           error = "";
         }
         window.__lastSave = result;
-        window.__lastDirty = !ok;
-        say(ok ? ("Saved" + (result.version ? " — new version " + result.version : "")) : ("Save failed: " + error),
-            ok ? "ok" : "err");
+        if (ok) {
+          window.__saveConfirmationPending = true;
+          say("Stored" + (result.version ? " — new version " + result.version : ""), "busy");
+        } else {
+          window.__lastDirty = true;
+          say("Save failed: " + error, "err");
+        }
       } catch (err) {
         error = err.message;
+        window.__lastSave = { ok: false };
+        window.__lastDirty = true;
         say("Save failed: " + error, "err");
       }
-      window.__saveInFlight = false;
       // Tell the app how the save ended. Without this the app waits for a
       // confirmation that never comes and the document stays dirty forever.
       if (ticket !== undefined && ticket !== null) {
@@ -253,20 +283,47 @@ window.addEventListener("message", async (event) => {
         const shown = ok ? "" : "the file could not be stored";
         toCraft("saveResult", { ticket: ticket, ok: ok, error: shown });
       }
+      window.__saveInFlight = false;
       break;
     }
 
     case APP + ":dirty":
-      window.__lastDirty = !!data.dirty;
+      if (data.dirty) {
+        dirtyRevision += 1;
+        window.__lastDirty = true;
+        window.__editorConfirmedSave = false;
+      } else if (window.__saveInFlight) {
+        // Craft can report clean as soon as it starts its own save. Keep the
+        // host dirty until the durable write and the editor's post-result
+        // dirty=false acknowledgement have both happened.
+        window.__lastDirty = true;
+      } else if (window.__saveConfirmationPending && window.__lastSave?.ok === true) {
+        // The editor's clean signal is accepted only after durable storage and
+        // the host's response, and only if no newer dirty signal arrived while
+        // those bytes were being stored.
+        window.__lastDirty = dirtyRevision !== saveRevision;
+        window.__editorConfirmedSave = !window.__lastDirty;
+        window.__saveConfirmationPending = false;
+      } else if (!window.__lastSave || window.__lastSave.ok === true) {
+        window.__lastDirty = false;
+      } else {
+        window.__lastDirty = true;
+      }
       // The gateway keeps the "not persisted" state, so the host can warn on
       // close and the service knows the document is unsaved.
       fetch("/session/" + SID + "/dirty", {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "text/plain" },
-        body: data.dirty ? "true" : "false",
+        body: window.__lastDirty ? "true" : "false",
       }).catch(() => {});
-      say(data.dirty ? "Unsaved changes" : FILE_NAME + " (no changes)", data.dirty ? "busy" : "ok");
+      if (window.__lastDirty) {
+        say("Unsaved changes", "busy");
+      } else if (window.__editorConfirmedSave) {
+        say("Saved" + (window.__lastSave.version ? " — new version " + window.__lastSave.version : ""), "ok");
+      } else {
+        say(FILE_NAME + " (no changes)", "ok");
+      }
       break;
 
     case APP + ":failed":
