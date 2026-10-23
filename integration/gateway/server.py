@@ -145,7 +145,7 @@ class Gateway:
         """The bytes of the document being edited."""
         if session.access_token:
             data = self.seafile.thirdparty_file_content(
-                session.access_token, session.file_id)
+                session.access_token, session.file_id, max_bytes=self.max_bytes)
         else:
             data = self.seafile.download(session.repo_id, session.path)
         if len(data) > self.max_bytes:
@@ -189,7 +189,10 @@ class Gateway:
                              "your changes were not saved",
                     "conflict": True,
                 }, 409
-            return {"ok": False, "error": f"Seafile save failed: {exc}"}, 502
+            # Upstream errors can echo capability-bearing URLs or document
+            # content. Keep details server-side; the browser gets no response
+            # body from Seafile.
+            return {"ok": False, "error": "Seafile could not confirm the save"}, 502
         session.file_id = saved["file_id"]
         session.head_commit_id = saved["head_commit_id"]
         session.unsaved = False
@@ -265,7 +268,11 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         path = urllib.parse.urlparse(self.path).path
         gateway = self.server.gateway
-        if not self._same_origin():
+        same_origin = self._same_origin()
+        # Seafile's hidden form navigates to /open/ across origins. Allow only
+        # that one capability-bearing handoff from the configured Seafile
+        # origin; every browser API POST remains same-origin with the gateway.
+        if not same_origin and not (path == "/open/" and self._from_seafile_origin()):
             return self._json(403, {"ok": False, "error": "same-origin request required"})
 
         if path == "/open/":
@@ -335,6 +342,16 @@ class Handler(BaseHTTPRequestHandler):
             origin.scheme.lower() == request_scheme
             and origin.netloc.lower() == request_host
             and request_host
+        )
+
+    def _from_seafile_origin(self):
+        allowed = urllib.parse.urlsplit(os.environ.get("ARTCRAFT_SEAFILE_ORIGIN", ""))
+        origin = urllib.parse.urlsplit(self.headers.get("Origin") or "")
+        return bool(
+            allowed.scheme in ("http", "https") and allowed.netloc
+            and not allowed.path and not allowed.query and not allowed.fragment
+            and origin.scheme.lower() == allowed.scheme.lower()
+            and origin.netloc.lower() == allowed.netloc.lower()
         )
 
     def _serve_static(self, path):

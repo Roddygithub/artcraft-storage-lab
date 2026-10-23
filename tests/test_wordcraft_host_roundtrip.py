@@ -53,7 +53,7 @@ class SyntheticSeafile:
             "head_commit_id": self.head,
         }
 
-    def thirdparty_file_content(self, token, expected_file_id):
+    def thirdparty_file_content(self, token, expected_file_id, max_bytes=None):
         assert token == TOKEN
         if expected_file_id != self.file_id:
             raise AssertionError("stale synthetic read")

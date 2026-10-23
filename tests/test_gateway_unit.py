@@ -67,7 +67,7 @@ class FakeSeafile:
     def download(self, repo_id, path):
         return self.content
 
-    def thirdparty_file_content(self, access_token, expected_file_id):
+    def thirdparty_file_content(self, access_token, expected_file_id, max_bytes=None):
         if self.obj_id != expected_file_id:
             from gateway.seafile import SeafileError
             raise SeafileError("conflict", status=409)
@@ -107,6 +107,31 @@ class UpstreamErrorHandler(BaseHTTPRequestHandler):
         self.send_response(403)
         self.send_header("Content-Length", "0")
         self.end_headers()
+
+
+class EchoSaveErrorHandler(BaseHTTPRequestHandler):
+    def log_message(self, *_args):
+        pass
+
+    def do_POST(self):
+        body = f"proxy error at {self.path}".encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+
+class LargeContentHandler(BaseHTTPRequestHandler):
+    def log_message(self, *_args):
+        pass
+
+    def do_GET(self):
+        body = b"x" * 64
+        self.send_response(200)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
 
 def make_gateway(seafile, dispatch=None):
@@ -227,10 +252,36 @@ def main():
     response = connection.getresponse()
     body = response.read().decode()
     connection.close()
-    httpd.shutdown()
-    thread.join(timeout=3)
     check("cross-origin POST cannot open or save a document", response.status == 403,
           f"HTTP {response.status}")
+
+    previous_seafile_origin = os.environ.get("ARTCRAFT_SEAFILE_ORIGIN")
+    os.environ["ARTCRAFT_SEAFILE_ORIGIN"] = "https://seafile.example.test"
+    connection = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
+    connection.request("POST", "/open/?format=json",
+                       urllib.parse.urlencode({"access_token": "user-token"}),
+                       {"Content-Type": "application/x-www-form-urlencoded",
+                        "Origin": "https://seafile.example.test", "Connection": "close"})
+    allowed_response = connection.getresponse()
+    allowed_body = allowed_response.read().decode()
+    connection.close()
+    foreign = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
+    foreign.request("POST", "/session/not-a-session/dirty", "true",
+                    {"Content-Type": "text/plain", "Origin": "https://seafile.example.test",
+                     "Connection": "close"})
+    foreign_response = foreign.getresponse()
+    foreign_response.read()
+    foreign.close()
+    if previous_seafile_origin is None:
+        os.environ.pop("ARTCRAFT_SEAFILE_ORIGIN", None)
+    else:
+        os.environ["ARTCRAFT_SEAFILE_ORIGIN"] = previous_seafile_origin
+    httpd.shutdown()
+    thread.join(timeout=3)
+    check("configured Seafile origin may only use the open handoff",
+          allowed_response.status == 200 and '"ok": true' in allowed_body
+          and foreign_response.status == 403,
+          f"open HTTP {allowed_response.status}; dirty HTTP {foreign_response.status}")
 
     # ---- Save As/export and format mismatch are refused ------------------
     seafile = FakeSeafile()
@@ -281,6 +332,40 @@ def main():
           response.status == 403 and "secret-capability-value" not in error_body
           and "access_token=" not in error_body,
           f"HTTP {response.status}: {error_body[:140]}")
+
+    # A malformed successful save response may echo the capability URL too.
+    upstream = ThreadingHTTPServer(("127.0.0.1", 0), EchoSaveErrorHandler)
+    upstream_thread = threading.Thread(target=upstream.serve_forever, daemon=True)
+    upstream_thread.start()
+    client = Seafile(f"http://127.0.0.1:{upstream.server_port}", "")
+    gw = make_gateway(client)
+    protected = gw.sessions.create(
+        repo_id="repo", path="/a.docx", name="a.docx", file_id="aaaa", user="alice",
+        can_edit=True, user_authorized=True, access_token="secret-capability-value",
+        app="wordcraft", head_commit_id="head-a")
+    result, status = gw.save(protected, valid_docx(), name="a.docx")
+    upstream.shutdown()
+    upstream_thread.join(timeout=3)
+    upstream.server_close()
+    check("malformed save response cannot leak capability through browser JSON",
+          status == 502 and "secret-capability-value" not in str(result)
+          and "access_token" not in str(result)
+          and result["error"] == "Seafile could not confirm the save",
+          f"HTTP {status}: {result}")
+
+    upstream = ThreadingHTTPServer(("127.0.0.1", 0), LargeContentHandler)
+    upstream_thread = threading.Thread(target=upstream.serve_forever, daemon=True)
+    upstream_thread.start()
+    client = Seafile(f"http://127.0.0.1:{upstream.server_port}", "")
+    try:
+        client.thirdparty_file_content("synthetic-token", "file-id", max_bytes=16)
+        bounded = False
+    except SeafileError as exc:
+        bounded = exc.status == 413
+    upstream.shutdown()
+    upstream_thread.join(timeout=3)
+    upstream.server_close()
+    check("Seafile document response is bounded before full buffering", bounded)
 
     # ---- deterministic CAS race -----------------------------------------
     seafile = FakeSeafile()

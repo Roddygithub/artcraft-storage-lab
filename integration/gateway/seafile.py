@@ -36,7 +36,8 @@ class Seafile:
 
     # -- plumbing ---------------------------------------------------------
 
-    def _request(self, url, method="GET", headers=None, data=None, raw=False, auth=True):
+    def _request(self, url, method="GET", headers=None, data=None, raw=False, auth=True,
+                 response_limit=None):
         """Perform a request.
 
         `auth=False` sends no credential. The file server's own URLs already carry
@@ -49,10 +50,13 @@ class Seafile:
         req = urllib.request.Request(url, method=method, data=data, headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                body = resp.read()
+                body = resp.read(response_limit + 1) if response_limit is not None else resp.read()
+                if response_limit is not None and len(body) > response_limit:
+                    raise SeafileError("Seafile response exceeds the document limit", 413)
                 return resp.status, body if raw else body
         except urllib.error.HTTPError as exc:
-            body = exc.read()
+            error_limit = min(response_limit + 1, 64 * 1024) if response_limit is not None else None
+            body = exc.read(error_limit) if error_limit is not None else exc.read()
             if raw:
                 raise SeafileError(
                     f"HTTP {exc.code} from {self._safe_url(url)}", exc.code, body) from exc
@@ -104,12 +108,12 @@ class Seafile:
                f"?access_token={urllib.parse.quote(access_token)}")
         return self._json(url)
 
-    def thirdparty_file_content(self, access_token, expected_file_id):
+    def thirdparty_file_content(self, access_token, expected_file_id, max_bytes=None):
         """GET the bytes, refusing a file that changed after the open."""
         url = (f"{self.base_url}/thirdparty-editor/file-content/"
                f"?access_token={urllib.parse.quote(access_token)}"
                f"&expected_file_id={urllib.parse.quote(expected_file_id)}")
-        status, body = self._request(url, raw=True)
+        status, body = self._request(url, raw=True, response_limit=max_bytes)
         return body
 
     # -- the ordinary API -------------------------------------------------
@@ -149,9 +153,12 @@ class Seafile:
         try:
             result = json.loads(body)
         except Exception as exc:
-            raise SeafileError(f"invalid save response: {body[:200]!r}", status, body) from exc
+            # Successful HTML/proxy error pages can echo the capability URL.
+            # Never copy an upstream response body into an exception shown to
+            # the browser; keep only the status for operator-side diagnosis.
+            raise SeafileError("Seafile returned an invalid save response", status) from exc
         if status != 200:
-            raise SeafileError(self._describe(status, body), status, body)
+            raise SeafileError(f"Seafile save failed with HTTP {status}", status)
         if not isinstance(result, dict) or not result.get("file_id") or not result.get("head_commit_id"):
             raise SeafileError("Seafile did not confirm a committed version", status=502)
         return result
