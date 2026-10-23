@@ -1,7 +1,7 @@
 # GPT-6.1 Sol Re-review — 0edbe52
 
-Date: 2026-10-23  
-Candidate: `0edbe524b4fa321b0f73f8601afef390e7f785e6`  
+Date: 2026-10-23
+Candidate: `0edbe524b4fa321b0f73f8601afef390e7f785e6`
 Verdict: **FAIL**
 
 This independent re-review was run with GPT-6.1 Sol at medium reasoning effort
