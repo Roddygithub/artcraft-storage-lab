@@ -30,6 +30,7 @@ CONFIG_PATH = os.path.join(ROOT, "config", "dispatch.json")
 
 # Permissions that allow writing a file back.
 EDITABLE_PERMISSIONS = ("rw", "cloud-edit", "preview-edit")
+MAX_CONTENT_TYPES_XML_BYTES = 1024 * 1024
 
 # The Craft app names, as the protocol uses them: "wordcraft:open".
 APP_ALIASES = {
@@ -52,8 +53,15 @@ def payload_matches_name(name, data):
     if ext in {"docx", "xlsx", "pptx"}:
         try:
             with zipfile.ZipFile(io.BytesIO(data)) as archive:
-                types = archive.read("[Content_Types].xml").decode("utf-8", "ignore")
-        except (KeyError, zipfile.BadZipFile):
+                entry = archive.getinfo("[Content_Types].xml")
+                if entry.file_size > MAX_CONTENT_TYPES_XML_BYTES:
+                    return False
+                with archive.open(entry) as stream:
+                    raw_types = stream.read(MAX_CONTENT_TYPES_XML_BYTES + 1)
+                if len(raw_types) > MAX_CONTENT_TYPES_XML_BYTES:
+                    return False
+                types = raw_types.decode("utf-8", "ignore")
+        except (KeyError, OSError, RuntimeError, zipfile.BadZipFile):
             return False
         expected = {
             "docx": "wordprocessingml.document",

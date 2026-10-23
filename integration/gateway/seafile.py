@@ -27,6 +27,8 @@ class SeafileError(Exception):
 
 
 class Seafile:
+    _credential_query_keys = {"access_token", "token", "jwt", "signature", "password"}
+
     def __init__(self, base_url, token, timeout=30):
         self.base_url = base_url.rstrip("/")
         self.token = token
@@ -52,10 +54,29 @@ class Seafile:
         except urllib.error.HTTPError as exc:
             body = exc.read()
             if raw:
-                raise SeafileError(f"HTTP {exc.code} for {url}", exc.code, body) from exc
-            raise SeafileError(self._describe(exc.code, body), exc.code, body) from exc
+                raise SeafileError(
+                    f"HTTP {exc.code} from {self._safe_url(url)}", exc.code, body) from exc
+            raise SeafileError(self._redact_query_values(self._describe(exc.code, body), url),
+                               exc.code, body) from exc
         except urllib.error.URLError as exc:
-            raise SeafileError(f"cannot reach {url}: {exc.reason}") from exc
+            raise SeafileError(
+                f"cannot reach {self._safe_url(url)}: {exc.reason}") from exc
+
+    @staticmethod
+    def _safe_url(url):
+        parts = urllib.parse.urlsplit(url)
+        # Drop every query parameter and any userinfo; either can be a bearer
+        # credential. Keep only enough context to identify the endpoint.
+        netloc = parts.netloc.rsplit("@", 1)[-1]
+        return urllib.parse.urlunsplit((parts.scheme, netloc, parts.path, "", ""))
+
+    @classmethod
+    def _redact_query_values(cls, message, url):
+        for key, value in urllib.parse.parse_qsl(urllib.parse.urlsplit(url).query):
+            if value and key.lower() in cls._credential_query_keys:
+                message = message.replace(value, "[redacted]")
+                message = message.replace(urllib.parse.quote(value), "[redacted]")
+        return message
 
     @staticmethod
     def _describe(status, body):
@@ -72,7 +93,8 @@ class Seafile:
         try:
             return json.loads(body)
         except Exception as exc:
-            raise SeafileError(f"invalid JSON from {url}: {body[:200]!r}", status, body) from exc
+            raise SeafileError(
+                f"invalid JSON from {self._safe_url(url)}", status, body) from exc
 
     # -- the third-party editor hook -------------------------------------
 

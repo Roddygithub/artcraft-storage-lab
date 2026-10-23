@@ -14,12 +14,14 @@ import threading
 import zipfile
 import io
 import http.client
-from http.server import ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import urllib.parse
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "integration"))
 
-from gateway.server import Gateway, Handler, load_dispatch  # noqa: E402
+from gateway.server import (MAX_CONTENT_TYPES_XML_BYTES, Gateway, Handler,
+                            load_dispatch, payload_matches_name)  # noqa: E402
+from gateway.seafile import Seafile, SeafileError  # noqa: E402
 from gateway.sessions import SessionStore  # noqa: E402
 
 FAILURES = []
@@ -95,6 +97,16 @@ class FakeSeafile:
         self.written.append((repo_id, path, data))
         self.obj_id = "bbbb"
         return self.obj_id
+
+
+class UpstreamErrorHandler(BaseHTTPRequestHandler):
+    def log_message(self, *_args):
+        pass
+
+    def do_GET(self):
+        self.send_response(403)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
 
 def make_gateway(seafile, dispatch=None):
@@ -228,6 +240,47 @@ def main():
     check("Save As cannot replace the original", status == 400 and not result["ok"])
     result, status = gw.save(session, b"%PDF-1.7", name="a.docx")
     check("PDF export cannot replace a DOCX", status == 400 and not result["ok"])
+
+    large_types = io.BytesIO()
+    with zipfile.ZipFile(large_types, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("[Content_Types].xml",
+                         "<Types>" + "x" * (MAX_CONTENT_TYPES_XML_BYTES + 1) + "</Types>")
+    check("oversized OOXML type metadata is rejected before full decompression",
+          not payload_matches_name("bomb.docx", large_types.getvalue()))
+    with open(os.path.join(os.path.dirname(__file__), "fixtures", "synthetic.xlsx"), "rb") as f:
+        sample_xlsx = f.read()
+    check("ordinary XLSX MIME is accepted by the gateway",
+          payload_matches_name("synthetic.xlsx", sample_xlsx))
+
+    # ---- Seafile capability URLs do not escape through browser errors -----
+    upstream = ThreadingHTTPServer(("127.0.0.1", 0), UpstreamErrorHandler)
+    upstream_thread = threading.Thread(target=upstream.serve_forever, daemon=True)
+    upstream_thread.start()
+    client = Seafile(f"http://127.0.0.1:{upstream.server_port}", "")
+    gw = make_gateway(client)
+    protected = gw.sessions.create(
+        repo_id="repo", path="/a.docx", name="a.docx", file_id="aaaa", user="alice",
+        can_edit=True, user_authorized=True, access_token="secret-capability-value",
+        app="wordcraft", head_commit_id="head-a")
+    browser_httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    browser_httpd.gateway = gw
+    browser_thread = threading.Thread(target=browser_httpd.serve_forever, daemon=True)
+    browser_thread.start()
+    connection = http.client.HTTPConnection("127.0.0.1", browser_httpd.server_port, timeout=3)
+    connection.request("GET", f"/session/{protected.sid}/document", headers={"Connection": "close"})
+    response = connection.getresponse()
+    error_body = response.read().decode()
+    connection.close()
+    browser_httpd.shutdown()
+    browser_thread.join(timeout=3)
+    browser_httpd.server_close()
+    upstream.shutdown()
+    upstream_thread.join(timeout=3)
+    upstream.server_close()
+    check("upstream failure does not leak a capability URL to the browser",
+          response.status == 403 and "secret-capability-value" not in error_body
+          and "access_token=" not in error_body,
+          f"HTTP {response.status}: {error_body[:140]}")
 
     # ---- deterministic CAS race -----------------------------------------
     seafile = FakeSeafile()
