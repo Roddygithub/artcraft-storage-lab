@@ -153,9 +153,11 @@ contract or support across Craft apps.
 
 Nemotron returned **PASS for the exact-byte remediation only**. It independently
 checked the deliberate FNV collision pair, synthetic browser regression, and
-post-fix Seafile readback/reopen evidence. It also recorded remaining minor
-gaps: VectorCraft cannot signal all dirty edits, save-failure retry and
-concurrent saves remain untested, and iframe sandbox/CSP controls are absent.
+post-fix Seafile readback/reopen evidence. It recorded that VectorCraft cannot
+signal all dirty edits, save-failure retry/concurrent-save coverage was missing,
+and iframe sandbox/CSP controls were absent. A later synthetic browser test now
+covers rejection followed by retry; concurrent VectorCraft saves, dirty tracking,
+and sandbox/CSP remain open. The retry test is not Seafile runtime evidence.
 The complete bounded review is in
 [`REVIEW-NEMOTRON-VECTORCRAFT-EXACT-BYTES.md`](../REVIEW-NEMOTRON-VECTORCRAFT-EXACT-BYTES.md).
 This result does not clear the historical GPT FAIL or establish common-contract

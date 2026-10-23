@@ -23,6 +23,7 @@ class State:
     first_save_started = threading.Event()
     release_first_save = threading.Event()
     vector_save_started = threading.Event()
+    vector_retry_started = threading.Event()
     save_count = 0
     vector_save_count = 0
     vector_saved_bytes = None
@@ -106,7 +107,11 @@ class Handler(BaseHTTPRequestHandler):
         if self.headers.get("X-ArtCraft-Filename") == "synthetic.svg":
             State.vector_save_count += 1
             State.vector_saved_bytes = body
-            State.vector_save_started.set()
+            if State.vector_save_count == 1:
+                State.vector_save_started.set()
+                return self._send(503, b'{"ok":false,"error":"synthetic first-attempt rejection"}')
+            if State.vector_save_count == 2:
+                State.vector_retry_started.set()
             return self._send(200, b'{"ok":true,"version":"vector-version"}')
 
         State.save_count += 1
@@ -124,6 +129,7 @@ def main():
     State.first_save_started.clear()
     State.release_first_save.clear()
     State.vector_save_started.clear()
+    State.vector_retry_started.clear()
     State.save_count = 0
     State.vector_save_count = 0
     State.vector_saved_bytes = None
@@ -189,10 +195,13 @@ def main():
             # 32-bit fingerprint implementation. Exact comparison must save B.
             page.evaluate("bytes => document.getElementById('frame').contentWindow.vectorcraft.replace(bytes)", list(changed))
             assert State.vector_save_started.wait(5), "changed VectorCraft bytes were skipped"
+            page.wait_for_function("() => window.__lastSave?.ok === false")
+            assert page.evaluate("() => window.__lastDirty === true"), "failed VectorCraft write must remain dirty"
+            assert State.vector_retry_started.wait(5), "VectorCraft did not retry the unchanged edited bytes"
             page.wait_for_function("() => window.__lastSave?.ok === true")
             assert State.vector_saved_bytes == changed, "host must persist the exact changed bytes"
             page.wait_for_timeout(900)
-            assert State.vector_save_count == 1, "identical post-save bytes must not create duplicate versions"
+            assert State.vector_save_count == 2, "failure must retry once, then identical saved bytes must not create duplicate versions"
             browser.close()
     finally:
         State.release_first_save.set()
@@ -204,7 +213,7 @@ def main():
     print("PASS: retry after prior save completes is durably confirmed")
     print("PASS: failed save cannot be cleared by the synthetic editor's dirty=false")
     print("PASS: distinct equal-length VectorCraft bytes with a 32-bit FNV-1a collision are persisted")
-    print("PASS: unchanged VectorCraft bytes do not save and persisted bytes do not save twice")
+    print("PASS: VectorCraft retries after a rejected write, then skips unchanged persisted bytes")
     print("NOTE: synthetic local protocol test; not a Craft/Seafile E2E")
 
 

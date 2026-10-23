@@ -31,6 +31,11 @@
   PASS for the collision regression and post-fix Seafile evidence. It recorded
   dirty-warning, retry/concurrency, iframe sandbox and CSP gaps. This does not
   change the project-level GPT FAIL.
+* Added a synthetic Chromium retry check: VectorCraft's first write is rejected,
+  the document remains dirty, the next poll retries the exact edited bytes, and
+  unchanged persisted output does not create another write. This closes only
+  the retry-test gap; concurrent saves and durable Seafile failure/retry remain
+  unverified.
 
 ## 2026-10-23 — VectorCraft SVG round-trip in isolated Seafile
 
