@@ -23,6 +23,8 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
 CURRENT GR: GR-015 — per-library routing + user-bound conditional save (local draft)
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
+INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
+                    two-editor save race reproduced afterward, other findings open
 
 VERIFIED IN LOCAL REMEDIATION:
 - GR-015's synthetic DOCX file-list click → WordCraft edit → durable version →
@@ -30,6 +32,9 @@ VERIFIED IN LOCAL REMEDIATION:
   evidence: `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`
 - a real simultaneous conditional-save request race returned one 200 and one
   409; a fresh WordCraft open rendered the winning writer
+- two actual WordCraft sessions also sent Ctrl+S concurrently after different
+  edits; one committed, one stayed dirty on 409, and a fresh Seahub click/reopen
+  rendered only the committed edit
 
 OPEN GAPS:
 - ONLYOFFICE edit/save/version/reopen regression remains NOT VERIFIED

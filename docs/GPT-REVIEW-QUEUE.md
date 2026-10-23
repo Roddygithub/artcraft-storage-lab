@@ -28,6 +28,16 @@ separate reports. The current worktree is not yet frozen or reviewed.
 
 ## Remediation evidence — 2026-10-23
 
+An independent Nemotron review of exact SHA
+`a4ecc8e1d0da44a12f7bd9c4e529ed4accdb4a0e` returned **FAIL for candidate
+readiness**. It accepted the isolated DOCX click/edit/save/reopen and route-token
+runtime evidence, but found ONLYOFFICE regression still unverified and retained
+major findings for production origins, authorization edge cases, editor-level
+concurrency, other Crafts, security controls and licensing. The two-real-editor
+concurrency result below was reproduced after this review and has not itself
+been independently reviewed. Full report:
+`docs/reviews/REVIEW-NEMOTRON-A4ECC8E.md`.
+
 After the reviewed `0edbe52` SHA, the exact pinned GR-015 Seahub and C server
 patches were applied and run in a synthetic rootless Podman environment. Django
 checks/migrations and the patched fileserver startup passed. The real synthetic
@@ -35,7 +45,10 @@ Seahub file-list click opened WordCraft Web/WASM; a text edit was saved, the
 fileserver committed a new head/file ID, WordCraft confirmed success, and a
 fresh Seafile click reopened the edit. A simultaneous pair of conditional
 Seahub save requests produced one HTTP 200 and one HTTP 409; a fresh WordCraft
-open showed the winning paragraph only. Detailed evidence and limits are in
+open showed the winning paragraph only. A further race used two actual
+WordCraft editors: both made different edits and sent Ctrl+S concurrently. One
+created a new version; the other remained dirty with HTTP 409. A fresh Seahub
+click/reopen rendered only the winner. Detailed evidence and limits are in
 `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`.
 
 This is remediation evidence on the current local tip, not a new frozen GPT

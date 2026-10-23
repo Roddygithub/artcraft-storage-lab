@@ -39,14 +39,24 @@ were built/run in an isolated synthetic rootless Podman stack; Seahub checks and
 migrations passed. The browser clicked the synthetic file in Seahub, opened the
 real WordCraft Web/WASM app, edited and saved, received a committed new Seafile
 head/file ID, and reopened the saved sentence in a fresh WordCraft session.
-Two concurrent conditional writes yielded one 200 and one 409, and the fresh
-editor rendered the winner.
+Two concurrent conditional writes yielded one 200 and one 409. A later test
+repeated the race through two real WordCraft editors: both made different edits
+and sent Ctrl+S concurrently, one committed, the other stayed dirty with a 409,
+and a fresh Seahub click/reopen rendered only the winner. Seafile readback
+confirmed the current head/file ID and that the losing edit was absent.
 
 This does not change Sol's FAIL on `0edbe52` and does not mark a new SHA reviewed.
 The local browser test used a same-origin loopback proxy, so separate-origin
 security remains unverified. ONLYOFFICE regression, permission revocation,
 read-only bypass, stock/Go fileserver rejection, and GridCraft/VectorCraft E2E
 remain open. Production services were not changed; upstream is still locked.
+
+Nemotron independently reviewed SHA `a4ecc8e1d0da44a12f7bd9c4e529ed4accdb4a0e`
+and returned FAIL for candidate readiness, chiefly because ONLYOFFICE
+regression and separate-origin/auth edge cases were still unverified. A real
+two-editor concurrent save/reopen was then reproduced and documented; Nemotron
+has not reviewed that later evidence. See
+`docs/reviews/REVIEW-NEMOTRON-A4ECC8E.md`.
 
 ## 1. Repository
 

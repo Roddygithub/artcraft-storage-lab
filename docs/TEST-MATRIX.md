@@ -22,7 +22,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 1.9 | Read-only file | the editor opens in view mode, save is refused server-side | [ ] the gateway enforces it; the browser path is not driven yet |
 | 1.10 | Save failure (editor server error / network) | the editor stays dirty, the UI does **not** claim success | [ ] the HTTP path is covered (409/404); the browser path is not driven yet |
 | 1.11 | Editor closed with unsaved changes | the user is warned, no version is created | [ ] not yet exercised |
-| 1.12 | Concurrent modification (user B saves first) | user A's save is **refused** with a conflict, nothing is overwritten | [x] Two real WordCraft sessions: stale session received 409 and stayed dirty; simultaneous conditional requests also yielded one 200/one 409. External writers not covered; see isolated runtime evidence |
+| 1.12 | Concurrent modification (user B saves first) | stale save is **refused** with a conflict, nothing is overwritten | [x] Two edited real WordCraft sessions sent Ctrl+S concurrently: one committed and showed a new version; the other returned 409 and stayed dirty; fresh Seahub click/reopen rendered only the winning change. External writers not covered; see isolated runtime evidence |
 
 ## 2. DOCX — failure and edge cases (GR-007, GR-008, GR-009)
 
@@ -31,7 +31,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 2.1 | Browser reload during editing | session is re-established or the user is told to reopen; no silent data loss | [ ] |
 | 2.2 | Network loss during save | save fails cleanly, document stays dirty | [ ] |
 | 2.3 | Interrupted upload | no partial version is committed | [ ] |
-| 2.4 | Double save / overlapping editor tickets | no lost update or false clean state | [x] Patched Seahub/C fileserver rejected one of two simultaneous conditional writes (200/409); two editor sessions also exercised sequential stale-write rejection. The direct simultaneous calls were not two simultaneous editor keystroke saves; see isolated runtime evidence |
+| 2.4 | Double save / overlapping editor tickets | no lost update or false clean state | [x] Two real WordCraft editors saved concurrently through the bridge; one got a durable version, the loser got 409 and stayed dirty; fresh editor reopen confirmed the winner. This is separate tabs, not two overlapping tickets in one editor. See isolated runtime evidence |
 | 2.5 | Expired session | the save is refused with an explicit "session expired", not a generic error | [ ] |
 | 2.6 | Invalid / forged token | the request is rejected; nothing is read or written | [ ] |
 | 2.7 | Permission revoked while editing | the save is refused | [ ] |

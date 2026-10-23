@@ -93,11 +93,35 @@ WordCraft page. WordCraft rendered `Concurrent writer A`; the competing
 `Concurrent writer B` paragraph was absent. The screenshot is
 [`concurrent-save-reopen.png`](concurrent-save-reopen.png).
 
-This is a real concurrent HTTP save race against the patched local Seahub and C
-fileserver. The race's two writes were direct synthetic calls to the same
-Seahub save endpoint, not two simultaneous keystroke-driven WordCraft saves.
-It does not test the Go fileserver, stock fileserver rejection, all crash/network
-windows, permission revocation, or external writers.
+This first race is a real concurrent HTTP save race against the patched local
+Seahub and C fileserver. The race's two writes were direct synthetic calls to
+the same Seahub save endpoint.
+
+### Concurrent saves from two real WordCraft sessions
+
+After the direct request test, two separate Chromium tabs opened the same
+current DOCX through the synthetic Seahub file route. Each real WordCraft editor
+received a different text edit and showed its dirty state. Ctrl+S was sent to
+both tabs concurrently.
+
+| Session | Result |
+| --- | --- |
+| Editor A | Host showed `Saved — new version f540086f76da398bea7fbdaefadb861eafc515dd`; file ID changed to `0deaba676f0e4f30df28dbb7708c2264f9864cbb`; editor became clean |
+| Editor B | Host showed `Unsaved changes`; save returned HTTP 409 conflict; editor remained dirty |
+
+A new click from the Seahub file list opened a fresh WordCraft session. After
+the WASM editor finished rendering, it showed `Concurrent editor session A`.
+The current Seafile file-info and file-content endpoints reported the same new
+head and file ID; the retrieved DOCX was 5,340 bytes, its `word/document.xml`
+contained session A and the earlier committed content, and it did not contain
+session B. The screenshot is
+[`concurrent-editor-save-reopen.png`](concurrent-editor-save-reopen.png).
+
+This reproduces two real editor saves competing through the host bridge and
+patched local Seahub/C fileserver; one committed, the other stayed dirty, and a
+fresh editor reopen rendered the winning change. It does not test the Go
+fileserver, stock fileserver rejection, crash/network windows, permission
+revocation, or external writers.
 
 ## Conditional-route token check
 
@@ -128,6 +152,30 @@ save; the successful DOCX save above is the evidence for that.
 | Production Seafile / LAN / Tailscale | **NOT TESTED or changed** |
 | GridCraft, VectorCraft, DeckCraft, PdfCraft | **NOT covered by this DOCX evidence** |
 | Upstream RFC/patch or publication | **NOT READY; locked** |
+
+## Local checks reproduced on 2026-10-23
+
+Repository SHA during the two-editor race: `a4ecc8e1d0da44a12f7bd9c4e529ed4accdb4a0e`.
+The patched Seafile runtime was the rootless `artcraft-seafile-dev` container;
+the exact patch artifacts passed reverse-application checks against its source
+trees. The system Python is 3.14.8; browser checks used an ephemeral Python
+3.13.16 environment at `/tmp/artcraft-review-pw` with Playwright 1.64.1 and the
+already installed Chromium build. No dependency was added to the repository.
+
+| Command | Exit | What it establishes |
+| --- | ---: | --- |
+| `python3 tests/test_gateway_unit.py` | 0 | Gateway unit checks, including fake CAS, permission handling and error redaction; upstream is simulated |
+| `/tmp/artcraft-review-pw/bin/python tests/test_hostpage_protocol.py` | 0 | Synthetic save acknowledgement, dirty state, overlapping-ticket refusal and retry protocol |
+| `/tmp/artcraft-review-pw/bin/python tests/test_wordcraft_host_roundtrip.py` | 0 | Real WordCraft Web edit/serialize/ack/reopen against in-memory storage; not Seafile persistence |
+| `/tmp/artcraft-review-pw/bin/python tests/test_vectorcraft_svg_local.py` | 0 | Local VectorCraft editor semantics; not gateway or Seafile persistence |
+| `python3 tests/test_gr012_svg_assertions.py` | 0 | SVG false-positive guards |
+| `python3 tests/test_xlsx_fixture.py` | 0 | Formula fixture includes an OOXML `<f>` element and cached value |
+| `ARTCRAFT_SEAHUB_SOURCE=/tmp/artcraft-seafile-dev/src/seahub ARTCRAFT_SEAFILE_SERVER_SOURCE=/tmp/artcraft-seafile-dev/src/seafile-server python3 tests/test_gr015_authorization.py` | 0 | Exact patched helper/decorator checks with synthetic dependencies; not Django authorization runtime |
+| `python3 -m compileall -q integration tests` | 0 | Python syntax compilation |
+| `git -C /tmp/artcraft-seafile-dev/src/seahub apply --reverse --check /home/roddy/Projects/artcraft-storage-lab/docs/reviews/GR-015/seahub-12.0.14.patch` | 0 | The recorded Seahub patch is present in the running source tree |
+| `git -C /tmp/artcraft-seafile-dev/src/seafile-server apply --reverse --check /home/roddy/Projects/artcraft-storage-lab/docs/reviews/GR-015/seafile-server-12.0.14.patch` | 0 | The recorded fileserver patch is present in the running source tree |
+| `/tmp/artcraft-review-pw/bin/python tests/test_gr012_svg.py` | 2 | Not run: requires a Seafile API token, gateway URL, repo ID and file path |
+| `python3 tests/test_integration.py` | 2 | Not run: requires a synthetic Seafile API token, repo ID and file path |
 
 ## Verdict boundary
 

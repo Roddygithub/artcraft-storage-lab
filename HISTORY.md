@@ -1,5 +1,37 @@
 # HISTORY
 
+## 2026-10-23 — concurrent real WordCraft saves
+
+* In the isolated synthetic Seafile/WordCraft stack, opened the same current
+  DOCX in two browser sessions, made a separate edit in each actual WordCraft
+  editor, then sent Ctrl+S to both concurrently. One save created a new Seafile
+  head/file ID and showed `Saved — new version`; the other returned 409 and
+  remained dirty.
+* Reopened the file by clicking it in the Seahub file list. The fresh WordCraft
+  editor rendered the winning edit. Readback through Seafile's file-content
+  endpoint confirmed the same current head and included A's phrase, while B's
+  phrase was absent. Evidence and screenshot:
+  `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` and
+  `docs/reviews/GR-015/concurrent-editor-save-reopen.png`.
+* This closes the earlier gap where the simultaneous requests bypassed the
+  editor bridge. Same-editor overlapping tickets, Go/stock fileserver behavior,
+  permission revocation, production topology and ONLYOFFICE regression remain
+  unverified. No production or upstream service was changed; GPT review remains
+  FAIL and upstream publication remains locked.
+
+## 2026-10-23 — independent Nemotron review of `a4ecc8e`
+
+* Nemotron reviewed exact SHA `a4ecc8e1d0da44a12f7bd9c4e529ed4accdb4a0e` at
+  medium effort and returned FAIL for GPT-candidate readiness. It accepted the
+  isolated DOCX E2E and route-token runtime evidence, while retaining blockers
+  for ONLYOFFICE regression and major findings for origin separation, permission
+  revocation/read-only/expiry, editor-level concurrency, other Craft apps,
+  deployment controls and licensing.
+* The two-editor concurrent save/reopen test documented above ran after that
+  review and addresses its direct-request-only concurrency objection. Nemotron
+  has not reviewed the later evidence. Full report:
+  `docs/reviews/REVIEW-NEMOTRON-A4ECC8E.md`.
+
 ## 2026-10-23 — isolated Seafile/WordCraft runtime E2E and conditional race
 
 * Starting from local tip `7f828a4c58f49de247ac71bc66e58d2f41bfa230`, applied
