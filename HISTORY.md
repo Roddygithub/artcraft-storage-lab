@@ -1,5 +1,19 @@
 # HISTORY
 
+## 2026-10-23 — VectorCraft SVG round-trip in isolated Seafile
+
+* Clicked a synthetic SVG in the isolated Seahub file list, edited it in the
+  pinned VectorCraft Web build using its deterministic page API, and saved from
+  the editor. Seafile's content ID changed; the History UI showed 270 B and
+  609 B versions; gateway readback matched the editor's 609-byte output hash.
+* A fresh Seahub click opened a new VectorCraft session that parsed the saved
+  pencil path at the expected geometry. Evidence:
+  `docs/reviews/GR-012/VECTORCRAFT-SEAFILE-E2E-20261023.md`.
+* This is one app-specific runtime proof. VectorCraft uses its private page API,
+  so the common host contract is not proven; PdfCraft and the remaining Craft
+  apps are still open. Temporary upload/dispatch changes were restored in the
+  synthetic container. Production Seafile and ONLYOFFICE were untouched.
+
 ## 2026-10-23 — GridCraft saves and reopens through synthetic Seafile
 
 * Reproduced a real Seahub file-list click → patched GridCraft Web/WASM edit →

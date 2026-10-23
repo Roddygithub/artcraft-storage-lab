@@ -1,17 +1,16 @@
 # GR-012 — a non-Office format round-trips
 
-Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; previous free-model PASS is
-provisional and the historical E2E claim is not accepted.
-Date: 2026-10-22 · Library `c82cc792-389d-43e6-b963-0dab1a47a9a8` · File
-`/artcraft-lab/synthetic.svg` (synthetic) · VectorCraft 0.14.0 web build
+Status: **GPT-6.1 Sol FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`; later local runtime evidence is not an independent review.
+Date: 2026-10-23 · See `VECTORCRAFT-SEAFILE-E2E-20261023.md` for the reproduced run.
 
 ## 0. The verdict
 
-> Historical claim rejected by GPT Sol: the old test omitted the required
+> The historical test claim was rejected by GPT Sol: it omitted the required
 > `Origin`, accepted a rectangle path as the drawn stroke, and called byte
-> equality a reopen. The test now checks the pencil path and reopens VectorCraft,
-> but this revised test has not yet run against Seafile. GR-012 remains **NOT
-> VERIFIED**.
+> equality a reopen. A later manual run now reproduces a VectorCraft SVG
+> edit/save/version/history/reopen in isolated Seafile. The run uses
+> VectorCraft's private page API, so the common Craft host contract is still
+> **NOT VERIFIED** for non-Office formats.
 
 ## 1. Why VectorCraft, and why not PdfCraft
 
@@ -133,6 +132,18 @@ warning: [eframe::web::app_runner] ...: Title("synthetic.svg - VectorCraft")    
 
 **The asterisk is the editor's own dirty flag, appearing and going away.**
 
+## 3.1 Reproduced Seafile runtime flow (2026-10-23)
+
+The previous statement that the revised test had not run against Seafile is
+superseded by the manual runtime evidence in
+[`VECTORCRAFT-SEAFILE-E2E-20261023.md`](VECTORCRAFT-SEAFILE-E2E-20261023.md).
+The actual Seahub list click opened VectorCraft; the editor drew and serialized
+a path; Seafile returned a new version/content ID; readback matched all 609
+editor bytes; the Seafile History UI showed both the 270-byte and 609-byte
+versions; and a fresh Seahub click opened VectorCraft with the path parsed.
+This is a VectorCraft-specific transport proof, not proof of the common host
+contract or support across Craft apps.
+
 ## 4. The screenshot
 
 `browser-proof-svg.png`:
@@ -177,10 +188,10 @@ so.
 
 | Claim | Status |
 | --- | --- |
-| a non-Office format round-trips through Seafile and a Craft web editor, with semantic reopen | **NOT VERIFIED**; the updated test has not run against Seafile |
+| a non-Office format round-trips through Seafile and a Craft web editor, with semantic reopen | **REPRODUCED for one synthetic SVG in VectorCraft**; see the 2026-10-23 runtime report |
 | the **common contract** (`?host=parent`) covers non-Office formats | **NOT PROVEN** — VectorCraft has no bridge; CADCraft has one but its web build exposes no automation surface |
 | PdfCraft handles a PDF round-trip | **NOT PROVEN** — the modification could not be driven; see §1 |
-| VectorCraft's page API can edit and serialize the synthetic SVG locally | **REPRODUCED** with the pinned local web bundle; this is not Seafile persistence evidence |
+| VectorCraft's page API can edit and serialize the synthetic SVG locally | **REPRODUCED** locally and in the Seafile-backed runtime run |
 | the page API is a second, supported transport | **implemented**, but lacks editor dirty/commit acknowledgement and is not the common contract |
 
 ## 7. The follow-ups

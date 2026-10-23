@@ -50,9 +50,10 @@ The initial local browser test used a same-origin loopback proxy. A follow-up
 used Seahub and gateway/Craft on separate loopback ports, saved a real WordCraft
 edit, reloaded the file route, and verified the saved DOCX content from Seafile.
 Production TLS/proxy/CSP/CSRF and adversarial-frame isolation remain unverified.
-ONLYOFFICE regression, permission revocation, read-only bypass, stock/Go
-fileserver rejection, and VectorCraft E2E remain open. GridCraft now has a
-separate synthetic Seafile runtime result, documented below. Production
+ONLYOFFICE regression, permission revocation, read-only bypass, and stock/Go
+fileserver rejection remain open. GridCraft and VectorCraft now have separate
+synthetic Seafile runtime results, documented below. VectorCraft uses its
+private page API rather than the common contract. Production
 services were not changed; upstream is still locked.
 
 ### GridCraft synthetic Seafile runtime update — 2026-10-23
@@ -292,7 +293,7 @@ The full list, with what is still open, is in `docs/SECURITY.md`.
 | 4 | the synthetic file-list click and DOCX save/reopen are reproduced in the isolated test; the production instance still routes to ONLYOFFICE | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
 | 5 | the gateway ran in the isolated local container for the proof; no production deployment was made | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
 | 5b | a **leave-page warning about unsaved edits** is impossible for VectorCraft without an upstream dirty signal; the editor itself keeps unsaved work in recovery copies in the browser | `docs/reviews/GR-012/README.md` §2 |
-| 6 | GridCraft `.xlsx` save/reopen is reproduced in the synthetic stack; formula recalculation/conflicts remain open. VectorCraft SVG still needs its own reviewed round-trip evidence. | GR-010 and GR-012 bundles |
+| 6 | GridCraft `.xlsx` and VectorCraft `.svg` save/reopen are reproduced in the synthetic stack. GridCraft formula recalculation/conflicts remain open; VectorCraft uses its private page API, not the common host contract, and lacks dirty/save events. | GR-010 and GR-012 bundles |
 | 7 | The inspected upstream baseline still lacks host integration in most Craft apps; local WordCraft/GridCraft patches do not complete the all-app contract. **VectorCraft is driven by its own page API.** | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
 | 7b | VectorCraft's page API has **no dirty signal and no save event**; the host page polls `files()` with a content fingerprint | `docs/reviews/GR-012/README.md` §2 |
 | 7c | VectorCraft keeps at most **16** saved files in the page | upstream: `apps/vectorcraft-web/src/saved_files.rs` |

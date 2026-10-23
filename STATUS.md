@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-010 — GridCraft runtime round-trip follow-up; GR-015 supplies the local Seafile conditional-save stack
+CURRENT GR: GR-012 — VectorCraft SVG Seafile runtime round-trip reproduced; next assess the other Craft Web bridges against the common contract
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -53,7 +53,7 @@ OPEN GAPS:
   review PASS with three minor follow-ups. Its Seafile runtime path is now
   reproduced in the isolated synthetic stack; formula recalculation, GridCraft
   conflict behavior, and deployment security remain NOT VERIFIED.
-- VectorCraft Seafile semantic reopen is not verified
+- GR-012 VectorCraft SVG now has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. PdfCraft and the remaining Craft apps are not covered.
 - the first E2E browser run used a same-origin proxy; a separate-origin loopback
   follow-up now verifies the handoff and durable save, but production TLS,
   reverse-proxy behavior, CSP, CSRF, rate limits and adversarial-frame isolation
@@ -61,10 +61,10 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- continue from the GridCraft runtime result by checking formula behavior and
-  failure cases, then complete the app-by-app Web bridge/save capability matrix;
-  the target remains one platform adapter and one common host contract serving
-  all ArtCraft Web editors, not a GridCraft-only feature
+- continue by auditing each ArtCraft Web app's actual open/edit/serialize/save
+  seam against the common host contract; prioritize an app with an existing
+  bridge and a deterministic synthetic format path, then record app-specific
+  gaps instead of implying universal compatibility
 - preserve the existing file-type dispatch behavior for out-of-scope libraries;
   that is a compatibility guard, while the product work remains the ArtCraft
   editor integration

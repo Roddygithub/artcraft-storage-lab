@@ -317,12 +317,13 @@ Decision/Files/Tests/Free review/Evidence/Known risks: (filled at freeze time)
 
 ### GR-012 — Non-office Craft integration
 
-Status: **GPT REVIEW FAIL** — the historical SVG run did not prove the intended
-stroke after editor reopen. Revised local assertions are present; Seafile E2E is
-not verified. See `docs/reviews/GR-012/README.md`.
+Status: **GPT REVIEW FAIL on 0edbe52**; later local evidence reproduces a
+VectorCraft SVG click/edit/save/version/history/reopen in synthetic Seafile.
+This does not prove the common host contract or other Craft apps. See
+`docs/reviews/GR-012/VECTORCRAFT-SEAFILE-E2E-20261023.md`.
 
 ```text
-Status:     GPT REVIEW FAIL (Sol); Seafile persistence and dirty/commit acknowledgement remain unverified
+Status:     GPT REVIEW FAIL (Sol); VectorCraft SVG runtime reproduced, common contract/general Craft coverage remain unverified
 Branch/SHA: (filled at freeze time)
 
 Requirements:  .pdf via PdfCraft Web and .svg via VectorCraft Web, proving the
