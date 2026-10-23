@@ -31,7 +31,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 2.1 | Browser reload during editing | session is re-established or the user is told to reopen; no silent data loss | [ ] |
 | 2.2 | Network loss during save | save fails cleanly, document stays dirty | [ ] |
 | 2.3 | Interrupted upload | no partial version is committed | [ ] |
-| 2.4 | Double save (click Save twice) | no lost update or duplicate commit | [ ] NOT VERIFIED against a fileserver; current C patch has not been built or run |
+| 2.4 | Double save / overlapping editor tickets | no lost update or false clean state | [~] local Chromium protocol test rejects overlap and preserves dirty state; conditional Seafile race not verified against a fileserver |
 | 2.5 | Expired session | the save is refused with an explicit "session expired", not a generic error | [ ] |
 | 2.6 | Invalid / forged token | the request is rejected; nothing is read or written | [ ] |
 | 2.7 | Permission revoked while editing | the save is refused | [ ] |
@@ -90,7 +90,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 6.2 | An unknown extension | the normal Seafile download/preview path is used, unchanged | [ ] |
 | 6.3 | The existing ONLYOFFICE integration still works | `.docx` opened in the ONLYOFFICE path is unaffected | [ ] NOT VERIFIED — no browser open/edit/save regression was run |
 | 6.4 | The ONLYOFFICE configuration is untouched | `seahub_settings.py` keeps `ENABLE_ONLYOFFICE = True` and the same 15 extensions | [x] SSH read-only check after removing the third-party `.xlsx` route; no ONLYOFFICE setting changed |
-| 6.5 | The integration is reachable over the same vhost | the Craft host path is additive, existing routes unchanged | [ ] |
+| 6.5 | The integration is reachable through configured origins | ArtCraft host/Craft are same-origin; Seahub is a separate origin; only `/open/` accepts Seahub Origin | [~] local origin-policy test passes; reverse-proxy/browser behavior not verified |
 | 6.6 | Rollback | removing the added route restores the previous behaviour | [ ] |
 
 ## 7. Security (GR-009)

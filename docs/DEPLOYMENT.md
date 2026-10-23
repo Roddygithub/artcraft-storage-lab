@@ -139,22 +139,28 @@ future deployment, save the current Nginx Proxy Manager host config; its
 ### 2.1 The decision
 
 ```text
-   Seafile Web
-        |  allow-listed repository + supported extension
-        |  user-bound third-party-editor token
+   https://seafile.example (Seahub)
+        | allow-listed repository + supported extension
+        | one-time third-party-editor capability, form POST
         v
-   same-origin reverse proxy
-        |
-        +-- /open/, /session/, /artcraft/ -> ArtCraft gateway
-        +-- /            ->  Seafile          (unchanged)
-        +-- /seafhttp/   ->  Seafile          (unchanged)
-        +-- /onlyoffice/ ->  ONLYOFFICE       (unchanged)
-        +-- /artcraft/   ->  the gateway      (NEW, additive)
-                |
-                +-- /artcraft/open/          the host page
-                +-- /artcraft/<app>/         the Craft web build, static
-                +-- /artcraft/api/           the session endpoints
+   https://craft.example (gateway + Craft builds; separate origin)
+        | host page and editor frame are same-origin with each other
+        +-- /open/             capability handoff, accepts configured Seafile Origin only
+        +-- /session/          one-document browser API, same-origin POSTs only
+        +-- /artcraft/<app>/   Craft web build
+
+   https://seafile.example remains unchanged:
+        +-- /, /seafhttp/      Seafile
+        +-- /onlyoffice/       ONLYOFFICE
 ```
+
+The Seafile and ArtCraft origins **must differ**. The untrusted Craft frame is
+same-origin with the gateway host page so the existing bridge works; that host
+page must not share the Seahub origin, cookies, or DOM containing the submitted
+capability. Configure `ARTCRAFT_SEAFILE_ORIGIN` to the exact Seahub origin. The
+gateway permits that origin only on `POST /open/`; all session mutations still
+require the gateway's own origin. This form-navigation flow does not require
+CORS.
 
 **One Seafile connector, one gateway and per-library routing.** The current
 third-party-editor hook is read-only, so a user-bound save endpoint and a
@@ -250,9 +256,10 @@ Referrer-Policy: no-referrer
 ```
 
 **Still required before public deployment** (see `docs/SECURITY.md` §7): a
-`Content-Security-Policy` and a rate limit on `/open/`. The gateway now checks
-same-origin on state-changing endpoints; this does not by itself approve public
-exposure.
+`Content-Security-Policy` and a rate limit on `/open/`. The gateway permits the
+configured Seahub origin only for the `/open/` form handoff and checks the
+gateway origin on session mutations; proxy behavior remains unverified. This
+does not approve public exposure.
 
 ### 2.6 The self-hosting constraints
 
@@ -263,7 +270,8 @@ exposure.
 | no permanent fork | the current gateway source does not need a permanent fork, but safe user-bound conditional writes require a Seahub endpoint and a Seafile Server CAS change; draft patches are in `docs/reviews/GR-015/` |
 | ONLYOFFICE keeps working | only repository-scoped ArtCraft dispatch can claim formats in the synthetic library; the old global `.xlsx` map is removed, and ONLYOFFICE's settings are unchanged |
 | the Craft side knows nothing about Seafile | the Craft app receives bytes and returns bytes; the gateway is the only thing that knows the platform |
-| the browser holds no credential | the browser holds one opaque session id |
+| the Craft frame cannot read Seahub credentials or the handoff form | Seahub and ArtCraft use distinct origins; this topology is required, not optional |
+| the browser holds no reusable storage credential | after the form handoff it holds only an opaque one-document gateway session id |
 
 ### 2.7 On the Proxmox host
 
