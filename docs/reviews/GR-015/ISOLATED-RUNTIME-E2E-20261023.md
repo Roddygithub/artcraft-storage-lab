@@ -33,7 +33,7 @@ publication.
 | Seahub source | `haiwen/seahub` `1e9bde801b4360c14d784d9681d4261abc233a8b`, GR-015 patch applied, Django checks and migrations completed, then run in the same isolated container |
 | Editor | WordCraft Web/WASM, built from the local GR-014 patched tree; the running editor showed the WordCraft UI and loaded the DOCX in Chromium |
 | Data | Synthetic user, synthetic library `6862763d-721f-498a-bbf0-d666cee97496`, synthetic `synthetic.docx`; no personal or production documents |
-| Network | Test-only Nginx proxy; browser-facing endpoints were bound to host loopback. Seahub, gateway, and Craft were merged onto one local origin because the collaborative browser could not reach a second loopback port. This does **not** verify the intended separate-origin production topology or its security properties. |
+| Network | The first browser run used a same-origin test proxy. A follow-up on the same isolated stack used Seahub at `http://127.0.0.1:18000` and the gateway/Craft at `http://127.0.0.1:18777`; both were loopback-only. This checks cross-origin handoff in Chromium, not production TLS, proxy headers, CSP, or CSRF. |
 | Live services | No production Seafile, ONLYOFFICE, Proxmox guest, DNS, or upstream repository was changed during this test. |
 
 The test account password, access capabilities, session identifiers, and tokens
@@ -123,6 +123,37 @@ fresh editor reopen rendered the winning change. It does not test the Go
 fileserver, stock fileserver rejection, crash/network windows, permission
 revocation, or external writers.
 
+### Separate Seahub and gateway origins
+
+After the two-editor race, the synthetic Seahub setting was temporarily changed
+to `ARTCRAFT_ACTION_URL = "http://127.0.0.1:18777/open/"`; the gateway was
+already configured to accept `/open/` only from Seahub's `http://127.0.0.1:18000`
+origin. Only the synthetic Seahub process/configuration was changed, then the
+original setting `/open/` was restored and Seahub restarted. No repository file,
+production service, or upstream artifact was changed.
+
+Opening the synthetic DOCX through Seahub loaded the handoff form with the
+gateway's `:18777/open/` action and targeted Seahub's `office_frame`. The frame
+was cross-origin from Seahub (`:18000` vs `:18777`); Chromium blocked direct
+document access across that boundary. The gateway served the real
+WordCraft Web/WASM app and its document-read endpoint returned HTTP 200. A
+keyboard edit added `OriginCheck`; Ctrl+S reached the patched
+`thirdparty-editor/file-save` path and returned HTTP 200. Readback from
+Seafile's user-bound file-content endpoint showed a new file ID
+`c5e9d4e4651ac4bbd4afb8c75962ff462bf5c251`, repository head
+`ce2bcd90b3684448251d1ef7145a9c356bc9b6d3`, and a six-entry file history.
+
+The file-view route was reloaded to mint a fresh handoff and reopen the saved
+DOCX. The subsequent Seafile readback returned HTTP 200 and 5,351 bytes; the
+DOCX `word/document.xml` contained `OriginCheck` and the earlier committed
+`Concurrent editor session A`, while `Concurrent editor session B` remained
+absent. This verifies separate-origin handoff, durable save, and persisted
+content after a fresh route load. The editor's visible clean/save-confirmation
+indicator was **not captured in this follow-up** because the preview snapshot
+timed out on the canvas-heavy tab; the earlier same-origin run did observe it.
+This test does not establish production origin isolation through a reverse
+proxy, TLS, CSP, CSRF, or credential non-access from an adversarial Craft build.
+
 ## Conditional-route token check
 
 Using the patched fileserver's actual HTTP listener and tokens minted by its
@@ -148,14 +179,14 @@ save; the successful DOCX save above is the evidence for that.
 | Permission revocation, read-only bypass, expired/replayed capability | **NOT VERIFIED** end to end |
 | Unsupported stock C or Go fileserver fails closed | Source route absence is known; runtime deployment test **NOT RUN** |
 | ONLYOFFICE edit/save/version/reopen regression | **NOT RUN**; ONLYOFFICE was not configured in the scratch stack |
-| Separate Seahub/gateway/Craft origins, TLS, CSP, CSRF, rate limits, proxy trust | **NOT VERIFIED**; the browser test used a same-origin local proxy |
+| Separate Seahub/gateway origins and cross-origin handoff | **REPRODUCED** on distinct loopback ports; production TLS/proxy/CSP/CSRF and adversarial-frame testing remain **NOT VERIFIED** |
 | Production Seafile / LAN / Tailscale | **NOT TESTED or changed** |
 | GridCraft, VectorCraft, DeckCraft, PdfCraft | **NOT covered by this DOCX evidence** |
 | Upstream RFC/patch or publication | **NOT READY; locked** |
 
 ## Local checks reproduced on 2026-10-23
 
-Repository SHA during the two-editor race: `a4ecc8e1d0da44a12f7bd9c4e529ed4accdb4a0e`.
+Repository SHA during the two-editor race: `a4ecc8e1d0da44a12f7bd9c4e529ed4accdb4a0e`. The separate-origin follow-up was exercised against the same committed application at local tip `e513c6ae8f076f5abc07bb5f9634a7c6975cba5b`; its only temporary change was the mounted synthetic Seahub setting described above.
 The patched Seafile runtime was the rootless `artcraft-seafile-dev` container;
 the exact patch artifacts passed reverse-application checks against its source
 trees. The system Python is 3.14.8; browser checks used an ephemeral Python
@@ -176,6 +207,7 @@ already installed Chromium build. No dependency was added to the repository.
 | `git -C /tmp/artcraft-seafile-dev/src/seafile-server apply --reverse --check /home/roddy/Projects/artcraft-storage-lab/docs/reviews/GR-015/seafile-server-12.0.14.patch` | 0 | The recorded fileserver patch is present in the running source tree |
 | `/tmp/artcraft-review-pw/bin/python tests/test_gr012_svg.py` | 2 | Not run: requires a Seafile API token, gateway URL, repo ID and file path |
 | `python3 tests/test_integration.py` | 2 | Not run: requires a synthetic Seafile API token, repo ID and file path |
+| Manual Chromium test on separate loopback origins, 2026-10-23 | — | Seahub file route → gateway `/open/` on `:18777` → real WordCraft edit/Ctrl+S → Seafile file ID/head/history/content readback → route reload and content readback; no production data |
 
 ## Verdict boundary
 

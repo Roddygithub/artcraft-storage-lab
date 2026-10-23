@@ -46,10 +46,13 @@ and a fresh Seahub click/reopen rendered only the winner. Seafile readback
 confirmed the current head/file ID and that the losing edit was absent.
 
 This does not change Sol's FAIL on `0edbe52` and does not mark a new SHA reviewed.
-The local browser test used a same-origin loopback proxy, so separate-origin
-security remains unverified. ONLYOFFICE regression, permission revocation,
-read-only bypass, stock/Go fileserver rejection, and GridCraft/VectorCraft E2E
-remain open. Production services were not changed; upstream is still locked.
+The initial local browser test used a same-origin loopback proxy. A follow-up
+used Seahub and gateway/Craft on separate loopback ports, saved a real WordCraft
+edit, reloaded the file route, and verified the saved DOCX content from Seafile.
+Production TLS/proxy/CSP/CSRF and adversarial-frame isolation remain unverified.
+ONLYOFFICE regression, permission revocation, read-only bypass, stock/Go
+fileserver rejection, and GridCraft/VectorCraft E2E remain open. Production
+services were not changed; upstream is still locked.
 
 Nemotron independently reviewed SHA `a4ecc8e1d0da44a12f7bd9c4e529ed4accdb4a0e`
 and returned FAIL for candidate readiness, chiefly because ONLYOFFICE

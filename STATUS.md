@@ -35,13 +35,18 @@ VERIFIED IN LOCAL REMEDIATION:
 - two actual WordCraft sessions also sent Ctrl+S concurrently after different
   edits; one committed, one stayed dirty on 409, and a fresh Seahub click/reopen
   rendered only the committed edit
+- a follow-up used separate synthetic loopback origins for Seahub (`:18000`)
+  and gateway/Craft (`:18777`); WordCraft saved `OriginCheck`, and a fresh
+  route load/readback preserved it. Synthetic Seahub config was restored.
 
 OPEN GAPS:
 - ONLYOFFICE edit/save/version/reopen regression remains NOT VERIFIED
 - GridCraft durable acknowledgement and XLSX semantic reopen are not verified
 - VectorCraft Seafile semantic reopen is not verified
-- the E2E browser used a test-only same-origin local proxy; separate-origin
-  isolation, TLS, CSP, CSRF, rate limits and proxy trust remain NOT VERIFIED
+- the first E2E browser run used a same-origin proxy; a separate-origin loopback
+  follow-up now verifies the handoff and durable save, but production TLS,
+  reverse-proxy behavior, CSP, CSRF, rate limits and adversarial-frame isolation
+  remain NOT VERIFIED
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:

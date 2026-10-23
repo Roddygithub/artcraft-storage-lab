@@ -52,11 +52,13 @@ click/reopen rendered only the winner. Detailed evidence and limits are in
 `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`.
 
 This is remediation evidence on the current local tip, not a new frozen GPT
-candidate and not a Sol PASS. The isolated browser test used a same-origin
-loopback proxy; separate-origin security, production/ONLYOFFICE regression,
-read-only/revocation cases, unsupported stock/Go fileserver behavior, and the
-other Craft apps remain unverified. Public deployment and upstream publication
-remain locked.
+candidate and not a Sol PASS. The initial browser test used a same-origin
+loopback proxy; a follow-up on separate Seahub and gateway/Craft loopback origins
+verified a WordCraft edit, durable save, and persisted content after a fresh
+route load. Production TLS/proxy/CSP/CSRF, adversarial-frame isolation,
+ONLYOFFICE regression, read-only/revocation cases, unsupported stock/Go
+fileserver behavior, and the other Craft apps remain unverified. Public
+deployment and upstream publication remain locked.
 
 ## Queue
 

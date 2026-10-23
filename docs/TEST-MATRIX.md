@@ -90,7 +90,7 @@ Legend: `[ ]` not implemented · `[~]` implemented, not run · `[x]` passed ·
 | 6.2 | An unknown extension | the normal Seafile download/preview path is used, unchanged | [ ] |
 | 6.3 | The existing ONLYOFFICE integration still works | `.docx` opened in the ONLYOFFICE path is unaffected | [ ] NOT VERIFIED — no browser open/edit/save regression was run |
 | 6.4 | The ONLYOFFICE configuration is untouched | `seahub_settings.py` keeps `ENABLE_ONLYOFFICE = True` and the same 15 extensions | [x] SSH read-only check after removing the third-party `.xlsx` route; no ONLYOFFICE setting changed |
-| 6.5 | The integration is reachable through configured origins | ArtCraft host/Craft are same-origin; Seahub is a separate origin; only `/open/` accepts Seahub Origin | [~] Browser flow works through a test-only same-origin proxy; intended separate-origin deployment, TLS and origin isolation remain NOT VERIFIED |
+| 6.5 | The integration is reachable through configured origins | ArtCraft host/Craft are same-origin; Seahub is a separate origin; only `/open/` accepts Seahub Origin | [x] Synthetic Chromium run used Seahub `:18000` and gateway/Craft `:18777`; `/open/` handoff, editor save, fresh route load and persisted bytes verified. Production TLS/proxy, CSP/CSRF and adversarial frame testing remain NOT VERIFIED |
 | 6.6 | Rollback | removing the added route restores the previous behaviour | [ ] |
 
 ## 7. Security (GR-009)

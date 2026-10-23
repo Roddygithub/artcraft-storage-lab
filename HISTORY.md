@@ -32,6 +32,23 @@
   has not reviewed the later evidence. Full report:
   `docs/reviews/REVIEW-NEMOTRON-A4ECC8E.md`.
 
+## 2026-10-23 — separate-origin synthetic browser save
+
+* Changed only the isolated synthetic Seahub action URL temporarily to post to
+  the loopback gateway on port 18777, distinct from Seahub on port 18000. The
+  browser loaded the real WordCraft Web/WASM editor; Chromium enforced the
+  cross-origin boundary between Seahub and its editor frame.
+* Typed `OriginCheck`, pressed Ctrl+S, and verified a 200 save response, a new
+  Seafile file ID/head, and a six-entry history. After reloading the file route,
+  Seafile readback returned a 5,351-byte DOCX containing `OriginCheck` and the
+  earlier winning edit, with the losing edit absent. The temporary Seahub
+  setting was restored and the synthetic service restarted.
+* The editor's visible clean indicator was not captured in this follow-up;
+  production proxy/TLS/CSP/CSRF, ONLYOFFICE regression and authorization edge
+  cases remain open. No production or upstream service was changed. GPT review
+  remains FAIL and upstream remains locked. Evidence:
+  `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md`.
+
 ## 2026-10-23 — isolated Seafile/WordCraft runtime E2E and conditional race
 
 * Starting from local tip `7f828a4c58f49de247ac71bc66e58d2f41bfa230`, applied
