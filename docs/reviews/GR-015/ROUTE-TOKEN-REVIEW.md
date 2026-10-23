@@ -27,7 +27,11 @@ existing `op=update` prefix check and does not remove or bypass that check.
 
 ## Limits
 
-No C compilation, Django route import, fileserver request, or Seafile save was
-executed. Authorization revocation, concurrent writes, commit acknowledgement,
-and the DOCX editor workflow remain unverified. This narrow PASS does not change
-the overall GPT-6.1 Sol **FAIL** on candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`.
+After this narrow review, the exact patched C source was configured and the
+modified object plus complete `server` subproject compiled and linked in an
+isolated `/tmp` build using locally staged dependencies. No C runtime request,
+Django route import, or Seafile save was executed. Authorization revocation,
+concurrent writes, commit acknowledgement, and the DOCX editor workflow remain
+unverified. This source-level PASS and compile/link evidence do not change the
+overall GPT-6.1 Sol **FAIL** on candidate
+`0edbe524b4fa321b0f73f8601afef390e7f785e6`.

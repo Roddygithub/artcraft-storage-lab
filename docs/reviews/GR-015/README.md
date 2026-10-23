@@ -1,6 +1,6 @@
 # GR-015 — Per-library ArtCraft routing and conditional Seafile save
 
-Status: **Sol FAIL on `0edbe524b4fa321b0f73f8601afef390e7f785e6`; route-name remediation is committed as `0da898f` but not runtime-verified or re-reviewed**.
+Status: **Sol FAIL on `0edbe524b4fa321b0f73f8601afef390e7f785e6`; route-name remediation is committed as `0da898f` and the pinned patched fileserver now builds locally, but runtime behavior and the full save workflow remain unverified and the finding has not had a full Sol re-review**.
 
 This is the server-side work needed to make the gateway usable without taking
 Office formats away from ONLYOFFICE globally.
@@ -34,8 +34,9 @@ Office formats away from ONLYOFFICE globally.
    fileserver maps this distinct route to its conditional handler. The stock C and Go routers do not
    expose that route, so the request must fail with 404 before an unconditional
    update can happen. The C handler also rejects requests missing either
-   precondition. The patch remains **unbuilt/uninstalled**; route behavior,
-   proxy path preservation, and stale-save races need runtime tests.
+   precondition. The exact patched fileserver source now builds locally, but is
+   **not installed or runtime-tested**; route behavior, proxy path preservation,
+   and stale-save races still need runtime tests.
 5. A successful response is returned only after the fileserver returns a new
    file id and Seahub reads back the committed repository head.
 
@@ -58,7 +59,7 @@ runtime test.
 | Exact-source patch application | PASS for both patches against clean recorded base SHAs; source tree diff matches the patch artifact |
 | License/provenance inventory | PASS for exact source SHAs and license-file references; legal compatibility/distribution is **NOT VERIFIED** (`THIRD-PARTY-NOTICES.md`) |
 | Patched Seahub syntax/helper checks | PASS for Python compilation and the synthetic AST harness, including capability audience/grant/allowlist and route-prefix source checks; actual C header-hook and Django/Seafile runtime are **NOT VERIFIED** |
-| Seafile Server C build | **NOT VERIFIED**; isolated configure stops because `libsearpc` is absent (and `intltoolize` is unavailable); no C compilation occurred |
+| Seafile Server C build | PASS for configure, the modified `upload-file.o`, and the complete `server` subproject at the pinned patched source SHA. Built in `/tmp` with locally staged dependencies and GNU C11 flags; no runtime or installation was performed. Reproduction details are in `HISTORY.md`. |
 | Seahub deployment/import test | **NOT RUN** |
 | Synthetic Seafile save and conflict test against patched binaries | **NOT RUN** |
 | Browser click from the Seafile file list | **REPRODUCED: current route opens ONLYOFFICE**, observed on the synthetic library; ArtCraft gateway is not installed/configured |

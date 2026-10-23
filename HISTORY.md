@@ -33,6 +33,20 @@
   existing token-operation check. The reviewer classified the evidence as
   static/source-only; no C/Django/runtime behavior was tested. See
   `docs/reviews/GR-015/ROUTE-TOKEN-REVIEW.md`.
+* The exact patched Seafile Server 12.0.14 source was subsequently configured
+  and built in an isolated `/tmp` tree. `server/upload-file.o` compiled and
+  `make -C server -j2` linked the complete fileserver subproject successfully.
+  An earlier apparent build PASS was discarded after a source-tree check showed
+  it had built the clean upstream base without the patch; both exact GR-015
+  patches were then applied and the build repeated successfully.
+  The workstation's `libjwt` 3.2.3 API is incompatible with this Seafile source,
+  so `libjwt` 1.18.4 was built from its upstream tag into `/tmp`; Seafile's other
+  missing build dependencies were staged under `/tmp` as well. GNU C11 flags
+  were needed for this older source's callback signatures with the current GCC.
+  This establishes compile/link only: the binary was not installed or run, and
+  no HTTP route, token hook, Django flow, race, or save was exercised. The
+  earlier “configure stopped/no C compilation” row below is superseded by this
+  result.
 
 ### Reproduction record for the local route remediation
 
@@ -50,7 +64,10 @@ were pinned to the Seahub and Seafile SHAs listed in `docs/reviews/GR-015/README
 | `git diff --check` plus pinned-source `git apply --check` for each GR-015 patch | 0 | Whitespace and applicability against clean source trees; no build/runtime |
 | `python3 tests/test_gr012_svg.py` without its required Seafile URL/token, gateway, repository and path | 2 | Not run; the script printed its invocation and stopped |
 | `python3 tests/test_gr010_xlsx.py` | 2 | Not run; no such test file exists (`tests/test_xlsx_fixture.py` is the fixture check) |
-| `./autogen.sh && ./configure --disable-fuse --disable-python --enable-httpserver` in the pinned patched Seafile Server source clone | 1 | Configure stopped because `libsearpc` is unavailable; `intltoolize` is also missing, so no C compilation occurred |
+| `./autogen.sh && ./configure --disable-fuse --disable-python --enable-httpserver` in the pinned patched Seafile Server clone, after staging its build dependencies under `/tmp` | 0 | Configure passed; `intltoolize` was unavailable but `autogen.sh` continued and generated the configure script |
+| `make -C lib libseafile_common.la` and `make -C common/cdc libcdc.la` with temporary dependency paths | 0 | Built required local static dependencies in the pinned source clone |
+| `git apply --check` then `git apply` for both GR-015 patches on the pinned Seahub and Seafile Server clones | 0 | Confirms both exact patch artifacts apply to the recorded upstream source commits; the Seafile Server worktree contains the patch during the build below |
+| `make -C server -j2` with `CPPFLAGS` for staged libjwt/libsearpc/evhtp headers, `CFLAGS='-std=gnu11 -g -O2'`, and temporary `LDFLAGS`/runtime library paths | 0 | Rebuilt and linked the complete fileserver subproject, including patched `upload-file.c`, against the pinned patched source; not runtime or integration evidence |
 
 Environment: Python 3 on the local workstation; Playwright is unavailable in the
 system Python and the old temporary browser-test environment is absent. No
