@@ -1,11 +1,11 @@
 # STATUS
 
 ```text
-PHASE:      GPT-6.1 Sol FAIL on 0edbe52; isolated GR-015 runtime remediation evidence recorded
+PHASE:      GPT-6.1 Sol FAIL on 0edbe52; GR-016 all-app seam audit and Rust transport prototype in progress
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   remediation commits are not reviewed by Sol
+WORKTREE:   GR-016 docs are modified locally; Rust prototype lives only in scratch clones
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-012 — VectorCraft SVG Seafile runtime round-trip reproduced; next assess the other Craft Web bridges against the common contract
+CURRENT GR: GR-016 — all 13 app seams inventoried; WordCraft/GridCraft synthetic-host round trips and GridCraft host-driven in-app Open pass; two GridCraft issues remediated and independently passed by Sol low with minor notes; project GPT status remains FAIL
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -53,7 +53,7 @@ OPEN GAPS:
   review PASS with three minor follow-ups. Its Seafile runtime path is now
   reproduced in the isolated synthetic stack; formula recalculation, GridCraft
   conflict behavior, and deployment security remain NOT VERIFIED.
-- GR-012 VectorCraft SVG now has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. PdfCraft and the remaining Craft apps are not covered.
+- GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
 - Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium collision test passes, and the isolated Seafile-backed VectorCraft flow was rerun successfully after the fix (695 B saved/read back byte-identically and reopened with the new path). See the GR-012 post-fix runtime report.
 - Nemotron independently returned a bounded PASS for that exact-byte fix. A later synthetic Chromium test now verifies failed-write retry; VectorCraft still lacks a full dirty signal, concurrent-save coverage and CSP/sandbox controls. This does not establish common-contract support or an overall project PASS.
 - the first E2E browser run used a same-origin proxy; a separate-origin loopback
@@ -63,12 +63,12 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- finish the parallel read-only audits of each ArtCraft Web app's actual
-  open/edit/serialize/save seam; several initial provider runs timed out, and
-  fast-model retries were launched for those apps
-- after their findings, implement a shared Rust/WASM transport in or beside
-  `craft-platform` and migrate WordCraft + GridCraft first, preserving their
-  distinct save lifecycles and using opaque string tickets on the wire
+- commit and push the independently reviewed GR-016 evidence to main; keep the
+  bounded review's minor notes and Seafile/remaining-app gaps visible
+- the Chromium tests use synthetic `sessionStorage`, not Seafile, and the app
+  dependency is still a temporary local path
+- keep later app adapters scoped to their observed per-app open/serialize/save
+  seams; a common transport does not create an editor serializer or durable ack
 - keep Seafile/provider persistence in the connector and editor lifecycle in
   Rust/WASM; do not publish upstream before GPT PASS
 - preserve the existing file-type dispatch behavior for out-of-scope libraries;

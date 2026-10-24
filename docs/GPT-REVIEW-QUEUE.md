@@ -368,6 +368,19 @@ Evidence:       docs/reviews/GR-006/
 Known risks:    NOT PUBLISHED. The upstream hard gate holds until GPT REVIEW PASS.
 ```
 
+### GR-016 — All-app seams and shared Rust transport
+
+```text
+Status:      PROTOTYPE IN PROGRESS; not a candidate; bounded Sol low review PASS with minor notes
+Branch/SHA:  main / root docs currently in local working tree; source changes remain in scratch clones
+Scope:       inventory all 13 ArtCraft Web app seams; standardize transport; adapt WordCraft and GridCraft first
+Evidence:    docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md and README.md
+Tests:       craft-platform 6 tests + strict clippy + WASM checks pass; WordCraft/GridCraft Chromium synthetic-host edit/ack/reopen and rejection checks pass; GridCraft in-app Open and Rust 1.95 WASM check pass using a temporary local path dependency
+Open:        Seafile E2E after refactor, three minor review notes, remaining app-specific seams
+GPT review:  NOT REQUESTED; existing project verdict remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC or patch was published
+```
+
 ## GPT review instruction (for the future session)
 
 ```text

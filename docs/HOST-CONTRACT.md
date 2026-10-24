@@ -1,8 +1,17 @@
 # The Craft Web Host Contract
 
-Status: **PROVISIONAL — local proposal** · GPT REVIEW: FAIL on the frozen `0edbe524` candidate; current remediation tip is not frozen or reviewed
+Status: **PROVISIONAL — local proposal; GR-016 prototype under review** · GPT REVIEW: FAIL on the frozen `0edbe524` candidate; current remediation tip is not frozen or reviewed
 Owner: artcraft-owner · Architecture input: artcraft-architect (GR-003) ·
 Feasibility: artcraft-owner · Independent review: artcraft-reviewer (pending)
+
+> **Revision note (2026-10-24):** Sections below record the earlier bridge
+> survey/proposal and contain stale app-count and capability claims. The current
+> pinned-source inventory is [`docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md`](reviews/GR-016/APP-SEAM-AUDITS-20261024.md).
+> A shared `craft-platform` Rust/WASM transport was prototyped with WordCraft
+> and GridCraft in scratch clones; release-browser smoke tests used a synthetic
+> `sessionStorage` host. See [`docs/reviews/GR-016/README.md`](reviews/GR-016/README.md).
+> This does not establish Seafile persistence or suite-wide adoption. Do not
+> treat the historical assertions below as current source findings.
 
 ## 0. Summary
 

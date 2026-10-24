@@ -100,7 +100,25 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 See `docs/SECURITY.md` for the full threat list. The matrix rows above 2.15-2.19
 are the executable part of it.
 
-## 8. How results are recorded
+## 8. Shared Rust host transport prototype (GR-016)
+
+| # | Test | Expected | Result |
+| --- | --- | --- | --- |
+| 8.1 | Opaque save ticket round-trip, one-time ack, bounded pending queue | JS-safe string IDs; duplicate/unknown results rejected; at most 64 pending saves | [~] 4 host protocol unit tests pass in scratch `craft-libs` checkout; code not yet in candidate |
+| 8.2 | Parent message origin/source validation | exact origin and parent source required | [~] native predicate tests pass; actual browser message source not exercised |
+| 8.3 | Shared browser transport compilation | Rust/WASM transport builds | [~] `cargo check -p craft-platform --features browser --target wasm32-unknown-unknown` passes in scratch checkout |
+| 8.4 | WordCraft and GridCraft adapters compile with shared transport | both pinned apps build for WASM | [~] `cargo check -p wordcraft-web --target wasm32-unknown-unknown` and GridCraft equivalent pass using a temporary local path dependency |
+| 8.5 | Browser editor saves only become clean after durable host ack | failed/stale/unknown responses keep document dirty | [~] Chromium smoke tests passed for WordCraft and GridCraft against a synthetic `sessionStorage` host; both apps stayed dirty after explicit host rejection |
+| 8.6 | Browser app reopen from saved bytes after shared refactor | app displays the saved edit | [~] fresh iframe reopen passed for both apps; XLSX ZIP/formula integrity checked |
+| 8.7 | Complete WordCraft / GridCraft Seafile save-version-reopen flow after shared refactor | saved edit survives fresh app reopen from Seafile | [ ] not run; no new Seafile E2E claim |
+| 8.8 | GridCraft in-app Open requests a file from the host | parent receives `gridcraft:openRequest` and supplies the selected bytes | [x] Rust 1.95 release bundle: Ctrl+O emitted one request; synthetic parent returned stored bytes; GridCraft displayed `HostAck`; screenshot in GR-016 |
+| 8.9 | Independent review of GridCraft Open/MSRV/ack remediations | no blocker or major finding remains | [x] GPT-6.1 Sol low provisional bounded PASS; three minor findings in `docs/reviews/GR-016/REVIEW-SOL-LOW-R3.md` |
+
+GridCraft now declares Rust 1.95 in the scratch prototype to match current
+dependency MSRVs. Full commands, warnings and exact pinned SHAs are in
+`docs/reviews/GR-016/README.md`.
+
+## 9. How results are recorded
 
 Each test result is recorded in the corresponding evidence bundle under
 `docs/reviews/GR-XXX/` with:

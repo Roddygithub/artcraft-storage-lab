@@ -1,0 +1,291 @@
+diff --git c/Cargo.lock w/Cargo.lock
+index 538b454..5ce5662 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
+@@ -878,6 +878,15 @@ dependencies = [
+  "thiserror 2.0.21",
+ ]
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-print"
+ version = "0.1.0"
+@@ -5426,6 +5435,7 @@ dependencies = [
+ name = "wordcraft-web"
+ version = "0.9.0"
+ dependencies = [
++ "craft-platform",
+  "eframe",
+  "egui",
+  "js-sys",
+diff --git c/Cargo.toml w/Cargo.toml
+index 2a7e9aa..0becad8 100644
+--- c/Cargo.toml
++++ w/Cargo.toml
+@@ -12,6 +12,7 @@ repository = "https://github.com/storytold/wordcraft"
+ 
+ [workspace.dependencies]
+ # internal
++craft-platform = { path = "/tmp/artcraft-gr016-craft-libs/crates/platform" }
+ wordcraft-geom = { path = "crates/geom" }
+ wordcraft-doc = { path = "crates/doc" }
+ wordcraft-fonts = { path = "crates/fonts" }
+diff --git c/apps/wordcraft-web/Cargo.toml w/apps/wordcraft-web/Cargo.toml
+index 9152db3..746cf5e 100644
+--- c/apps/wordcraft-web/Cargo.toml
++++ w/apps/wordcraft-web/Cargo.toml
+@@ -23,10 +23,11 @@ wordcraft-doc = { workspace = true }
+ wordcraft-fonts = { workspace = true }
+ 
+ [target.'cfg(target_arch = "wasm32")'.dependencies]
++craft-platform = { workspace = true, features = ["browser"] }
+ # `wgpu` pulls egui-wgpu's defaults: WebGPU plus the WebGL2 fallback.
+ eframe = { workspace = true, features = ["default_fonts", "wgpu", "accesskit"] }
+ rfd = { workspace = true }
+ wasm-bindgen = "0.2"
+ wasm-bindgen-futures = "0.4"
+ js-sys = "0.3"
+-web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "HtmlIFrameElement", "Blob", "BlobPropertyBag", "Url", "Location", "CssStyleDeclaration", "Event", "EventTarget", "BeforeUnloadEvent", "ClipboardEvent", "DataTransfer", "FileList", "File", "DomStringList", "IdbFactory", "IdbOpenDbRequest", "IdbRequest", "IdbDatabase", "IdbObjectStore", "IdbTransaction", "IdbTransactionMode", "MediaQueryList", "Storage"] }
++web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "HtmlIFrameElement", "Blob", "BlobPropertyBag", "Url", "Location", "CssStyleDeclaration", "Event", "EventTarget", "BeforeUnloadEvent", "ClipboardEvent", "DataTransfer", "FileList", "File", "DomStringList", "MessageEvent", "UrlSearchParams", "IdbFactory", "IdbOpenDbRequest", "IdbRequest", "IdbDatabase", "IdbObjectStore", "IdbTransaction", "IdbTransactionMode", "MediaQueryList", "Storage"] }
+diff --git c/apps/wordcraft-web/src/host.rs w/apps/wordcraft-web/src/host.rs
+new file mode 100644
+index 0000000..4df98ff
+--- /dev/null
++++ w/apps/wordcraft-web/src/host.rs
+@@ -0,0 +1,126 @@
++//! WordCraft adapter for the shared Craft parent-frame transport.
++use std::cell::{Cell, RefCell};
++use std::rc::Rc;
++
++use craft_platform::browser::host::{HostListener, HostMessage, HostTransport};
++use craft_platform::host_protocol::{PendingSaves, SaveTicket};
++use wordcraft_ui_egui::async_saves::{AsyncSaves, SaveOutcome};
++use wordcraft_ui_egui::{Inbox, Services};
++
++const MAX_AUTHOR_CHARS: usize = 200;
++
++#[derive(Clone)]
++pub struct Bridge {
++    transport: HostTransport,
++    saves: AsyncSaves,
++    pending: Rc<RefCell<PendingSaves<u64>>>,
++    listener: Rc<RefCell<Option<HostListener>>>,
++    reported: Rc<Cell<Option<bool>>>,
++}
++
++impl Bridge {
++    /// `None` when this page is not framed by a same-origin parent.
++    pub fn new(saves: AsyncSaves) -> Option<Self> {
++        Some(Self {
++            transport: HostTransport::current("wordcraft").ok()??,
++            saves,
++            pending: Rc::default(),
++            listener: Rc::default(),
++            reported: Rc::default(),
++        })
++    }
++
++    pub fn connect(&self, services: &mut Services, inbox: Inbox, ctx: egui::Context) {
++        self.listen(inbox, ctx);
++        let bridge = self.clone();
++        services.download = Some(Box::new(move |path: &str, bytes: &[u8]| {
++            let name = file_name(path);
++            let save_id = bridge.saves.start();
++            let Some(ticket) = SaveTicket::new(format!("wordcraft:{save_id}")) else {
++                bridge.saves.finish(save_id, SaveOutcome::Failed("couldn't create save ticket".into()));
++                return Err("couldn't create save ticket".to_string());
++            };
++            if bridge.pending.borrow_mut().insert(ticket.clone(), save_id).is_err() {
++                bridge.saves.finish(save_id, SaveOutcome::Failed("too many saves are waiting for the host".into()));
++                return Err("too many saves are waiting for the host".to_string());
++            }
++            if let Err(error) = bridge.transport.post_save(&ticket, &name, bytes, false) {
++                bridge.pending.borrow_mut().complete(&ticket);
++                bridge.saves.finish(save_id, SaveOutcome::Failed(js_error(error)));
++                return Err("couldn't send save to host".to_string());
++            }
++            Ok(())
++        }));
++
++        let bridge = self.clone();
++        services.open_async = Some(Box::new(move |purpose: &str| {
++            let _ = bridge.transport.post_open_request(purpose);
++        }));
++
++        let bridge = self.clone();
++        let previous = services.on_dirty.take();
++        services.on_dirty = Some(Box::new(move |dirty| {
++            if let Some(previous) = &previous {
++                previous(dirty);
++            }
++            bridge.post_dirty(dirty);
++        }));
++    }
++
++    pub fn set_author(app: &mut wordcraft_ui_egui::WordApp, author: &str) {
++        let author: String = author.trim().chars().take(MAX_AUTHOR_CHARS).collect();
++        if !author.is_empty() {
++            app.session.author = author;
++        }
++    }
++
++    pub fn post_ready(&self) {
++        let _ = self.transport.post_ready(env!("CARGO_PKG_VERSION"));
++    }
++
++    pub fn post_failed(&self, error: &str) {
++        let _ = self.transport.post_failed(error);
++    }
++
++    pub fn post_dirty(&self, dirty: bool) {
++        if self.reported.get() == Some(dirty) {
++            return;
++        }
++        if self.transport.post_dirty(dirty).is_ok() {
++            self.reported.set(Some(dirty));
++        }
++    }
++
++    fn listen(&self, inbox: Inbox, ctx: egui::Context) {
++        let saves = self.saves.clone();
++        let pending = self.pending.clone();
++        let reported = self.reported.clone();
++        let listener = self.transport.listen(move |message| match message {
++            HostMessage::Open { name, bytes } => {
++                inbox.lock().unwrap_or_else(|e| e.into_inner()).push((name, bytes));
++                ctx.request_repaint();
++            }
++            HostMessage::SaveResult { ticket, ok, error } => {
++                let Some(save_id) = pending.borrow_mut().complete(&ticket) else {
++                    return;
++                };
++                let outcome =
++                    if ok { SaveOutcome::Saved } else { SaveOutcome::Failed(error.unwrap_or_else(|| "the host couldn't save the file".to_string())) };
++                saves.finish(save_id, outcome);
++                reported.set(None);
++                ctx.request_repaint();
++            }
++        });
++        if let Ok(listener) = listener {
++            *self.listener.borrow_mut() = Some(listener);
++        }
++    }
++}
++
++fn file_name(path: &str) -> String {
++    std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| "document.docx".to_string())
++}
++
++fn js_error(error: wasm_bindgen::JsValue) -> String {
++    error.as_string().unwrap_or_else(|| "host message failed".to_string())
++}
+diff --git c/apps/wordcraft-web/src/main.rs w/apps/wordcraft-web/src/main.rs
+index 39c2f98..5f62d98 100644
+--- c/apps/wordcraft-web/src/main.rs
++++ w/apps/wordcraft-web/src/main.rs
+@@ -7,7 +7,8 @@
+ //! Differences from the desktop app: no TCP control channel; Open and Insert › Pictures use the
+ //! browser file picker (bytes arrive through `Services::inbox`); Save and Export download.
+ //! Preferences (theme, interface size, editing options…) are kept in `localStorage` (`prefs`).
+-//! URL flags: `?webgl` forces WebGL2; `?sample` opens the sample document.
++//! URL flags: `?webgl` forces WebGL2; `?sample` opens the sample document;
++//! `?host=parent` talks to a same-origin parent page instead (see `host`).
+ #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
+ 
+ #[cfg(any(target_arch = "wasm32", test))]
+@@ -15,6 +16,9 @@ mod prefs;
+ #[cfg(any(target_arch = "wasm32", test))]
+ mod save_fallback;
+ 
++#[cfg(target_arch = "wasm32")]
++mod host;
++
+ #[cfg(target_arch = "wasm32")]
+ mod web;
+ 
+diff --git c/apps/wordcraft-web/src/web.rs w/apps/wordcraft-web/src/web.rs
+index b2e698c..c69e2a2 100644
+--- c/apps/wordcraft-web/src/web.rs
++++ w/apps/wordcraft-web/src/web.rs
+@@ -29,6 +29,12 @@ pub fn start() {
+         };
+         let dirty = Rc::new(Cell::new(false));
+         let saves = AsyncSaves::default();
++        // `?host=parent`: a same-origin page framing WordCraft (such as a Nextcloud app) opens
++        // documents in it and stores what it saves (`host`).
++        let host = query_param("host").as_deref() == Some("parent");
++        let bridge = if host { crate::host::Bridge::new(saves.clone()) } else { None };
++        // A copy for the failure path below, which the runner's closure can't hand back.
++        let bridge_on_failure = bridge.clone();
+         if let Err(e) = guard_unload(dirty.clone(), saves.clone()) {
+             log::error!("no unsaved-changes guard: {e}");
+         }
+@@ -43,6 +49,7 @@ pub fn start() {
+                 canvas,
+                 options,
+                 Box::new(move |cc| {
++                    let bridge = bridge.clone();
+                     if let Some(rs) = &cc.wgpu_render_state {
+                         log::info!("wordcraft-web: wgpu backend {:?}", rs.adapter.get_info().backend);
+                     }
+@@ -65,6 +72,15 @@ pub fn start() {
+                     // Pasted pictures wait apart from dropped files: the app inserts one only when the page is the edit target (#1349).
+                     app.services.pasted = Some(pasted);
+                     app.autosave = false;
++                    if let Some(bridge) = &bridge {
++                        // The parent opens the documents and takes the saves; the browser's own
++                        // file picker and download stand aside.
++                        bridge.connect(&mut app.services, inbox.clone(), cc.egui_ctx.clone());
++                        if let Some(author) = query_param("author") {
++                            crate::host::Bridge::set_author(&mut app, &author);
++                        }
++                        bridge.post_ready();
++                    }
+                     // Preferences from an earlier visit (#2132), as the desktop app reads `ui.json`.
+                     let stored = stored_prefs();
+                     crate::prefs::restore(&mut app, stored.as_deref());
+@@ -76,7 +92,8 @@ pub fn start() {
+                     }
+                     let prefs = crate::prefs::PrefsSync::new(stored);
+                     // No document to show: start on File › Home, as the desktop app does (#766).
+-                    if !sample {
++                    // A framed page shows the document the parent sends instead.
++                    if !sample && !host {
+                         app.start_screen();
+                     }
+                     Ok(Box::new(WebShell { app, inbox, messages, prefs }))
+@@ -86,7 +103,13 @@ pub fn start() {
+         if let Some(el) = document.get_element_by_id(LOADING_ID) {
+             match result {
+                 Ok(()) => el.remove(),
+-                Err(e) => el.set_inner_html(&format!("<p>WordCraft failed to start: {e:?}</p><p>A browser with WebGPU or WebGL2 is required.</p>")),
++                Err(e) => {
++                    // The parent framed this page: it has to know the app didn't start.
++                    if let Some(bridge) = &bridge_on_failure {
++                        bridge.post_failed(&format!("{e:?}"));
++                    }
++                    el.set_inner_html(&format!("<p>WordCraft failed to start: {e:?}</p><p>A browser with WebGPU or WebGL2 is required.</p>"))
++                }
+             }
+         }
+     });
+@@ -96,6 +119,11 @@ fn query() -> String {
+     web_sys::window().and_then(|w| w.location().search().ok()).unwrap_or_default()
+ }
+ 
++/// One value of the page's query string, e.g. `host` of `?host=parent`.
++fn query_param(key: &str) -> Option<String> {
++    web_sys::UrlSearchParams::new_with_str(&query()).ok()?.get(key)
++}
++
+ /// Wraps the app to read dropped files asynchronously (browsers can't read them synchronously)
+ /// and feed them through the inbox.
+ struct WebShell {

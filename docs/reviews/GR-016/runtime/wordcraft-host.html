@@ -1,0 +1,53 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>WordCraft shared-host transport smoke test</title>
+<style>body{font:14px sans-serif;margin:12px}#bar{display:flex;gap:12px;align-items:center;margin-bottom:8px}#status{font-family:monospace}.frame{width:100%;height:82vh;border:1px solid #888}</style>
+<div id="bar"><button id="reopen">Close and reopen saved bytes</button><button id="reset">Reset fixture</button><label><input id="reject" type="checkbox"> reject next save</label><span id="status">waiting for WordCraft…</span></div>
+<iframe id="editor" class="frame"></iframe>
+<script>
+const frame = document.getElementById('editor');
+const status = document.getElementById('status');
+const storageKey = 'gr016-wordcraft-docx';
+let opening = false;
+let rejectNext = false;
+document.getElementById('reject').addEventListener('change', e => { rejectNext = e.target.checked; });
+function toBase64(bytes) { let s = ''; for (let i=0;i<bytes.length;i+=0x8000) s += String.fromCharCode(...bytes.subarray(i,i+0x8000)); return btoa(s); }
+function fromBase64(value) { const s=atob(value), b=new Uint8Array(s.length); for(let i=0;i<s.length;i++) b[i]=s.charCodeAt(i); return b; }
+async function sendOpen() {
+  if (opening) return;
+  opening = true;
+  try {
+    const saved=sessionStorage.getItem(storageKey);
+    const bytes=saved ? fromBase64(saved) : new Uint8Array(await (await fetch('./synthetic.docx')).arrayBuffer());
+    const name=saved ? 'GR016-saved.docx' : 'GR016-fixture.docx';
+    status.textContent=`open ${name} (${bytes.length} bytes)`;
+    const buffer=bytes.buffer;
+    frame.contentWindow.postMessage({type:'wordcraft:open',name,bytes:buffer},location.origin,[buffer]);
+  } catch(e) { status.textContent='open failed: '+e; }
+  finally { opening = false; }
+}
+window.addEventListener('message', async event => {
+  if (event.origin !== location.origin || event.source !== frame.contentWindow) return;
+  const msg=event.data || {};
+  if(msg.type==='wordcraft:ready') { status.textContent='ready; '+(sessionStorage.getItem(storageKey)?'reopening saved bytes':'opening fixture'); await sendOpen(); }
+  if(msg.type==='wordcraft:dirty') status.textContent=`editor dirty=${msg.dirty}`;
+  if(msg.type==='wordcraft:save') {
+    const bytes = msg.bytes instanceof ArrayBuffer ? new Uint8Array(msg.bytes) : new Uint8Array(msg.bytes.buffer,msg.bytes.byteOffset,msg.bytes.byteLength);
+    const ticket=msg.ticket;
+    if(rejectNext) {
+      rejectNext=false; document.getElementById('reject').checked=false;
+      frame.contentWindow.postMessage({type:'wordcraft:saveResult',ticket,ok:false,error:'synthetic host rejection'},location.origin);
+      status.textContent=`rejected ${ticket}; ${bytes.length} serialized bytes`;
+      return;
+    }
+    // sessionStorage is a synthetic durable host for this smoke test, not Seafile.
+    sessionStorage.setItem(storageKey,toBase64(bytes));
+    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),x=>x.toString(16).padStart(2,'0')).join('');
+    frame.contentWindow.postMessage({type:'wordcraft:saveResult',ticket,ok:true},location.origin);
+    status.textContent=`stored ${bytes.length} bytes sha256=${hash.slice(0,16)}…; ack ${ticket}`;
+  }
+});
+document.getElementById('reopen').onclick=()=>{ frame.src=`./index.html?host=parent&webgl&reopen=${Date.now()}`; status.textContent='reloading editor for fresh open…'; };
+document.getElementById('reset').onclick=()=>{ sessionStorage.removeItem(storageKey); frame.src=`./index.html?host=parent&webgl&reset=${Date.now()}`; status.textContent='reloading fixture…'; };
+frame.src='./index.html?host=parent&webgl';
+</script>

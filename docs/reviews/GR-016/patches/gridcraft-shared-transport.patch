@@ -1,0 +1,482 @@
+diff --git c/Cargo.lock w/Cargo.lock
+index e041aaf..7804499 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
+@@ -742,6 +742,15 @@ dependencies = [
+  "libc",
+ ]
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-print"
+ version = "0.1.0"
+@@ -1657,6 +1666,7 @@ dependencies = [
+ name = "gridcraft-web"
+ version = "0.10.0"
+ dependencies = [
++ "craft-platform",
+  "eframe",
+  "egui",
+  "gridcraft-engine",
+diff --git c/Cargo.toml w/Cargo.toml
+index e8a6dc6..fc95d62 100644
+--- c/Cargo.toml
++++ w/Cargo.toml
+@@ -7,11 +7,12 @@ default-members = ["crates/*", "apps/gridcraft", "apps/gridcraft-cli", "xtask"]
+ version = "0.10.0"
+ edition = "2024"
+ license = "MIT OR Apache-2.0"
+-rust-version = "1.90"
++rust-version = "1.95"
+ repository = "https://github.com/storytold/gridcraft"
+ 
+ [workspace.dependencies]
+ # internal
++craft-platform = { path = "/tmp/artcraft-gr016-craft-libs/crates/platform" }
+ gridcraft-core = { path = "crates/core" }
+ gridcraft-numfmt = { path = "crates/numfmt" }
+ gridcraft-formula = { path = "crates/formula" }
+diff --git c/apps/gridcraft-web/Cargo.toml w/apps/gridcraft-web/Cargo.toml
+index 41059d3..d3b0f23 100644
+--- c/apps/gridcraft-web/Cargo.toml
++++ w/apps/gridcraft-web/Cargo.toml
+@@ -21,6 +21,7 @@ log = { workspace = true }
+ serde_json = { workspace = true }
+ 
+ [target.'cfg(target_arch = "wasm32")'.dependencies]
++craft-platform = { workspace = true, features = ["browser"] }
+ eframe = { workspace = true, features = ["default_fonts", "wgpu", "accesskit"] }
+ rfd = { workspace = true }
+ wasm-bindgen = "0.2"
+diff --git c/apps/gridcraft-web/src/host.rs w/apps/gridcraft-web/src/host.rs
+index 2286023..3149432 100644
+--- c/apps/gridcraft-web/src/host.rs
++++ w/apps/gridcraft-web/src/host.rs
+@@ -1,69 +1,64 @@
+-//! The `postMessage` bridge to a same-origin parent page (`?host=parent`), for pages that embed
+-//! GridCraft in an `<iframe>` (such as a Nextcloud app). Messages are plain objects with a `type`:
+-//!
+-//! - `gridcraft:ready` (to the parent): `{ version }`, the app is listening; send a file now.
+-//! - `gridcraft:open` (from the parent): `{ name, bytes }`, bytes an `ArrayBuffer` or
+-//!   `Uint8Array`. It opens like a workbook picked with File › Open or dropped on the window.
+-//! - `gridcraft:save` (to the parent): `{ name, bytes }` (a transferred `ArrayBuffer`) for every
+-//!   file GridCraft would otherwise download: Save and Save As (an .xlsx workbook) and Export
+-//!   as PDF. The parent stores it and reports failures itself.
+-//! - `gridcraft:dirty` (to the parent): `{ dirty }` whenever unsaved changes appear or go away.
+-//! - `gridcraft:failed` (to the parent): `{ error }` when the app couldn't start.
+-//!
+-//! Only the parent window on the page's own origin is heard or answered. In host mode the page
+-//! starts with an empty workbook instead of a sample, and the parent guards leaving the page.
+-
++//! GridCraft adapter for the shared Craft parent-frame transport.
+ use std::cell::{Cell, RefCell};
+ use std::rc::Rc;
+ 
+-use gridcraft_ui_egui::{Inbox, Services, SheetApp};
+-use wasm_bindgen::JsCast as _;
+-use wasm_bindgen::JsValue;
+-use wasm_bindgen::closure::Closure;
++use craft_platform::browser::host::{HostListener, HostMessage, HostTransport};
++use craft_platform::host_protocol::{PendingSaves, SaveTicket};
++use gridcraft_ui_egui::{Inbox, SaveSnapshot, Services, SheetApp};
+ 
+-/// Saving one of these hands the whole workbook to the parent, which stores it: the workbook
+-/// counts as saved under that name, as it would after Save on the desktop.
+-const WORKBOOK_EXTS: &[&str] = &["xlsx"];
+-
+-/// The longest user name taken from `?author=`.
+ const MAX_AUTHOR_CHARS: usize = 200;
+ 
+ #[derive(Clone)]
+ pub struct Bridge {
+-    window: web_sys::Window,
+-    parent: web_sys::Window,
+-    origin: String,
+-    /// Names of the files handed to the parent since the last frame.
+-    saved: Rc<RefCell<Vec<String>>>,
+-    /// The unsaved-changes state last reported to the parent.
++    transport: HostTransport,
++    pending: Rc<RefCell<PendingSaves<PendingSave>>>,
++    results: Rc<RefCell<Vec<(PendingSave, bool, String)>>>,
++    errors: Rc<RefCell<Vec<String>>>,
++    next_ticket: Rc<Cell<u64>>,
++    listener: Rc<RefCell<Option<HostListener>>>,
+     reported: Rc<Cell<Option<bool>>>,
+ }
+ 
++struct PendingSave {
++    name: String,
++    snapshot: Option<SaveSnapshot>,
++}
++
+ impl Bridge {
+-    /// `None` when the page isn't framed (there is no parent to talk to).
++    /// `None` when not framed by a same-origin parent.
+     pub fn new() -> Option<Self> {
+-        let window = web_sys::window()?;
+-        let parent = window.parent().ok().flatten()?;
+-        if js_sys::Object::is(&parent, &window) {
+-            return None;
+-        }
+-        let origin = window.location().origin().ok()?;
+-        Some(Self { window, parent, origin, saved: Rc::default(), reported: Rc::default() })
++        Some(Self {
++            transport: HostTransport::current("gridcraft").ok()??,
++            pending: Rc::default(),
++            results: Rc::default(),
++            errors: Rc::default(),
++            next_ticket: Rc::new(Cell::new(0)),
++            listener: Rc::default(),
++            reported: Rc::default(),
++        })
+     }
+ 
+-    /// Send saved and exported files to the parent instead of downloading them, and hear files
+-    /// from it.
+     pub fn connect(&self, services: &mut Services, inbox: Inbox, ctx: egui::Context) {
+-        self.listen(inbox, ctx);
++        self.listen(inbox, ctx.clone());
+         let bridge = self.clone();
+-        services.download = Some(Box::new(move |name: &str, bytes: &[u8]| {
+-            if let Err(e) = bridge.post_save(name, bytes) {
+-                log::error!("couldn't hand {name} to the page: {e}");
++        services.open_async = Some(Box::new(move || {
++            if let Err(error) = bridge.transport.post_open_request("open") {
++                let error = error.as_string().unwrap_or_else(|| "host message failed".into());
++                log::error!("couldn't ask the host to open a workbook: {error}");
++            }
++        }));
++
++        let bridge = self.clone();
++        let errors = self.errors.clone();
++        let error_ctx = ctx.clone();
++        services.download = Some(Box::new(move |path: &str, bytes: &[u8], snapshot| {
++            if let Err(error) = bridge.post_save(path, bytes, snapshot) {
++                errors.borrow_mut().push(format!("couldn't send {path} to the host: {error}"));
++                error_ctx.request_repaint();
+             }
+         }));
+     }
+ 
+-    /// `?author=`: the host's name for the user signs new notes and comments.
+     pub fn set_author(app: &mut SheetApp, author: &str) {
+         let author: String = author.trim().chars().take(MAX_AUTHOR_CHARS).collect();
+         if !author.is_empty() {
+@@ -72,95 +67,65 @@ impl Bridge {
+     }
+ 
+     pub fn post_ready(&self) {
+-        self.send(&[("type", "gridcraft:ready".into()), ("version", env!("CARGO_PKG_VERSION").into())]);
++        let _ = self.transport.post_ready(env!("CARGO_PKG_VERSION"));
+     }
+-
+     pub fn post_failed(&self, error: &str) {
+-        self.send(&[("type", "gridcraft:failed".into()), ("error", error.into())]);
++        let _ = self.transport.post_failed(error);
+     }
+ 
+-    /// After each frame: a workbook handed to the parent this frame counts as saved under the
+-    /// name it was saved as, and the parent hears when unsaved changes appear or go away.
++    /// Source workbook becomes clean only after durable host acknowledgement.
+     pub fn sync(&self, app: &mut SheetApp) {
+-        let saved = std::mem::take(&mut *self.saved.borrow_mut());
+-        if let Some(name) = saved.iter().rev().find(|name| is_workbook(name))
+-            && let Some(doc) = app.session.active_mut()
+-        {
+-            doc.saved = doc.wb.clone();
+-            if doc.path.is_none() {
+-                doc.title = name.clone();
++        for (pending, ok, error) in std::mem::take(&mut *self.results.borrow_mut()) {
++            if ok {
++                if let Some((uid, workbook)) = pending.snapshot {
++                    app.session.mark_saved(uid, workbook, Some(&pending.name));
++                }
++            } else {
++                app.message = Some(("GridCraft".into(), if error.is_empty() { "The host could not save the workbook.".into() } else { error }));
+             }
+         }
+-        let dirty = app.session.documents().iter().any(|d| d.is_dirty());
+-        if self.reported.get() != Some(dirty) && self.send(&[("type", "gridcraft:dirty".into()), ("dirty", dirty.into())]) {
++        for error in std::mem::take(&mut *self.errors.borrow_mut()) {
++            app.message = Some(("GridCraft".into(), error));
++        }
++        let dirty = app.session.documents().iter().any(|document| document.is_dirty());
++        if self.reported.get() != Some(dirty) && self.transport.post_dirty(dirty).is_ok() {
+             self.reported.set(Some(dirty));
+         }
+     }
+ 
+-    fn post_save(&self, path: &str, bytes: &[u8]) -> Result<(), String> {
++    fn post_save(&self, path: &str, bytes: &[u8], snapshot: Option<SaveSnapshot>) -> Result<(), String> {
+         let name = std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| path.to_string());
+-        let buffer = js_sys::Uint8Array::from(bytes).buffer();
+-        let message = message(&[("type", "gridcraft:save".into()), ("name", name.as_str().into()), ("bytes", buffer.clone().into())])
+-            .ok_or_else(|| "couldn't build the message".to_string())?;
+-        self.parent
+-            .post_message_with_transfer(&message, &self.origin, &js_sys::Array::of1(&buffer))
+-            .map_err(|e| e.as_string().unwrap_or_else(|| format!("{e:?}")))?;
+-        self.saved.borrow_mut().push(name);
++        let next = self.next_ticket.get().wrapping_add(1).max(1);
++        self.next_ticket.set(next);
++        let ticket = SaveTicket::new(format!("gridcraft:{next}")).ok_or_else(|| "empty save ticket".to_string())?;
++        self.pending
++            .borrow_mut()
++            .insert(ticket.clone(), PendingSave { name: name.clone(), snapshot })
++            .map_err(|_| "duplicate save ticket".to_string())?;
++        if let Err(error) = self.transport.post_save(&ticket, &name, bytes, false) {
++            self.pending.borrow_mut().complete(&ticket);
++            return Err(error.as_string().unwrap_or_else(|| "host message failed".to_string()));
++        }
+         Ok(())
+     }
+ 
+     fn listen(&self, inbox: Inbox, ctx: egui::Context) {
+-        let parent = self.parent.clone();
+-        let origin = self.origin.clone();
+-        let on_message = Closure::<dyn FnMut(web_sys::MessageEvent)>::new(move |event: web_sys::MessageEvent| {
+-            if event.origin() != origin || !event.source().is_some_and(|s| js_sys::Object::is(&s, &parent)) {
+-                return;
++        let results = self.results.clone();
++        let pending = self.pending.clone();
++        let listener = self.transport.listen(move |message| match message {
++            HostMessage::Open { name, bytes } => {
++                inbox.lock().unwrap_or_else(|e| e.into_inner()).push((name, bytes));
++                ctx.request_repaint();
+             }
+-            let data = event.data();
+-            if string(&data, "type").as_deref() != Some("gridcraft:open") {
+-                return;
++            HostMessage::SaveResult { ticket, ok, error } => {
++                if let Some(pending) = pending.borrow_mut().complete(&ticket) {
++                    results.borrow_mut().push((pending, ok, error.unwrap_or_default()));
++                    ctx.request_repaint();
++                }
+             }
+-            let name = string(&data, "name").filter(|n| !n.trim().is_empty()).unwrap_or_else(|| "Book.xlsx".to_string());
+-            let Some(bytes) = bytes(&data) else { return };
+-            inbox.lock().unwrap_or_else(|e| e.into_inner()).push((name, bytes));
+-            ctx.request_repaint();
+         });
+-        if self.window.add_event_listener_with_callback("message", on_message.as_ref().unchecked_ref()).is_ok() {
+-            // The listener lives as long as the page.
+-            on_message.forget();
++        if let Ok(listener) = listener {
++            *self.listener.borrow_mut() = Some(listener);
+         }
+     }
+-
+-    /// Post a message to the parent; false if it couldn't be sent.
+-    fn send(&self, fields: &[(&str, JsValue)]) -> bool {
+-        message(fields).is_some_and(|m| self.parent.post_message(&m, &self.origin).is_ok())
+-    }
+-}
+-
+-fn is_workbook(name: &str) -> bool {
+-    name.rsplit_once('.').is_some_and(|(_, ext)| WORKBOOK_EXTS.iter().any(|e| ext.eq_ignore_ascii_case(e)))
+-}
+-
+-fn message(fields: &[(&str, JsValue)]) -> Option<js_sys::Object> {
+-    let m = js_sys::Object::new();
+-    for (key, value) in fields {
+-        js_sys::Reflect::set(&m, &JsValue::from_str(key), value).ok()?;
+-    }
+-    Some(m)
+-}
+-
+-fn string(data: &JsValue, key: &str) -> Option<String> {
+-    js_sys::Reflect::get(data, &JsValue::from_str(key)).ok()?.as_string()
+-}
+-
+-/// `bytes` as an `ArrayBuffer` or `Uint8Array`.
+-fn bytes(data: &JsValue) -> Option<Vec<u8>> {
+-    let bytes = js_sys::Reflect::get(data, &JsValue::from_str("bytes")).ok()?;
+-    if let Some(array) = bytes.dyn_ref::<js_sys::Uint8Array>() {
+-        Some(array.to_vec())
+-    } else if bytes.is_instance_of::<js_sys::ArrayBuffer>() {
+-        Some(js_sys::Uint8Array::new(&bytes).to_vec())
+-    } else {
+-        None
+-    }
+ }
+diff --git c/apps/gridcraft-web/src/web.rs w/apps/gridcraft-web/src/web.rs
+index 8e2e608..4a3fca4 100644
+--- c/apps/gridcraft-web/src/web.rs
++++ w/apps/gridcraft-web/src/web.rs
+@@ -200,7 +200,7 @@ fn services(inbox: Inbox, ctx: egui::Context) -> Services {
+                 ctx.request_repaint();
+             });
+         })),
+-        download: Some(Box::new(|name: &str, bytes: &[u8]| {
++        download: Some(Box::new(|name: &str, bytes: &[u8], _snapshot| {
+             if let Err(e) = download(name, bytes) {
+                 log::error!("download of {name} failed: {e}");
+             }
+diff --git c/crates/engine/src/lib.rs w/crates/engine/src/lib.rs
+index 10c6cb8..8881eb3 100644
+--- c/crates/engine/src/lib.rs
++++ w/crates/engine/src/lib.rs
+@@ -339,6 +339,18 @@ impl Session {
+     pub fn active_mut(&mut self) -> Option<&mut DocState> {
+         self.docs.get_mut(self.active)
+     }
++    /// Record the exact workbook snapshot acknowledged by a host save. A later edit keeps the
++    /// document dirty because `wb` no longer points at this snapshot; a closed document is ignored.
++    pub fn mark_saved(&mut self, uid: u64, snapshot: Arc<Workbook>, title: Option<&str>) -> bool {
++        let Some(doc) = self.docs.iter_mut().find(|doc| doc.uid == uid) else { return false };
++        doc.saved = snapshot;
++        if doc.path.is_none()
++            && let Some(title) = title
++        {
++            doc.title = title.to_string();
++        }
++        true
++    }
+     pub fn doc(&self) -> Result<&DocState> {
+         self.active().ok_or(EngineError::NoDocument)
+     }
+diff --git c/crates/engine/src/tests.rs w/crates/engine/src/tests.rs
+index d6a99be..448d164 100644
+--- c/crates/engine/src/tests.rs
++++ w/crates/engine/src/tests.rs
+@@ -9,6 +9,33 @@ fn s() -> Session {
+     s
+ }
+ 
++#[test]
++fn host_save_ack_records_its_snapshot_without_clearing_later_edits() {
++    let mut session = s();
++    let (uid, saved_snapshot) = {
++        let doc = session.active().unwrap();
++        (doc.uid, doc.wb.clone())
++    };
++    session.new_workbook();
++    let other_uid = session.active().unwrap().uid;
++    session.set_active(0);
++    session.execute("cell.set", json!({"cell": "A1", "input": "later edit"})).unwrap();
++    assert!(session.active().unwrap().is_dirty());
++
++    assert!(session.mark_saved(uid, saved_snapshot, Some("budget.xlsx")));
++    let doc = session.documents().iter().find(|doc| doc.uid == uid).unwrap();
++    assert!(doc.is_dirty(), "a durable ack for an older snapshot must not clear newer edits");
++    assert_eq!(doc.title, "budget.xlsx");
++
++    let snapshot = doc.wb.clone();
++    assert!(session.mark_saved(uid, snapshot, None));
++    assert!(!session.documents().iter().find(|doc| doc.uid == uid).unwrap().is_dirty());
++    assert!(!session.documents().iter().find(|doc| doc.uid == other_uid).unwrap().is_dirty());
++    session.close_document(0);
++    let closed_snapshot = session.active().unwrap().wb.clone();
++    assert!(!session.mark_saved(uid, closed_snapshot, None), "late ack for a closed doc must be ignored");
++}
++
+ fn v(s: &Session, a: &str) -> Value {
+     s.doc().unwrap().wb.active().unwrap().value(CellRef::parse(a).unwrap())
+ }
+diff --git c/crates/ui-egui/src/backstage.rs w/crates/ui-egui/src/backstage.rs
+index c2acf02..3396fb5 100644
+--- c/crates/ui-egui/src/backstage.rs
++++ w/crates/ui-egui/src/backstage.rs
+@@ -922,7 +922,7 @@ pub fn export_as(app: &mut SheetApp, fmt: &str) -> bool {
+             let name = r.get("name").and_then(Json::as_str).map_or_else(|| format!("{stem}.{fmt}"), str::to_string);
+             match (bytes, &app.services.download) {
+                 (Some(b), Some(dl)) => {
+-                    dl(&name, &b);
++                    dl(&name, &b, None);
+                     true
+                 }
+                 _ => false,
+diff --git c/crates/ui-egui/src/lib.rs w/crates/ui-egui/src/lib.rs
+index faae9bf..be7526a 100644
+--- c/crates/ui-egui/src/lib.rs
++++ w/crates/ui-egui/src/lib.rs
+@@ -36,6 +36,7 @@ pub mod theme;
+ pub mod widgets;
+ 
+ use std::collections::HashMap;
++use std::sync::Arc;
+ 
+ use gridcraft_engine::core::{CellRef, RangeRef};
+ use gridcraft_engine::{Session, UiRequest};
+@@ -192,8 +193,8 @@ pub struct Services {
+     /// gets it from egui's `Event::Paste`). `None` from the host, or no service (web), pastes
+     /// GridCraft's own clipboard.
+     pub paste_text: Option<Box<dyn FnMut() -> Option<String>>>,
+-    /// Web: deliver a file to the user (name, bytes).
+-    pub download: Option<Box<dyn Fn(&str, &[u8])>>,
++    /// Web: deliver a file to the user (name, bytes, optional workbook save snapshot).
++    pub download: Option<Box<dyn Fn(&str, &[u8], Option<SaveSnapshot>)>>,
+     /// Web: start an asynchronous file pick; the bytes arrive later in `inbox`.
+     pub open_async: Option<Box<dyn Fn()>>,
+     /// Files delivered asynchronously (name, bytes), opened on the next frame.
+@@ -203,6 +204,9 @@ pub struct Services {
+     pub print: Option<Box<dyn Fn(&[u8])>>,
+ }
+ 
++/// The document identity and immutable workbook snapshot represented by an `.xlsx` save.
++pub type SaveSnapshot = (u64, Arc<gridcraft_engine::model::Workbook>);
++
+ /// Shared queue of files read asynchronously (browser file picker, drag and drop).
+ pub type Inbox = std::sync::Arc<std::sync::Mutex<Vec<(String, Vec<u8>)>>>;
+ 
+@@ -516,7 +520,7 @@ impl SheetApp {
+             && let Some(b) = result.get("base64").and_then(Json::as_str).and_then(gridcraft_engine::io::base64_decode)
+         {
+             let title = self.session.active().map(|d| d.display_title()).unwrap_or_else(|| "Book1".into());
+-            dl(&std::path::Path::new(&title).with_extension("pdf").to_string_lossy(), &b);
++            dl(&std::path::Path::new(&title).with_extension("pdf").to_string_lossy(), &b, None);
+         }
+     }
+ 
+@@ -797,7 +801,8 @@ impl SheetApp {
+                     && let Some(b) = r.get("base64").and_then(Json::as_str).and_then(gridcraft_engine::io::base64_decode)
+                 {
+                     let name = r.get("name").and_then(Json::as_str).unwrap_or("Book.xlsx").to_string();
+-                    dl(&name, &b);
++                    let snapshot = self.session.active().map(|doc| (doc.uid, doc.wb.clone()));
++                    dl(&name, &b, snapshot);
+                 }
+             }
+             // File › Options (`file.options`) and the File tab itself open the Backstage view.
+diff --git c/crates/ui-egui/tests/file_menu.rs w/crates/ui-egui/tests/file_menu.rs
+index 047efe1..058de75 100644
+--- c/crates/ui-egui/tests/file_menu.rs
++++ w/crates/ui-egui/tests/file_menu.rs
+@@ -77,7 +77,7 @@ fn save_actions_include_the_cell_draft_and_close_keeps_the_unsaved_prompt() {
+     let downloads = Arc::new(Mutex::new(Vec::<(String, Vec<u8>)>::new()));
+     let capture = downloads.clone();
+     let mut h = harness(Services {
+-        download: Some(Box::new(move |name, bytes| capture.lock().unwrap().push((name.to_string(), bytes.to_vec())))),
++        download: Some(Box::new(move |name, bytes, _snapshot| capture.lock().unwrap().push((name.to_string(), bytes.to_vec())))),
+         ..Default::default()
+     });
+     h.input_mut().events.push(egui::Event::Text("123".into()));
+@@ -180,7 +180,7 @@ fn export_as_pdf_is_delivered_as_a_download() {
+     let files = Arc::new(Mutex::new(Vec::<(String, Vec<u8>)>::new()));
+     let capture = files.clone();
+     let mut h = harness(Services {
+-        download: Some(Box::new(move |name, bytes| capture.lock().unwrap().push((name.to_string(), bytes.to_vec())))),
++        download: Some(Box::new(move |name, bytes, _snapshot| capture.lock().unwrap().push((name.to_string(), bytes.to_vec())))),
+         ..Default::default()
+     });
+     h.state_mut().run("file.exportPdf", serde_json::json!({})).unwrap();
+diff --git c/crates/ui-egui/tests/text_box_editing.rs w/crates/ui-egui/tests/text_box_editing.rs
+index 1d3b053..5415649 100644
+--- c/crates/ui-egui/tests/text_box_editing.rs
++++ w/crates/ui-egui/tests/text_box_editing.rs
+@@ -194,7 +194,7 @@ fn saving_and_switching_context_commit_to_the_original_text_box() {
+     // Save and Save As must work while the editor still owns keyboard focus.
+     let downloaded = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+     let sink = downloaded.clone();
+-    h.state_mut().services.download = Some(Box::new(move |_, bytes| *sink.lock().unwrap() = bytes.to_vec()));
++    h.state_mut().services.download = Some(Box::new(move |_, bytes, _snapshot| *sink.lock().unwrap() = bytes.to_vec()));
+     for modifiers in [Modifiers::COMMAND, Modifiers::COMMAND | Modifiers::SHIFT] {
+         edit_box(&mut h, id);
+         replace(&mut h, "Saved from the text editor");

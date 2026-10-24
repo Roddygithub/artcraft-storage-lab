@@ -1,5 +1,34 @@
 # HISTORY
 
+## 2026-10-24 — GR-016 app seam inventory and Rust transport prototype
+
+* Consolidated source-only host seam findings for all 13 ArtCraft Web apps in
+  `docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md`. The inventory corrects
+  outdated claims about FigCraft `Services`, FilmCraft's page API and
+  LightCraft's local photo library. It does not claim runtime save/version/reopen
+  support for apps outside the existing WordCraft, GridCraft and VectorCraft
+  synthetic Seafile evidence.
+* Six slow GLM-5.3-Flash retry lanes were canceled at the user's request; the
+  remaining source audits completed through GPT-6 Luna high with concise briefs.
+  No upstream repositories or production services were changed.
+* Prototyped a shared transport in a scratch `craft-platform` checkout and
+  migrated the already-patched WordCraft and GridCraft host adapters to it.
+  `cargo test -p craft-platform` (6 tests), its strict clippy and browser-feature
+  WASM check passed. WordCraft and GridCraft WASM `cargo check`s passed on their
+  pinned source SHAs with a local path dependency. Release bundles and Chromium
+  synthetic-host tests now pass for WordCraft and GridCraft: both serialized a
+  real editor change, stayed dirty on an explicit host rejection, and reopened
+  the acknowledged bytes in a fresh iframe. After review found GridCraft's
+  in-app Open still used the browser picker, its adapter was corrected; a Rust
+  1.95 release-bundle browser run confirmed Ctrl+O requests a file from the
+  parent and reopens the stored `HostAck` edit. The host used `sessionStorage`,
+  not Seafile. GridCraft's declared MSRV is raised to 1.95 in the scratch patch
+  because its dependency graph already requires 1.95. GPT-6.1 Sol low
+  independently returned provisional PASS for the bounded fixes with three
+  minor notes in `docs/reviews/GR-016/REVIEW-SOL-LOW-R3.md`. The existing
+  project-level GPT-6.1 Sol FAIL and upstream publication lock are unchanged.
+* The prototype and audit report are documented in `docs/reviews/GR-016/`.
+
 ## 2026-10-23 — Common Rust host transport plan clarified
 
 * The Sol low interim review identified the ticket-format mismatch between the
@@ -10,9 +39,9 @@
   module in `craft-platform`, but no common host/postMessage transport. The
   RFC now leaves open whether to extend that module or add a focused crate.
 * The proposed common JSON ticket is an opaque string echoed unchanged. Local
-  WordCraft/GridCraft patches still differ and must be normalized before they
-  are presented as one implementation. Thirteen per-app capability audits are
-  running; no upstream source was modified or published.
+  WordCraft/GridCraft patches still differed and needed normalization before
+  they could be presented as one implementation. The 13-app source audit later
+  completed under GR-016; no upstream source was modified or published.
 
 ## 2026-10-23 — VectorCraft polling collision guard
 

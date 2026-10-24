@@ -3,6 +3,13 @@
 Status: **PROVISIONAL — upstream capability inventory** · GPT REVIEW: FAIL on frozen candidate `0edbe524`; current remediation tip is not frozen or reviewed
 GR-003 · Inspected 2026-10-22 against the live `storytold/*` repositories on `main`
 
+> **Follow-up correction (2026-10-24):** the app seams were re-inspected at pinned
+> revisions for GR-016. That report supersedes stale capability claims below,
+> especially the statements that FigCraft has only `NoServices`, that FilmCraft
+> has no host-callable open API, and that LightCraft's browser-local library is a
+> document host bridge. See
+> [`APP-SEAM-AUDITS-20261024.md`](reviews/GR-016/APP-SEAM-AUDITS-20261024.md).
+
 ## 0. Evidence base
 
 * Repositories: the 13 `storytold/*` apps and `storytold/craft-libs`, cloned read-only
@@ -37,21 +44,26 @@ GR-003 · Inspected 2026-10-22 against the live `storytold/*` repositories on `m
 
 | App | Web build | WASM | Host bridge | Open from host | Save to host | iframe | Origin requirements | Relevant API | Maturity | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **wordcraft** | **yes** | yes (`wasm-bindgen`, `web-sys`, `js-sys`; `wasm32-unknown-unknown` target) | **none** — but the `Services` seam has every hook needed (`open_async`, `inbox`, `download`, `async_saves`, `on_dirty`) | no | no | yes (documented) | same-origin for the bridge | `wordcraft_ui_egui::Services`, `async_saves::{AsyncSaves, SaveOutcome}` | alpha, ~60 % ready | `apps/wordcraft-web/{Cargo.toml,Trunk.toml,index.html,src/main.rs,src/web.rs}`; `crates/ui-egui/src/lib.rs:100-190`; `crates/ui-egui/src/async_saves.rs` |
-| **gridcraft** | **yes** | yes | **yes** — `?host=parent`, `postMessage` | **yes** (`gridcraft:open`) | **yes** (`gridcraft:save`) | yes | **same-origin only** (origin *and* source checked; explicit `targetOrigin`) | `gridcraft:ready\|open\|save\|dirty\|failed` | alpha | `apps/gridcraft-web/src/host.rs` (166 lines); `apps/gridcraft-web/src/web.rs:39-41`; `crates/ui-egui/src/lib.rs:195-196` |
-| **deckcraft** | **yes** | yes | none | no | no | yes (documented) | same-origin for a bridge | `deckcraft_ui_egui::Services` (`open_async`, `inbox`, `download` present) | alpha | `apps/deckcraft-web/`; `crates/ui-egui/src/lib.rs` |
-| **pdfcraft** | **yes** | yes | **yes** — `?host=parent`, `postMessage` | **yes** (`pdfcraft:open`) | **yes** (`pdfcraft:save`, with `saveAs`) | yes | **same-origin only** (the bridge refuses a parent on another origin) | `pdfcraft:ready\|open\|save\|dirty\|failed`; `Services::host_save` | alpha | `apps/pdfcraft-web/src/main.rs:135-260` (`mod host`); `crates/ui-egui/src/lib.rs:630-636`; `crates/ui-egui/src/editing.rs:670-685` |
+| **wordcraft** | **yes** | yes (`wasm-bindgen`, `web-sys`, `js-sys`; `wasm32-unknown-unknown` target) | no upstream parent bridge; `Services` has inbox, async open, download, async save outcomes, dirty callback | no upstream bridge | browser download | yes (documented) | same-origin for proposed bridge | `wordcraft_ui_egui::Services`, `async_saves::{AsyncSaves, SaveOutcome}` | alpha | `00bc6a4b`; `crates/ui-egui/src/lib.rs`; local GR-014 adapter |
+| **gridcraft** | **yes** | yes | **yes** — `?host=parent`, `postMessage`; baseline lacks durable result | **yes** (`gridcraft:open`) | sends bytes, but upstream clears dirty before host storage result | yes | **same-origin only** (origin *and* source checked; explicit `targetOrigin`) | `gridcraft:ready\|open\|save\|dirty\|failed` | alpha | `06920de8`; `apps/gridcraft-web/src/host.rs`; local GR-010 ack patch |
+| **deckcraft** | **yes** | yes | partial: byte serialization exists, no JS host bridge | engine open-bytes API, not exposed to parent JS | browser download | yes (documented) | same-origin for a future bridge | `file.openBytes`, `file.saveBytes`, Web `Services` | alpha | `0f4fffcf`; `apps/deckcraft-web/`; `crates/ui-egui/src/lib.rs` |
+| **pdfcraft** | **yes** | yes | **yes** — same-origin `postMessage` bridge; no durable host acknowledgement | **yes** (`pdfcraft:open`) | sends bytes; app marks clean after synchronous handoff | yes | same-origin only | `pdfcraft:ready\|open\|save\|dirty\|failed`; `Services::host_save` | alpha | `57e531cc`; `apps/pdfcraft-web/src/main.rs`; `crates/ui-egui/src/editing.rs` |
 | **vectorcraft** | **yes** | yes (also a WASM plug-in sandbox, `wasmi`) | **different shape**: a page-global promise API `window.vectorcraft` (`execute`, `request`, `commands`, `screenshot`, `openFile`, `captureDownloads`, `files`, `readFile`), the desktop control protocol in the page | **yes** (`openFile(name, bytes)`) | **yes** (`captureDownloads(true)` + `files()`) | yes | the page API is same-origin by nature | `window.vectorcraft` (promise API), `docs/control-protocol.md` | alpha | `apps/vectorcraft-web/src/api.rs`; `docs/control-protocol.md` |
-| **photocraft** | **yes** (+ `photocraft-web-boot`) | yes | none | no | no | yes | same-origin for a bridge | `Services` present, `inbox` present, **no `download`** | alpha, ~45 % | `apps/photocraft-web/`; `crates/ui-egui/src/lib.rs` |
-| **figcraft** | **yes** (+ `figcraft-server`) | yes | none | no | no | yes | same-origin for a bridge | `NoServices` — a **placeholder**, no services at all | pre-alpha | `crates/ui-egui/src/lib.rs:382`; `apps/figcraft-server/` |
-| **designcraft** | **yes** | yes | none | no | no | yes | same-origin for a bridge | `Services` with `open_async`, `inbox`, `download`; **no `async_saves`** | pre-alpha | `apps/designcraft-web/`; `crates/ui-egui/src/lib.rs` |
-| **cadcraft** | **yes** | yes | **yes** — `?host=parent`, `postMessage` | **yes** (`cadcraft:open`) | **yes** (`cadcraft:save`) | yes | **same-origin only** | `cadcraft:ready\|open\|save\|dirty\|failed`; the save "replaces the engine's delivery hook" | pre-alpha, 38 % | `apps/cadcraft-web/src/host.rs`; `apps/cadcraft-web/src/main.rs` |
-| **filmcraft** | **yes** (`cargo xtask web`) | yes | none | no | no | yes | same-origin for a bridge | `FsServices` in `crates/engine/src/lib.rs:161` — a **filesystem** shape, not a browser one | alpha | `apps/filmcraft-web/`; `docs/web.md` |
-| **lightcraft** | **yes** (`cargo xtask web --serve`) | yes | none | no | no | yes | same-origin for a bridge | `Services` present; **no `open_async`/`inbox`/`download`** | alpha | `apps/lightcraft-web/`; `docs/web.md` |
-| **effectcraft** | **yes** (`cargo xtask web`) | yes | none | no | no | yes | same-origin for a bridge | `FsServices` in `crates/engine/src/lib.rs:138` | alpha | `apps/effectcraft-web/`; `docs/web.md` |
-| **soundcraft** | **yes** | yes | none | no | no | yes | same-origin for a bridge | `Services` present; **no `open_async`/`inbox`/`download`** | pre-alpha | `apps/soundcraft-web/`; `crates/ui-egui/src/lib.rs` |
+| **photocraft** | **yes** (+ `photocraft-web-boot`) | yes | no host bridge found | picker/import only | browser download/unconfirmed write | yes | same-origin for a future bridge | byte import/export; local dirty tracking | alpha | `a02f2ee4`; `apps/photocraft-web/src/web.rs` |
+| **figcraft** | **yes** (+ `figcraft-server`) | yes | no host bridge; real `Services` trait exists | byte-based app open only | browser download; WASM path write errors | yes | same-origin for a future bridge | `Services`, `file.open`, byte serializer | pre-alpha | `8d790607`; `crates/ui-egui/src/lib.rs`; `apps/figcraft-web/src/web.rs` |
+| **designcraft** | **yes** | yes | no host bridge found | picker/inbox only | browser download, marks clean after call | yes | same-origin for a future bridge | `file.serialize`, internal dirty state | pre-alpha | `80d13911`; `apps/designcraft-web/src/web.rs` |
+| **cadcraft** | **yes** | yes | **yes** — existing parent bridge; optimistic save | **yes** (`cadcraft:open`) | sends save bytes and marks clean on `postMessage` success | yes | same-origin only | `cadcraft:ready\|open\|save\|dirty\|failed` | pre-alpha | `7bf5905a`; `apps/cadcraft-web/src/host.rs` |
+| **filmcraft** | **yes** (`cargo xtask web`) | yes | private `window.filmcraft` API, not common bridge | `openProject(fileOrUrl)` | serialized `.fcproj` currently downloads; no durable host result | yes | same-origin API | `openProject`, `ui.inspect`, `Services::write_file` | alpha | `fa550ce2`; `apps/filmcraft-web/src/api.rs`; `crates/engine/src/commands.rs` |
+| **lightcraft** | **yes** (`cargo xtask web --serve`) | yes | local photo library, not a document host bridge | picker/drop | browser download export; storage flush not a host save ack | yes | same-origin for a future bridge | `web.stats` is local-library state | alpha | `98702b5c`; `apps/lightcraft-web/src/web.rs` |
+| **effectcraft** | **yes** (`cargo xtask web`) | yes | private browser API primitives, no durable host bridge | `window.effectcraft.addFile` | browser storage/download; host ack absent | yes | same-origin API | `project.summary`, `file.save`, `flush` | alpha | `049070d6`; `apps/effectcraft-web/src/files.rs`; `persist.rs` |
+| **soundcraft** | **yes** | yes | partial `DeliverHook`, no parent bridge | picker/bytes path | download via synchronous function-pointer sink | yes | same-origin for future bridge | `.scraftz`, `set_deliver`, `open_session_bytes` | pre-alpha | `d47abe48`; `crates/engine/src/io.rs`; `apps/soundcraft-web/src/web.rs` |
 
 **Reading the table**
+
+The capability descriptions that follow this paragraph under §2 are the
+2026-10-22 baseline. If they conflict with the pinned-revision follow-up in
+GR-016, use the 2026-10-24 report for current app seams; the baseline remains
+for historical context only.
 
 The app rows describe the inspected upstream revisions, not every local patch.
 GR-010 and GR-014 add local bridges/save-result handling and have synthetic
@@ -63,9 +75,9 @@ Seafile runtime evidence; those changes are not upstream releases.
   the same `?host=parent` + `postMessage` shape and the same message vocabulary.
 * **The 13 are not equivalent.** The seams differ: `Services` with browser hooks
   (wordcraft, gridcraft, deckcraft, vectorcraft, designcraft, photocraft,
-  cadcraft, lightcraft, soundcraft), a reduced one (pdfcraft: `inbox` + `host_save`
-  only), a placeholder (`figcraft`: `NoServices`) and a filesystem shape
-  (filmcraft, effectcraft: `FsServices`).
+  cadcraft, lightcraft, soundcraft), reduced or app-specific APIs (PDF, Vector,
+  Film, Effect), and filesystem-oriented serializers. FigCraft has a real
+  `Services` trait; LightCraft's current browser storage is a photo library.
 * **`wordcraft` is the one with the most complete seam** — `open_async`, `inbox`,
   `download`, `async_saves` and `on_dirty` — which is why it is the right MVP target
   even though it has no bridge yet.

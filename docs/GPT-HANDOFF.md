@@ -30,6 +30,36 @@ during that review.
 The local remediation after `0edbe52` is not yet frozen for Sol. Record the exact
 next review SHA after the final status/evidence commit.
 
+### GR-016 all-app audit and transport prototype — 2026-10-24
+
+The 13 ArtCraft Web apps now have a consolidated source seam inventory in
+`docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md`. Six remaining audits that had
+failed or returned unusable results were rerun as brief GPT-6 Luna high source
+reads. These are not implementation reviews and do not prove runtime behavior.
+
+A scratch prototype extends the pinned `craft-platform` browser feature with
+same-origin/source validation, RAII message-listener cleanup, transferred byte
+buffers, opaque string save tickets, and bounded pending-save tracking. The
+pinned local GR-014 WordCraft and GR-010 GridCraft adapters were refactored to
+use it. On Rust 1.97, `craft-platform` tests (6), strict clippy, its browser
+WASM check, and both app `cargo check`s passed. The app checks used a temporary
+local path to the scratch library; they do not validate a published dependency
+revision. WordCraft and GridCraft release bundles then passed local Chromium
+synthetic-host edit/save-ack/reopen smoke tests, including failed-save dirty
+state. The harness used `sessionStorage`; this is not a Seafile E2E.
+
+The prototype remains in scratch clones and is not ready to publish. The first
+review found two GridCraft defects: in-app Open still used the browser picker,
+and the declared 1.90 MSRV conflicted with dependencies requiring 1.95. The
+adapter now routes Open through the host; a Rust 1.95 release-bundle browser
+test observed a request and reopened the stored edit. GridCraft's scratch MSRV
+is raised to 1.95 and its WASM check passes. GPT-6.1 Sol low independently
+returned provisional PASS for these bounded remediations with three minor
+notes; the full report is `docs/reviews/GR-016/REVIEW-SOL-LOW-R3.md`.
+Full details and exact SHAs are in
+`docs/reviews/GR-016/README.md`. The old Sol FAIL on `0edbe524` stands, public
+deployment is not ready, and the upstream hard gate remains locked.
+
 ### Isolated runtime update — 2026-10-23
 
 The statements above about unbuilt/unrun patches and an unverified DOCX E2E are

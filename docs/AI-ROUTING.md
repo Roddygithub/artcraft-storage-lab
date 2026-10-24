@@ -139,7 +139,11 @@ Rules in force:
 | 2026-10-22 | `artcraft-architect` (GLM-5.3) | the same timeout on the GR-003 capability audit, after cloning all 14 repositories and reading them for hours | abandoned; the owner had already completed GR-003 independently and verified it against the sources (`docs/ARTCRAFT-WEB-CAPABILITIES.md`, `docs/reviews/GR-003/WEB-BUILD-SURVEY.md`) | none — the artifact existed before the timeout |
 | 2026-10-23 | `artcraft-architect` (GLM-5.3) | GridCraft save-ack design task ran for an extended period without returning a bounded design | canceled; owner inspected the pinned GridCraft host/UI/engine call sites directly and implemented the minimal ticketed acknowledgement patch | no agent edits; source review and compilation recorded in `docs/reviews/GR-010/README.md` |
 | 2026-10-23 | `artcraft-worker` (GLM-5.3-Flash) | GridCraft implementation task made no code changes while spending an extended period reading the repository | canceled; owner implemented the bounded change directly, then ran its focused unit test and WASM compile | no agent edits; implementation evidence recorded in `docs/reviews/GR-010/README.md` |
-| 2026-10-23 | OpenCode V2 `nvidia/openai/gpt-oss-20b` app-audit lanes | seven per-app tasks (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft, SoundCraft, VectorCraft) timed out waiting for response headers before returning source findings | rerouted those seven bounded audits to `nvidia/z-ai/glm-5.3-flash` with `effort=none`; steered them to inspect the exact public app repositories and pin the SHAs | no repository changes; the other six first-round app audits are still running |
+| 2026-10-23 | OpenCode V2 `nvidia/openai/gpt-oss-20b` app-audit lanes | seven per-app tasks (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft, SoundCraft, VectorCraft) timed out waiting for response headers before returning source findings | rerouted those seven bounded audits to `nvidia/z-ai/glm-5.3-flash` with `effort=none`; their source-only findings are summarized in GR-016 | no repository changes |
+| 2026-10-24 | OpenCode V2 `nvidia/z-ai/glm-5.3-flash`, `effort=none` | six retry audits for CADCraft, DesignCraft, FilmCraft, EffectCraft, PhotoCraft and LightCraft were still running; user reported these models were too slow and token-heavy | canceled all six before results; switched to `gpt-6-luna` `reasoningEffort=high` with a 300-word cap per app | no repository edits from the canceled GLM tasks |
+| 2026-10-24 | T3 Code `gpt-6-luna`, `reasoningEffort=high`, default service tier | six bounded source audits for the remaining apps completed | findings recorded in `docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md`; this is source research, not an independent implementation review | no upstream or production changes |
+| 2026-10-24 | OpenCode V2 Nemotron 3 Ultra, `effort=default` | bounded GR-016 remediation review remained running without returning a result; interrupted to control delay and token use | rerouted the same exact review scope to user-authorized `gpt-6.1-sol`, `reasoningEffort=low` | no repository or scratch-source changes by reviewer |
+| 2026-10-24 | T3 Code GPT-6.1 Sol, `reasoningEffort=low` | independent bounded review of GridCraft Open/MSRV/ack fixes returned provisional PASS, no blockers/majors, three minor notes | preserved in `docs/reviews/GR-016/REVIEW-SOL-LOW-R3.md`; not the final project Sol review | no source changes by reviewer |
 
 > **A note on the architect.** Two long research tasks produced no artifact
 > before the provider timed out. Both were already covered by the owner's own
@@ -215,3 +219,16 @@ GPT REVIEW FAIL
 ```
 
 Only `GPT REVIEW PASS` unlocks publication upstream.
+
+### GR-016 bounded implementation review — 2026-10-24
+
+After the WordCraft/GridCraft synthetic-host Chromium smoke tests passed, a
+separate-task GPT-6 Luna high adversarial check inspected the scratch diffs and
+evidence (`artcraft-gr016-independent-review-luna-high-20261024-r1`) and
+returned FAIL. Since it used the same model family as the implementation owner,
+it is not counted as an independent free review under the configured policy:
+GridCraft's in-app Open still used the browser picker, and its declared Rust
+1.90 MSRV did not match the Rust 1.95 dependency graph. Both are being handled
+in scratch patches with new browser/toolchain checks and a fresh bounded review.
+This is an implementation review only, not the final ArtCraft project verdict.
+No upstream changes or Seafile production access are involved.
