@@ -29,6 +29,19 @@
   project-level GPT-6.1 Sol FAIL and upstream publication lock are unchanged.
 * The prototype and audit report are documented in `docs/reviews/GR-016/`.
 
+## 2026-10-24 — GR-016 Seafile Open-request boundary
+
+* Comparing the shared transport with the Seafile gateway found that the new
+  `gridcraft:openRequest` had no handler in the single-file host page. The page
+  now tells the user to return to Seafile and select another document; it does
+  not reuse the active document capability to browse or open another path.
+* A T3 Chromium preview with a synthetic same-origin frame verified the message
+  and that an existing `dirty=true` state remains dirty. This is UI/protocol
+  evidence only, not a Seafile file picker or save E2E.
+* `python3 tests/test_gateway_unit.py` passes. The documented Playwright
+  protocol test could not run under system Python because Playwright is absent;
+  the test now includes the Open-request case for the browser-test environment.
+
 ## 2026-10-23 — Common Rust host transport plan clarified
 
 * The Sol low interim review identified the ticket-format mismatch between the

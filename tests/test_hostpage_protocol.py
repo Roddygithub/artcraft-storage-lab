@@ -47,6 +47,8 @@ window.requestSave = (ticket, text) => {
   parent.postMessage({type: 'wordcraft:save', name: 'synthetic.docx',
     bytes: new TextEncoder().encode(text).buffer, ticket}, location.origin);
 };
+window.requestOpen = () => parent.postMessage(
+  {type: 'wordcraft:openRequest', purpose: 'open'}, location.origin);
 setTimeout(() => parent.postMessage({type: 'wordcraft:ready'}, location.origin), 50);
 </script>"""
 
@@ -146,6 +148,10 @@ def main():
             page.wait_for_function("() => document.getElementById('frame').contentWindow?.requestSave")
             page.wait_for_function("() => window.__lastDirty === true")
 
+            page.evaluate("() => document.getElementById('frame').contentWindow.requestOpen()")
+            page.wait_for_function("() => document.getElementById('state').innerText.includes('return to Seafile')")
+            assert page.evaluate("() => window.__lastDirty === true"), "open request must not clear dirty state"
+
             page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-a', 'first edit')")
             assert State.first_save_started.wait(5), "first save request did not reach the host"
             page.wait_for_function("() => window.__saveInFlight === true")
@@ -212,6 +218,7 @@ def main():
     print("PASS: earlier acknowledgement cannot clear a later dirty revision")
     print("PASS: retry after prior save completes is durably confirmed")
     print("PASS: failed save cannot be cleared by the synthetic editor's dirty=false")
+    print("PASS: file-open request explains the single-file Seafile session boundary")
     print("PASS: distinct equal-length VectorCraft bytes with a 32-bit FNV-1a collision are persisted")
     print("PASS: VectorCraft retries after a rejected write, then skips unchanged persisted bytes")
     print("NOTE: synthetic local protocol test; not a Craft/Seafile E2E")

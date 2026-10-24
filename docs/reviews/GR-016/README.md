@@ -140,6 +140,13 @@ concurrent writers. Extracted output files from this run remain under `/tmp`.
    same-model Luna review remains a provisional FAIL in the history and is not
    counted as independent. Full report:
    [`REVIEW-SOL-LOW-R3.md`](REVIEW-SOL-LOW-R3.md).
+6. The gateway's editing session is scoped to the single file selected in
+   Seahub. It handles an app `openRequest` by telling the user to return to
+   Seafile and select another document; it does not browse the library or
+   reuse the current file capability for another path. A T3 Chromium preview
+   with a synthetic same-origin frame verified the message and that dirty state
+   stays set. A Seafile-backed file picker remains a separate,
+   authorization-sensitive feature.
 
 See [`APP-SEAM-AUDITS-20261024.md`](APP-SEAM-AUDITS-20261024.md) for the full
 13-app source seam inventory. These audits are evidence for planning, not proof

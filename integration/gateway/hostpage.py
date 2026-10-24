@@ -5,8 +5,10 @@ inside an iframe). It embeds the Craft web app in a same-origin iframe and
 implements the host half of the protocol described in docs/HOST-CONTRACT.md:
 
     child -> host   <app>:ready  { version }
+    child -> host   <app>:openRequest { purpose }
     host  -> child  <app>:open   { name, bytes }
-    child -> host   <app>:save   { name, bytes }
+    child -> host   <app>:save   { ticket, name, bytes }
+    host  -> child  <app>:saveResult { ticket, ok, error? }
     child -> host   <app>:dirty  { dirty }
     child -> host   <app>:failed { error }
 
@@ -230,6 +232,14 @@ window.addEventListener("message", async (event) => {
         say(FILE_NAME + " opened", "ok");
       } catch (err) {
         say("Could not load the document: " + err.message, "err");
+      }
+      break;
+
+    case APP + ":openRequest":
+      // This editing session is scoped to the single file selected in Seahub.
+      // Do not silently reuse that file's capability to browse the library.
+      if (data.purpose === "open") {
+        say("To open another document, return to Seafile and select it.", "busy");
       }
       break;
 

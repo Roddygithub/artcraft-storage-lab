@@ -113,6 +113,7 @@ are the executable part of it.
 | 8.7 | Complete WordCraft / GridCraft Seafile save-version-reopen flow after shared refactor | saved edit survives fresh app reopen from Seafile | [ ] not run; no new Seafile E2E claim |
 | 8.8 | GridCraft in-app Open requests a file from the host | parent receives `gridcraft:openRequest` and supplies the selected bytes | [x] Rust 1.95 release bundle: Ctrl+O emitted one request; synthetic parent returned stored bytes; GridCraft displayed `HostAck`; screenshot in GR-016 |
 | 8.9 | Independent review of GridCraft Open/MSRV/ack remediations | no blocker or major finding remains | [x] GPT-6.1 Sol low provisional bounded PASS; three minor findings in `docs/reviews/GR-016/REVIEW-SOL-LOW-R3.md` |
+| 8.10 | Seafile single-file host handles Craft `openRequest` | explain that another document must be opened from Seafile; preserve dirty state and do not broaden the current file capability | [x] T3 Chromium preview with synthetic same-origin frame: guidance shown and `dirty=true` retained; no Seafile file picker is implemented |
 
 GridCraft now declares Rust 1.95 in the scratch prototype to match current
 dependency MSRVs. Full commands, warnings and exact pinned SHAs are in

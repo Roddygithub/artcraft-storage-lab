@@ -60,6 +60,15 @@ Full details and exact SHAs are in
 `docs/reviews/GR-016/README.md`. The old Sol FAIL on `0edbe524` stands, public
 deployment is not ready, and the upstream hard gate remains locked.
 
+The root Seafile host page did not handle the shared transport's
+`<app>:openRequest`. It now displays a safe instruction to choose another file
+from Seafile and retains dirty state. The connector session remains bound to
+the document selected in Seahub; it does not provide a library browser. A T3
+Chromium synthetic-frame preview verified this message path. The documented
+Playwright protocol test was updated but could not run in system Python because
+the Playwright module is unavailable. This does not verify the refactored
+WordCraft/GridCraft save flow against Seafile.
+
 ### Isolated runtime update — 2026-10-23
 
 The statements above about unbuilt/unrun patches and an unverified DOCX E2E are

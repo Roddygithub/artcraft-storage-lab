@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; GR-016 all-app seam audit and Rust tran
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   GR-016 docs are modified locally; Rust prototype lives only in scratch clones
+WORKTREE:   GR-016 compatibility changes are uncommitted; Rust prototype remains in scratch clones
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-016 — all 13 app seams inventoried; WordCraft/GridCraft synthetic-host round trips and GridCraft host-driven in-app Open pass; two GridCraft issues remediated and independently passed by Sol low with minor notes; project GPT status remains FAIL
+CURRENT GR: GR-016 — all 13 app seams inventoried; WordCraft/GridCraft synthetic-host round trips and GridCraft host-driven in-app Open pass; Seafile gateway now explains the single-file Open boundary; project GPT status remains FAIL
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -63,8 +63,11 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- commit and push the independently reviewed GR-016 evidence to main; keep the
-  bounded review's minor notes and Seafile/remaining-app gaps visible
+- rerun the Playwright protocol suite when its dependency is available; the
+  current T3 Chromium preview verifies Open-request guidance and dirty-state
+  preservation only
+- reproduce WordCraft/GridCraft save-version-reopen with the shared transport
+  in the isolated Seafile stack before claiming connector compatibility
 - the Chromium tests use synthetic `sessionStorage`, not Seafile, and the app
   dependency is still a temporary local path
 - keep later app adapters scoped to their observed per-app open/serialize/save
