@@ -1,5 +1,28 @@
 # HISTORY
 
+## 2026-10-24 — GR-019 FigCraft shared host-save adapter prototype
+
+* Added a FigCraft Web adapter using the immutable shared `craft-platform`
+  transport. The bounded slice opens one pathless `.figcraft` document, sends
+  snapshot bytes with a ticket, and clears dirty state only after the matching
+  durable host acknowledgement.
+* Added engine tests for pathless snapshot acknowledgement, edit-during-save,
+  and refusal to acknowledge documents with native filesystem paths; added a
+  synthetic-host UI test covering unknown/valid tickets and later edits.
+* Rust 1.95 focused tests, WASM compile, clean-base patch applicability,
+  formatting and whitespace checks passed. Browser and Seafile runtime remain
+  NOT VERIFIED; no dispatch entry, upstream source, or production service was
+  changed. See `docs/reviews/GR-019/README.md`.
+* Sol low round 1 found two major scope-guard issues and a ready-reporting
+  defect. The local remediation blocks those UI routes, fails closed for an
+  unexpected extra tab, includes all tabs in dirty reporting, and drops an
+  unready bridge; focused tests and WASM checks passed. Round 2 found reachable
+  file/version duplication and live-session join paths; those are now being
+  blocked and added to the regression test. Rust 1.95 focused UI test and WASM
+  check pass on the updated patch. Sol low round 3 returned bounded PASS with
+  one minor: failed dirty-state reports are not retried until the state changes.
+  Browser and Seafile runtime remain NOT VERIFIED.
+
 ## 2026-10-24 — Standalone GR-016 craft-platform source artifact
 
 * Packaged the GR-016 craft-platform snapshot under

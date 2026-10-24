@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-018 — CADCraft durable host acknowledgement; synthetic Seafile save/history/reopen reproduced; most other ArtCraft apps and deployment gates remain open; project GPT status remains FAIL
+CURRENT GR: GR-019 — FigCraft shared host-save adapter prototype; focused tests and WASM compile pass; Seafile/browser runtime remains NOT VERIFIED; project GPT status remains FAIL
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -78,6 +78,17 @@ OPEN GAPS:
   The stored app patch pins the packaged transport revision and now passes a
   clean Rust 1.95 locked WASM check.
   Evidence is in `docs/reviews/GR-018/`.
+- GR-019 adds a local FigCraft Web adapter over the pinned shared transport.
+  Three engine snapshot tests and one synthetic-host UI lifecycle test pass;
+  Rust 1.95 WASM check and clean-base patch application pass. It is restricted
+  to one `.figcraft` file per iframe and refuses host Save As. The patch is not
+  in Seafile dispatch and has no browser or Seafile runtime evidence. Sol low
+  rounds 1 and 2 found one-document scope bypasses (including duplicate and
+  live-session commands) plus a startup-reporting issue. The latest patch
+  blocks those dispatches; focused tests/WASM checks pass and Sol low round 3
+  returned bounded PASS with one minor dirty-report retry limitation. Seafile
+  browser/runtime E2E remains NOT VERIFIED. Details:
+  `docs/reviews/GR-019/README.md`.
 - GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
 - GR-016 WordCraft and GridCraft now both have reproduced shared-transport Seafile save/version/reopen flows on the isolated synthetic stack. GridCraft also recalculated `SUM(B2:B2)` after B2 changed to 1337, persisted a new Seafile version, and reopened showing 1337. GR-018 CADCraft now has a separate synthetic Seafile history/reopen run. Exact outbound-payload hashing and optimized-bundle performance remain open. These synthetic runs do not establish public deployment readiness or all-app support.
 - Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium collision test passes, and the isolated Seafile-backed VectorCraft flow was rerun successfully after the fix (695 B saved/read back byte-identically and reopened with the new path). See the GR-012 post-fix runtime report.
@@ -92,6 +103,8 @@ NEXT:
 - continue app-by-app adapters from the GR-016 seam inventory; WordCraft,
   GridCraft, PdfCraft and CADCraft now use the immutable packaged transport
   revision and compile from clean pinned-source checkouts with Rust 1.95
+- continue from GR-019 to DeckCraft and remaining apps; FigCraft's patch is a
+  local prototype only until browser and Seafile runtime evidence exists
 - retain the limits: only those four patches have reproducible builds; other
   app integrations, runtime coverage and deployment controls remain incomplete
 - continue remaining Craft Web adapters from the GR-016 per-app seam inventory;

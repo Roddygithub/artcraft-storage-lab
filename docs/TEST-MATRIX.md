@@ -154,6 +154,21 @@ Patch, commands and limits: `docs/reviews/GR-017/README.md`.
 
 Patch and bounded-review reports: `docs/reviews/GR-018/`.
 
+## 11. FigCraft durable host-save adapter prototype (GR-019)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 11.1 | External ACK without a filesystem path | only the matching serialized snapshot becomes the saved baseline | [x] 3 focused `figcraft-engine` tests pass; later edits remain dirty and pathful native documents cannot be externally acknowledged |
+| 11.2 | Synthetic host open/edit/save/ACK flow | no clean state before ACK; unknown ticket ignored; exact snapshot bytes reopen; later edit remains dirty | [x] 1 focused `figcraft-ui-egui` test passes with a mock transport service and real FigCraft serialization |
+| 11.3 | FigCraft Web shared transport build | pinned shared transport compiles for `wasm32-unknown-unknown` | [x] Rust 1.95 locked check passes; existing optional-font/dead-code warnings remain |
+| 11.4 | Apply stored patch to pinned upstream base | all hunks apply to clean FigCraft SHA `8d790607ff1ad40e32343ca2116d8fdcf3244c8d` | [x] `git apply --check` passes against a clean archive |
+| 11.5 | Browser transport + Seafile save/version/reopen | actual Seafile click, editor save ACK, version and fresh reopen | [ ] NOT VERIFIED; patch is not in dispatch and no FigCraft bundle/runtime run was performed |
+| 11.6 | Host timeout, wrong-origin/source and production security | failure paths remain safe in a real browser topology | [ ] NOT VERIFIED; source implements 120-second unknown-outcome warning; runtime path not exercised |
+| 11.7 | Single-document scope guards | host mode refuses new/open/duplicate/version-duplicate, branches and collaboration; unexpected extra dirty tabs remain visible and cannot be saved as the bound file | [x] synthetic UI test covers these dispatch paths, extra-tab dirty reporting and fail-closed save; browser controls NOT VERIFIED |
+| 11.8 | Independent bounded patch review | no blocker/major correctness finding on exact patch SHA | [x] GPT-6.1 Sol low round 3 PASS; one MINOR: dirty-state transport failure is not retried until the state changes; project verdict unchanged |
+
+Patch and limits: `docs/reviews/GR-019/README.md`.
+
 ## 9. How results are recorded
 
 Each test result is recorded in the corresponding evidence bundle under

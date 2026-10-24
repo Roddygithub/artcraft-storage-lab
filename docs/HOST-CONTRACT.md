@@ -371,7 +371,7 @@ saved. **The integration layer must never pretend a save succeeded.**
 | vectorcraft | no | has a *different* mechanism (`window.vectorcraft`, a promise API) — see §6 | decide whether to port the bridge or adapt the page API |
 | designcraft | no | `download` present, `open_async` present, no `async_saves` | port the bridge; check the save hook's signature |
 | photocraft | no | `inbox` present, no `download` | port the bridge; the save hook may not exist yet |
-| figcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
+| figcraft | upstream: no; local GR-019 prototype only | upstream `Services` is picker/download-only; local patch adds pathless `.figcraft` snapshot ACK | browser and Seafile E2E remain NOT VERIFIED; host Save As/branches/previews are out of first-slice scope |
 | cadcraft | yes | existing bridge replaces the engine delivery hook | migrate to the shared crate and verify durable save-result semantics |
 | filmcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
 | lightcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |

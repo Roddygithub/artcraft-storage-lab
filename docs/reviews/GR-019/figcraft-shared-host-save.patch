@@ -1,0 +1,725 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 27cb0d4..c5db6f9 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -904,6 +904,16 @@ name = "craft-docpath"
+ version = "0.1.0"
+ source = "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=90c261de22ef75c4c7c5c5cd1c712d483be0bbc8#90c261de22ef75c4c7c5c5cd1c712d483be0bbc8"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-window"
+ version = "0.1.0"
+@@ -1779,6 +1789,7 @@ dependencies = [
+ name = "figcraft-web"
+ version = "0.10.0"
+ dependencies = [
++ "craft-platform",
+  "eframe",
+  "egui",
+  "figcraft-collab-net",
+diff --git a/Cargo.toml b/Cargo.toml
+index 95c956d..13f9585 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -37,6 +37,7 @@ craft-docpath = { version = "0.1.0", git = "https://github.com/storytold/craft-l
+ # Who draws the window frame on Linux — the compositor or the app — so every Craft app shows the
+ # same native titlebar per desktop (craft-libs). The `egui` feature adds `decorate`/`decorations`.
+ craft-window = { git = "https://github.com/storytold/craft-libs", rev = "1f805378d454dac48b5c214029d254055fdf961b", features = ["egui"] }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8", package = "craft-platform" }
+ 
+ # foundation
+ kurbo = { version = "0.13", features = ["serde"] }
+diff --git a/apps/figcraft-web/Cargo.toml b/apps/figcraft-web/Cargo.toml
+index ffd44f3..707e1f4 100644
+--- a/apps/figcraft-web/Cargo.toml
++++ b/apps/figcraft-web/Cargo.toml
+@@ -17,6 +17,7 @@ path = "src/main.rs"
+ figcraft-engine = { workspace = true }
+ figcraft-ui-egui = { workspace = true }
+ figcraft-collab-net = { workspace = true }
++craft-platform = { workspace = true, features = ["browser"] }
+ egui = { workspace = true }
+ log = { workspace = true }
+ 
+diff --git a/apps/figcraft-web/src/host.rs b/apps/figcraft-web/src/host.rs
+new file mode 100644
+index 0000000..c1c5bac
+--- /dev/null
++++ b/apps/figcraft-web/src/host.rs
+@@ -0,0 +1,96 @@
++//! Thin browser adapter for the shared Craft host transport.
++
++use std::{cell::RefCell, rc::Rc};
++
++use craft_platform::browser::host::{HostListener, HostMessage, HostTransport};
++use figcraft_ui_egui::HostEvent;
++
++pub struct HostBridge {
++    transport: Option<HostTransport>,
++    _listener: Option<HostListener>,
++    events: Rc<RefCell<Vec<HostMessage>>>,
++    requested: bool,
++}
++
++impl HostBridge {
++    pub fn new(ctx: egui::Context, requested: bool) -> Self {
++        let events = Rc::new(RefCell::new(Vec::new()));
++        let (transport, listener) = if requested {
++            match HostTransport::current("figcraft") {
++                Ok(Some(transport)) => {
++                    let queue = events.clone();
++                    let wake = ctx.clone();
++                    match transport.listen(move |message| {
++                        queue.borrow_mut().push(message);
++                        wake.request_repaint();
++                    }) {
++                        Ok(listener) => {
++                            if let Err(e) = transport.post_ready(env!("CARGO_PKG_VERSION")) {
++                                log::error!("couldn't announce FigCraft host readiness: {e:?}");
++                                (None, None)
++                            } else {
++                                (Some(transport), Some(listener))
++                            }
++                        }
++                        Err(e) => {
++                            log::error!("couldn't listen for FigCraft host messages: {e:?}");
++                            (None, None)
++                        }
++                    }
++                }
++                Ok(None) => {
++                    log::error!("FigCraft host mode requires a same-origin parent frame");
++                    (None, None)
++                }
++                Err(e) => {
++                    log::error!("couldn't initialize FigCraft host transport: {e:?}");
++                    (None, None)
++                }
++            }
++        } else {
++            (None, None)
++        };
++        Self { transport, _listener: listener, events, requested }
++    }
++
++    pub fn is_requested(&self) -> bool {
++        self.requested
++    }
++
++    pub fn is_available(&self) -> bool {
++        self.transport.is_some()
++    }
++
++    pub fn take_events(&self) -> Vec<HostEvent> {
++        self.events
++            .borrow_mut()
++            .drain(..)
++            .map(|message| match message {
++                HostMessage::Open { name, bytes } => HostEvent::Open { name, bytes },
++                HostMessage::SaveResult { ticket, ok, error } => HostEvent::SaveResult { ticket: ticket.as_str().to_owned(), ok, error },
++            })
++            .collect()
++    }
++
++    pub fn save(&self, ticket: &str, name: &str, bytes: &[u8]) -> Result<(), String> {
++        let transport = self.transport.as_ref().ok_or_else(|| "The FigCraft host transport is unavailable".to_string())?;
++        let ticket = craft_platform::host_protocol::SaveTicket::new(ticket).ok_or_else(|| "Invalid save ticket".to_string())?;
++        transport.post_save(&ticket, name, bytes, false).map_err(|e| format!("Couldn't send save to host: {e:?}"))
++    }
++
++    pub fn open_request(&self) -> Result<(), String> {
++        self.transport
++            .as_ref()
++            .ok_or_else(|| "The FigCraft host transport is unavailable".to_string())?
++            .post_open_request("open")
++            .map_err(|e| format!("Couldn't request a file from the host: {e:?}"))
++    }
++
++    pub fn dirty(&self, dirty: bool) -> Result<(), String> {
++        self.transport
++            .as_ref()
++            .ok_or_else(|| "The FigCraft host transport is unavailable".to_string())?
++            .post_dirty(dirty)
++            .map_err(|e| format!("Couldn't report FigCraft dirty state: {e:?}"))
++    }
++}
+diff --git a/apps/figcraft-web/src/main.rs b/apps/figcraft-web/src/main.rs
+index 7eed2ff..71b236d 100644
+--- a/apps/figcraft-web/src/main.rs
++++ b/apps/figcraft-web/src/main.rs
+@@ -20,6 +20,8 @@
+ //! The link carries the session's secret; a fragment is never sent to the web host, but the address
+ //! bar and the browser history keep it, so the URL is as private as the link itself.
+ 
++#[cfg(target_arch = "wasm32")]
++mod host;
+ #[cfg(any(target_arch = "wasm32", test))]
+ mod query;
+ #[cfg(test)]
+diff --git a/apps/figcraft-web/src/web.rs b/apps/figcraft-web/src/web.rs
+index f08ca90..63661e7 100644
+--- a/apps/figcraft-web/src/web.rs
++++ b/apps/figcraft-web/src/web.rs
+@@ -1,7 +1,7 @@
+ //! The browser shell: web `Services` and the eframe web runner.
+ 
+ use figcraft_engine::Session;
+-use figcraft_ui_egui::{ContentsFuture, FigApp, Services};
++use figcraft_ui_egui::{ContentsFuture, FigApp, HostEvent, Services};
+ use wasm_bindgen::JsCast as _;
+ 
+ const CANVAS_ID: &str = "figcraft_canvas";
+@@ -35,15 +35,17 @@ pub fn start() {
+                         log::info!("figcraft-web: wgpu backend {:?}", rs.adapter.get_info().backend);
+                     }
+                     let reduce_motion = web_sys::window().and_then(|w| w.match_media("(prefers-reduced-motion: reduce)").ok().flatten());
+-                    let mut session = Session::new();
++                    let host_requested = query().trim_start_matches('?').split('&').any(|part| part == "host=parent");
++                    let host = crate::host::HostBridge::new(cc.egui_ctx.clone(), host_requested);
++                    let mut session = if host_requested { Session::empty() } else { Session::new() };
+                     // Live sessions: the browser joins sessions a desktop app hosts; whatever arrives
+                     // on the socket wakes the page for a frame.
+                     let ctx = cc.egui_ctx.clone();
+                     session.live.install(Box::new(figcraft_collab_net::NetLink::new(std::sync::Arc::new(move || ctx.request_repaint()))));
+-                    let mut fig = FigApp::new(session, Box::new(WebServices { reduce_motion, ctx: cc.egui_ctx.clone() }));
++                    let mut fig = FigApp::new(session, Box::new(WebServices { reduce_motion, ctx: cc.egui_ctx.clone(), host }));
+                     // `#join=<link>`: join that session, as opening an invite link does on the desktop.
+                     let hash = web_sys::window().and_then(|w| w.location().hash().ok()).unwrap_or_default();
+-                    if let Some(link) = crate::query::join_link(&hash) {
++                    if !host_requested && let Some(link) = crate::query::join_link(&hash) {
+                         let link = js_sys::decode_uri_component(link).ok().and_then(|s| s.as_string()).unwrap_or_else(|| link.to_string());
+                         figcraft_ui_egui::live::open_invite(&mut fig, &link);
+                     }
+@@ -83,9 +85,28 @@ struct WebServices {
+     /// `prefers-reduced-motion: reduce` (it follows the setting while the page is open).
+     reduce_motion: Option<web_sys::MediaQueryList>,
+     ctx: egui::Context,
++    host: crate::host::HostBridge,
+ }
+ 
+ impl Services for WebServices {
++    fn host_mode(&self) -> bool {
++        self.host.is_requested()
++    }
++    fn host_available(&self) -> bool {
++        self.host.is_available()
++    }
++    fn take_host_events(&mut self) -> Vec<HostEvent> {
++        self.host.take_events()
++    }
++    fn host_save(&mut self, ticket: &str, name: &str, bytes: &[u8]) -> Result<(), String> {
++        self.host.save(ticket, name, bytes)
++    }
++    fn host_open_request(&mut self) -> Result<(), String> {
++        self.host.open_request()
++    }
++    fn host_dirty(&mut self, dirty: bool) -> Result<(), String> {
++        self.host.dirty(dirty)
++    }
+     /// An `<input type="file">` taking `exts`, clicked; its file is read once picked.
+     fn pick_open_contents(&mut self, _title: &str, exts: &[&str]) -> Option<ContentsFuture> {
+         let accept = exts.iter().map(|e| format!(".{e}")).collect::<Vec<_>>().join(",");
+diff --git a/crates/engine/src/cmd/file.rs b/crates/engine/src/cmd/file.rs
+index 7380711..568396a 100644
+--- a/crates/engine/src/cmd/file.rs
++++ b/crates/engine/src/cmd/file.rs
+@@ -817,6 +817,22 @@ impl FileSnapshot {
+         branch_tabs_saved(s, self.uid);
+         Ok(true)
+     }
++
++    /// Record a host-confirmed write without touching the filesystem. Later edits stay dirty.
++    pub fn acknowledge_external(self, s: &mut Session) -> bool {
++        if self.path.is_some() {
++            return false;
++        }
++        let Some(ds) = s.docs.iter_mut().find(|d| d.uid == self.uid && d.path == self.path && Arc::ptr_eq(&d.saved_doc, &self.saved)) else {
++            return false;
++        };
++        if ds.revision == self.revision {
++            ds.versions_changed = false;
++        }
++        ds.saved_doc = self.doc;
++        ds.revision += 1;
++        true
++    }
+ }
+ 
+ /// The branch tabs of the file in tab `uid` were saved with it.
+@@ -1730,3 +1746,44 @@ mod staging_write_tests {
+         let _ = std::fs::remove_dir_all(&d);
+     }
+ }
++
++#[cfg(test)]
++mod external_snapshot_tests {
++    use super::*;
++
++    #[test]
++    fn external_ack_commits_only_the_encoded_snapshot() {
++        let mut session = Session::new();
++        session.execute("shape.rectangle", &json!({"x": 0, "y": 0, "width": 10, "height": 10})).unwrap();
++        let snapshot = FileSnapshot::of(session.ds().unwrap());
++        let bytes = snapshot.encode().unwrap();
++        session.execute("shape.rectangle", &json!({"x": 20, "y": 0, "width": 10, "height": 10})).unwrap();
++
++        assert!(snapshot.acknowledge_external(&mut session));
++        assert!(session.ds().unwrap().is_dirty(), "the later rectangle is still unsaved");
++
++        let (saved, _) = load_bytes(&bytes, "snapshot.figcraft").unwrap();
++        assert_eq!(saved.nodes().filter(|n| matches!(n.kind, NodeKind::Rectangle)).count(), 1);
++        assert_eq!(session.doc().unwrap().nodes().filter(|n| matches!(n.kind, NodeKind::Rectangle)).count(), 2);
++    }
++
++    #[test]
++    fn external_ack_cleans_the_matching_snapshot_without_a_path() {
++        let mut session = Session::new();
++        session.execute("shape.rectangle", &json!({"x": 0, "y": 0, "width": 10, "height": 10})).unwrap();
++        let snapshot = FileSnapshot::of(session.ds().unwrap());
++        assert_eq!(session.ds().unwrap().path, None);
++        assert!(snapshot.acknowledge_external(&mut session));
++        assert!(!session.ds().unwrap().is_dirty());
++    }
++
++    #[test]
++    fn external_ack_cannot_mark_a_native_path_saved_without_writing_it() {
++        let mut session = Session::new();
++        session.execute("shape.rectangle", &json!({"x": 0, "y": 0, "width": 10, "height": 10})).unwrap();
++        session.ds_mut().unwrap().path = Some("native.figcraft".into());
++        let snapshot = FileSnapshot::of(session.ds().unwrap());
++        assert!(!snapshot.acknowledge_external(&mut session));
++        assert!(session.ds().unwrap().is_dirty());
++    }
++}
+diff --git a/crates/ui-egui/src/host_save_tests.rs b/crates/ui-egui/src/host_save_tests.rs
+new file mode 100644
+index 0000000..3e33896
+--- /dev/null
++++ b/crates/ui-egui/src/host_save_tests.rs
+@@ -0,0 +1,100 @@
++use std::{cell::RefCell, rc::Rc};
++
++use figcraft_engine::{Session, cmd::file::file_bytes};
++use serde_json::json;
++
++use crate::{FigApp, HostEvent, Services};
++
++#[derive(Default)]
++struct State {
++    events: Vec<HostEvent>,
++    saves: Vec<(String, String, Vec<u8>)>,
++    dirty: Vec<bool>,
++}
++
++struct Host(Rc<RefCell<State>>);
++
++impl Services for Host {
++    fn host_mode(&self) -> bool {
++        true
++    }
++    fn take_host_events(&mut self) -> Vec<HostEvent> {
++        std::mem::take(&mut self.0.borrow_mut().events)
++    }
++    fn host_save(&mut self, ticket: &str, name: &str, bytes: &[u8]) -> Result<(), String> {
++        self.0.borrow_mut().saves.push((ticket.into(), name.into(), bytes.into()));
++        Ok(())
++    }
++    fn host_dirty(&mut self, dirty: bool) -> Result<(), String> {
++        self.0.borrow_mut().dirty.push(dirty);
++        Ok(())
++    }
++}
++
++#[test]
++fn host_save_waits_for_ack_and_keeps_edits_made_while_pending() {
++    let mut source = Session::new();
++    source.execute("shape.rectangle", &json!({"x": 0, "y": 0, "width": 10, "height": 10})).unwrap();
++    let bytes = file_bytes(source.ds().unwrap()).unwrap();
++    let state = Rc::new(RefCell::new(State::default()));
++    state.borrow_mut().events.push(HostEvent::Open { name: "Board.figcraft".into(), bytes });
++    let mut app = FigApp::new(Session::empty(), Box::new(Host(state.clone())));
++    let ctx = egui::Context::default();
++    app.logic(&ctx);
++    assert_eq!(app.session.docs.len(), 1);
++    assert!(!app.session.ds().unwrap().is_dirty());
++
++    assert!(app.run("file.new", json!({})).is_none());
++    assert_eq!(app.session.docs.len(), 1, "host mode refuses a second document");
++    crate::menus::invoke(&mut app, "branch.create");
++    assert!(app.ui.versions.form.is_none(), "host mode refuses branch creation");
++    crate::menus::invoke(&mut app, "collab.join");
++    assert!(app.ui.live.join.is_none(), "host mode refuses the live-join dialog");
++    assert!(app.run("file.duplicate", json!({})).is_none(), "host mode refuses file duplication");
++    assert!(app.run("version.duplicate", json!({"id": "missing"})).is_none(), "host mode refuses version duplication");
++    assert_eq!(app.session.docs.len(), 1);
++
++    app.run("shape.rectangle", json!({"x": 20, "y": 0, "width": 10, "height": 10}));
++    app.save();
++    let (ticket, name, saved_bytes) = state.borrow().saves[0].clone();
++    assert_eq!(name, "Board.figcraft");
++    assert!(app.session.ds().unwrap().is_dirty(), "handoff is not durable acknowledgement");
++
++    state.borrow_mut().events.push(HostEvent::SaveResult { ticket: "unknown".into(), ok: true, error: None });
++    app.logic(&ctx);
++    assert!(app.session.ds().unwrap().is_dirty(), "unknown ticket cannot clean the drawing");
++    state.borrow_mut().events.push(HostEvent::SaveResult { ticket, ok: true, error: None });
++    app.logic(&ctx);
++    assert!(!app.session.ds().unwrap().is_dirty(), "unknown tickets must not consume a valid pending save");
++
++    let (saved, _) = figcraft_format::load_bytes(&saved_bytes).unwrap();
++    assert_eq!(saved.nodes().filter(|n| matches!(n.kind, figcraft_doc::NodeKind::Rectangle)).count(), 2);
++
++    app.run("shape.rectangle", json!({"x": 40, "y": 0, "width": 10, "height": 10}));
++    app.save();
++    let (ticket, _, saved_bytes) = state.borrow().saves[1].clone();
++    app.run("shape.rectangle", json!({"x": 60, "y": 0, "width": 10, "height": 10}));
++    state.borrow_mut().events.push(HostEvent::SaveResult { ticket, ok: true, error: None });
++    app.logic(&ctx);
++    assert!(app.session.ds().unwrap().is_dirty(), "edits after the snapshot remain dirty");
++    let (saved, _) = figcraft_format::load_bytes(&saved_bytes).unwrap();
++    assert_eq!(saved.nodes().filter(|n| matches!(n.kind, figcraft_doc::NodeKind::Rectangle)).count(), 3);
++    assert_eq!(app.session.doc().unwrap().nodes().filter(|n| matches!(n.kind, figcraft_doc::NodeKind::Rectangle)).count(), 4);
++
++    app.save();
++    let (ticket, _, _) = state.borrow().saves[2].clone();
++    state.borrow_mut().events.push(HostEvent::SaveResult { ticket, ok: true, error: None });
++    app.logic(&ctx);
++    assert!(!app.session.ds().unwrap().is_dirty());
++
++    assert!(app.run("file.saveAs", json!({})).is_none(), "host Save As is explicitly refused");
++
++    // Defend the one-document boundary even if a second document enters through an unexpected path.
++    app.session.execute("file.new", &json!({"name": "Unsupported second tab"})).unwrap();
++    app.run("shape.rectangle", json!({"x": 80, "y": 0, "width": 10, "height": 10}));
++    app.logic(&ctx);
++    assert_eq!(state.borrow().dirty.last(), Some(&true), "all dirty tabs must protect the host session from close");
++    let save_count = state.borrow().saves.len();
++    app.save();
++    assert_eq!(state.borrow().saves.len(), save_count, "an unsupported active tab must not save the bound file");
++}
+diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
+index c93333b..ba7c70b 100644
+--- a/crates/ui-egui/src/lib.rs
++++ b/crates/ui-egui/src/lib.rs
+@@ -117,6 +117,8 @@ mod home_recents_tests;
+ #[cfg(test)]
+ mod home_tests;
+ #[cfg(test)]
++mod host_save_tests;
++#[cfg(test)]
+ mod idle_tests;
+ #[cfg(test)]
+ mod ime_tests;
+@@ -242,6 +244,28 @@ pub use control::{ControlReply, ControlRequest};
+ 
+ /// Platform services the app crate provides (file dialogs, clipboard, URLs).
+ pub trait Services {
++    /// Whether this editor is embedded in a file-host session.
++    fn host_mode(&self) -> bool {
++        false
++    }
++    /// Whether the requested parent-frame transport was successfully initialized.
++    fn host_available(&self) -> bool {
++        true
++    }
++    /// Messages queued by the browser host transport.
++    fn take_host_events(&mut self) -> Vec<HostEvent> {
++        Vec::new()
++    }
++    /// Send a serialized snapshot to the host; success means only that it was handed off.
++    fn host_save(&mut self, _ticket: &str, _name: &str, _bytes: &[u8]) -> Result<(), String> {
++        Err("The file host is unavailable".into())
++    }
++    fn host_open_request(&mut self) -> Result<(), String> {
++        Err("The file host is unavailable".into())
++    }
++    fn host_dirty(&mut self, _dirty: bool) -> Result<(), String> {
++        Ok(())
++    }
+     fn pick_open(&mut self, _title: &str, _exts: &[&str]) -> DialogFuture {
+         Box::pin(std::future::ready(None))
+     }
+@@ -303,6 +327,12 @@ pub trait Services {
+     }
+ }
+ 
++/// Events from a parent file host. The UI consumes them on its frame thread.
++pub enum HostEvent {
++    Open { name: String, bytes: Vec<u8> },
++    SaveResult { ticket: String, ok: bool, error: Option<String> },
++}
++
+ pub type DialogFuture = Pin<Box<dyn Future<Output = Option<PathBuf>>>>;
+ /// A picked file's name and contents ([`Services::pick_open_contents`]); `None` when the picker
+ /// was cancelled, `Err` with what to tell the user when the file couldn't be read.
+@@ -802,6 +832,23 @@ pub struct FigApp {
+     /// The automation roots the app was started with: every frame and control request runs
+     /// confined to them ([`windows::guard`]).
+     pub automation_roots: Option<Arc<figcraft_engine::file_access::Roots>>,
++    host_file: Option<HostFile>,
++    host_save: Option<PendingHostSave>,
++    next_host_ticket: u64,
++    host_dirty_reported: Option<bool>,
++    host_problem_reported: bool,
++    host_opening: bool,
++}
++
++struct HostFile {
++    uid: u64,
++    name: String,
++}
++struct PendingHostSave {
++    ticket: String,
++    snapshot: figcraft_engine::cmd::file::FileSnapshot,
++    started_at: web_time::Instant,
++    timeout_reported: bool,
+ }
+ 
+ /// What to do with the result of a command run in the background.
+@@ -833,6 +880,12 @@ impl FigApp {
+             pending_dialog: None,
+             ui_context: None,
+             automation_roots: None,
++            host_file: None,
++            host_save: None,
++            next_host_ticket: 1,
++            host_dirty_reported: None,
++            host_problem_reported: false,
++            host_opening: false,
+         }
+     }
+ 
+@@ -845,6 +898,23 @@ impl FigApp {
+ 
+     /// Run a command, surfacing errors as a toast. Returns the result.
+     pub fn run(&mut self, id: &str, params: Value) -> Option<Value> {
++        if self.services.host_mode() {
++            if id == "file.save" {
++                return self.start_host_save().then(|| json!({"pending": true}));
++            }
++            if id == "file.saveAs" {
++                self.show_error("Save As is not supported by this host session".into());
++                return None;
++            }
++            if !self.host_opening
++                && (id.starts_with("branch.")
++                    || id.starts_with("collab.")
++                    || matches!(id, "file.new" | "file.newFromTemplate" | "file.open" | "file.openRecent" | "file.duplicate" | "version.duplicate"))
++            {
++                self.show_error("This host session is limited to the Seafile document already open".into());
++                return None;
++            }
++        }
+         let r = self.session.execute(id, &params);
+         self.clear_comment_draft_after_tool_set(id, r.is_ok());
+         self.handle_ui_requests();
+@@ -1140,6 +1210,10 @@ impl FigApp {
+     }
+ 
+     pub fn save_as_dialog(&mut self) {
++        if self.services.host_mode() {
++            self.show_error("Save As is not supported by this host session".into());
++            return;
++        }
+         let Ok(name) = self.session.doc().map(|d| d.name.clone()) else { return };
+         self.pick_save(i18n::tr("Save as"), &format!("{name}.figcraft"), &["figcraft", "fig"], |app, mut p| {
+             if p.extension().is_none_or(|e| e.is_empty()) {
+@@ -1170,6 +1244,10 @@ impl FigApp {
+     }
+ 
+     pub fn save(&mut self) {
++        if self.services.host_mode() {
++            self.start_host_save();
++            return;
++        }
+         // A branch tab saves its main file.
+         let tab = figcraft_engine::branches::file_tab(&self.session);
+         // A path ending in .fig is never saved over silently: a .fig destination is an export copy.
+@@ -1189,6 +1267,12 @@ impl FigApp {
+     }
+ 
+     pub fn open_dialog(&mut self) {
++        if self.services.host_mode() {
++            if let Err(e) = self.services.host_open_request() {
++                self.show_error(e);
++            }
++            return;
++        }
+         // Opening needs no file in front: it goes ahead even if that file closed meanwhile.
+         self.pick_file(i18n::tr("Open"), OPEN_EXTENSIONS, false, |app, file| {
+             if app.run_user("file.open", file).is_some() {
+@@ -1364,6 +1448,7 @@ impl FigApp {
+ 
+     /// Per-frame logic that doesn't draw (control requests, theme, language).
+     pub fn logic(&mut self, ctx: &egui::Context) {
++        self.process_host_events(ctx);
+         if self.language.as_ref() != Some(&self.session.prefs.language) {
+             i18n::set(&self.session.prefs.language, self.services.system_language().as_deref());
+             self.language = Some(self.session.prefs.language.clone());
+@@ -1410,6 +1495,141 @@ impl FigApp {
+         if self.worker.is_none() {
+             self.worker = Some(render_worker::Worker::new(ctx.clone()));
+         }
++        self.report_host_dirty();
++    }
++
++    fn process_host_events(&mut self, ctx: &egui::Context) {
++        if !self.services.host_mode() {
++            return;
++        }
++        if !self.host_problem_reported && !self.services.host_available() {
++            self.host_problem_reported = true;
++            self.show_error("FigCraft host mode needs a working same-origin parent frame".into());
++        }
++        for event in self.services.take_host_events() {
++            match event {
++                HostEvent::Open { name, bytes } => {
++                    if self.host_file.is_some() {
++                        self.show_error("This FigCraft host session already has a file open".into());
++                        continue;
++                    }
++                    if !name.to_ascii_lowercase().ends_with(".figcraft") {
++                        self.show_error("Only native .figcraft files can be edited in this host session".into());
++                        continue;
++                    }
++                    if let Err(e) = browser_can_read(&name, bytes.len() as f64) {
++                        self.show_error(e);
++                        continue;
++                    }
++                    use base64::Engine as _;
++                    let data = base64::engine::general_purpose::STANDARD.encode(bytes);
++                    self.host_opening = true;
++                    let opened = self.run_user("file.open", json!({"name": name, "data": data})).is_some();
++                    self.host_opening = false;
++                    if opened {
++                        if let Some(ds) = self.session.docs.get(self.session.active) {
++                            self.host_file = Some(HostFile { uid: ds.uid, name });
++                            self.ui.home = false;
++                        }
++                    }
++                }
++                HostEvent::SaveResult { ticket, ok, error } => {
++                    if self.host_save.as_ref().is_none_or(|pending| pending.ticket != ticket) {
++                        continue;
++                    }
++                    let Some(pending) = self.host_save.take() else { continue };
++                    if ok {
++                        if !pending.snapshot.acknowledge_external(&mut self.session) {
++                            self.show_error("The saved snapshot is stale; the document remains unsaved".into());
++                        } else if self
++                            .host_file
++                            .as_ref()
++                            .is_some_and(|f| self.session.docs.iter().find(|d| d.uid == f.uid).is_some_and(|d| d.is_dirty()))
++                        {
++                            self.toast("Earlier changes saved; newer changes remain unsaved");
++                        } else {
++                            self.toast("Saved to Seafile");
++                        }
++                    } else {
++                        self.show_error(error.unwrap_or_else(|| "Seafile did not save the document".into()));
++                    }
++                }
++            }
++        }
++        const HOST_SAVE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(120);
++        let timeout_warning = if let Some(pending) = &mut self.host_save {
++            let elapsed = pending.started_at.elapsed();
++            if elapsed >= HOST_SAVE_TIMEOUT && !pending.timeout_reported {
++                pending.timeout_reported = true;
++                true
++            } else {
++                if !pending.timeout_reported {
++                    ctx.request_repaint_after(HOST_SAVE_TIMEOUT.saturating_sub(elapsed));
++                }
++                false
++            }
++        } else {
++            false
++        };
++        if timeout_warning {
++            self.toast("No save confirmation arrived. The outcome is unknown; check Seafile before retrying.");
++        }
++    }
++
++    fn start_host_save(&mut self) -> bool {
++        let Some(file) = self.host_file.as_ref() else {
++            self.show_error("No Seafile document is bound to this FigCraft session".into());
++            return false;
++        };
++        if self.host_save.is_some() {
++            self.toast("A Seafile save is already in progress");
++            return false;
++        }
++        if self.session.docs.len() != 1 || self.session.active != 0 {
++            self.show_error("Close or return to the Seafile document before saving this host session".into());
++            return false;
++        }
++        let Some(ds) = self.session.docs.get(self.session.active).filter(|d| d.uid == file.uid) else {
++            self.show_error("The Seafile document is no longer open".into());
++            return false;
++        };
++        if ds.branch_of.is_some() || ds.preview.is_some() || ds.text_preview.is_some() || ds.interaction.is_some() {
++            self.show_error("Finish the current preview or interaction before saving to Seafile".into());
++            return false;
++        }
++        let snapshot = figcraft_engine::cmd::file::FileSnapshot::of(ds);
++        let bytes = match snapshot.encode() {
++            Ok(bytes) => bytes,
++            Err(e) => {
++                self.show_error(e.to_string());
++                return false;
++            }
++        };
++        let ticket = format!("figcraft:{}", self.next_host_ticket);
++        self.next_host_ticket = self.next_host_ticket.wrapping_add(1).max(1);
++        self.host_save = Some(PendingHostSave { ticket: ticket.clone(), snapshot, started_at: web_time::Instant::now(), timeout_reported: false });
++        if let Err(e) = self.services.host_save(&ticket, &file.name, &bytes) {
++            self.host_save = None;
++            self.show_error(e);
++            false
++        } else {
++            self.toast("Saving to Seafile…");
++            true
++        }
++    }
++
++    fn report_host_dirty(&mut self) {
++        if !self.services.host_mode() {
++            return;
++        }
++        let dirty = self.session.docs.iter().any(|d| d.is_dirty()) || self.host_save.is_some();
++        if self.host_dirty_reported == Some(dirty) {
++            return;
++        }
++        self.host_dirty_reported = Some(dirty);
++        if let Err(e) = self.services.host_dirty(dirty) {
++            log::warn!("couldn't report host dirty state: {e}");
++        }
+     }
+ 
+     /// Every [`AUTOSAVE_SECS`], each open document with unsaved changes since its last version
+diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
+index 9659c6b..193f013 100644
+--- a/crates/ui-egui/src/menus.rs
++++ b/crates/ui-egui/src/menus.rs
+@@ -115,6 +115,10 @@ pub fn record_recent(app: &mut FigApp, key: &str) {
+ /// Run a menu, shortcut or palette action by id: actions that need the UI (dialogs, panels, the
+ /// clipboard) are handled here, the rest go to the engine.
+ pub fn invoke(app: &mut FigApp, id: &str) {
++    if app.services.host_mode() && (id.starts_with("branch.") || id.starts_with("collab.")) {
++        app.show_error("Branches and live collaboration are not supported by this host session".into());
++        return;
++    }
+     match id {
+         // Edit ▸ Delete (and the Delete binding) with an interaction open in the Prototype tab
+         // removes that interaction, not the layer (#767).

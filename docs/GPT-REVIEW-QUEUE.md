@@ -438,6 +438,21 @@ GPT review:  NOT REQUESTED as a project candidate; project remains GPT REVIEW FA
 Publication: LOCKED; no upstream issue, PR, RFC or patch was published
 ```
 
+### GR-019 — FigCraft shared host-save adapter prototype
+
+```text
+Status:      local prototype; focused tests and WASM compile pass; not Seafile E2E
+Base:        storytold/figcraft 8d790607ff1ad40e32343ca2116d8fdcf3244c8d
+Transport:   craft-platform pinned at 90c261de22ef75c4c7c5c5cd1c712d483be0bbc8
+Scope:       one pathless .figcraft file per iframe; ticketed snapshot save ACK; no host Save As
+Evidence:    docs/reviews/GR-019/README.md and figcraft-shared-host-save.patch
+Tests:       3 engine tests, 1 synthetic-host UI test, Rust 1.95 locked WASM check, patch apply check, fmt/diff checks
+Open:        browser postMessage runtime, Seafile dispatch/version/reopen, timeout runtime, and deployment security NOT VERIFIED
+Independent: Sol low rounds 1 and 2 returned FAIL; round 3 returned bounded PASS for exact patch `e2a55885642960cadb0a7f6dc77894f6d53c43625abc701c4cc02db2543dc366`; reports: `docs/reviews/GR-019/REVIEW-SOL-LOW-R1.md`, `REVIEW-SOL-LOW-R2.md`, `REVIEW-SOL-LOW-R3.md`; one MINOR remains for retrying failed dirty-state reports; no project GPT PASS, Seafile E2E, or upstream authorization
+GPT review:  NOT REQUESTED as a project candidate; project remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC, or patch published
+```
+
 ## GPT review instruction (for the future session)
 
 ```text
