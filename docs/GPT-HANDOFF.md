@@ -445,3 +445,20 @@ edit/save/ACK/fresh-reopen smoke using `sessionStorage`. See
 project's prior GPT-6.1 Sol FAIL remains in force; PdfCraft Seafile
 persistence/version/reopen is not verified, and this work does not unlock
 upstream publication.
+
+### GR-018 CADCraft durable host-save acknowledgement — 2026-10-24
+
+On pinned CADCraft base `7bf5905ac97316a7896de8cbc12d243f57b09bd8`, a local
+patch adds correlated `cadcraft:save` / `cadcraft:saveResult` handling. The
+engine holds the drawing dirty until a positive host acknowledgement, preserves
+newer edits and SaveAs destination after stale success, tracks exports without
+clearing the source drawing, and expires tickets on the earliest deadline.
+Sol low bounded rounds 1–4 culminated in PASS for the local prototype; each
+round-1/2 finding was remediated and round 3's export-timeout message was
+corrected. Rust 1.95 WASM check, eight focused acknowledgement tests and 344
+engine tests pass. Full evidence is in `docs/reviews/GR-018/`.
+
+The adapter still depends on the GR-016 transport at an absolute `/tmp` path.
+This is not a portable build. No CADCraft browser save/reopen or Seafile version
+E2E was run. Project GPT remains FAIL on `0edbe524`; public deployment and
+upstream publication remain locked.

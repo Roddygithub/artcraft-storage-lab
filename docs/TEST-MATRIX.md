@@ -137,6 +137,19 @@ dependency MSRVs. Full commands, warnings and exact pinned SHAs are in
 
 Patch, commands and limits: `docs/reviews/GR-017/README.md`.
 
+## 10. CADCraft durable host-save acknowledgement prototype (GR-018)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 10.1 | CADCraft host adapter compiles for wasm32 | pinned adapter compiles with ticketed host transport | [x] Rust 1.95 `cargo check -p cadcraft-web --target wasm32-unknown-unknown --locked --offline` passed; dependency is a temporary absolute path |
+| 10.2 | Save acknowledgement engine behavior | success, rejection, stale edit, expiry cancellation, capacity and overlap rules preserve data integrity | [x] 8 focused `host_ack_tests` pass, including undo to acknowledged snapshot |
+| 10.3 | CADCraft engine regression suite | existing engine behavior remains intact | [x] 344 `cadcraft-engine` library tests pass |
+| 10.4 | Timeout scheduling, export feedback and source/origin validation | browser host protocol behaves correctly | [ ] Not run in a browser; source-level behavior bounded-reviewed by Sol, with these runtime paths still unverified |
+| 10.5 | CADCraft save → Seafile new version → close/reopen | saved CAD drawing persists and reopens with edit intact | [ ] NOT VERIFIED; no CADCraft browser or Seafile E2E performed |
+| 10.6 | Independent bounded code review | no blocker/major correctness issue in exact patch | [x] GPT-6.1 Sol low round 4 PASS; local prototype only; `/tmp` transport path remains a publication/reproducibility gate |
+
+Patch and bounded-review reports: `docs/reviews/GR-018/`.
+
 ## 9. How results are recorded
 
 Each test result is recorded in the corresponding evidence bundle under

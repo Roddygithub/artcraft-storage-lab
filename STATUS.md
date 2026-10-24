@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; synthetic Seafile runtime flows reprodu
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; GR-017 PdfCraft synthetic Seafile evidence independently reviewed, awaiting commit/push; no upstream changes
+WORKTREE:   main-only workflow; GR-017 evidence is on main; GR-018 CADCraft bounded prototype review passed; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-017 — PdfCraft durable host acknowledgement and synthetic Seafile runtime verification; most ArtCraft apps remain open; project GPT status remains FAIL
+CURRENT GR: GR-018 — CADCraft durable host acknowledgement prototype; CADCraft browser/Seafile E2E and most other ArtCraft apps remain open; project GPT status remains FAIL
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -63,6 +63,13 @@ OPEN GAPS:
   instance with the annotation visible. It opened through the direct Seahub file
   route; file-list click and exact outbound payload hash remain NOT VERIFIED.
   Evidence is in `docs/reviews/GR-017/`.
+- GR-018 adds ticketed host save acknowledgements to CADCraft in a pinned
+  scratch clone. GPT-6.1 Sol low round 4 returned a bounded prototype PASS after
+  four rounds of remediation; Rust 1.95 WASM check and 344 engine tests pass.
+  CADCraft browser save confirmation and Seafile save/version/reopen remain
+  NOT VERIFIED. Its shared transport is still an absolute scratch path, so the
+  patch is not standalone or publication-ready. Evidence is in
+  `docs/reviews/GR-018/`.
 - GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
 - GR-016 WordCraft and GridCraft now both have reproduced shared-transport Seafile save/version/reopen flows on the isolated synthetic stack. GridCraft also recalculated `SUM(B2:B2)` after B2 changed to 1337, persisted a new Seafile version, and reopened showing 1337. The independent evidence review's formula finding is addressed; exact outbound-payload hashing and optimized-bundle performance remain open. These synthetic runs do not establish public deployment readiness or all-app support.
 - Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium collision test passes, and the isolated Seafile-backed VectorCraft flow was rerun successfully after the fix (695 B saved/read back byte-identically and reopened with the new path). See the GR-012 post-fix runtime report.
@@ -74,8 +81,11 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- commit and push the independently reviewed GR-017 synthetic Seafile evidence
-  to `main`, then continue the next app seam
+- commit and push the GR-018 bounded prototype evidence to `main`; then run a
+  CADCraft synthetic browser save/ACK/reopen test using the existing connector
+- replace the shared transport scratch path with a pinned/distributable source
+  before treating app patches as portable
+- continue remaining Craft Web adapters from the GR-016 per-app seam inventory
 - rerun the Playwright protocol suite when its dependency is available; the
   current T3 Chromium preview verifies Open-request guidance and dirty-state
   preservation only

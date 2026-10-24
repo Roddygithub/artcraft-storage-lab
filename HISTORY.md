@@ -1,5 +1,23 @@
 # HISTORY
 
+## 2026-10-24 — GR-018 CADCraft host-save acknowledgement prototype
+
+* Added a bounded patch for CADCraft Web that sends serialized drawing saves
+  with correlation tickets and keeps drawings dirty until the host confirms
+  persistence. Failed/stale results preserve newer edits; SaveAs metadata,
+  export completion feedback, expiry and undo-to-saved-snapshot state are
+  handled.
+* Four GPT-6.1 Sol low bounded review rounds remediated the initial wasm clock,
+  save lifecycle, expiry, export, queue, and snapshot-baseline findings. The
+  final bounded review returned PASS; it is not a project-level GPT verdict.
+* Rust 1.95 formatting and wasm32 check pass; eight focused tests and all 344
+  CADCraft engine library tests pass. No browser CADCraft runtime or Seafile
+  save/version/reopen test was run.
+* The patch still references `craft-platform` through an absolute `/tmp` path.
+  The transport must become a pinned distributable dependency before the patch
+  is portable or publishable. The overall project GPT FAIL and upstream lock
+  remain unchanged. Details: `docs/reviews/GR-018/`.
+
 ## 2026-10-24 — GR-016 shared transport on synthetic Seafile: WordCraft and GridCraft
 
 * Built the pinned GR-016 WordCraft Rust/WASM adapter and exercised it through

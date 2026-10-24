@@ -407,6 +407,20 @@ GPT review:  NOT REQUESTED; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch was published
 ```
 
+### GR-018 — CADCraft durable host-save acknowledgement
+
+```text
+Status:      BOUNDED LOCAL PROTOTYPE REVIEW PASS (GPT-6.1 Sol low round 4); no project-level GPT change
+Base:        storytold/cadcraft `7bf5905ac97316a7896de8cbc12d243f57b09bd8`
+Transport:   GR-016 `craft-platform` scratch checkout; absolute `/tmp` dependency remains a portability/publication gate
+Scope:       ticketed save/saveResult adapter; dirty state follows host durable acknowledgement
+Evidence:    docs/reviews/GR-018/README.md, cadcraft-host-save.patch, REVIEW-SOL-LOW-R2.md through REVIEW-SOL-LOW-R4.md
+Tests:       Rust 1.95 WASM check; 8 focused acknowledgement tests; 344 engine library tests; fmt and diff checks
+Open:        CADCraft browser timer/transport and Seafile version/reopen are NOT VERIFIED; standalone reproducibility is blocked by local transport path
+GPT review:  NOT REQUESTED as a project candidate; project remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC or patch was published
+```
+
 ## GPT review instruction (for the future session)
 
 ```text

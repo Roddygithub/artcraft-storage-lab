@@ -1,0 +1,1104 @@
+diff --git c/Cargo.lock w/Cargo.lock
+index e5076e8..ff7e4b2 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
+@@ -738,8 +738,10 @@ dependencies = [
+  "cadcraft-engine",
+  "cadcraft-io",
+  "cadcraft-ui-egui",
++ "craft-platform",
+  "eframe",
+  "egui",
++ "js-sys",
+  "log",
+  "serde_json",
+  "wasm-bindgen",
+@@ -948,6 +950,15 @@ name = "craft-docpath"
+ version = "0.1.0"
+ source = "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-ui"
+ version = "0.1.0"
+diff --git c/apps/cadcraft-web/Cargo.toml w/apps/cadcraft-web/Cargo.toml
+index 4fb706d..8d07a17 100644
+--- c/apps/cadcraft-web/Cargo.toml
++++ w/apps/cadcraft-web/Cargo.toml
+@@ -28,5 +28,7 @@ web-sys = { version = "0.3", features = ["HtmlInputElement", "FileList", "File"]
+ [target.'cfg(target_arch = "wasm32")'.dependencies]
+ eframe = { workspace = true, features = ["persistence", "default_fonts", "wgpu", "accesskit"] }
+ wasm-bindgen = "0.2"
++js-sys = "0.3"
+ wasm-bindgen-futures = "0.4"
+-web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "Location", "Navigator", "Blob", "BlobPropertyBag", "Url", "MessageEvent", "UrlSearchParams", "MediaQueryList"] }
++web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "Location", "Navigator", "Blob", "BlobPropertyBag", "Url", "MessageEvent", "UrlSearchParams", "MediaQueryList", "Performance"] }
++craft-platform = { path = "/tmp/artcraft-gr016-craft-libs/crates/platform", features = ["browser"] }
+diff --git c/apps/cadcraft-web/src/download.rs w/apps/cadcraft-web/src/download.rs
+index 68185e3..aa29fd4 100644
+--- c/apps/cadcraft-web/src/download.rs
++++ w/apps/cadcraft-web/src/download.rs
+@@ -3,6 +3,7 @@
+ //! produces a file: drawing saves today (installed as the engine's
+ //! [`cadcraft_engine::cmd::file::set_deliver`] hook), plots next.
+ 
++use cadcraft_engine::cmd::file::SaveOutcome;
+ use wasm_bindgen::JsCast as _;
+ use web_sys::js_sys;
+ 
+@@ -13,7 +14,7 @@ const REVOKE_AFTER_MS: i32 = 60_000;
+ ///
+ /// `Ok` once the download was triggered. Where it lands (or whether the user cancels a "save as"
+ /// prompt of the browser) is up to the browser and can't be observed from the page.
+-pub fn download(name: &str, mime: &str, bytes: &[u8]) -> Result<(), String> {
++pub fn download(name: &str, mime: &str, bytes: &[u8], _save_as: bool) -> Result<SaveOutcome, String> {
+     if name.trim().is_empty() {
+         return Err("a file name is required".into());
+     }
+@@ -36,7 +37,7 @@ pub fn download(name: &str, mime: &str, bytes: &[u8]) -> Result<(), String> {
+     if window.set_timeout_with_callback_and_timeout_and_arguments_0(revoke.unchecked_ref(), REVOKE_AFTER_MS).is_err() {
+         let _ = web_sys::Url::revoke_object_url(&url);
+     }
+-    Ok(())
++    Ok(SaveOutcome::Complete(bytes.len()))
+ }
+ 
+ fn click_link(document: &web_sys::Document, body: &web_sys::HtmlElement, url: &str, name: &str) -> Result<(), String> {
+diff --git c/apps/cadcraft-web/src/host.rs w/apps/cadcraft-web/src/host.rs
+index 03fe15b..5636699 100644
+--- c/apps/cadcraft-web/src/host.rs
++++ w/apps/cadcraft-web/src/host.rs
+@@ -1,150 +1,263 @@
+ //! The `postMessage` bridge to a same-origin parent page (`?host=parent`), for pages that embed
+-//! CADCraft in an `<iframe>` (such as a Nextcloud app). Messages are plain objects with a `type`:
++//! CADCraft in an `<iframe>` (such as a Nextcloud app). Uses the common Craft host protocol
++//! with save tickets and explicit save results.
++//!
++//! Messages are plain objects with a `type`:
+ //!
+ //! - `cadcraft:ready` (to the parent): `{ version }`, the app is listening; send a drawing now.
+ //! - `cadcraft:open` (from the parent): `{ name, bytes }`, bytes an `ArrayBuffer` or
+ //!   `Uint8Array`. It opens like a file picked with File › Open or dropped on the window.
+-//! - `cadcraft:save` (to the parent): `{ name, bytes }` (a transferred `ArrayBuffer`) for every
+-//!   file CADCraft would otherwise download (SAVE, SAVEAS, exports): it replaces the engine's
+-//!   delivery hook. The parent stores the file and reports failures itself.
++//! - `cadcraft:save` (to the parent): `{ ticket, name, bytes, saveAs }` — a transferred `ArrayBuffer`
++//!   with an opaque correlation ticket. The parent stores the file durably and replies with
++//!   `cadcraft:saveResult`.
++//! - `cadcraft:saveResult` (from the parent): `{ ticket, ok, error? }` — acknowledges a save ticket.
++//!   Only on `ok: true` does the editor mark the drawing clean.
+ //! - `cadcraft:dirty` (to the parent): `{ dirty }` whenever unsaved changes appear or go away.
+ //! - `cadcraft:failed` (to the parent): `{ error }` when the app couldn't start.
+ //!
+ //! Only the parent window on the page's own origin is heard or answered. In host mode the app
+ //! starts on the Start tab rather than an empty Drawing1, and the parent guards leaving the page.
+ 
+-use std::cell::{Cell, RefCell};
++use std::cell::RefCell;
++use std::rc::Rc;
++use std::sync::atomic::{AtomicU64, Ordering};
++use std::time::Duration;
+ 
++use cadcraft_engine::cmd::file::{SaveOutcome, SaveTicket};
+ use cadcraft_ui_egui::CadApp;
+-use wasm_bindgen::JsCast as _;
+-use wasm_bindgen::JsValue;
+-use wasm_bindgen::closure::Closure;
+-use web_sys::js_sys;
++use craft_platform::browser::host::{HostListener, HostMessage, HostTransport};
+ 
+ /// Longest file name taken from the parent page.
+ const MAX_NAME_CHARS: usize = 255;
+ 
++/// Maximum age of a pending save before it is expired (host didn't respond).
++const PENDING_SAVE_MAX_AGE_MS: f64 = 300_000.0;
++const PENDING_SAVE_MAX_AGE: Duration = Duration::from_secs(300);
++
++/// Ticket generator: monotonically increasing counter prefixed with the app name.
++static TICKET_COUNTER: AtomicU64 = AtomicU64::new(1);
++
++fn next_ticket() -> SaveTicket {
++    let n = TICKET_COUNTER.fetch_add(1, Ordering::Relaxed);
++    SaveTicket::new(format!("cadcraft:{n}")).expect("ticket format is valid")
++}
++
+ thread_local! {
+     /// The bridge [`deliver`] posts through (the engine's hook is a plain `fn`).
+     static BRIDGE: RefCell<Option<Bridge>> = const { RefCell::new(None) };
++
++    /// Queue of save results received from the parent, to be processed on the next logic frame.
++    static SAVE_RESULT_QUEUE: RefCell<Vec<QueuedSaveResult>> = const { RefCell::new(Vec::new()) };
+ }
+ 
+-#[derive(Clone)]
+-pub struct Bridge {
+-    window: web_sys::Window,
+-    parent: web_sys::Window,
+-    origin: String,
++const MAX_PENDING_SAVES: usize = cadcraft_engine::cmd::file::MAX_PENDING_HOST_SAVES;
++
++fn now_ms() -> f64 {
++    web_sys::window().and_then(|window| window.performance().map(|performance| performance.now())).unwrap_or_else(js_sys::Date::now)
++}
++
++/// A save result received from the parent, queued for frame processing.
++#[derive(Clone, Debug)]
++struct QueuedSaveResult {
++    ticket: SaveTicket,
++    ok: bool,
++    error: Option<String>,
++    name: String,
++    drawing: bool,
++}
++
++#[derive(Clone, Debug)]
++struct PendingRequest {
++    sent_at_ms: f64,
++    name: String,
++    drawing: bool,
+ }
+ 
+ /// The unsaved-changes state last reported to the parent.
+ #[derive(Default)]
+-pub struct DirtyReport(Cell<Option<bool>>);
++pub struct DirtyReport(std::cell::Cell<Option<bool>>);
++
++#[derive(Clone)]
++pub struct Bridge {
++    ctx: egui::Context,
++    transport: HostTransport,
++    pending: Rc<RefCell<std::collections::HashMap<String, PendingRequest>>>,
++    _listener: Rc<HostListener>,
++}
+ 
+ impl Bridge {
+     /// `None` when the page isn't framed (there is no parent to talk to).
+-    pub fn new() -> Option<Self> {
+-        let window = web_sys::window()?;
+-        let parent = window.parent().ok().flatten()?;
+-        if js_sys::Object::is(&parent, &window) {
+-            return None;
+-        }
+-        let origin = window.location().origin().ok()?;
+-        Some(Self { window, parent, origin })
++    /// Takes the real egui Context and upload Inbox from the app startup closure.
++    pub fn new(ctx: &egui::Context, inbox: &crate::upload::Inbox) -> Option<Self> {
++        let transport = HostTransport::current("cadcraft").ok()??;
++        let inbox_clone = inbox.clone();
++        let ctx_clone = ctx.clone();
++        let pending = Rc::new(RefCell::new(std::collections::HashMap::<String, PendingRequest>::new()));
++        let pending_for_listener = pending.clone();
++        let listener = transport
++            .listen(move |msg| match msg {
++                HostMessage::Open { name, bytes } => {
++                    let name = name.chars().take(MAX_NAME_CHARS).collect::<String>().trim().to_string();
++                    let name = if name.is_empty() { "Drawing.dxf".to_string() } else { name };
++                    if let Some(e) = CadApp::open_size_error(&name, bytes.len() as u64) {
++                        inbox_clone.refuse(e);
++                        return;
++                    }
++                    inbox_clone.receive(name, bytes);
++                }
++                HostMessage::SaveResult { ticket, ok, error } => {
++                    let Some(request) = pending_for_listener.borrow_mut().remove(ticket.as_str()) else {
++                        return; // unknown or duplicate ticket
++                    };
++                    // Convert craft-platform's SaveTicket to engine's SaveTicket
++                    let engine_ticket = SaveTicket::new(ticket.as_str()).expect("valid ticket");
++                    // Queue the result for processing in the logic frame.
++                    SAVE_RESULT_QUEUE.with(|q| {
++                        let mut queue = q.borrow_mut();
++                        let expired = now_ms() - request.sent_at_ms >= PENDING_SAVE_MAX_AGE_MS;
++                        queue.push(QueuedSaveResult {
++                            ticket: engine_ticket,
++                            ok: ok && !expired,
++                            error: if expired { Some("save result arrived after timeout".to_string()) } else { error },
++                            name: request.name,
++                            drawing: request.drawing,
++                        });
++                    });
++                    ctx_clone.request_repaint();
++                }
++            })
++            .ok()?;
++
++        transport.post_ready(env!("CARGO_PKG_VERSION")).ok()?;
++
++        Some(Self { ctx: ctx.clone(), transport, pending, _listener: Rc::new(listener) })
+     }
+ 
+-    /// Make this the bridge [`deliver`] uses.
+-    pub fn install(&self) {
+-        BRIDGE.with(|b| *b.borrow_mut() = Some(self.clone()));
++    /// Called each frame: process queued save results, expire stale pending saves, report dirty state.
++    pub fn tick(&self, app: &mut CadApp, reported: &DirtyReport) {
++        self.process_queued_results(app);
++        self.expire_stale_saves(app);
++        self.report_dirty(app, reported);
+     }
+ 
+-    pub fn post_ready(&self) {
+-        self.send(&[("type", "cadcraft:ready".into()), ("version", env!("CARGO_PKG_VERSION").into())]);
+-    }
+-
+-    pub fn post_failed(&self, error: &str) {
+-        self.send(&[("type", "cadcraft:failed".into()), ("error", error.into())]);
+-    }
+-
+-    /// Hear drawings from the parent; they arrive through the upload inbox.
+-    pub fn listen(&self, inbox: crate::upload::Inbox) {
+-        let parent = self.parent.clone();
+-        let origin = self.origin.clone();
+-        let on_message = Closure::<dyn FnMut(web_sys::MessageEvent)>::new(move |event: web_sys::MessageEvent| {
+-            if event.origin() != origin || !event.source().is_some_and(|s| js_sys::Object::is(&s, &parent)) {
+-                return;
+-            }
+-            let data = event.data();
+-            if string(&data, "type").as_deref() != Some("cadcraft:open") {
+-                return;
+-            }
+-            let name = string(&data, "name")
+-                .filter(|n| !n.trim().is_empty())
+-                .map(|n| n.chars().take(MAX_NAME_CHARS).collect())
+-                .unwrap_or_else(|| "Drawing.dxf".to_string());
+-            // Refuse an oversized drawing before copying it into the app's memory.
+-            let Some(array) = byte_array(&data) else { return };
+-            if let Some(e) = CadApp::open_size_error(&name, u64::from(array.length())) {
+-                inbox.refuse(e);
+-                return;
+-            }
+-            inbox.receive(name, array.to_vec());
++    fn process_queued_results(&self, app: &mut CadApp) {
++        let results: Vec<QueuedSaveResult> = SAVE_RESULT_QUEUE.with(|q| {
++            let mut queue = q.borrow_mut();
++            std::mem::take(&mut *queue)
+         });
+-        if self.window.add_event_listener_with_callback("message", on_message.as_ref().unchecked_ref()).is_ok() {
+-            // The listener lives as long as the page.
+-            on_message.forget();
++
++        for result in results {
++            // Call the engine's ack_save method which handles ticket lookup and verification.
++            if result.ok && result.drawing {
++                let _ = app.session.ack_save(&result.ticket, true, None);
++            } else if result.ok {
++                let message = format!("Export saved by host: {}", result.name);
++                app.session.echo(message.clone());
++                app.set_status(message);
++            } else {
++                if result.drawing {
++                    let _ = app.session.ack_save(&result.ticket, false, None);
++                }
++                // Failure case: the engine's ack_save already keeps the drawing dirty.
++                // Report the error to the user.
++                let msg = result.error.unwrap_or_else(|| "save failed".to_string());
++                app.session.echo(format!("Save failed: {msg}"));
++                app.set_status(format!("Save failed: {msg}"));
++            }
+         }
+     }
+ 
+-    /// After each frame: tell the parent when unsaved changes appear or go away.
++    fn expire_stale_saves(&self, app: &mut CadApp) {
++        let now = now_ms();
++        let expired: Vec<_> = {
++            let mut pending = self.pending.borrow_mut();
++            let keys = pending
++                .iter()
++                .filter(|(_, request)| now - request.sent_at_ms >= PENDING_SAVE_MAX_AGE_MS)
++                .map(|(ticket, request)| (ticket.clone(), request.clone()))
++                .collect::<Vec<_>>();
++            for (ticket, _) in &keys {
++                pending.remove(ticket);
++            }
++            keys
++        };
++        if !expired.is_empty() {
++            for (ticket, request) in &expired {
++                if request.drawing
++                    && let Some(ticket) = SaveTicket::new(ticket.clone())
++                {
++                    app.session.cancel_pending_save(&ticket);
++                }
++            }
++            let drawing_expired = expired.iter().any(|(_, request)| request.drawing);
++            let export_expired = expired.iter().any(|(_, request)| !request.drawing);
++            let message = match (drawing_expired, export_expired) {
++                (true, true) => "Host save/export timed out; pending changes remain unconfirmed.",
++                (true, false) => "Host save timed out; the drawing remains unsaved.",
++                (false, true) => "Host export timed out; the export was not confirmed.",
++                (false, false) => "Host operation timed out; completion was not confirmed.",
++            };
++            app.set_status(message.to_string());
++            app.session.echo(message.to_string());
++        }
++        if let Some(delay_ms) =
++            self.pending.borrow().values().map(|request| request.sent_at_ms + PENDING_SAVE_MAX_AGE_MS - now).min_by(f64::total_cmp)
++        {
++            let delay = Duration::from_secs_f64((delay_ms.max(1.0) / 1000.0).min(PENDING_SAVE_MAX_AGE.as_secs_f64()));
++            self.ctx.request_repaint_after(delay);
++        }
++    }
++
++    /// Report unsaved-changes state to the parent.
+     pub fn report_dirty(&self, app: &CadApp, reported: &DirtyReport) {
+         let dirty = app.session.docs.iter().any(|d| d.is_dirty());
+-        if reported.0.get() != Some(dirty) && self.send(&[("type", "cadcraft:dirty".into()), ("dirty", dirty.into())]) {
++        if reported.0.get() != Some(dirty) && self.transport.post_dirty(dirty).is_ok() {
+             reported.0.set(Some(dirty));
+         }
+     }
+ 
+-    fn post_save(&self, name: &str, bytes: &[u8]) -> Result<(), String> {
+-        let buffer = js_sys::Uint8Array::from(bytes).buffer();
+-        let message = message(&[("type", "cadcraft:save".into()), ("name", name.into()), ("bytes", buffer.clone().into())])
+-            .ok_or_else(|| "couldn't build the message".to_string())?;
+-        self.parent
+-            .post_message_with_transfer(&message, &self.origin, &js_sys::Array::of1(&buffer))
+-            .map_err(|e| e.as_string().unwrap_or_else(|| format!("{e:?}")))
+-    }
+-
+-    /// Post a message to the parent; false if it couldn't be sent.
+-    fn send(&self, fields: &[(&str, JsValue)]) -> bool {
+-        message(fields).is_some_and(|m| self.parent.post_message(&m, &self.origin).is_ok())
++    /// Send a save request to the parent with a fresh ticket. Returns the ticket so the
++    /// caller can track it.
++    fn post_save(&self, name: &str, bytes: &[u8], save_as: bool) -> Result<SaveTicket, String> {
++        if self.pending.borrow().len() >= MAX_PENDING_SAVES {
++            return Err("too many saves are awaiting host confirmation".to_string());
++        }
++        let ticket = next_ticket();
++        // Convert engine's SaveTicket to craft-platform's SaveTicket for the transport
++        let platform_ticket = craft_platform::host_protocol::SaveTicket::new(ticket.as_str()).expect("valid ticket");
++        self.transport.post_save(&platform_ticket, name, bytes, save_as).map_err(|e| format!("could not send save to host: {e:?}"))?;
++        self.pending.borrow_mut().insert(
++            ticket.as_str().to_string(),
++            PendingRequest { sent_at_ms: now_ms(), name: name.to_string(), drawing: cadcraft_engine::cmd::file::is_drawing_file(name) },
++        );
++        self.ctx.request_repaint_after(PENDING_SAVE_MAX_AGE);
++        Ok(ticket)
+     }
+ }
+ 
+-/// The engine's delivery hook in host mode ([`cadcraft_engine::cmd::file::set_deliver`]): hand
+-/// the file to the parent page. `Ok` once it was posted; the engine then counts a drawing as saved.
+-pub fn deliver(name: &str, _mime: &str, bytes: &[u8]) -> Result<(), String> {
++/// Notify an embedding parent if the WebRunner fails before the app's bridge is constructed.
++pub fn post_failed(error: &str) {
++    if let Ok(Some(transport)) = HostTransport::current("cadcraft") {
++        let _ = transport.post_failed(error);
++    }
++}
++
++/// The engine's delivery hook in host mode ([`cadcraft_engine::cmd::file::set_deliver`]):
++/// hand the file to the parent page with a ticket. Returns `SaveOutcome::Pending` with the
++/// ticket so the engine knows the save is not yet durable. The drawing stays dirty until
++/// the parent's `saveResult` confirms durability.
++pub fn deliver(name: &str, _mime: &str, bytes: &[u8], save_as: bool) -> Result<SaveOutcome, String> {
+     let bridge = BRIDGE.with(|b| b.borrow().clone()).ok_or("the page that embeds CADCraft is gone")?;
+-    bridge.post_save(name, bytes)
++
++    let ticket = bridge.post_save(name, bytes, save_as)?;
++
++    Ok(SaveOutcome::Pending { ticket, path: name.to_string(), snapshot: None })
+ }
+ 
+-fn message(fields: &[(&str, JsValue)]) -> Option<js_sys::Object> {
+-    let m = js_sys::Object::new();
+-    for (key, value) in fields {
+-        js_sys::Reflect::set(&m, &JsValue::from_str(key), value).ok()?;
+-    }
+-    Some(m)
++pub(crate) fn set_bridge(bridge: Bridge) {
++    BRIDGE.with(|cell| *cell.borrow_mut() = Some(bridge));
+ }
+ 
+-fn string(data: &JsValue, key: &str) -> Option<String> {
+-    js_sys::Reflect::get(data, &JsValue::from_str(key)).ok()?.as_string()
+-}
+-
+-/// `bytes` (an `ArrayBuffer` or `Uint8Array`) as a view, not yet copied.
+-fn byte_array(data: &JsValue) -> Option<js_sys::Uint8Array> {
+-    let bytes = js_sys::Reflect::get(data, &JsValue::from_str("bytes")).ok()?;
+-    if let Some(array) = bytes.dyn_ref::<js_sys::Uint8Array>() {
+-        Some(array.clone())
+-    } else if bytes.is_instance_of::<js_sys::ArrayBuffer>() {
+-        Some(js_sys::Uint8Array::new(&bytes))
+-    } else {
+-        None
+-    }
++pub(crate) fn clear_bridge() {
++    BRIDGE.with(|cell| *cell.borrow_mut() = None);
+ }
+diff --git c/apps/cadcraft-web/src/main.rs w/apps/cadcraft-web/src/main.rs
+index 5b4873e..2e12a04 100644
+--- c/apps/cadcraft-web/src/main.rs
++++ w/apps/cadcraft-web/src/main.rs
+@@ -33,10 +33,16 @@ mod web {
+             self.1.take_dropped(ctx);
+             self.1.drain(&mut self.0);
+             self.0.system_animations = self.3.as_ref().map(|reduced| !reduced.matches());
+-            self.0.logic(ctx);
+-            if let Some((bridge, reported)) = &self.2 {
+-                bridge.report_dirty(&self.0, reported);
++            // Set the bridge for the deliver hook to access during saves.
++            if let Some((bridge, _)) = &self.2 {
++                crate::host::set_bridge(bridge.clone());
+             }
++            self.0.logic(ctx);
++            // Process completed saves (saveResult acknowledgments from the parent).
++            if let Some((bridge, reported)) = &self.2 {
++                bridge.tick(&mut self.0, reported);
++            }
++            crate::host::clear_bridge();
+         }
+         fn raw_input_hook(&mut self, ctx: &egui::Context, raw: &mut egui::RawInput) {
+             self.0.raw_input_hook(raw);
+@@ -51,10 +57,12 @@ mod web {
+             false
+         }
+         fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+-            self.0.ui(ui);
+-            if let Some((bridge, reported)) = &self.2 {
+-                bridge.report_dirty(&self.0, reported);
++            if let Some((bridge, _)) = &self.2 {
++                crate::host::set_bridge(bridge.clone());
+             }
++            self.0.ui(ui);
++            crate::host::clear_bridge();
++            // Dirty reporting is now done in logic() via bridge.tick().
+         }
+     }
+ 
+@@ -90,15 +98,18 @@ mod web {
+         // `?host=parent`: a same-origin page framing CADCraft (such as a Nextcloud app) opens
+         // drawings in it and stores what it saves. Otherwise there is no file system here: saved
+         // files reach the user as browser downloads.
+-        let bridge = if query_param("host").as_deref() == Some("parent") { crate::host::Bridge::new() } else { None };
++        let bridge = if query_param("host").as_deref() == Some("parent") {
++            // Bridge will be created inside the closure where we have the real context and inbox.
++            Some(())
++        } else {
++            None
++        };
+         match &bridge {
+-            Some(bridge) => {
+-                bridge.install();
++            Some(_) => {
+                 cadcraft_engine::cmd::file::set_deliver(crate::host::deliver);
+             }
+             None => cadcraft_engine::cmd::file::set_deliver(crate::download::download),
+         }
+-        let app_bridge = bridge.clone();
+         wasm_bindgen_futures::spawn_local(async move {
+             let Some(document) = web_sys::window().and_then(|w| w.document()) else { return };
+             let Some(canvas) = document.get_element_by_id(CANVAS_ID).and_then(|e| e.dyn_into::<web_sys::HtmlCanvasElement>().ok()) else {
+@@ -117,7 +128,7 @@ mod web {
+                     options,
+                     Box::new(move |cc| {
+                         // Embedded, the parent sends the drawing: start on the Start tab, not Drawing1.
+-                        let session = if app_bridge.is_some() { Session::empty() } else { Session::new() };
++                        let session = if bridge.is_some() { Session::empty() } else { Session::new() };
+                         let mut app = CadApp::new(session, services());
+                         app.system_languages =
+                             web_sys::window().map(|w| w.navigator().languages().iter().filter_map(|v| v.as_string()).collect()).unwrap_or_default();
+@@ -146,18 +157,17 @@ mod web {
+                             picker.pick();
+                             None
+                         }));
+-                        let host = app_bridge.map(|bridge| {
+-                            bridge.listen(inbox.clone());
+-                            bridge.post_ready();
+-                            (bridge, crate::host::DirtyReport::default())
+-                        });
++                        // Create the bridge with the real context and inbox.
++                        let host = bridge
++                            .and_then(|_| crate::host::Bridge::new(&cc.egui_ctx, &inbox).map(|bridge| (bridge, crate::host::DirtyReport::default())));
+                         let reduced_motion = web_sys::window().and_then(|w| w.match_media("(prefers-reduced-motion: reduce)").ok().flatten());
+                         Ok(Box::new(Shell(app, inbox, host, reduced_motion)))
+                     }),
+                 )
+                 .await;
+-            if let (Err(e), Some(bridge)) = (&result, &bridge) {
+-                bridge.post_failed(&format!("{e:?}"));
++            if let (Err(e), Some(_)) = (&result, &bridge) {
++                crate::host::post_failed(&format!("{e:?}"));
++                log::error!("failed to start: {e:?}");
+             }
+             if let Some(el) = document.get_element_by_id(LOADING_ID) {
+                 match result {
+diff --git c/crates/engine/src/cmd/file.rs w/crates/engine/src/cmd/file.rs
+index b6998f4..957b38c 100644
+--- c/crates/engine/src/cmd/file.rs
++++ w/crates/engine/src/cmd/file.rs
+@@ -12,7 +12,7 @@ pub use cadcraft_dxf::Version;
+ use serde_json::{Value, json};
+ 
+ use super::*;
+-use crate::{Accept, Input, Prompt, Result, Session, Step};
++use crate::{Accept, Input, PendingSaveInfo, Prompt, Result, Session, Step};
+ 
+ /// The rules the Command Aliases dialog checks before it sends an alias to ALIASEDIT.
+ pub use pgp::{MAX_ALIASES, alias_name, command_id};
+@@ -70,8 +70,9 @@ pub fn entity_codec() -> Option<&'static EntityCodec> {
+ pub mod compare;
+ 
+ /// Hand finished file bytes to the user where there is no file system (the browser: a download).
+-/// Arguments: file name, MIME type, bytes. `Ok` only once the delivery was actually started.
+-pub type DeliverHook = fn(&str, &str, &[u8]) -> std::result::Result<(), String>;
++/// Arguments: file name, MIME type, bytes. Returns `SaveOutcome::Complete` for synchronous
++/// delivery (native file, browser download) or `SaveOutcome::Pending` for ticketed host delivery.
++pub type DeliverHook = fn(&str, &str, &[u8], bool) -> std::result::Result<SaveOutcome, String>;
+ 
+ static DELIVER: OnceLock<DeliverHook> = OnceLock::new();
+ 
+@@ -84,6 +85,35 @@ pub fn deliver() -> Option<DeliverHook> {
+     DELIVER.get().copied()
+ }
+ 
++/// Opaque host correlation token for ticketed saves (same representation as craft-platform's SaveTicket).
++#[derive(Clone, Debug, Eq, Hash, PartialEq)]
++pub struct SaveTicket(String);
++
++impl SaveTicket {
++    /// Construct a non-empty ticket.
++    pub fn new(value: impl Into<String>) -> Option<Self> {
++        let value = value.into();
++        (!value.trim().is_empty() && value.len() <= 256).then_some(Self(value))
++    }
++    /// Borrow the wire representation.
++    pub fn as_str(&self) -> &str {
++        &self.0
++    }
++}
++
++/// Result of a save delivery: either completed synchronously (native file or browser download)
++/// or pending a host acknowledgement with a ticket.
++#[derive(Debug, PartialEq)]
++pub enum SaveOutcome {
++    /// Save completed; the drawing can be marked clean immediately.
++    Complete(usize),
++    /// Save sent to host; caller receives a ticket and must wait for `ack_save`.
++    /// The snapshot is filled in by `commit_save` with the actual drawing state.
++    Pending { ticket: SaveTicket, path: String, snapshot: Option<std::sync::Arc<Drawing>> },
++}
++
++pub const MAX_PENDING_HOST_SAVES: usize = 64;
++
+ /// How a drawing file is written: its version (`None`: the drawing's own, `$ACADVER`) and
+ /// binary instead of ASCII DXF.
+ #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+@@ -256,7 +286,7 @@ fn run_new(s: &mut Session, p: &Value) -> Result<Value> {
+     Ok(json!({ "index": i, "title": s.docs.get(i).map(|d| d.title.clone()) }))
+ }
+ 
+-fn file_name(path: &str) -> String {
++pub fn file_name(path: &str) -> String {
+     std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| path.to_string())
+ }
+ 
+@@ -385,75 +415,132 @@ fn run_closeall(s: &mut Session, _p: &Value) -> Result<Value> {
+     ok()
+ }
+ 
+-pub(crate) fn save_to(s: &mut Session, path: &str) -> Result<usize> {
++pub(crate) fn save_to(s: &mut Session, path: &str) -> Result<SaveOutcome> {
+     let opts = SaveAs { version: None, binary: s.state()?.binary_dxf && is_dxf(path) };
+     save_as(s, "save", path, &opts)
+ }
+ 
+ /// Save to `path` with `opts`. A drawing file then keeps the version and binary choice: the
+ /// version goes into the drawing's `$ACADVER`, so later saves (QSAVE) write it again.
+-fn save_as(s: &mut Session, cmd: &str, path: &str, opts: &SaveAs) -> Result<usize> {
++fn save_as(s: &mut Session, cmd: &str, path: &str, opts: &SaveAs) -> Result<SaveOutcome> {
+     if s.doc()?.refedit.is_some() {
+         return Err(bad(cmd, "A block reference is being edited in place: finish with REFCLOSE (Save or Discard) before saving."));
+     }
+     let bytes = write_bytes(s, cmd, path, opts)?;
+-    let n = commit_save(s, path, &bytes, store)?;
++    let outcome = commit_save(s, path, &bytes, cmd == "saveas", opts, store)?;
+     if is_drawing_file(path) {
+-        let st = s.state_mut()?;
+-        st.binary_dxf = opts.binary;
+-        if let Some(v) = opts.version
+-            && st.drawing().header.get("ACADVER").and_then(cadcraft_doc::HVal::as_str) != Some(v.code())
+-        {
+-            std::sync::Arc::make_mut(st.drawing_arc_mut()).header.set_str("ACADVER", v.code());
+-            st.saved = st.drawing().clone();
++        if let SaveOutcome::Complete(_) = &outcome {
++            let st = s.state_mut()?;
++            st.binary_dxf = opts.binary;
++            if let Some(v) = opts.version
++                && st.drawing().header.get("ACADVER").and_then(cadcraft_doc::HVal::as_str) != Some(v.code())
++            {
++                std::sync::Arc::make_mut(st.drawing_arc_mut()).header.set_str("ACADVER", v.code());
++                st.saved = st.drawing().clone();
++            }
+         }
++        // For Pending, the ack_save will handle binary_dxf/version after verification.
+     }
+-    Ok(n)
++    Ok(outcome)
+ }
+ 
+ /// Put saved bytes where the user gets them: natively the file at `path` (written atomically); on
+ /// the web, which has no file system, a browser download named after `path` via [`deliver`].
+-fn store(path: &str, bytes: &[u8]) -> Result<()> {
++/// Returns `SaveOutcome::Complete` for synchronous delivery (native file, browser download)
++/// or `SaveOutcome::Pending` for ticketed host delivery.
++fn store(path: &str, bytes: &[u8], save_as: bool) -> Result<SaveOutcome> {
+     #[cfg(not(target_arch = "wasm32"))]
+     {
++        let _ = save_as;
+         // Exclusively create a fresh temporary file and rename it over `path`, so a planted
+         // `<path>.cadcraft-tmp` symlink cannot redirect the write onto another file (CWE-59).
+-        crate::atomic_write::write_atomic(std::path::Path::new(path), bytes).map_err(|e| bad("save", format!("{path}: {e}")))
++        crate::atomic_write::write_atomic(std::path::Path::new(path), bytes).map_err(|e| bad("save", format!("{path}: {e}")))?;
++        Ok(SaveOutcome::Complete(bytes.len()))
+     }
+     #[cfg(target_arch = "wasm32")]
+     {
+         let name = file_name(path);
+         let deliver = deliver().ok_or_else(|| bad("save", "saving files is not available in this build; use document.bytes"))?;
+-        deliver(&name, "application/octet-stream", bytes).map_err(|e| bad("save", format!("{name}: {e}")))
++        deliver(&name, "application/octet-stream", bytes, save_as).map_err(|e| bad("save", format!("{name}: {e}")))
+     }
+ }
+ 
+-/// Store the bytes, then mark the drawing saved under `path`. If storing fails the drawing keeps
+-/// its unsaved changes, file name and title. On the web a started download counts as saved: the
+-/// browser owns the file from there (we can't see whether the user keeps it), and the name stays so
+-/// a later QSAVE downloads the drawing again under it. An image or PDF export (SVG, PNG, PDF) only
+-/// stores the file: the drawing keeps its name, title and unsaved changes, so closing still asks.
+-fn commit_save(s: &mut Session, path: &str, bytes: &[u8], store: impl FnOnce(&str, &[u8]) -> Result<()>) -> Result<usize> {
+-    s.state()?;
+-    store(path, bytes)?;
+-    if !is_drawing_file(path) {
+-        return Ok(bytes.len());
++/// Store the bytes, then mark the drawing saved under `path` if the outcome is `Complete`.
++/// If storing fails the drawing keeps its unsaved changes, file name and title.
++/// For `Pending` outcomes, the drawing stays dirty until `ack_save` confirms the exact snapshot.
++/// An image or PDF export (SVG, PNG, PDF) only stores the file: the drawing keeps its name,
++/// title and unsaved changes, so closing still asks.
++fn commit_save(
++    s: &mut Session,
++    path: &str,
++    bytes: &[u8],
++    save_as: bool,
++    opts: &SaveAs,
++    store: impl FnOnce(&str, &[u8], bool) -> Result<SaveOutcome>,
++) -> Result<SaveOutcome> {
++    let uid = s.state()?.uid;
++    if is_drawing_file(path) {
++        if s.pending_saves.values().any(|pending| pending.drawing_uid == uid) {
++            return Err(bad("save", "a save for this drawing is already awaiting host confirmation"));
++        }
++        if s.pending_saves.len() >= MAX_PENDING_HOST_SAVES {
++            return Err(bad("save", "too many host saves are awaiting confirmation; retry after one completes"));
++        }
++    }
++    let outcome = store(path, bytes, save_as)?;
++    match outcome {
++        SaveOutcome::Complete(n) => {
++            if !is_drawing_file(path) {
++                return Ok(SaveOutcome::Complete(n));
++            }
++            let st = s.state_mut()?;
++            st.saved = st.drawing().clone();
++            st.path = Some(path.to_string());
++            st.title = file_name(path);
++            // A BEgin group still open when the drawing is saved ends there.
++            st.end_undo_group();
++            Ok(SaveOutcome::Complete(n))
++        }
++        SaveOutcome::Pending { ticket, path: _, snapshot: _ } => {
++            if is_drawing_file(path) {
++                // Register the pending save in the session for later acknowledgement.
++                let st = s.state_mut()?;
++                let snapshot = st.drawing().clone();
++                s.pending_saves.insert(
++                    ticket.clone(),
++                    PendingSaveInfo {
++                        drawing_uid: uid,
++                        snapshot: snapshot.clone(),
++                        path: path.to_string(),
++                        binary_dxf: opts.binary,
++                        version: opts.version,
++                    },
++                );
++                // Return the outcome with the actual snapshot for the caller.
++                Ok(SaveOutcome::Pending { ticket, path: path.to_string(), snapshot: Some(snapshot) })
++            } else {
++                // For non-drawing files (exports), the store should have returned Complete.
++                // But if we get here, return as-is.
++                Ok(SaveOutcome::Pending { ticket, path: path.to_string(), snapshot: None })
++            }
++        }
+     }
+-    let st = s.state_mut()?;
+-    st.saved = st.drawing().clone();
+-    st.path = Some(path.to_string());
+-    st.title = file_name(path);
+-    // A BEgin group still open when the drawing is saved ends there.
+-    st.end_undo_group();
+-    Ok(bytes.len())
+ }
+ 
+ /// The save result; on the web it also names the file the browser downloaded.
+-fn saved(path: &str, bytes: usize) -> Value {
++fn saved(path: &str, outcome: &SaveOutcome) -> Value {
++    let bytes = match outcome {
++        SaveOutcome::Complete(n) => *n,
++        SaveOutcome::Pending { .. } => 0, // bytes unknown until ack; report 0 for now
++    };
+     let mut r = json!({ "path": path, "bytes": bytes });
+-    if cfg!(target_arch = "wasm32") {
++    if cfg!(target_arch = "wasm32") && matches!(outcome, SaveOutcome::Complete(_)) {
+         r["download"] = json!(file_name(path));
+     }
++    if let SaveOutcome::Pending { ticket, .. } = outcome {
++        r["ticket"] = json!(ticket.as_str());
++        r["pending"] = json!(true);
++    }
+     r
+ }
+ 
+@@ -462,18 +549,24 @@ fn run_save(s: &mut Session, p: &Value) -> Result<Value> {
+         Some(p) => p.to_string(),
+         None => s.state()?.path.clone().ok_or_else(|| bad("qsave", "drawing has no file name yet; use saveas {path}"))?,
+     };
+-    let n = save_to(s, &path)?;
+-    Ok(saved(&path, n))
++    let outcome = save_to(s, &path)?;
++    Ok(saved(&path, &outcome))
+ }
+ 
+ fn run_saveas(s: &mut Session, p: &Value) -> Result<Value> {
+     let path = str_param(p, "path").ok_or_else(|| bad("saveas", "`path` is required"))?.to_string();
+     let opts = save_options("saveas", p)?;
+-    let n = save_as(s, "saveas", &path, &opts)?;
+-    let mut r = saved(&path, n);
++    let outcome = save_as(s, "saveas", &path, &opts)?;
++    let mut r = saved(&path, &outcome);
+     if is_drawing_file(&path) {
+-        r["version"] = json!(opts.version.unwrap_or_else(|| drawing_version(s, &path)).year());
+-        r["binary"] = json!(opts.binary);
++        if let SaveOutcome::Complete(_) = &outcome {
++            r["version"] = json!(opts.version.unwrap_or_else(|| drawing_version(s, &path)).year());
++            r["binary"] = json!(opts.binary);
++        } else {
++            // Pending: version/binary will be applied on ack
++            r["version"] = json!(opts.version.unwrap_or_else(|| drawing_version(s, &path)).year());
++            r["binary"] = json!(opts.binary);
++        }
+     }
+     Ok(r)
+ }
+@@ -557,7 +650,7 @@ pub fn drops_unknown(path: &str) -> bool {
+ }
+ 
+ /// Whether `path` is saved as a drawing (DXF, DWG) rather than exported as an image.
+-fn is_drawing_file(path: &str) -> bool {
++pub fn is_drawing_file(path: &str) -> bool {
+     let ext = std::path::Path::new(path).extension().map(|e| e.to_string_lossy().to_ascii_lowercase()).unwrap_or_default();
+     matches!(ext.as_str(), "dxf" | "dwg" | "dwt" | "")
+ }
+@@ -730,7 +823,7 @@ mod pr193_tests {
+         assert!(st.is_dirty() && st.path.is_none());
+ 
+         // The file route is unavailable or fails (the web without a download): no success, still dirty.
+-        let failed = commit_save(&mut s, "a/Owned.dxf", b"0\nEOF\n", |_, _| Err(bad("save", "no download")));
++        let failed = commit_save(&mut s, "a/Owned.dxf", b"0\nEOF\n", false, &SaveAs::default(), |_, _, _| Err(bad("save", "no download")));
+         assert!(failed.is_err());
+         let st = s.state().unwrap();
+         assert!(st.is_dirty(), "a save that delivered nothing must keep the unsaved state");
+@@ -738,15 +831,122 @@ mod pr193_tests {
+ 
+         // The file route took the bytes (written, or a download started): saved under that name.
+         let mut got = None;
+-        let n = commit_save(&mut s, "a/Owned.dxf", b"0\nEOF\n", |p, b| {
++        let outcome = commit_save(&mut s, "a/Owned.dxf", b"0\nEOF\n", false, &SaveAs::default(), |p, b, _| {
+             got = Some((p.to_string(), b.len()));
+-            Ok(())
++            Ok(SaveOutcome::Complete(b.len()))
+         })
+         .unwrap();
+-        assert_eq!((n, got), (6, Some(("a/Owned.dxf".to_string(), 6))));
++        assert_eq!((&outcome, got), (&SaveOutcome::Complete(6), Some(("a/Owned.dxf".to_string(), 6))));
+         let st = s.state().unwrap();
+         assert!(!st.is_dirty());
+         assert_eq!((st.path.as_deref(), st.title.as_str()), (Some("a/Owned.dxf"), "Owned.dxf"));
+-        assert_eq!(saved("a/Owned.dxf", n)["bytes"], 6);
++        assert_eq!(saved("a/Owned.dxf", &outcome)["bytes"], 6);
++    }
++}
++
++#[cfg(test)]
++mod host_ack_tests {
++    use super::*;
++
++    fn pending_save(s: &mut Session, ticket: &str) -> SaveTicket {
++        s.cmdline("circle 4,4 1").unwrap();
++        let ticket = SaveTicket::new(ticket).unwrap();
++        let outcome = commit_save(s, "Drawing.dxf", b"serialized drawing", false, &SaveAs::default(), |_, _, _| {
++            Ok(SaveOutcome::Pending { ticket: ticket.clone(), path: "Drawing.dxf".to_string(), snapshot: None })
++        })
++        .unwrap();
++        assert!(matches!(outcome, SaveOutcome::Pending { .. }));
++        ticket
++    }
++
++    #[test]
++    fn failed_acknowledgement_keeps_drawing_dirty_and_unassigned() {
++        let mut s = Session::new();
++        let ticket = pending_save(&mut s, "cadcraft:failed");
++        s.ack_save(&ticket, false, None).unwrap();
++        assert!(s.state().unwrap().is_dirty());
++        assert!(s.state().unwrap().path.is_none());
++    }
++
++    #[test]
++    fn successful_acknowledgement_clears_only_the_saved_snapshot() {
++        let mut s = Session::new();
++        let ticket = pending_save(&mut s, "cadcraft:success");
++        s.ack_save(&ticket, true, None).unwrap();
++        assert!(!s.state().unwrap().is_dirty());
++        assert_eq!(s.state().unwrap().path.as_deref(), Some("Drawing.dxf"));
++    }
++
++    #[test]
++    fn stale_acknowledgement_keeps_later_edit_dirty() {
++        let mut s = Session::new();
++        let ticket = pending_save(&mut s, "cadcraft:stale");
++        s.cmdline("circle 8,8 2").unwrap();
++        s.ack_save(&ticket, true, None).unwrap();
++        assert!(s.state().unwrap().is_dirty());
++        assert_eq!(s.state().unwrap().path.as_deref(), Some("Drawing.dxf"));
++    }
++
++    #[test]
++    fn undo_to_a_successfully_saved_snapshot_restores_clean_state() {
++        let mut s = Session::new();
++        let ticket = pending_save(&mut s, "cadcraft:undo");
++        let saved_snapshot = s.state().unwrap().drawing().clone();
++        s.cmdline("circle 8,8 2").unwrap();
++        s.ack_save(&ticket, true, None).unwrap();
++        assert!(s.state().unwrap().is_dirty());
++        s.undo().unwrap();
++        let state = s.state().unwrap();
++        assert!(std::sync::Arc::ptr_eq(state.drawing(), &saved_snapshot));
++        assert!(!state.is_dirty());
++    }
++
++    #[test]
++    fn timed_out_save_is_removed_and_late_ack_is_ignored() {
++        let mut s = Session::new();
++        let ticket = pending_save(&mut s, "cadcraft:timeout");
++        assert!(s.cancel_pending_save(&ticket));
++        s.ack_save(&ticket, true, None).unwrap();
++        assert!(s.state().unwrap().is_dirty());
++    }
++
++    #[test]
++    fn pending_saves_are_bounded_before_delivery() {
++        let mut s = Session::new();
++        for i in 0..MAX_PENDING_HOST_SAVES {
++            if i > 0 {
++                s.execute("new", &serde_json::json!({})).unwrap();
++            }
++            let _ = pending_save(&mut s, &format!("cadcraft:{i}"));
++        }
++        s.execute("new", &serde_json::json!({})).unwrap();
++        let mut delivered = false;
++        let result = commit_save(&mut s, "Drawing.dxf", b"bytes", false, &SaveAs::default(), |_, _, _| {
++            delivered = true;
++            Ok(SaveOutcome::Complete(5))
++        });
++        assert!(result.is_err());
++        assert!(!delivered, "must reject before posting bytes to the parent");
++    }
++
++    #[test]
++    fn pending_host_save_is_not_reported_as_a_download() {
++        let outcome = SaveOutcome::Pending { ticket: SaveTicket::new("cadcraft:pending").unwrap(), path: "Drawing.dxf".to_string(), snapshot: None };
++        let result = saved("Drawing.dxf", &outcome);
++        assert_eq!(result["pending"], true);
++        assert!(result.get("download").is_none());
++    }
++
++    #[test]
++    fn overlapping_save_for_same_drawing_is_rejected_before_delivery() {
++        let mut s = Session::new();
++        let _ = pending_save(&mut s, "cadcraft:first");
++        let mut delivered = false;
++        let result = commit_save(&mut s, "Other.dxf", b"bytes", true, &SaveAs::default(), |_, _, _| {
++            delivered = true;
++            Ok(SaveOutcome::Complete(5))
++        });
++        assert!(result.is_err());
++        assert!(!delivered, "a second write must not race the outstanding snapshot");
+     }
+ }
+diff --git c/crates/engine/src/cmd/table/cells.rs w/crates/engine/src/cmd/table/cells.rs
+index a2efca4..d83989a 100644
+--- c/crates/engine/src/cmd/table/cells.rs
++++ w/crates/engine/src/cmd/table/cells.rs
+@@ -511,16 +511,17 @@ pub(crate) fn table_csv(t: &Table, sep: char) -> String {
+ }
+ 
+ /// Write `text` to `path`: natively the file, on the web a download through the host.
+-fn write_text(path: &str, text: &str) -> Result<()> {
++fn write_text(path: &str, text: &str) -> Result<crate::cmd::file::SaveOutcome> {
+     #[cfg(not(target_arch = "wasm32"))]
+     {
+-        std::fs::write(path, text).map_err(|e| bad("tableexport", format!("{path}: {e}")))
++        std::fs::write(path, text).map_err(|e| bad("tableexport", format!("{path}: {e}")))?;
++        Ok(crate::cmd::file::SaveOutcome::Complete(text.len()))
+     }
+     #[cfg(target_arch = "wasm32")]
+     {
+         let name = std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| path.to_string());
+         let deliver = crate::cmd::file::deliver().ok_or_else(|| bad("tableexport", "files can't be written in this build; use the returned csv"))?;
+-        deliver(&name, "text/csv", text.as_bytes()).map_err(|e| bad("tableexport", format!("{name}: {e}")))
++        deliver(&name, "text/csv", text.as_bytes(), true).map_err(|e| bad("tableexport", format!("{name}: {e}")))
+     }
+ }
+ 
+@@ -549,9 +550,16 @@ fn run_export(s: &mut Session, p: &Value) -> Result<Value> {
+     let csv = table_csv(&t, sep);
+     let mut r = json!({ "handle": h.hex(), "rows": t.cells.len(), "cols": t.col_widths.len(), "csv": csv });
+     if let Some(path) = str_param(p, "path").map(str::trim).filter(|x| !x.is_empty()) {
+-        write_text(path, &csv)?;
++        let outcome = write_text(path, &csv)?;
+         r["path"] = json!(path);
+-        r["message"] = json!(format!("Table exported to {path}."));
++        match outcome {
++            crate::cmd::file::SaveOutcome::Complete(_) => r["message"] = json!(format!("Table exported to {path}.")),
++            crate::cmd::file::SaveOutcome::Pending { ticket, .. } => {
++                r["ticket"] = json!(ticket.as_str());
++                r["pending"] = json!(true);
++                r["message"] = json!(format!("Table export to {path} is awaiting host confirmation."));
++            }
++        }
+     }
+     Ok(r)
+ }
+diff --git c/crates/engine/src/lib.rs w/crates/engine/src/lib.rs
+index 1bf8e00..994c4e7 100644
+--- c/crates/engine/src/lib.rs
++++ w/crates/engine/src/lib.rs
+@@ -35,6 +35,7 @@ pub mod sysvars;
+ pub mod undoctl;
+ pub mod units;
+ 
++use std::collections::HashMap;
+ use std::sync::Arc;
+ 
+ use cadcraft_doc::{Common, Drawing, Entity, EntityKind, Handle, Space};
+@@ -49,6 +50,16 @@ pub use cmd::hatch::{HatchPicks, PatternChoice, PickMode, pattern_choices};
+ pub use cmd::{CommandInfo, CommandSpec, command_specs, find_command};
+ pub use prompt::{Accept, Drag, Input, Interactive, Picker, Prompt, Step};
+ 
++/// Information about a pending host save, stored in the session while awaiting acknowledgement.
++#[derive(Clone, Debug)]
++pub struct PendingSaveInfo {
++    pub drawing_uid: u64,
++    pub snapshot: Arc<Drawing>,
++    pub path: String,
++    pub binary_dxf: bool,
++    pub version: Option<cmd::file::Version>,
++}
++
+ #[derive(Debug, thiserror::Error)]
+ pub enum EngineError {
+     #[error("unknown command `{0}`")]
+@@ -698,6 +709,8 @@ pub struct Session {
+     lisp_last: Option<std::result::Result<lisp::value::Value, String>>,
+     /// What the last HATCHPICK kept (the Hatch and Gradient dialog's picks).
+     pub hatch_picks: Option<cmd::hatch::HatchPicks>,
++    /// Pending host saves awaiting acknowledgement: ticket -> (drawing_uid, snapshot, path, save_as).
++    pending_saves: std::collections::HashMap<cmd::file::SaveTicket, PendingSaveInfo>,
+ }
+ 
+ impl Default for Session {
+@@ -747,6 +760,7 @@ impl Session {
+             lisp: lisp::LispState::default(),
+             lisp_last: None,
+             hatch_picks: None,
++            pending_saves: HashMap::new(),
+         }
+     }
+     pub fn new_drawing(&mut self, metric: bool) -> usize {
+@@ -1845,6 +1859,64 @@ impl Session {
+             "settings": self.drafting_settings(),
+         })
+     }
++
++    /// Acknowledge a ticketed save from a host (e.g., Seafile via iframe).
++    /// Verifies the drawing's current state matches the snapshot sent with the ticket.
++    /// On success: marks the drawing clean (sets `saved` to current drawing, updates path/title if provided).
++    /// On failure (snapshot mismatch or unknown ticket): keeps drawing dirty, returns error.
++    /// Later edits after the save are preserved as dirty.
++    pub fn ack_save(&mut self, ticket: &cmd::file::SaveTicket, success: bool, path: Option<&str>) -> Result<()> {
++        let Some(info) = self.pending_saves.remove(ticket) else {
++            // Unknown or duplicate ticket: ignore silently (protocol defense).
++            return Ok(());
++        };
++
++        if !success {
++            self.echo("Host rejected the save; the drawing remains unsaved.".to_string());
++            return Ok(());
++        }
++
++        // Find the drawing by UID.
++        let Some(idx) = self.docs.iter().position(|d| d.uid == info.drawing_uid) else {
++            // Drawing was closed: nothing to do.
++            return Ok(());
++        };
++
++        // Preserve newer edits, but remember the committed snapshot and SaveAs destination.
++        let st = &mut self.docs[idx];
++        let current_matches = Arc::ptr_eq(st.drawing(), &info.snapshot);
++        let mut committed = (*info.snapshot).clone();
++        let normalize_version =
++            info.version.is_some_and(|version| info.snapshot.header.get("ACADVER").and_then(cadcraft_doc::HVal::as_str) != Some(version.code()));
++        if let Some(version) = info.version {
++            committed.header.set_str("ACADVER", version.code());
++            if st.drawing().header.get("ACADVER").and_then(cadcraft_doc::HVal::as_str) != Some(version.code()) {
++                Arc::make_mut(st.drawing_arc_mut()).header.set_str("ACADVER", version.code());
++            }
++        }
++        st.binary_dxf = info.binary_dxf;
++        st.saved = if current_matches {
++            st.drawing().clone()
++        } else if normalize_version {
++            Arc::new(committed)
++        } else {
++            info.snapshot
++        };
++        if let Some(p) = path.or(Some(&info.path)) {
++            st.path = Some(p.to_string());
++            st.title = cmd::file::file_name(p);
++        } else {
++            st.path = Some(info.path.clone());
++            st.title = cmd::file::file_name(&info.path);
++        }
++        st.end_undo_group();
++        Ok(())
++    }
++
++    /// Remove a host-save ticket after timeout or close. Late acknowledgements are ignored.
++    pub fn cancel_pending_save(&mut self, ticket: &cmd::file::SaveTicket) -> bool {
++        self.pending_saves.remove(ticket).is_some()
++    }
+ }
+ 
+ /// Typed text that is LISP: `(expression)` or `!variable`.

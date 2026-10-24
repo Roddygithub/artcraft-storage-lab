@@ -220,6 +220,15 @@ GPT REVIEW FAIL
 
 Only `GPT REVIEW PASS` unlocks publication upstream.
 
+### GR-018 bounded reviews — GPT-6.1 Sol low — 2026-10-24
+
+Four cost-bounded rounds reviewed the CADCraft save-acknowledgement prototype
+against the same pinned source base. Rounds 1 and 2 requested changes; round 3
+passed with one minor export-timeout wording issue; round 4 passed after that
+message was corrected. This is a narrow implementation review only and does
+not alter the project-level GPT FAIL. Exact reports are in
+`docs/reviews/GR-018/REVIEW-SOL-LOW-R2.md` through `REVIEW-SOL-LOW-R4.md`.
+
 ### GR-016 bounded implementation review — 2026-10-24
 
 After the WordCraft/GridCraft synthetic-host Chromium smoke tests passed, a
