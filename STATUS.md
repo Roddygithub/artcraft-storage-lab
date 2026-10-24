@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-019 — FigCraft shared host-save adapter prototype; focused tests and WASM compile pass; Seafile/browser runtime remains NOT VERIFIED; project GPT status remains FAIL
+CURRENT GR: GR-020 — DeckCraft shared host-save adapter prototype; focused tests, WASM compile and bounded independent review pass; browser/Seafile runtime remains NOT VERIFIED; project GPT status remains FAIL
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -89,7 +89,18 @@ OPEN GAPS:
   returned bounded PASS with one minor dirty-report retry limitation. Seafile
   browser/runtime E2E remains NOT VERIFIED. Details:
   `docs/reviews/GR-019/README.md`.
-- GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
+- GR-020 adds a local DeckCraft Web host-save adapter over the pinned shared
+  transport. Two engine tests and four UI lifecycle tests pass, as do the Rust
+  1.95 app WASM check, `xtask wasm`, `assets`, and `layers`; two independent Luna
+  high rounds returned bounded PASS on the current exact patch. Host mode is
+  restricted to one document and waits for a ticket-matched durable ACK. No
+  DeckCraft browser runtime or Seafile dispatch/version/reopen is verified. The
+  full workspace test suite did not complete; `xtask ci` stops at existing
+  Clippy findings outside the changed files. See `docs/reviews/GR-020/README.md`.
+- The isolated synthetic Seafile runtime flows currently documented are for
+  WordCraft, GridCraft, VectorCraft, PdfCraft and CADCraft. VectorCraft uses its
+  page API, not the common `?host=parent` contract. DeckCraft now has a local
+  host-save adapter but no browser or Seafile runtime reproduction.
 - GR-016 WordCraft and GridCraft now both have reproduced shared-transport Seafile save/version/reopen flows on the isolated synthetic stack. GridCraft also recalculated `SUM(B2:B2)` after B2 changed to 1337, persisted a new Seafile version, and reopened showing 1337. GR-018 CADCraft now has a separate synthetic Seafile history/reopen run. Exact outbound-payload hashing and optimized-bundle performance remain open. These synthetic runs do not establish public deployment readiness or all-app support.
 - Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium collision test passes, and the isolated Seafile-backed VectorCraft flow was rerun successfully after the fix (695 B saved/read back byte-identically and reopened with the new path). See the GR-012 post-fix runtime report.
 - Nemotron independently returned a bounded PASS for that exact-byte fix. A later synthetic Chromium test now verifies failed-write retry; VectorCraft still lacks a full dirty signal, concurrent-save coverage and CSP/sandbox controls. This does not establish common-contract support or an overall project PASS.
@@ -103,10 +114,12 @@ NEXT:
 - continue app-by-app adapters from the GR-016 seam inventory; WordCraft,
   GridCraft, PdfCraft and CADCraft now use the immutable packaged transport
   revision and compile from clean pinned-source checkouts with Rust 1.95
-- continue from GR-019 to DeckCraft and remaining apps; FigCraft's patch is a
-  local prototype only until browser and Seafile runtime evidence exists
-- retain the limits: only those four patches have reproducible builds; other
-  app integrations, runtime coverage and deployment controls remain incomplete
+- continue from GR-020 to remaining apps; FigCraft and DeckCraft patches are
+  local prototypes only until browser and Seafile runtime evidence exists
+- retain the limits: WordCraft, GridCraft, PdfCraft and CADCraft have recorded
+  clean-checkout build evidence; DeckCraft has a passing local pinned-source
+  WASM build, but its full workspace suite did not complete. Other app
+  integrations, runtime coverage and deployment controls remain incomplete
 - continue remaining Craft Web adapters from the GR-016 per-app seam inventory;
   CADCraft synthetic Seafile save/version/reopen evidence is already recorded
 - rerun the Playwright protocol suite when its dependency is available; the

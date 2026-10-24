@@ -367,7 +367,7 @@ saved. **The integration layer must never pretend a save succeeded.**
 | gridcraft | **yes** | upstream baseline: `download: Fn(&str, &[u8])`; local GR-010 patch adds ticketed `saveResult` and snapshot tracking | synthetic Seafile save acknowledgement and fresh editor reopen reproduced; formula recalculation and GridCraft conflict behavior remain open |
 | pdfcraft | **yes** | `host_save: Fn(&str, &[u8], bool) -> Result<(), String>` — synchronous | reference for the save-failure part; would need to become asynchronous to match WordCraft |
 | wordcraft | upstream baseline: no | `download: Fn(...) -> Result<(), String>` **+ `async_saves`** | local GR-014 bridge patch and isolated synthetic Seafile edit/save/version/reopen are reproduced; upstream adoption and broader failure/security coverage remain open |
-| deckcraft | no | not surveyed in detail | port the bridge |
+| deckcraft | no (upstream) | local GR-020 patch adds single-file host save ACK; not browser/Seafile verified | review the local adapter, then test runtime before generalizing |
 | vectorcraft | no | has a *different* mechanism (`window.vectorcraft`, a promise API) — see §6 | decide whether to port the bridge or adapt the page API |
 | designcraft | no | `download` present, `open_async` present, no `async_saves` | port the bridge; check the save hook's signature |
 | photocraft | no | `inbox` present, no `download` | port the bridge; the save hook may not exist yet |

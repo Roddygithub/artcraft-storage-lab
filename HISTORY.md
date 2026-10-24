@@ -1,5 +1,22 @@
 # HISTORY
 
+## 2026-10-24 — GR-020 DeckCraft host-save acknowledgement prototype
+
+* Added a local DeckCraft Web adapter on the immutable shared `craft-platform`
+  transport. Host mode opens one presentation and only clears dirty state after
+  a matching durable save acknowledgement for the serialized snapshot.
+* Added engine snapshot-acknowledgement tests and synthetic-host UI tests for
+  positive/negative ACKs, edits during a pending save, and reopen from saved
+  bytes. Rust 1.95 focused tests and the WASM check pass.
+* Independent GPT-6 Luna high bounded review returned PASS with no findings on
+  the exact current patch. The initial review was followed by a one-line
+  Clippy simplification and a second review of the regenerated patch.
+  DeckCraft browser messaging and Seafile version/reopen remain NOT VERIFIED;
+  no Seafile dispatch, production system, or upstream source changed. The
+  `assets`, `layers`, and `wasm` checks pass; full workspace tests did not
+  complete, and workspace Clippy is blocked by existing findings in untouched
+  crates. See `docs/reviews/GR-020/README.md` and `REVIEW-LUNA-HIGH-R2.md`.
+
 ## 2026-10-24 — GR-019 FigCraft shared host-save adapter prototype
 
 * Added a FigCraft Web adapter using the immutable shared `craft-platform`
