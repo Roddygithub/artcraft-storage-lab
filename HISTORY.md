@@ -60,12 +60,23 @@
   Rust 1.95 WASM check pass. The release/browser smoke predates this
   callback-accounting-only change. Sol low round 4 returned bounded prototype
   PASS (no blocker/major; lifecycle test gap remains minor). Seafile persistence
-  remains NOT VERIFIED and the project GPT verdict remains FAIL. The evidence
+  remained NOT VERIFIED at that point and the project GPT verdict remained FAIL. The evidence
   bundle and project status were committed and pushed to `main` as `af510c4`.
   Afterwards, Trunk built the exact patch revision and Chromium reproduced the
   form edit → 2,385-byte save → matching ACK → clean → fresh iframe reopen path.
-  The synthetic host stores in `sessionStorage`; Seafile persistence is still
-  NOT VERIFIED. See `docs/reviews/GR-017/RUNTIME-SMOKE-R4.md`.
+* Follow-up on 2026-10-24 used the patched PdfCraft release WASM with an
+  isolated synthetic Seahub/Seafile stack. A PdfCraft text annotation produced
+  a new Seafile file ID and history commit; API readback parsed as a valid PDF
+  containing the annotation, and a fresh PdfCraft instance rendered it. The
+  file was opened by direct Seahub route navigation, not an observed file-list
+  click, and the exact outgoing bridge payload was not captured for hash
+  comparison. Full IDs, hash, screenshots and limits are in
+  `docs/reviews/GR-017/SEAFILE-PDFCRAFT-E2E-20261024.md`. Nemotron Free accepted
+  this bounded evidence with minor qualifications and no blocker/major finding;
+  see `REVIEW-NEMOTRON-SEAFILE-E2E-R1.md`. Production and upstream repositories
+  remain untouched. Project GPT review remains FAIL.
+* The separate synthetic-host smoke stores bytes in `sessionStorage` and is not
+  Seafile evidence; see `docs/reviews/GR-017/RUNTIME-SMOKE-R4.md`.
 
 ## 2026-10-24 — GR-016 app seam inventory and Rust transport prototype
 

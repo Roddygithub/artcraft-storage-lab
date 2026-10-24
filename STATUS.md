@@ -1,11 +1,11 @@
 # STATUS
 
 ```text
-PHASE:      GPT-6.1 Sol FAIL on 0edbe52; GR-016 shared transport reproduced with WordCraft and GridCraft on synthetic Seafile
+PHASE:      GPT-6.1 Sol FAIL on 0edbe52; synthetic Seafile runtime flows reproduced for WordCraft, GridCraft, VectorCraft and PdfCraft
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; GR-016 E2E evidence and bounded re-review are pending commit; no upstream changes
+WORKTREE:   main-only workflow; GR-017 PdfCraft synthetic Seafile evidence independently reviewed, awaiting commit/push; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-016 — shared-transport WordCraft DOCX and GridCraft XLSX synthetic Seafile runtime verification; other apps remain open; project GPT status remains FAIL
+CURRENT GR: GR-017 — PdfCraft durable host acknowledgement and synthetic Seafile runtime verification; most ArtCraft apps remain open; project GPT status remains FAIL
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -57,10 +57,12 @@ OPEN GAPS:
   Seven focused native acknowledgement tests, Rust 1.95 WASM check, formatting
   and diff checks pass on the current callback-cap remediation. Sol low rounds
   Sol low round 4 returned bounded PROTOTYPE PASS (no blocker/major; lifecycle
-  test coverage remains a minor). The exact current patch now also passes a
-  release build and Chromium ACK/fresh-reopen smoke using sessionStorage, not
-  Seafile; persistence/versioning remains NOT VERIFIED. Evidence is in
-  `docs/reviews/GR-017/`.
+  test coverage remains a minor). A subsequent isolated synthetic Seafile run
+  used actual PdfCraft WASM to annotate a PDF, save a new Seafile history
+  revision, read back and parse the PDF, and reopen it in a fresh PdfCraft
+  instance with the annotation visible. It opened through the direct Seahub file
+  route; file-list click and exact outbound payload hash remain NOT VERIFIED.
+  Evidence is in `docs/reviews/GR-017/`.
 - GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
 - GR-016 WordCraft and GridCraft now both have reproduced shared-transport Seafile save/version/reopen flows on the isolated synthetic stack. GridCraft also recalculated `SUM(B2:B2)` after B2 changed to 1337, persisted a new Seafile version, and reopened showing 1337. The independent evidence review's formula finding is addressed; exact outbound-payload hashing and optimized-bundle performance remain open. These synthetic runs do not establish public deployment readiness or all-app support.
 - Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium collision test passes, and the isolated Seafile-backed VectorCraft flow was rerun successfully after the fix (695 B saved/read back byte-identically and reopened with the new path). See the GR-012 post-fix runtime report.
@@ -72,14 +74,14 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- finish the GR-017 bounded review cycle; keep it provisional and do not claim
-  PdfCraft Seafile persistence without a real isolated E2E
+- commit and push the independently reviewed GR-017 synthetic Seafile evidence
+  to `main`, then continue the next app seam
 - rerun the Playwright protocol suite when its dependency is available; the
   current T3 Chromium preview verifies Open-request guidance and dirty-state
   preservation only
 - continue app-by-app seam implementation and evidence; do not infer all-app support from the WordCraft/GridCraft synthetic Seafile runs
-- the Chromium tests use synthetic `sessionStorage`, not Seafile, and the app
-  dependency is still a temporary local path
+- the GR-016 shared transport dependency remains a scratch/local-path prototype;
+  no upstream dependency or patch has been published
 - keep later app adapters scoped to their observed per-app open/serialize/save
   seams; a common transport does not create an editor serializer or durable ack
 - keep Seafile/provider persistence in the connector and editor lifecycle in

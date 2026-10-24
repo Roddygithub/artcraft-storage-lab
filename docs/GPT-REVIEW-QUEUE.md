@@ -396,13 +396,13 @@ updated evidence with minor qualifications; see
 ### GR-017 — PdfCraft durable host-save acknowledgement
 
 ```text
-Status:      BOUNDED PROTOTYPE REVIEW PASS (Sol low round 4); project GPT remains FAIL
+Status:      BOUNDED PROTOTYPE REVIEW PASS (Sol low round 4); synthetic Seafile E2E accepted with minor qualifications by Nemotron Free; project GPT remains FAIL
 Base:        storytold/pdfcraft `57e531ccca0047597809748b5cb4276336d6051a`
 Transport:   storytold/craft-libs `f180fc0d35d521c5d18e118c881d3efde1ec1eee` scratch prototype
 Scope:       reuse ticketed shared transport for PdfCraft's existing same-origin host bridge; preserve dirty state until durable result
-Evidence:    docs/reviews/GR-017/README.md and patches/pdfcraft-durable-host-ack.patch
-Tests:       7 focused native acknowledgement tests, Rust 1.95 WASM check, formatting/diff checks, exact-revision release build and Chromium synthetic-host ACK/fresh-reopen smoke pass
-Open:        lifecycle test gaps remain MINOR for this bounded prototype; Seafile version/reopen, browser timeout/response loss, deployment security and portable shared dependency are NOT VERIFIED
+Evidence:    docs/reviews/GR-017/README.md, SEAFILE-PDFCRAFT-E2E-20261024.md, and patches/pdfcraft-durable-host-ack.patch
+Tests:       7 focused native acknowledgement tests, Rust 1.95 WASM check, formatting/diff checks, exact-revision release build, Chromium synthetic-host ACK/reopen smoke, and isolated synthetic Seafile save/version/readback/fresh-reopen reproduction
+Open:        lifecycle test gaps remain MINOR for this bounded prototype; file-list click, exact editor-to-gateway payload hash, browser timeout/response loss, deployment security and portable shared dependency are NOT VERIFIED
 GPT review:  NOT REQUESTED; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch was published
 ```

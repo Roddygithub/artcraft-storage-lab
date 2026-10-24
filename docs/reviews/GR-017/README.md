@@ -1,8 +1,9 @@
 # GR-017 — PdfCraft durable host-save acknowledgement
 
-Status: **bounded prototype review PASS; not upstream-ready, not a project GPT
-candidate**. The project-level GPT verdict remains FAIL on `0edbe524`; upstream
-publication stays locked. Only the local lab repository receives this evidence.
+Status: **bounded prototype review PASS; synthetic Seafile runtime save/version/
+reopen reproduced; not upstream-ready, not a project GPT candidate**. The
+project-level GPT verdict remains FAIL on `0edbe524`; upstream publication stays
+locked. Only the local lab repository receives this evidence.
 
 ## Scope
 
@@ -53,12 +54,15 @@ transport patch/revision first.
 | `cargo +1.95.0 fmt --all -- --check` | PASS |
 | `git diff --check` | PASS |
 | `CARGO_BUILD_JOBS=2 CARGO_PROFILE_RELEASE_DEBUG=0 CARGO_INCREMENTAL=0 trunk build --release` from `apps/pdfcraft-web` | PASS on the exact current patch with Rust 1.97; 12m31s release compile plus `wasm-opt -Oz`; existing unused/dead-code warnings only |
-| Chromium synthetic-host smoke | PASS on the exact current patch — form edit, ticket `pdfcraft:1`, 2,385-byte save, matching ACK, clean state, fresh iframe reopen renders `r4-exact-host-ack`; `sessionStorage` only, not Seafile. Full record and hashes: [`RUNTIME-SMOKE-R4.md`](RUNTIME-SMOKE-R4.md). |
+| Chromium synthetic-host smoke | PASS on the exact current patch — form edit, ticket `pdfcraft:1`, 2,385-byte save, matching ACK, clean state, fresh iframe reopen renders `r4-exact-host-ack`; `sessionStorage` only. Full record and hashes: [`RUNTIME-SMOKE-R4.md`](RUNTIME-SMOKE-R4.md). |
+| Chromium + isolated synthetic Seafile E2E | PASS, bounded — PdfCraft text annotation saved as a new Seafile revision and displayed in a fresh PdfCraft instance. The file was opened through the direct Seahub file route; a file-list click was not observed. Details, IDs, hash, screenshots and limits: [`SEAFILE-PDFCRAFT-E2E-20261024.md`](SEAFILE-PDFCRAFT-E2E-20261024.md). |
 
 The native tests exercise save-state handling with a synthetic PDF fixture. The
-browser smoke uses the actual release WASM bridge and Chromium, but its parent
-stores bytes in `sessionStorage`; it does **not** test Seafile persistence or
-version creation. No Seafile service or production editor was accessed.
+synthetic-host browser smoke uses the actual release WASM bridge and Chromium,
+but its parent stores bytes in `sessionStorage`; that smoke alone does **not**
+test Seafile persistence or version creation. A separate isolated synthetic
+Seafile E2E is recorded below. No production Seafile service or production
+editor was accessed.
 
 ## Not verified / remaining work
 
@@ -67,7 +71,10 @@ version creation. No Seafile service or production editor was accessed.
 - Save As, timeout execution, send failure and capacity recovery are not covered
   by automated lifecycle tests; the native tests construct pending-save state
   directly. This remains a bounded test-coverage gap.
-- No PDF edit → Seafile new version → fresh PdfCraft reopen E2E was run.
+- The synthetic Seafile E2E covers one text annotation only; it does not establish
+  broad PDF feature compatibility. The file-list click path was not observed.
+- The exact outgoing `pdfcraft:save` payload was not independently hashed at the
+  browser boundary; see the E2E report for the readback hash and its limits.
 - The change depends on the GR-016 shared transport patch, which is not yet an
   upstream published library revision.
 - Only a bounded source/runtime review can assess this prototype; the overall
@@ -92,5 +99,15 @@ this revision. A fresh Rust 1.97 release build and Chromium smoke on the exact
 current patch also pass. Sol low round 4 returned
 **PASS** for this bounded prototype,
 with no blocker/major and one non-blocking lifecycle-test minor. See
-`REVIEW-SOL-LOW-R4.md`. This does not change the project-level GPT FAIL or
-establish Seafile persistence/version/reopen.
+`REVIEW-SOL-LOW-R4.md`. That bounded code review does not change the project-
+level GPT FAIL. The separate synthetic Seafile persistence/version/reopen
+evidence is recorded in `SEAFILE-PDFCRAFT-E2E-20261024.md` and independently
+reviewed below.
+
+The synthetic Seafile E2E evidence was independently reviewed by Nemotron Free
+round 1: **ACCEPT WITH MINOR QUALIFICATIONS**, with no blocker or major finding.
+The reviewer confirmed that the file-list click and exact outbound payload hash
+are explicitly not claimed, and that the fresh-instance screenshot shows the
+annotation. The lifecycle-test coverage gap remains minor and is recorded in
+[`REVIEW-NEMOTRON-SEAFILE-E2E-R1.md`](REVIEW-NEMOTRON-SEAFILE-E2E-R1.md). This
+bounded review does not change the project-level GPT FAIL.
