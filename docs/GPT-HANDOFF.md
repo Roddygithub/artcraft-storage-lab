@@ -418,3 +418,27 @@ Only GPT REVIEW PASS may unlock upstream publication.
    did it introduce anything new?
 6. `docs/reviews/GR-012/README.md` §2 — is the VectorCraft transport divergence
    (a page API, not the common contract) stated honestly, and are its gaps?
+
+### GR-017 PdfCraft durable host acknowledgement — 2026-10-24
+
+PdfCraft is the next bounded adapter after the all-app seam audit. On pinned
+source SHA `57e531ccca0047597809748b5cb4276336d6051a`, the scratch patch reuses
+the GR-016 `craft-platform` transport and adds ticketed save results. PdfCraft
+keeps its snapshot dirty until a matching host response confirms persistence;
+failed, duplicate or stale acknowledgements do not mark newer edits clean.
+The first bounded Sol low review returned FAIL: UI form drafts could be lost on
+an older save acknowledgement, overlapping same-document saves could lose a
+close callback, and unanswered tickets could retain capacity indefinitely. The
+patch now commits typing before comparing generations, coalesces and queues
+same-document requests, adds a 120-second ticket timeout, bounds retained bytes,
+and releases pending snapshots when tabs close. Round 3 found no blocker/major,
+but found callback-cap bypass through wrapped follow-up callbacks. The current
+patch propagates retained callback counts and the 64-callback regression test
+passes. Seven focused native tests, Rust 1.95 WASM check, formatting and diff
+checks pass. Release/browser smoke used `sessionStorage` and predates the
+callback-accounting-only change; Seafile persistence/versioning is not claimed.
+Sol low round 4 returned bounded prototype PASS, with no blocker/major and one
+non-blocking lifecycle-test minor. See `docs/reviews/GR-017/README.md` and
+`REVIEW-SOL-LOW-R4.md`. The project's prior GPT-6.1 Sol FAIL remains in force;
+PdfCraft Seafile persistence/version/reopen is not verified, and this work does
+not unlock upstream publication.

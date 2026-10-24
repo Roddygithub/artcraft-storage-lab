@@ -1,5 +1,36 @@
 # HISTORY
 
+## 2026-10-24 — GR-017 PdfCraft durable host acknowledgement prototype
+
+* Started a bounded PdfCraft adapter on pinned upstream SHA
+  `57e531ccca0047597809748b5cb4276336d6051a`, reusing the GR-016
+  `craft-platform` transport from its pinned scratch checkout.
+* The adapter now sends ticketed saves and keeps the editor dirty until the host
+  returns a durable result. Sol low review round 1 found that drafts could be
+  lost, overlapping saves could discard a close callback, and unanswered saves
+  could retain capacity indefinitely. The patch now commits form typing before
+  stale-generation checks, coalesces/queues same-document requests, expires
+  unanswered browser tickets after 120 seconds, bounds retained bytes and
+  drops pending snapshots when tabs close. Five native tests and the Rust 1.95
+  WASM check pass. A release build hit `/tmp` quota and was stopped while the
+  review fixes were applied; it has not yet been rerun.
+* At this point no browser runtime, Seafile persistence, new Seafile version,
+  or reopen claim was made for this adapter. The initial patch and limits are
+  recorded under `docs/reviews/GR-017/`. Project GPT remains FAIL and upstream
+  publication remains locked.
+* Sol low round 2 found a remaining paragraph line-editor draft loss and
+  unbounded coalesced callbacks/forgotten timer closures. The current scratch
+  patch commits paragraph drafts before ACK settlement, caps callbacks, and
+  clears timer closures on result. Seven native tests, Rust 1.95 WASM check,
+  release build and Chromium synthetic-host edit/save/ACK/reopen pass. Sol low
+  round 3 found no blocker/major but found a callback-cap bypass through wrapped
+  follow-up callbacks. The current scratch patch preserves retained callback
+  counts and extends the cap regression test; seven focused native tests and a
+  Rust 1.95 WASM check pass. The release/browser smoke predates this
+  callback-accounting-only change. Sol low round 4 returned bounded prototype
+  PASS (no blocker/major; lifecycle test gap remains minor). Seafile persistence
+  remains NOT VERIFIED and the project GPT verdict remains FAIL.
+
 ## 2026-10-24 — GR-016 app seam inventory and Rust transport prototype
 
 * Consolidated source-only host seam findings for all 13 ArtCraft Web apps in

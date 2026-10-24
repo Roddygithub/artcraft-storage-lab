@@ -372,12 +372,26 @@ Known risks:    NOT PUBLISHED. The upstream hard gate holds until GPT REVIEW PAS
 
 ```text
 Status:      PROTOTYPE IN PROGRESS; not a candidate; bounded Sol low review PASS with minor notes
-Branch/SHA:  main / gateway compatibility update in local working tree; source changes remain in scratch clones
+Branch/SHA:  main / `bdbea5faa7e8b1cdd4c1e526cd3b212e712a0789` (gateway compatibility update pushed); source changes remain in scratch clones
 Scope:       inventory all 13 ArtCraft Web app seams; standardize transport; adapt WordCraft and GridCraft first
 Evidence:    docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md and README.md
 Tests:       craft-platform 6 tests + strict clippy + WASM checks pass; WordCraft/GridCraft Chromium synthetic-host edit/ack/reopen and rejection checks pass; GridCraft in-app Open and Rust 1.95 WASM check pass using a temporary local path dependency
 Open:        Seafile E2E after refactor, single-file Open boundary, three minor review notes, remaining app-specific seams
 GPT review:  NOT REQUESTED; existing project verdict remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC or patch was published
+```
+
+### GR-017 — PdfCraft durable host-save acknowledgement
+
+```text
+Status:      BOUNDED PROTOTYPE REVIEW PASS (Sol low round 4); project GPT remains FAIL
+Base:        storytold/pdfcraft `57e531ccca0047597809748b5cb4276336d6051a`
+Transport:   storytold/craft-libs `f180fc0d35d521c5d18e118c881d3efde1ec1eee` scratch prototype
+Scope:       reuse ticketed shared transport for PdfCraft's existing same-origin host bridge; preserve dirty state until durable result
+Evidence:    docs/reviews/GR-017/README.md and patches/pdfcraft-durable-host-ack.patch
+Tests:       7 focused native acknowledgement tests, Rust 1.95 WASM check, fmt and diff checks pass on current revision; release/browser smoke was on the immediately prior revision
+Open:        lifecycle test gaps remain MINOR for this bounded prototype; Seafile version/reopen, browser timeout/response loss, deployment security and portable shared dependency are NOT VERIFIED
+GPT review:  NOT REQUESTED; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch was published
 ```
 
