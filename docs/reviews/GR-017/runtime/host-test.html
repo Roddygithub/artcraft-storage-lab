@@ -1,0 +1,55 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>PdfCraft synthetic host smoke test</title>
+<style>
+  body { margin: 0; font: 14px sans-serif; color: #eee; background: #202124; }
+  header { padding: 8px 12px; display: flex; align-items: center; gap: 12px; }
+  #status { white-space: pre-wrap; }
+  iframe { display: block; width: 100vw; height: calc(100vh - 48px); border: 0; }
+</style>
+<header><strong>Synthetic host</strong><button id="reopen">Reopen stored bytes</button><span id="status">Waiting for PdfCraft…</span></header>
+<iframe id="craft" src="index.html?host=parent"></iframe>
+<script>
+  const app = "pdfcraft";
+  const frame = document.getElementById("craft");
+  const status = document.getElementById("status");
+  const evidence = window.__hostEvidence = {ready: 0, dirty: [], saves: [], lastBytes: null};
+  const savedKey = "gr017-pdfcraft-synthetic";
+
+  async function openBytes() {
+    const stored = sessionStorage.getItem(savedKey);
+    let bytes;
+    if (stored) {
+      const binary = atob(stored);
+      bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    } else {
+      bytes = new Uint8Array(await (await fetch("form.pdf")).arrayBuffer());
+    }
+    frame.contentWindow.postMessage({type: "pdfcraft:open", name: "form.pdf", bytes}, location.origin, [bytes.buffer]);
+    status.textContent = stored ? "Reopened synthetic stored bytes" : "Opened synthetic form.pdf";
+  }
+
+  window.addEventListener("message", async event => {
+    if (event.source !== frame.contentWindow || event.origin !== location.origin) return;
+    const data = event.data || {};
+    if (data.type === "pdfcraft:ready") {
+      evidence.ready++;
+      await openBytes();
+    } else if (data.type === "pdfcraft:dirty") {
+      evidence.dirty.push(!!data.dirty);
+      status.textContent = "dirty=" + !!data.dirty;
+    } else if (data.type === "pdfcraft:save") {
+      const bytes = data.bytes instanceof ArrayBuffer ? new Uint8Array(data.bytes) : data.bytes;
+      const binary = Array.from(bytes, b => String.fromCharCode(b)).join("");
+      sessionStorage.setItem(savedKey, btoa(binary));
+      evidence.lastBytes = bytes.length;
+      evidence.saves.push({ticket: data.ticket, name: data.name, bytes: bytes.length, saveAs: !!data.saveAs});
+      status.textContent = `stored ${bytes.length} bytes; acknowledging ${data.ticket}`;
+      frame.contentWindow.postMessage({type: "pdfcraft:saveResult", ticket: data.ticket, ok: true}, location.origin);
+    }
+  });
+
+  document.getElementById("reopen").addEventListener("click", () => {
+    frame.src = "index.html?host=parent&reopen=" + Date.now();
+  });
+</script>

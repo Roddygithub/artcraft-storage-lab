@@ -57,9 +57,9 @@ OPEN GAPS:
   Seven focused native acknowledgement tests, Rust 1.95 WASM check, formatting
   and diff checks pass on the current callback-cap remediation. Sol low rounds
   Sol low round 4 returned bounded PROTOTYPE PASS (no blocker/major; lifecycle
-  test coverage remains a minor). Release/Chromium smoke evidence is from the
-  immediately prior revision and uses sessionStorage, not Seafile;
-  persistence/versioning remains NOT VERIFIED. Evidence is in
+  test coverage remains a minor). The exact current patch now also passes a
+  release build and Chromium ACK/fresh-reopen smoke using sessionStorage, not
+  Seafile; persistence/versioning remains NOT VERIFIED. Evidence is in
   `docs/reviews/GR-017/`.
 - GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
 - Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium collision test passes, and the isolated Seafile-backed VectorCraft flow was rerun successfully after the fix (695 B saved/read back byte-identically and reopened with the new path). See the GR-012 post-fix runtime report.

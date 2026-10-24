@@ -438,7 +438,10 @@ passes. Seven focused native tests, Rust 1.95 WASM check, formatting and diff
 checks pass. Release/browser smoke used `sessionStorage` and predates the
 callback-accounting-only change; Seafile persistence/versioning is not claimed.
 Sol low round 4 returned bounded prototype PASS, with no blocker/major and one
-non-blocking lifecycle-test minor. See `docs/reviews/GR-017/README.md` and
-`REVIEW-SOL-LOW-R4.md`. The project's prior GPT-6.1 Sol FAIL remains in force;
-PdfCraft Seafile persistence/version/reopen is not verified, and this work does
-not unlock upstream publication.
+non-blocking lifecycle-test minor. After that review, the exact current patch
+passed a fresh Rust 1.97 release build and Chromium synthetic-host
+edit/save/ACK/fresh-reopen smoke using `sessionStorage`. See
+`docs/reviews/GR-017/RUNTIME-SMOKE-R4.md` and `REVIEW-SOL-LOW-R4.md`. The
+project's prior GPT-6.1 Sol FAIL remains in force; PdfCraft Seafile
+persistence/version/reopen is not verified, and this work does not unlock
+upstream publication.

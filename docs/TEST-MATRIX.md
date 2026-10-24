@@ -129,7 +129,7 @@ dependency MSRVs. Full commands, warnings and exact pinned SHAs are in
 | 9.4 | Edit/form/paragraph typing after request, then success for old snapshot | newer input stays dirty and a close callback cannot discard it | [x] native focused tests commit queued form and paragraph drafts before evaluating the ack |
 | 9.5 | Same-snapshot Save and Save-and-close | one pending ticket preserves the close callback | [x] native coalescing/settlement test |
 | 9.6 | Closing/discarding a tab with a save pending | app releases its retained PDF bytes | [x] native pending-snapshot cleanup test; browser bridge ticket expires after 120 seconds by code, not runtime-tested |
-| 9.7 | PdfCraft release bundle and browser message round trip | browser receives bytes and responds with durable result | [x] release build plus Chromium synthetic-host edit/Ctrl+S/ACK/reload on prior revision; callback-accounting-only change not rerun in browser; sessionStorage only, not Seafile |
+| 9.7 | PdfCraft release bundle and browser message round trip | browser receives bytes and responds with durable result | [x] exact-patch release build and Chromium form edit/Ctrl+S/ACK/fresh iframe reopen; `sessionStorage` only, not Seafile; see `docs/reviews/GR-017/RUNTIME-SMOKE-R4.md` |
 | 9.8 | PdfCraft save → Seafile new version → reopen | persisted edit appears after fresh editor open | [ ] NOT VERIFIED |
 | 9.9 | Bounded code review of PdfCraft save acknowledgement | no blocker/major in exact patch | [x] GPT-6.1 Sol low round 4 PASS; lifecycle test coverage remains minor; no Seafile E2E established |
 

@@ -389,7 +389,7 @@ Base:        storytold/pdfcraft `57e531ccca0047597809748b5cb4276336d6051a`
 Transport:   storytold/craft-libs `f180fc0d35d521c5d18e118c881d3efde1ec1eee` scratch prototype
 Scope:       reuse ticketed shared transport for PdfCraft's existing same-origin host bridge; preserve dirty state until durable result
 Evidence:    docs/reviews/GR-017/README.md and patches/pdfcraft-durable-host-ack.patch
-Tests:       7 focused native acknowledgement tests, Rust 1.95 WASM check, fmt and diff checks pass on current revision; release/browser smoke was on the immediately prior revision
+Tests:       7 focused native acknowledgement tests, Rust 1.95 WASM check, formatting/diff checks, exact-revision release build and Chromium synthetic-host ACK/fresh-reopen smoke pass
 Open:        lifecycle test gaps remain MINOR for this bounded prototype; Seafile version/reopen, browser timeout/response loss, deployment security and portable shared dependency are NOT VERIFIED
 GPT review:  NOT REQUESTED; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch was published

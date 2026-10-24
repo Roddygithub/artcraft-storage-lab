@@ -52,8 +52,8 @@ transport patch/revision first.
 | `CARGO_BUILD_JOBS=2 CARGO_PROFILE_TEST_DEBUG=0 CARGO_INCREMENTAL=0 cargo +1.95.0 test -p pdfcraft-ui-egui --lib host_save_ack_tests` | PASS — 7 tests: rejection/duplicate ack, exact snapshot, same-snapshot coalescing, form and paragraph typing during save, aggregated callback cap, and tab-close snapshot cleanup |
 | `cargo +1.95.0 fmt --all -- --check` | PASS |
 | `git diff --check` | PASS |
-| `CARGO_BUILD_JOBS=2 CARGO_PROFILE_RELEASE_DEBUG=0 CARGO_INCREMENTAL=0 trunk build --release` | PASS on the prior timer/ACK revision; not rerun after the callback-accounting-only change |
-| Chromium synthetic-host smoke | PASS on the prior timer/ACK revision — typed `test async PDF host save`, Ctrl+S produced ticket `pdfcraft:1` and 2,395 bytes, host ACK returned clean state, fresh iframe reload from `sessionStorage` rendered the edit. Not rerun after callback-accounting-only change; not Seafile persistence. |
+| `CARGO_BUILD_JOBS=2 CARGO_PROFILE_RELEASE_DEBUG=0 CARGO_INCREMENTAL=0 trunk build --release` from `apps/pdfcraft-web` | PASS on the exact current patch with Rust 1.97; 12m31s release compile plus `wasm-opt -Oz`; existing unused/dead-code warnings only |
+| Chromium synthetic-host smoke | PASS on the exact current patch — form edit, ticket `pdfcraft:1`, 2,385-byte save, matching ACK, clean state, fresh iframe reopen renders `r4-exact-host-ack`; `sessionStorage` only, not Seafile. Full record and hashes: [`RUNTIME-SMOKE-R4.md`](RUNTIME-SMOKE-R4.md). |
 
 The native tests exercise save-state handling with a synthetic PDF fixture. The
 browser smoke uses the actual release WASM bridge and Chromium, but its parent
@@ -88,8 +88,8 @@ but identified that callback limits could be bypassed when callback groups were
 wrapped during follow-up saves. The current scratch patch carries the retained
 callback count through aggregation and tests the 64-callback boundary. Seven
 focused native tests, Rust 1.95 WASM check, formatting and diff checks pass on
-this revision. Release/browser evidence applies to the immediately preceding
-revision, not this callback-accounting-only change. Sol low round 4 returned
+this revision. A fresh Rust 1.97 release build and Chromium smoke on the exact
+current patch also pass. Sol low round 4 returned
 **PASS** for this bounded prototype,
 with no blocker/major and one non-blocking lifecycle-test minor. See
 `REVIEW-SOL-LOW-R4.md`. This does not change the project-level GPT FAIL or
