@@ -29,7 +29,8 @@
   Rust 1.95 WASM check pass. The release/browser smoke predates this
   callback-accounting-only change. Sol low round 4 returned bounded prototype
   PASS (no blocker/major; lifecycle test gap remains minor). Seafile persistence
-  remains NOT VERIFIED and the project GPT verdict remains FAIL.
+  remains NOT VERIFIED and the project GPT verdict remains FAIL. The evidence
+  bundle and project status were committed and pushed to `main` as `af510c4`.
 
 ## 2026-10-24 — GR-016 app seam inventory and Rust transport prototype
 

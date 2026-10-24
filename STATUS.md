@@ -1,11 +1,11 @@
 # STATUS
 
 ```text
-PHASE:      GPT-6.1 Sol FAIL on 0edbe52; GR-016 transport prototype and GR-017 PdfCraft adapter in progress
+PHASE:      GPT-6.1 Sol FAIL on 0edbe52; GR-016 transport and GR-017 PdfCraft bounded prototype continue
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main is synchronized at bdbea5f; GR-017 evidence/docs are uncommitted and PdfCraft source remains a scratch patch
+WORKTREE:   main clean and pushed with GR-017 bounded review evidence; PdfCraft source remains a scratch patch
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
