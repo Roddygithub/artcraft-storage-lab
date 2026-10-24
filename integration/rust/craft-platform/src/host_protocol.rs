@@ -26,11 +26,22 @@ pub struct PendingSaves<T> {
 
 impl<T> Default for PendingSaves<T> {
     fn default() -> Self {
-        Self { pending: HashMap::new() }
+        Self {
+            pending: HashMap::new(),
+        }
     }
 }
 
 const MAX_PENDING_SAVES: usize = 64;
+
+/// Bounds total parent-provided document copies in one editor runtime.
+#[derive(Debug, Default)]
+pub struct OpenAdmission {
+    messages: usize,
+    bytes: usize,
+}
+
+const MAX_OPEN_MESSAGES: usize = 64;
 
 impl<T> PendingSaves<T> {
     pub fn insert(&mut self, ticket: SaveTicket, value: T) -> Result<(), T> {
@@ -48,6 +59,18 @@ impl<T> PendingSaves<T> {
     }
     pub fn is_empty(&self) -> bool {
         self.pending.is_empty()
+    }
+}
+
+impl OpenAdmission {
+    /// Admit multiple opens within a cumulative byte and message budget.
+    pub fn admit(&mut self, byte_len: usize, max_bytes: usize) -> bool {
+        if self.messages >= MAX_OPEN_MESSAGES || byte_len > max_bytes.saturating_sub(self.bytes) {
+            return false;
+        }
+        self.messages += 1;
+        self.bytes += byte_len;
+        true
     }
 }
 
@@ -88,8 +111,35 @@ mod tests {
 
     #[test]
     fn parent_messages_require_exact_origin_and_parent_source() {
-        assert!(accepts_parent_message("https://host.test", "https://host.test", true));
-        assert!(!accepts_parent_message("https://evil.test", "https://host.test", true));
-        assert!(!accepts_parent_message("https://host.test", "https://host.test", false));
+        assert!(accepts_parent_message(
+            "https://host.test",
+            "https://host.test",
+            true
+        ));
+        assert!(!accepts_parent_message(
+            "https://evil.test",
+            "https://host.test",
+            true
+        ));
+        assert!(!accepts_parent_message(
+            "https://host.test",
+            "https://host.test",
+            false
+        ));
+    }
+
+    #[test]
+    fn open_admission_bounds_cumulative_bytes_and_message_count() {
+        let mut admission = OpenAdmission::default();
+        assert!(!admission.admit(9, 8));
+        assert!(admission.admit(4, 8));
+        assert!(admission.admit(4, 8));
+        assert!(!admission.admit(1, 8));
+
+        let mut empty_opens = OpenAdmission::default();
+        for _ in 0..MAX_OPEN_MESSAGES {
+            assert!(empty_opens.admit(0, 8));
+        }
+        assert!(!empty_opens.admit(0, 8));
     }
 }

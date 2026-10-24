@@ -1,15 +1,21 @@
 //! Same-origin iframe transport for the common Craft host protocol.
 use js_sys::{Array, Object, Reflect, Uint8Array};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 use wasm_bindgen::{JsCast, JsValue, closure::Closure};
 use web_sys::{EventTarget, MessageEvent, Window};
 
-use crate::host_protocol::{SaveTicket, accepts_parent_message};
+use crate::host_protocol::{OpenAdmission, SaveTicket, accepts_parent_message};
 
 const MAX_OPEN_BYTES: usize = 256 * 1024 * 1024;
 const MAX_TYPE_UTF16_UNITS: u32 = 128;
 const MAX_NAME_UTF16_UNITS: u32 = 1024;
 const MAX_TICKET_UTF16_UNITS: u32 = 256;
 const MAX_ERROR_UTF16_UNITS: u32 = 4096;
+
+thread_local! {
+    static OPEN_ADMISSIONS: RefCell<HashMap<(String, String), Rc<RefCell<OpenAdmission>>>> =
+        RefCell::new(HashMap::new());
+}
 
 /// Messages received from the parent host.
 pub enum HostMessage {
@@ -30,6 +36,7 @@ pub struct HostTransport {
     parent: Window,
     origin: String,
     app: String,
+    open_admission: Rc<RefCell<OpenAdmission>>,
 }
 
 impl HostTransport {
@@ -48,14 +55,17 @@ impl HostTransport {
         if origin.is_empty() || app.trim().is_empty() || parent.location().origin()? != origin {
             return Ok(None);
         }
+        let open_admission = shared_open_admission(&origin, app);
         Ok(Some(Self {
             parent,
             origin,
             app: app.to_owned(),
+            open_admission,
         }))
     }
 
     /// Listen for parent messages. Exact origin and `event.source` are both checked.
+    /// Open bytes are admitted within a cumulative per-app runtime budget before copying.
     pub fn listen(
         &self,
         mut callback: impl FnMut(HostMessage) + 'static,
@@ -64,6 +74,7 @@ impl HostTransport {
         let parent: JsValue = self.parent.clone().into();
         let origin = self.origin.clone();
         let app = self.app.clone();
+        let open_admission = self.open_admission.clone();
         let handler = Closure::<dyn FnMut(MessageEvent)>::new(move |event: MessageEvent| {
             let source_is_parent = event
                 .source()
@@ -82,6 +93,13 @@ impl HostTransport {
                 let Ok(value) = Reflect::get(&data, &JsValue::from_str("bytes")) else {
                     return;
                 };
+                let Some(length) = bytes_len(&value).filter(|length| *length <= MAX_OPEN_BYTES)
+                else {
+                    return;
+                };
+                if !open_admission.borrow_mut().admit(length, MAX_OPEN_BYTES) {
+                    return;
+                }
                 let Some(bytes) = read_bytes(&value, MAX_OPEN_BYTES) else {
                     return;
                 };
@@ -187,6 +205,18 @@ impl HostTransport {
     }
 }
 
+fn shared_open_admission(origin: &str, app: &str) -> Rc<RefCell<OpenAdmission>> {
+    OPEN_ADMISSIONS.with(|admissions| {
+        let mut admissions = admissions.borrow_mut();
+        let key = (origin.to_owned(), app.to_owned());
+        Rc::clone(
+            admissions
+                .entry(key)
+                .or_insert_with(|| Rc::new(RefCell::new(OpenAdmission::default()))),
+        )
+    })
+}
+
 /// Owns and removes the global message listener on drop.
 pub struct HostListener {
     target: EventTarget,
@@ -215,13 +245,25 @@ fn string_field(value: &JsValue, key: &str, max_utf16_units: u32) -> Result<Stri
         .ok_or_else(|| JsValue::from_str("expected string field"))
 }
 
-fn read_bytes(value: &JsValue, max_bytes: usize) -> Option<Vec<u8>> {
+fn bytes_len(value: &JsValue) -> Option<usize> {
     if let Some(array) = value.dyn_ref::<Uint8Array>() {
-        let length = array.length() as usize;
-        (length <= max_bytes).then(|| array.to_vec())
+        Some(array.length() as usize)
     } else if let Some(buffer) = value.dyn_ref::<js_sys::ArrayBuffer>() {
-        let length = buffer.byte_length() as usize;
-        (length <= max_bytes).then(|| Uint8Array::new(value).to_vec())
+        Some(buffer.byte_length() as usize)
+    } else {
+        None
+    }
+}
+
+fn read_bytes(value: &JsValue, max_bytes: usize) -> Option<Vec<u8>> {
+    let length = bytes_len(value)?;
+    if length > max_bytes {
+        return None;
+    }
+    if let Some(array) = value.dyn_ref::<Uint8Array>() {
+        Some(array.to_vec())
+    } else if value.is_instance_of::<js_sys::ArrayBuffer>() {
+        Some(Uint8Array::new(value).to_vec())
     } else {
         None
     }
@@ -231,6 +273,20 @@ fn read_bytes(value: &JsValue, max_bytes: usize) -> Option<Vec<u8>> {
 mod tests {
     use super::*;
     use wasm_bindgen_test::wasm_bindgen_test;
+
+    #[wasm_bindgen_test]
+    fn separate_transports_share_open_budget_for_same_app_and_origin() {
+        let first = shared_open_admission("https://host.test", "wordcraft");
+        let second = shared_open_admission("https://host.test", "wordcraft");
+        assert!(Rc::ptr_eq(&first, &second));
+        assert!(first.borrow_mut().admit(4, 8));
+        assert!(second.borrow_mut().admit(4, 8));
+        assert!(!first.borrow_mut().admit(1, 8));
+
+        let other_app = shared_open_admission("https://host.test", "gridcraft");
+        assert!(!Rc::ptr_eq(&first, &other_app));
+        assert!(other_app.borrow_mut().admit(8, 8));
+    }
 
     #[wasm_bindgen_test]
     fn oversized_arraybuffer_and_typed_array_are_rejected_before_copy() {

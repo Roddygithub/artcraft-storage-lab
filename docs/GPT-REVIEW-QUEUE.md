@@ -474,14 +474,38 @@ Publication: LOCKED; no upstream issue, PR, RFC, or patch was published
 ```text
 Status:      local prototype only; project GPT verdict remains FAIL on 0edbe524
 Base:        storytold/designcraft 80d13911b2d20fbb5cd9398696627bb3a715417b
-Transport:   DesignCraft review R1 found a P2 allocation gap; shared parser fix has independent bounded PASS; app patch repin pending
+Transport:   pre-copy bounds now include cumulative byte/message admission shared per app runtime; app patch repin pending until the package update is committed
 Patch:       initial local patch SHA c92f88e399b3e4d2c457c70900cf34c213f718870dc6f4e33a5b1ae49d9fbe86 is superseded when repinned
 Scope:       one pathless native .designcraft document; serialized snapshot save with durable ticket ACK; no Save As
 Tests:       2 engine + 3 UI tests and locked WASM check pass as reported by author; shared transport 6 native tests and WASM test compilation pass
-Independent: Luna high R1 FAIL on exact pre-repin patch due to pre-copy transport allocation; fixed in shared package and bounded package review PASS; DesignCraft exact-patch R2 pending
+Independent: Luna high R1 FAIL on exact pre-repin patch due to pre-copy transport allocation; shared package passed bounded review after fixes; DesignCraft exact-patch review pending after repin
 Open:        browser transport runtime, Seafile version/reopen, and production security NOT VERIFIED
 GPT review:  not a project candidate; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC, or patch published
+```
+
+### GR-021 — shared transport Open admission
+
+```text
+Status:      bounded local transport remediation; project GPT verdict remains FAIL on 0edbe524
+Base:        craft-platform package revision d59c3ace80140fa20672131c5ae7c4e6392f8da6
+Change:      incoming Open bytes share a cumulative 256 MiB and 64-message budget across same-origin/app transports in one WASM runtime; repeat Open remains supported
+Review:      Luna high R2 found one-open compatibility and per-listener state defects; latest bounded review R4 found no functional findings, one wording nit corrected
+Tests:       7 native package tests, WASM `--tests` compile, 19 checksums, formatting and diff checks pass; browser tests were not run
+Open:        DesignCraft/EffectCraft/FilmCraft app patches need this new transport pin and exact-patch reviews; browser and Seafile runtime remain NOT VERIFIED
+Publication: no upstream publication; project and public deployment readiness unchanged
+Evidence:    `docs/reviews/GR-021/TRANSPORT-OPEN-ADMISSION-REVIEW.md`
+```
+
+### GR-022 — EffectCraft host-save acknowledgement prototype
+
+```text
+Status:      bounded local prototype; independent exact-patch review pending
+Base:        storytold/effectcraft `049070d65c66a73f322b496b22521816e0018f14`
+Finding:     Luna high identified a `templates.create` replacement bypass; engine guard now rejects it in host mode and regression test preserves standalone behavior
+Checks:      host-mode template guard and host-save tests pass; Rust 1.95 locked WASM check, formatting and diff checks pass, per author
+Open:        repin to next transport commit and re-review; browser messaging and Seafile save/version/reopen NOT VERIFIED
+Publication: no upstream change
 ```
 
 ## GPT review instruction (for the future session)

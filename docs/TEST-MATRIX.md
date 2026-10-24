@@ -184,15 +184,16 @@ Patch and limits: `docs/reviews/GR-019/README.md`.
 
 Patch, exact source pin, checks and evidence limits: `docs/reviews/GR-020/README.md`.
 
-## 13. Shared host-message pre-copy limits (GR-021 remediation)
+## 13. Shared host-message pre-copy and repeat-Open bounds (GR-021 remediation)
 
 | # | Test | Expected | Result |
 |---|---|---|---|
-| 13.1 | Native `craft-platform` suite | protocol and lifecycle tests pass | [x] 6 passed via `./scripts/check-craft-platform.sh` |
+| 13.1 | Native `craft-platform` suite | protocol and lifecycle tests pass | [x] 7 passed via `./scripts/check-craft-platform.sh` |
 | 13.2 | Browser parser test compilation | oversized ArrayBuffer/Uint8Array and strings rejected before Rust allocation/conversion | [x] `cargo check --features browser --target wasm32-unknown-unknown --tests` passes; tests compiled but were not browser-executed |
 | 13.3 | Package manifest integrity | all packaged source/attribution hashes match | [x] `sha256sum -c SHA256SUMS` from `integration/rust/craft-platform/` passes (19 entries) |
 | 13.4 | Independent bounded review | pre-copy caps close DesignCraft review P2 | [x] Luna high review PASS; browser tests compile-only; see `docs/reviews/GR-021/TRANSPORT-PRECOPY-REVIEW.md` |
-| 13.5 | DesignCraft application patch review | adapter is safe with hardened transport pin | [ ] Pending repin to new immutable package commit and exact-patch re-review |
+| 13.5 | Repeated Open compatibility and shared budget | same-session OpenRequest works; repeated buffers remain bounded across transport/listener instances | [~] Native cumulative byte/message test passes; WASM sharing test compiles; Luna high round 4 found no functional issue; browser tests not executed; see `TRANSPORT-OPEN-ADMISSION-REVIEW.md` |
+| 13.6 | DesignCraft application patch review | adapter is safe with hardened transport pin | [ ] Pending repin to new immutable package commit and exact-patch re-review |
 
 This package fix does not establish browser runtime, Seafile persistence, or
 application-level open/edit/save/reopen behavior.

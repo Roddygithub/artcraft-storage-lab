@@ -85,6 +85,10 @@ do not choose a frame or draw an application header.
 The optional `browser` feature also exposes the GR-016 same-origin parent-frame
 host transport and the app-agnostic ticket protocol. It validates exact origin
 and parent source, owns the message listener, transfers bytes, and tracks
-bounded one-time save acknowledgements. See `PROVENANCE.md` for the pinned source
-snapshot and packaging details. This local artifact does not establish an
-upstream release or an app integration contract.
+bounded one-time save acknowledgements. Incoming Open bytes and metadata are
+size-checked before conversion/copy, with cumulative byte and message budgets
+shared across the app runtime so in-session Open remains available without
+unbounded copies.
+See `PROVENANCE.md` for the pinned source snapshot and packaging details. This
+local artifact does not establish an upstream release or an app integration
+contract.

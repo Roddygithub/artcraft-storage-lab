@@ -6,7 +6,8 @@ changes from `/tmp/artcraft-gr016-craft-libs` applied. Those changes add the
 host protocol and browser host transport, and enable the required `web-sys`
 features. The browser message parser is locally hardened to bound incoming
 ArrayBuffer/Uint8Array lengths and metadata strings before copying them into
-Rust-owned buffers. The source checkout's own `crates/platform` Cargo manifest inherited
+Rust-owned buffers, and bounds cumulative Open bytes and message count per
+app runtime before payload copies, shared across transport instances. The source checkout's own `crates/platform` Cargo manifest inherited
 workspace package, dependency, and lint keys; this artifact replaces those
 inheritance entries with their explicit values so it can build independently.
 The repository root has a minimal Cargo workspace that exposes this nested

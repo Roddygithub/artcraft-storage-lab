@@ -1,5 +1,21 @@
 # HISTORY
 
+## 2026-10-24 — GR-021 cumulative Open admission
+
+* Extended the shared browser transport's pre-copy limits to repeated Open
+  messages. A same-origin app runtime allows multiple Opens within a cumulative
+  256 MiB and 64-message budget; separate transports/listeners share the same
+  accounting. This preserves the existing in-session OpenRequest path while
+  bounding repeated large copies and zero-byte message floods.
+* Added native cumulative-budget coverage and a WASM shared-state test. Seven
+  native tests, the WASM browser-feature test compilation, package checksums,
+  formatting and whitespace checks pass. Browser tests were not executed.
+* Luna high round 2 found the one-Open attempt broke compatibility; follow-up
+  review found per-listener state could be bypassed. The final cumulative
+  implementation received bounded PASS in round 4. The app-level GR-021 patch
+  still needs repinning and re-review. See
+  `docs/reviews/GR-021/TRANSPORT-OPEN-ADMISSION-REVIEW.md`.
+
 ## 2026-10-24 — GR-021 shared host-message allocation bounds
 
 * Hardened the shared browser host transport to reject oversized
