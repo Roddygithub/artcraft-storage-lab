@@ -17,7 +17,7 @@ the GR-016 `craft-platform` prototype.
 |---|---|---|
 | `storytold/cadcraft` | `7bf5905ac97316a7896de8cbc12d243f57b09bd8` | [`cadcraft-host-save.patch`](cadcraft-host-save.patch) |
 
-Patch SHA-256: `9026384e7441a12b4eb955f93f7df6845e057a737c031349206abb5f7e810acd`.
+Patch SHA-256: `cb85f2ed0493333d4e3dfa6df959cbc85e460ca208c4f07d9e59f740525a516e`.
 
 The standalone `craft-platform` source snapshot is now packaged at
 [`integration/rust/craft-platform`](../../../integration/rust/craft-platform)
@@ -26,12 +26,11 @@ It has a runnable metadata/native-test/WASM-build check at
 [`scripts/check-craft-platform.sh`](../../../scripts/check-craft-platform.sh).
 The package received a bounded independent review with no blocker/major; see
 the GR-016 packaging review.
-The stored CADCraft patch still has its historical `/tmp` path because this
-worktree has no artifact commit SHA to pin in Cargo. Make the patch portable in
-a second commit: first commit the crate artifact, then replace the patch's path
-with a `git` dependency pinned to that exact commit and refresh its SHA-256.
-Until then, the CADCraft app patch remains a review artifact, not a standalone
-app build or distributable upstream patch.
+The CADCraft patch pins `craft-platform` to repository revision
+`90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`. It applies to a clean CADCraft
+checkout and passes the Rust 1.95 locked WASM check. Exact commands and all four
+app patch hashes are recorded in
+[`../GR-016/PORTABLE-APP-PATCHES-20261024.md`](../GR-016/PORTABLE-APP-PATCHES-20261024.md).
 
 ## Behavior in the patch
 

@@ -1,5 +1,5 @@
 diff --git c/Cargo.lock w/Cargo.lock
-index e5076e8..ff7e4b2 100644
+index e5076e8..7d2c3ec 100644
 --- c/Cargo.lock
 +++ w/Cargo.lock
 @@ -738,8 +738,10 @@ dependencies = [
@@ -13,13 +13,14 @@ index e5076e8..ff7e4b2 100644
   "log",
   "serde_json",
   "wasm-bindgen",
-@@ -948,6 +950,15 @@ name = "craft-docpath"
+@@ -948,6 +950,16 @@ name = "craft-docpath"
  version = "0.1.0"
  source = "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
  
 +[[package]]
 +name = "craft-platform"
 +version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=90c261de22ef75c4c7c5c5cd1c712d483be0bbc8#90c261de22ef75c4c7c5c5cd1c712d483be0bbc8"
 +dependencies = [
 + "js-sys",
 + "wasm-bindgen",
@@ -30,7 +31,7 @@ index e5076e8..ff7e4b2 100644
  name = "craft-ui"
  version = "0.1.0"
 diff --git c/apps/cadcraft-web/Cargo.toml w/apps/cadcraft-web/Cargo.toml
-index 4fb706d..8d07a17 100644
+index 4fb706d..7506961 100644
 --- c/apps/cadcraft-web/Cargo.toml
 +++ w/apps/cadcraft-web/Cargo.toml
 @@ -28,5 +28,7 @@ web-sys = { version = "0.3", features = ["HtmlInputElement", "FileList", "File"]
@@ -41,7 +42,7 @@ index 4fb706d..8d07a17 100644
  wasm-bindgen-futures = "0.4"
 -web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "Location", "Navigator", "Blob", "BlobPropertyBag", "Url", "MessageEvent", "UrlSearchParams", "MediaQueryList"] }
 +web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "Location", "Navigator", "Blob", "BlobPropertyBag", "Url", "MessageEvent", "UrlSearchParams", "MediaQueryList", "Performance"] }
-+craft-platform = { path = "/tmp/artcraft-gr016-craft-libs/crates/platform", features = ["browser"] }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8", package = "craft-platform", features = ["browser"] }
 diff --git c/apps/cadcraft-web/src/download.rs w/apps/cadcraft-web/src/download.rs
 index 68185e3..aa29fd4 100644
 --- c/apps/cadcraft-web/src/download.rs

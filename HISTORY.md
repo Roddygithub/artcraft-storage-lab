@@ -8,13 +8,31 @@
   explicit standalone metadata.
 * Added a lockfile and `scripts/check-craft-platform.sh`; metadata, six native
   tests, and the browser-feature WASM check pass without the `/tmp` checkout.
-* The GR-016/GR-018 stored app manifests still need a follow-up exact git rev
-  after this artifact is committed. No project GPT verdict or upstream
+* WordCraft/GridCraft/PdfCraft/CADCraft app manifests were subsequently pinned
+  to this artifact's immutable Git revision; clean-checkout locked WASM builds
+  are recorded in the follow-up report. No project GPT verdict or upstream
   readiness changed.
 * A bounded independent Sol low review found no blocker/major; its minor
-  metadata-lock finding was fixed and the standalone check was rerun. App patch
-  pins and clean app builds remain open. See
+  metadata-lock finding was fixed and the standalone check was rerun. See
   `docs/reviews/GR-016/REVIEW-PORTABLE-CRAFT-PLATFORM-20261024.md`.
+
+## 2026-10-24 — Pin shared transport in four Craft app patches
+
+* Replaced the local `/tmp` dependency in the stored WordCraft, GridCraft,
+  PdfCraft, and CADCraft patches with immutable `craft-platform` revision
+  `90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`.
+* Applied each patch to a clean checkout at its recorded source SHA and passed
+  Rust 1.95 WASM `cargo check --locked`. Neither WordCraft nor GridCraft patch
+  changes the temporary `wasm-opt=0` setting used for their functional browser
+  bundles; optimized bundle performance remains unverified.
+* Generated diffs match the stored patch hashes. The report is
+  `docs/reviews/GR-016/PORTABLE-APP-PATCHES-20261024.md`. This closes build
+  reproducibility for these four patches only; other apps, runtime coverage,
+  overall GPT review and upstream readiness remain open/locked.
+* GPT-6.1 Sol independently reviewed the follow-up: round 1 found two MINOR
+  stale-status/optimizer-scope issues; both were corrected, and round 3 returned
+  bounded PASS. See
+  `docs/reviews/GR-016/REVIEW-PORTABLE-APP-PATCHES-SOL-LOW-20261024.md`.
 
 ## 2026-10-24 — GR-018 CADCraft host-save acknowledgement prototype
 

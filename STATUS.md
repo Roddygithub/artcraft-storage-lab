@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; synthetic Seafile runtime flows reprodu
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; GR-017 evidence is on main; GR-018 CADCraft bounded prototype review passed; no upstream changes
+WORKTREE:   main-only workflow; GR-016/017/018 evidence is on main; four app patches pin the packaged transport and passed bounded Sol review; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -53,7 +53,7 @@ OPEN GAPS:
   review PASS with three minor follow-ups. Its Seafile runtime path is now
   reproduced in the isolated synthetic stack; formula recalculation, GridCraft
   conflict behavior, and deployment security remain NOT VERIFIED.
-- GR-017 adds a ticketed durable-result adapter to PdfCraft in a scratch clone.
+- GR-017 adds a ticketed durable-result adapter to PdfCraft.
   Seven focused native acknowledgement tests, Rust 1.95 WASM check, formatting
   and diff checks pass on the current callback-cap remediation. Sol low rounds
   Sol low round 4 returned bounded PROTOTYPE PASS (no blocker/major; lifecycle
@@ -75,8 +75,8 @@ OPEN GAPS:
   CADCraft instance. The Seafile readback hash is recorded; exact
   editor-to-gateway bytes were not captured. The bundle used `wasm-opt=0`, and
   timeout/security paths remain unverified, so this is not publication-ready.
-  The standalone shared transport artifact now builds in this repository; the
-  stored app patch still needs a second commit to pin its exact git revision.
+  The stored app patch pins the packaged transport revision and now passes a
+  clean Rust 1.95 locked WASM check.
   Evidence is in `docs/reviews/GR-018/`.
 - GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
 - GR-016 WordCraft and GridCraft now both have reproduced shared-transport Seafile save/version/reopen flows on the isolated synthetic stack. GridCraft also recalculated `SUM(B2:B2)` after B2 changed to 1337, persisted a new Seafile version, and reopened showing 1337. GR-018 CADCraft now has a separate synthetic Seafile history/reopen run. Exact outbound-payload hashing and optimized-bundle performance remain open. These synthetic runs do not establish public deployment readiness or all-app support.
@@ -89,20 +89,20 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- commit the standalone shared transport artifact, then pin GR-016/GR-018 app
-  manifests to that exact commit in a follow-up before treating app patches as
-  portable; package review found no blocker/major, and the metadata-lock minor
-  was fixed
-- reproduce CADCraft save/version/reopen against isolated synthetic Seafile;
-  current CADCraft browser smoke uses only in-memory host storage
-- continue remaining Craft Web adapters from the GR-016 per-app seam inventory
+- continue app-by-app adapters from the GR-016 seam inventory; WordCraft,
+  GridCraft, PdfCraft and CADCraft now use the immutable packaged transport
+  revision and compile from clean pinned-source checkouts with Rust 1.95
+- retain the limits: only those four patches have reproducible builds; other
+  app integrations, runtime coverage and deployment controls remain incomplete
+- continue remaining Craft Web adapters from the GR-016 per-app seam inventory;
+  CADCraft synthetic Seafile save/version/reopen evidence is already recorded
 - rerun the Playwright protocol suite when its dependency is available; the
   current T3 Chromium preview verifies Open-request guidance and dirty-state
   preservation only
 - continue app-by-app seam implementation and evidence; do not infer all-app support from the WordCraft/GridCraft synthetic Seafile runs
-- the standalone GR-016 transport artifact is present, but stored app patches
-  still need an exact git revision in a follow-up commit; no upstream dependency
-  or patch has been published
+- the standalone GR-016 transport artifact and four exact Git-pinned app patch
+  manifests are present; clean-checkout WASM build evidence is recorded; no
+  upstream dependency or patch has been published
 - keep later app adapters scoped to their observed per-app open/serialize/save
   seams; a common transport does not create an editor serializer or durable ack
 - keep Seafile/provider persistence in the connector and editor lifecycle in

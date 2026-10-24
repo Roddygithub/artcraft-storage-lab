@@ -38,20 +38,18 @@ GPT-6.1 Sol low independently reviewed the package with no blocker/major; its
 minor lockfile finding was fixed by adding `--locked` to metadata. See
 [`REVIEW-PORTABLE-CRAFT-PLATFORM-20261024.md`](REVIEW-PORTABLE-CRAFT-PLATFORM-20261024.md).
 
-The stored WordCraft/GridCraft patch manifests still contain the scratch path:
-a valid Cargo `git + rev` cannot point at this artifact until it exists in a
-repository commit. Use two commits when making these patches portable: first
-commit the standalone artifact; then set both manifests to the repository URL
-and that exact first commit SHA, and refresh the patch checksums. No branch
-dependency or guessed revision is valid. Until that second step, the app patch
-series remain review artifacts and are not independently applicable.
+The WordCraft and GridCraft patch manifests now pin the packaged transport to
+the immutable repository revision `90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`.
+Both patches were applied to clean checkouts and passed Rust 1.95 WASM checks
+with `--locked`. Exact patch hashes and commands are recorded in
+[`PORTABLE-APP-PATCHES-20261024.md`](PORTABLE-APP-PATCHES-20261024.md).
 
 The exact scratch diffs are preserved in [`patches/`](patches/):
 `craft-libs-shared-transport.patch`, `wordcraft-shared-transport.patch`, and
 `gridcraft-shared-transport.patch`. The app diffs include their pre-existing
 lab GR-014/GR-010 bridge patches before the common transport refactor. They are
-review artifacts with a temporary `/tmp` path dependency, not ready-to-apply
-upstream patches.
+review artifacts with a pinned dependency on this repository; this verifies
+build reproducibility, not upstream readiness or the remaining app integrations.
 
 ## Behavior preserved by the adapters
 

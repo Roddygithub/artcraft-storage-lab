@@ -18,12 +18,13 @@ The experiment uses read-only scratch clones:
 | Repository | Base SHA | Notes |
 | --- | --- | --- |
 | `storytold/pdfcraft` | `57e531ccca0047597809748b5cb4276336d6051a` | shallow source clone; no upstream edits |
-| `storytold/craft-libs` | `f180fc0d35d521c5d18e118c881d3efde1ec1eee` | GR-016 transport prototype; dependency is a temporary local path |
+| `storytold/craft-libs` | `f180fc0d35d521c5d18e118c881d3efde1ec1eee` | source base for packaged transport; app patch pins repository revision `90c261de22ef75c4c7c5c5cd1c712d483be0bbc8` |
 
 Patch: [`patches/pdfcraft-durable-host-ack.patch`](patches/pdfcraft-durable-host-ack.patch).
-The manifest deliberately points at `/tmp/artcraft-gr016-craft-libs`; the patch
-is evidence for review, not a portable upstream patch. It requires the GR-016
-transport patch/revision first.
+The transport dependency is pinned to the packaged `craft-platform` revision
+`90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`. The patch was applied to a clean
+PdfCraft checkout and passed the Rust 1.95 locked WASM check; details and its
+exact hash are in [`../GR-016/PORTABLE-APP-PATCHES-20261024.md`](../GR-016/PORTABLE-APP-PATCHES-20261024.md).
 
 ## Implemented behavior
 

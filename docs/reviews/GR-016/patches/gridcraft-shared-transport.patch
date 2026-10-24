@@ -1,14 +1,15 @@
 diff --git c/Cargo.lock w/Cargo.lock
-index e041aaf..7804499 100644
+index e041aaf..48d08dd 100644
 --- c/Cargo.lock
 +++ w/Cargo.lock
-@@ -742,6 +742,15 @@ dependencies = [
+@@ -742,6 +742,16 @@ dependencies = [
   "libc",
  ]
  
 +[[package]]
 +name = "craft-platform"
 +version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=90c261de22ef75c4c7c5c5cd1c712d483be0bbc8#90c261de22ef75c4c7c5c5cd1c712d483be0bbc8"
 +dependencies = [
 + "js-sys",
 + "wasm-bindgen",
@@ -18,7 +19,7 @@ index e041aaf..7804499 100644
  [[package]]
  name = "craft-print"
  version = "0.1.0"
-@@ -1657,6 +1666,7 @@ dependencies = [
+@@ -1657,6 +1667,7 @@ dependencies = [
  name = "gridcraft-web"
  version = "0.10.0"
  dependencies = [
@@ -27,7 +28,7 @@ index e041aaf..7804499 100644
   "egui",
   "gridcraft-engine",
 diff --git c/Cargo.toml w/Cargo.toml
-index e8a6dc6..fc95d62 100644
+index e8a6dc6..5b9ff38 100644
 --- c/Cargo.toml
 +++ w/Cargo.toml
 @@ -7,11 +7,12 @@ default-members = ["crates/*", "apps/gridcraft", "apps/gridcraft-cli", "xtask"]
@@ -40,7 +41,7 @@ index e8a6dc6..fc95d62 100644
  
  [workspace.dependencies]
  # internal
-+craft-platform = { path = "/tmp/artcraft-gr016-craft-libs/crates/platform" }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8", package = "craft-platform" }
  gridcraft-core = { path = "crates/core" }
  gridcraft-numfmt = { path = "crates/numfmt" }
  gridcraft-formula = { path = "crates/formula" }

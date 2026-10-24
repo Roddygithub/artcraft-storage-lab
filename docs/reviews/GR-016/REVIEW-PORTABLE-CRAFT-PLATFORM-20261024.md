@@ -42,3 +42,14 @@ can close.
 No upstream app repository, upstream issue/PR, or production service was
 changed. This review does not change the project GPT FAIL, public-deployment
 readiness, or upstream lock.
+
+
+## Follow-up: app patch portability
+
+The open item above was addressed after this review: the four stored WordCraft,
+GridCraft, PdfCraft, and CADCraft patches now pin the package at immutable
+revision `90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`. All four patches were
+applied to clean pinned-source checkouts and passed Rust 1.95 locked WASM checks;
+the generated diff hashes match the stored patches. Independent review of this
+follow-up is pending in `PORTABLE-APP-PATCHES-20261024.md`. This does not change
+the bounded package review into a project-level PASS.

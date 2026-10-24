@@ -1,14 +1,15 @@
 diff --git i/Cargo.lock w/Cargo.lock
-index 496eeab..f2bd284 100644
+index 496eeab..7b00fec 100644
 --- i/Cargo.lock
 +++ w/Cargo.lock
-@@ -1147,6 +1147,15 @@ name = "craft-docpath"
+@@ -1147,6 +1147,16 @@ name = "craft-docpath"
  version = "0.1.0"
  source = "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
  
 +[[package]]
 +name = "craft-platform"
 +version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=90c261de22ef75c4c7c5c5cd1c712d483be0bbc8#90c261de22ef75c4c7c5c5cd1c712d483be0bbc8"
 +dependencies = [
 + "js-sys",
 + "wasm-bindgen",
@@ -18,7 +19,7 @@ index 496eeab..f2bd284 100644
  [[package]]
  name = "craft-print"
  version = "0.1.0"
-@@ -4415,6 +4424,7 @@ dependencies = [
+@@ -4415,6 +4425,7 @@ dependencies = [
  name = "pdfcraft-web"
  version = "0.13.0"
  dependencies = [
@@ -27,14 +28,14 @@ index 496eeab..f2bd284 100644
   "egui",
   "js-sys",
 diff --git i/apps/pdfcraft-web/Cargo.toml w/apps/pdfcraft-web/Cargo.toml
-index a64d729..bf1b681 100644
+index a64d729..d332f69 100644
 --- i/apps/pdfcraft-web/Cargo.toml
 +++ w/apps/pdfcraft-web/Cargo.toml
 @@ -15,6 +15,7 @@ eframe = { workspace = true, features = ["default_fonts", "glow", "persistence",
  egui = { workspace = true }
  
  [target.'cfg(target_arch = "wasm32")'.dependencies]
-+craft-platform = { path = "/tmp/artcraft-gr016-craft-libs/crates/platform", version = "0.1.0", features = ["browser"] }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8", package = "craft-platform", version = "0.1.0", features = ["browser"] }
  wasm-bindgen-futures = "0.4"
  web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlCanvasElement", "HtmlElement", "Location", "Url", "UrlSearchParams", "Response", "Event", "MessageEvent", "EventTarget"] }
  js-sys = "0.3"
