@@ -199,8 +199,8 @@ Patch, exact source pin, checks and evidence limits: `docs/reviews/GR-020/README
 | 13.9 | Malformed host save acknowledgements | missing/non-boolean `ok` does not consume a ticket as a false ACK; valid true/false retain behavior | [x] Parser tests cover malformed values and valid booleans; WASM test target compiled but was not browser-executed; 7 native tests and 19 checksums pass; see `docs/reviews/GR-024/` |
 
 GR-024 does not establish browser runtime, Seafile persistence, or
-application-level open/edit/save/reopen behavior. Its immutable pin must be
-adopted by app patches after the transport commit is created.
+application-level open/edit/save/reopen behavior. Active app patches must pin
+immutable transport revision `56c5e16d79b77751106173c13111ef4fe0a2c0ec`.
 
 ## 9. How results are recorded
 
