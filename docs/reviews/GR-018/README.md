@@ -1,8 +1,9 @@
 # GR-018 — CADCraft durable host-save acknowledgement
 
-Status: **bounded local prototype review PASS (GPT-6.1 Sol low round 4).** This
-is not a project-level GPT verdict and does not establish CADCraft Seafile E2E
-or unlock upstream publication. The project-level GPT result remains FAIL on
+Status: **bounded local prototype review PASS (GPT-6.1 Sol low round 4); a
+separate synthetic Seafile runtime E2E is also reproduced.** These bounded
+results are not a project-level GPT verdict and do not unlock upstream
+publication. The project-level GPT result remains FAIL on
 `0edbe524b4fa321b0f73f8601afef390e7f785e6`.
 
 ## Scope and source
@@ -68,6 +69,11 @@ drawing, export, and mixed operations. Findings and review scope are recorded
 in `REVIEW-SOL-LOW-R1.md` through `REVIEW-SOL-LOW-R4.md`.
 
 **NOT VERIFIED:** browser-host behavior, save confirmation in a browser, Seafile
-version creation, CADCraft close/reopen persistence, production authorization,
-and standalone reproducibility. This work does not change overall project,
-public deployment, or upstream readiness.
+The separate synthetic Seafile run reproduced a browser save, Seafile version,
+and fresh reopen; its full record is in
+[`CADCRAFT-SEAFILE-E2E-20261024.md`](CADCRAFT-SEAFILE-E2E-20261024.md).
+
+**NOT VERIFIED:** browser timeout/failure and adversarial-origin paths,
+production authorization, exact editor-to-gateway byte identity, optimized
+bundle performance, and standalone reproducibility. This work does not change
+overall project, public deployment, or upstream readiness.

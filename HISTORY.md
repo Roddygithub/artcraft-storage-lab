@@ -25,6 +25,15 @@
   unverified. A second browser run rejected a save, confirmed dirty remained
   true, then accepted a retry. See
   `docs/reviews/GR-018/CADCRAFT-BROWSER-ACK-SMOKE-20261024.md`.
+* A subsequent isolated synthetic Seafile run used the real Seahub file list:
+  uploading a synthetic DXF fixture, clicking it opened CADCraft Web/WASM,
+  adding a circle and Ctrl+S produced a Seafile history entry and new file ID,
+  and a fresh Seahub click reopened the circle in a new CADCraft instance.
+  Seafile API readback was 17,501 bytes and contained a `CIRCLE` entity. The
+  readback hash is recorded, but the exact editor-to-gateway message bytes were
+  not captured. The test remained local/synthetic; the shared transport path,
+  non-optimized wasm bundle, public deployment and all-app coverage remain open.
+  See `docs/reviews/GR-018/CADCRAFT-SEAFILE-E2E-20261024.md`.
 
 ## 2026-10-24 — GR-016 shared transport on synthetic Seafile: WordCraft and GridCraft
 

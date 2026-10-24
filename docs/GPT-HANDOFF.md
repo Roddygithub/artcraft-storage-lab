@@ -458,7 +458,12 @@ round-1/2 finding was remediated and round 3's export-timeout message was
 corrected. Rust 1.95 WASM check, eight focused acknowledgement tests and 344
 engine tests pass. Full evidence is in `docs/reviews/GR-018/`.
 
-The adapter still depends on the GR-016 transport at an absolute `/tmp` path.
-This is not a portable build. No CADCraft browser save/reopen or Seafile version
-E2E was run. Project GPT remains FAIL on `0edbe524`; public deployment and
-upstream publication remain locked.
+The local build still depends on the GR-016 transport at an absolute `/tmp`
+path and used `wasm-opt=0`; standalone reproducibility and optimized bundle
+performance remain unverified. A later isolated synthetic Seafile runtime run
+did reproduce Seahub file-list click → CADCraft circle edit → save confirmation
+→ new Seafile history entry/file ID → fresh Seahub click and CADCraft reopen
+with the circle visible. The API readback hash is recorded, but the exact
+editor-to-gateway message bytes were not independently hashed. See
+`docs/reviews/GR-018/CADCRAFT-SEAFILE-E2E-20261024.md`. Project GPT remains
+FAIL on `0edbe524`; public deployment and upstream publication remain locked.
