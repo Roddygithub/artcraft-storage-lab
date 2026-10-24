@@ -1,0 +1,720 @@
+diff --git c/Cargo.lock w/Cargo.lock
+index e75e8d5a..108aecd5 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
+@@ -851,6 +851,16 @@ dependencies = [
+  "thiserror 2.0.21",
+ ]
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=91836a9ebad5ffcd8f1966fb4f36dc84387f2cdd#91836a9ebad5ffcd8f1966fb4f36dc84387f2cdd"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-print"
+ version = "0.1.0"
+@@ -1265,6 +1275,7 @@ dependencies = [
+ name = "designcraft-web"
+ version = "0.12.0"
+ dependencies = [
++ "craft-platform",
+  "designcraft-engine",
+  "designcraft-format",
+  "designcraft-ui-egui",
+diff --git c/apps/designcraft-web/Cargo.toml w/apps/designcraft-web/Cargo.toml
+index 1667e69e..854a2254 100644
+--- c/apps/designcraft-web/Cargo.toml
++++ w/apps/designcraft-web/Cargo.toml
+@@ -31,3 +31,4 @@ wasm-bindgen = "0.2"
+ wasm-bindgen-futures = "0.4"
+ js-sys = "0.3"
+ web-sys = { version = "0.3", features = ["Event", "EventTarget", "Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "Blob", "BlobPropertyBag", "Url", "Location", "CssStyleDeclaration"] }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "91836a9ebad5ffcd8f1966fb4f36dc84387f2cdd", features = ["browser"] }
+diff --git c/apps/designcraft-web/src/web.rs w/apps/designcraft-web/src/web.rs
+index 27d236a2..8ec6ffb5 100644
+--- c/apps/designcraft-web/src/web.rs
++++ w/apps/designcraft-web/src/web.rs
+@@ -3,7 +3,7 @@
+ use super::browser_policy::{has_query_flag, mime_for};
+ use crate::graphics::{GraphicsState, RecoveryDocument, recovery_documents};
+ use designcraft_engine::Session;
+-use designcraft_ui_egui::{DesignApp, ImportRequest, ImportedFile, Inbox, Services};
++use designcraft_ui_egui::{DesignApp, HostEvent, HostEventQueue, ImportRequest, ImportedFile, Inbox, Services};
+ use wasm_bindgen::JsCast as _;
+ 
+ const DOC_EXTS: &[&str] = &["designcraft", "idml", "indd", "indt"];
+@@ -72,11 +72,63 @@ pub fn start() {
+                         });
+                     }
+                     let inbox: Inbox = Inbox::default();
+-                    let mut app = DesignApp::new(Session::new(), services(inbox.clone(), cc.egui_ctx.clone()));
+-                    if has_query_flag(&query(), "sample") {
++                    let host_requested = host_parent_requested(&query());
++                    let host_events: HostEventQueue = Default::default();
++                    let mut platform_services = services(inbox.clone(), cc.egui_ctx.clone());
++                    let mut host_listener = None;
++                    if host_requested {
++                        platform_services.host_mode = true;
++                        match craft_platform::browser::host::HostTransport::current("designcraft") {
++                            Ok(Some(transport)) => {
++                                let queue = host_events.clone();
++                                let repaint = cc.egui_ctx.clone();
++                                match transport.listen(move |message| {
++                                    let event = match message {
++                                        craft_platform::browser::host::HostMessage::Open { name, bytes } => HostEvent::Open { name, bytes },
++                                        craft_platform::browser::host::HostMessage::SaveResult { ticket, ok, error } => {
++                                            HostEvent::SaveResult { ticket: ticket.as_str().to_owned(), ok, error }
++                                        }
++                                    };
++                                    if queue.lock().unwrap_or_else(|e| e.into_inner()).enqueue(event) {
++                                        repaint.request_repaint();
++                                    } else {
++                                        log::warn!("dropping duplicate or over-limit DesignCraft host message");
++                                    }
++                                }) {
++                                    Ok(listener) => {
++                                        let save_transport = transport.clone();
++                                        platform_services.host_save = Some(Box::new(move |ticket, name, bytes| {
++                                            let ticket =
++                                                craft_platform::host_protocol::SaveTicket::new(ticket.to_owned()).ok_or("invalid save ticket")?;
++                                            save_transport.post_save(&ticket, name, bytes, false).map_err(|e| format!("{e:?}"))
++                                        }));
++                                        let dirty_transport = transport.clone();
++                                        platform_services.host_dirty =
++                                            Some(Box::new(move |dirty| dirty_transport.post_dirty(dirty).map_err(|e| format!("{e:?}"))));
++                                        platform_services.host_events = Some(host_events.clone());
++                                        if let Err(error) = transport.post_ready(env!("CARGO_PKG_VERSION")) {
++                                            let _ = transport.post_failed(&format!("could not announce readiness: {error:?}"));
++                                        }
++                                        host_listener = Some(listener);
++                                    }
++                                    Err(error) => {
++                                        let _ = transport.post_failed(&format!("could not install parent listener: {error:?}"));
++                                        log::error!("DesignCraft parent bridge unavailable: {error:?}");
++                                    }
++                                }
++                            }
++                            Ok(None) => log::error!("DesignCraft host mode requires a same-origin parent"),
++                            Err(error) => log::error!("DesignCraft host bridge failed: {error:?}"),
++                        }
++                    }
++                    let mut app = DesignApp::new(Session::new(), platform_services);
++                    if host_requested && host_listener.is_none() {
++                        app.status_error("Host mode", "same-origin parent transport unavailable; saving is disabled");
++                    }
++                    if !host_requested && has_query_flag(&query(), "sample") {
+                         let _ = app.run("file.newSample", serde_json::json!({}));
+                     }
+-                    Ok(Box::new(WebShell { app, inbox, graphics: creator_graphics }))
++                    Ok(Box::new(WebShell { app, inbox, graphics: creator_graphics, _host_listener: host_listener }))
+                 }),
+             )
+             .await;
+@@ -339,12 +391,17 @@ fn query() -> String {
+     web_sys::window().and_then(|w| w.location().search().ok()).unwrap_or_default()
+ }
+ 
++fn host_parent_requested(query: &str) -> bool {
++    form_urlencoded::parse(query.strip_prefix('?').unwrap_or(query).as_bytes()).any(|(key, value)| key == "host" && value == "parent")
++}
++
+ /// Wraps the app to read dropped files asynchronously (browsers can't read them synchronously)
+ /// and feed them through the inbox.
+ struct WebShell {
+     app: DesignApp,
+     inbox: Inbox,
+     graphics: GraphicsState,
++    _host_listener: Option<craft_platform::browser::host::HostListener>,
+ }
+ 
+ impl eframe::App for WebShell {
+diff --git c/crates/engine/src/cmd/file.rs w/crates/engine/src/cmd/file.rs
+index c644284d..c5aa1de6 100644
+--- c/crates/engine/src/cmd/file.rs
++++ w/crates/engine/src/cmd/file.rs
+@@ -180,6 +180,11 @@ pub fn is_document(bytes: &[u8]) -> bool {
+     designcraft_idml::is_idml(bytes) || designcraft_format::starts_designcraft(bytes) || designcraft_format::is_designcraft(bytes)
+ }
+ 
++/// Whether `bytes` are a native DesignCraft package (not an IDML import).
++pub fn is_native_designcraft(bytes: &[u8]) -> bool {
++    designcraft_format::starts_designcraft(bytes) || designcraft_format::is_designcraft(bytes)
++}
++
+ /// How much of a file [`is_document`] needs to recognise a package by its `mimetype` entry.
+ pub const DOCUMENT_SNIFF_BYTES: u64 = 64 << 10;
+ 
+diff --git c/crates/engine/src/cmd/mod.rs w/crates/engine/src/cmd/mod.rs
+index 1d6294ea..5d03855b 100644
+--- c/crates/engine/src/cmd/mod.rs
++++ w/crates/engine/src/cmd/mod.rs
+@@ -347,7 +347,8 @@ pub fn file_from(b: &[u8]) -> Result<designcraft_doc::Document> {
+ pub(crate) use datamerge::sync_placeholders;
+ pub(crate) use file::load_document_fonts;
+ pub use file::{
+-    DOCUMENT_SNIFF_BYTES, RecentPreview, base64_decode, base64_encode, from_bytes, is_document, recent_preview, to_bytes, with_document_extension,
++    DOCUMENT_SNIFF_BYTES, RecentPreview, base64_decode, base64_encode, from_bytes, is_document, is_native_designcraft, recent_preview, to_bytes,
++    with_document_extension,
+ };
+ pub use layout::chapter_numbering;
+ pub use paste_svg::is_svg_markup;
+diff --git c/crates/engine/src/lib.rs w/crates/engine/src/lib.rs
+index d16dc9dd..4cf72eff 100644
+--- c/crates/engine/src/lib.rs
++++ w/crates/engine/src/lib.rs
+@@ -112,6 +112,26 @@ pub struct DocState {
+     pub fonts: Option<Arc<FontScope>>,
+ }
+ 
++/// Immutable state captured for a remote host save. The host may persist these bytes after the
++/// user has continued editing; acknowledging it advances only this saved baseline.
++#[derive(Clone, Debug)]
++pub struct HostSaveSnapshot {
++    uid: u64,
++    revision: u64,
++    base: Arc<Document>,
++    document: Arc<Document>,
++    pub bytes: Vec<u8>,
++}
++
++/// The small, byte-free baseline retained while a host persists a [`HostSaveSnapshot`].
++#[derive(Clone, Debug)]
++pub struct HostSaveBaseline {
++    uid: u64,
++    revision: u64,
++    base: Arc<Document>,
++    document: Arc<Document>,
++}
++
+ /// A document's font scope ([`designcraft_fonts::FontDb::load_document_fonts`]): its fonts are
+ /// found until the document's state (with every copy of it) is gone — closed, reverted, or its
+ /// session ended.
+@@ -381,6 +401,33 @@ impl Default for Session {
+ }
+ 
+ impl Session {
++    /// Serialize the active, pathless document for a host save without changing its saved state.
++    pub fn host_save_snapshot(&self, uid: u64) -> Result<HostSaveSnapshot> {
++        let st = self.active().filter(|st| st.uid == uid).ok_or(EngineError::NoDocument)?;
++        if st.path.is_some() || st.preview_stash.is_some() || st.interaction.is_some() {
++            return Err(EngineError::Other("document is not in a host-saveable state".into()));
++        }
++        let document = st.doc.clone();
++        let bytes = cmd::to_bytes(&document)?;
++        Ok(HostSaveSnapshot { uid, revision: st.revision, base: st.saved_doc.clone(), document, bytes })
++    }
++
++    pub fn host_save_baseline(snapshot: &HostSaveSnapshot) -> HostSaveBaseline {
++        HostSaveBaseline { uid: snapshot.uid, revision: snapshot.revision, base: snapshot.base.clone(), document: snapshot.document.clone() }
++    }
++
++    /// Apply a durable host acknowledgement to the captured snapshot, preserving any later edits.
++    /// Returns the document's dirty state after acknowledgement.
++    pub fn acknowledge_host_save(&mut self, snapshot: HostSaveBaseline) -> Result<bool> {
++        let st = self.docs.iter_mut().find(|st| st.uid == snapshot.uid).ok_or(EngineError::NoDocument)?;
++        if st.path.is_some() || !Arc::ptr_eq(&st.saved_doc, &snapshot.base) {
++            return Err(EngineError::Other("host save snapshot is stale".into()));
++        }
++        st.saved_doc = snapshot.document;
++        st.saved_revision = snapshot.revision;
++        Ok(st.is_dirty())
++    }
++
+     /// The name `file.new` gives the next document without a title (New Document shows it).
+     pub fn next_untitled_title(&self) -> String {
+         format!("Untitled-{}", self.untitled.saturating_add(1))
+@@ -751,6 +798,8 @@ mod tests_autosize;
+ #[cfg(test)]
+ mod tests_file_guard;
+ #[cfg(test)]
++mod tests_host_save;
++#[cfg(test)]
+ mod tests_idml;
+ #[cfg(test)]
+ mod tests_ime;
+diff --git c/crates/engine/src/tests_host_save.rs w/crates/engine/src/tests_host_save.rs
+new file mode 100644
+index 00000000..44e96a6e
+--- /dev/null
++++ w/crates/engine/src/tests_host_save.rs
+@@ -0,0 +1,50 @@
++use crate::Session;
++use serde_json::json;
++use std::sync::Arc;
++
++#[test]
++fn host_acknowledges_only_the_captured_snapshot_and_reopens_its_bytes() {
++    let mut session = Session::new();
++    session.execute("file.new", &json!({"title": "before"})).unwrap();
++    let uid = session.active().unwrap().uid;
++    let snapshot = session.host_save_snapshot(uid).unwrap();
++    let baseline = Session::host_save_baseline(&snapshot);
++    assert!(!session.active().unwrap().is_dirty());
++
++    session
++        .edit(|doc, _| {
++            doc.title = "after".into();
++            Ok(())
++        })
++        .unwrap();
++    assert!(session.acknowledge_host_save(baseline.clone()).unwrap());
++    assert!(session.active().unwrap().is_dirty());
++
++    let reopened = crate::cmd::from_bytes(&snapshot.bytes).unwrap();
++    assert_eq!(reopened.title, "before");
++    let current = session.active().unwrap();
++    assert_eq!(current.doc.title, "after");
++    assert!(Arc::ptr_eq(&current.saved_doc, &snapshot.document));
++}
++
++#[test]
++fn host_snapshot_rejects_path_and_stale_baseline() {
++    let mut session = Session::new();
++    session.execute("file.new", &json!({})).unwrap();
++    session.execute("frame.create", &json!({"rect": [10, 10, 100, 100]})).unwrap();
++    let uid = session.active().unwrap().uid;
++    let snapshot = session.host_save_snapshot(uid).unwrap();
++    let baseline = Session::host_save_baseline(&snapshot);
++    session
++        .edit(|doc, _| {
++            doc.title = "edited".into();
++            Ok(())
++        })
++        .unwrap();
++    session.acknowledge_host_save(baseline.clone()).unwrap();
++    assert!(session.acknowledge_host_save(baseline).is_err());
++
++    let uid = session.active().unwrap().uid;
++    session.active_mut().unwrap().path = Some("/tmp/document.designcraft".into());
++    assert!(session.host_save_snapshot(uid).is_err());
++}
+diff --git c/crates/ui-egui/src/lib.rs w/crates/ui-egui/src/lib.rs
+index b149cea6..be498e89 100644
+--- c/crates/ui-egui/src/lib.rs
++++ w/crates/ui-egui/src/lib.rs
+@@ -30,6 +30,8 @@ mod section_options;
+ mod shortcut_import;
+ pub mod story_editor;
+ pub mod taskbar;
++#[cfg(test)]
++mod tests_host_save;
+ pub mod theme;
+ pub mod title_bar;
+ pub mod toolbar;
+@@ -65,10 +67,58 @@ pub type DownloadFn = Box<dyn FnMut(&str, &[u8]) -> Result<(), String>>;
+ pub type ClipboardFn = Box<dyn FnMut() -> Option<String>>;
+ /// Files delivered asynchronously with their original operation and document identity.
+ pub type Inbox = std::sync::Arc<std::sync::Mutex<Vec<ImportedFile>>>;
++pub type HostEventQueue = std::sync::Arc<std::sync::Mutex<HostEventBuffer>>;
++pub type HostSaveFn = Box<dyn FnMut(&str, &str, &[u8]) -> Result<(), String>>;
++pub type HostDirtyFn = Box<dyn FnMut(bool) -> Result<(), String>>;
++
++pub enum HostEvent {
++    Open { name: String, bytes: Vec<u8> },
++    SaveResult { ticket: String, ok: bool, error: Option<String> },
++}
++
++const MAX_HOST_DOCUMENT_BYTES: usize = 64 * 1024 * 1024;
++
++#[derive(Default)]
++pub struct HostEventBuffer {
++    events: Vec<HostEvent>,
++    expected_ticket: Option<String>,
++    open_queued: bool,
++}
++
++impl HostEventBuffer {
++    pub fn expect_save(&mut self, ticket: Option<String>) {
++        self.expected_ticket = ticket;
++    }
++
++    pub fn enqueue(&mut self, event: HostEvent) -> bool {
++        if self.events.len() >= 2 {
++            return false;
++        }
++        match &event {
++            HostEvent::Open { bytes, .. } if bytes.len() <= MAX_HOST_DOCUMENT_BYTES && !self.open_queued => {
++                self.open_queued = true;
++            }
++            HostEvent::SaveResult { ticket, .. } if self.expected_ticket.as_deref() == Some(ticket) => {}
++            _ => return false,
++        }
++        self.events.push(event);
++        true
++    }
++
++    fn drain(&mut self) -> Vec<HostEvent> {
++        self.open_queued = false;
++        std::mem::take(&mut self.events)
++    }
++}
+ 
+ /// Platform services injected by the host (desktop or web).
+ #[derive(Default)]
+ pub struct Services {
++    /// Explicit parent-frame mode; remote saves never fall back to browser downloads.
++    pub host_mode: bool,
++    pub host_events: Option<HostEventQueue>,
++    pub host_save: Option<HostSaveFn>,
++    pub host_dirty: Option<HostDirtyFn>,
+     /// Open-file dialog for a purpose (`open`, `place`) → path.
+     pub pick_open: Option<PickFn>,
+     /// Save dialog with a suggested name → path. The name may start with the folder the dialog
+@@ -567,6 +617,11 @@ pub struct Perf {
+ }
+ 
+ pub struct DesignApp {
++    host_bound_uid: Option<u64>,
++    host_pending: Option<PendingHostSave>,
++    host_opening: bool,
++    host_dirty_sent: Option<bool>,
++    host_ticket: u64,
+     pending_pdf: Option<ImportedFile>,
+     pub session: Session,
+     pub ui: UiState,
+@@ -589,6 +644,7 @@ pub struct DesignApp {
+     /// The persisted colour settings have been applied this session.
+     pub color_applied: bool,
+     pub perf: Perf,
++    host_name: Option<String>,
+     pub synthetic: Vec<egui::Event>,
+     /// Control input stays separate from native-menu input until its frame is processed.
+     pub(crate) control_synthetic: Vec<egui::Event>,
+@@ -652,6 +708,24 @@ pub struct DesignApp {
+     live_preview: LivePreview,
+ }
+ 
++struct PendingHostSave {
++    ticket: String,
++    snapshot: designcraft_engine::HostSaveBaseline,
++    submitted_at: f64,
++    timeout_reported: bool,
++}
++
++fn host_forbidden_command(id: &str) -> bool {
++    matches!(id, "file.recovery.open" | "file.saveAs" | "file.saveACopy" | "file.close" | "data.merge")
++        || id.starts_with("file.new")
++        || id.starts_with("file.open")
++        || id.starts_with("file.duplicate")
++        || id.starts_with("version.")
++        || id.starts_with("branch.")
++        || id.starts_with("collab.")
++        || matches!(id, "app.openDialog" | "app.openRecent" | "app.newDocumentDialog" | "app.closeDocument" | "app.saveCopyDialog")
++}
++
+ /// The preview a panel opened with `edit.preview`: it stays open while a panel holds it each frame.
+ #[derive(Default)]
+ struct LivePreview {
+@@ -670,6 +744,11 @@ impl DesignApp {
+         // The font menus and the first file opened need the installed fonts: catalog them now.
+         designcraft_fonts::FontDb::global().scan_in_background();
+         DesignApp {
++            host_bound_uid: None,
++            host_pending: None,
++            host_opening: false,
++            host_dirty_sent: None,
++            host_ticket: 0,
+             pending_pdf: None,
+             session,
+             ui: UiState::default(),
+@@ -685,6 +764,7 @@ impl DesignApp {
+             power_zoom: None,
+             color_applied: false,
+             perf: Perf::default(),
++            host_name: None,
+             synthetic: vec![],
+             control_synthetic: vec![],
+             control_input_frame: Default::default(),
+@@ -813,6 +893,17 @@ impl DesignApp {
+ 
+     /// THE entry point for every action (menus, shortcuts, palette, panels, control channel).
+     pub fn run(&mut self, id: &str, params: Value) -> Result<Value, String> {
++        if self.services.host_mode {
++            if matches!(id, "app.save" | "file.save") {
++                return self.host_save();
++            }
++            if matches!(id, "app.saveDialog" | "app.saveCopyDialog" | "file.saveAs" | "file.saveACopy") {
++                return Err("Save As is unavailable for a host-managed document".into());
++            }
++            if !self.host_opening && host_forbidden_command(id) {
++                return Err("This embedded editor is limited to its host document".into());
++            }
++        }
+         if let Some(r) = menus::run_ui(self, id, &params) {
+             return r;
+         }
+@@ -979,6 +1070,9 @@ impl DesignApp {
+     /// Ask the host for a file to open (`open`) or place (`place`). Synchronous pickers run the
+     /// command right away; asynchronous ones (web) deliver the file through the inbox.
+     pub fn pick_and_open(&mut self, purpose: &str) -> Result<Value, String> {
++        if self.services.host_mode {
++            return Err("Open requests must be selected in the host file browser".into());
++        }
+         let target = self.session.active().map(|d| d.uid);
+         if let Some(pick) = self.services.pick_open.as_mut() {
+             return match pick(purpose) {
+@@ -1143,6 +1237,7 @@ impl DesignApp {
+             self.egui_ctx = Some(ctx.clone());
+         }
+         self.window_maximized = ctx.input(|i| i.viewport().maximized.unwrap_or(false));
++        self.process_host_events(ctx);
+         if !self.color_applied {
+             self.color_applied = true;
+             for path in self.ui.color_profiles.clone() {
+@@ -1234,6 +1329,122 @@ impl DesignApp {
+         self.handle_quit(ctx);
+     }
+ 
++    fn host_save(&mut self) -> Result<Value, String> {
++        if self.host_pending.is_some() {
++            return Err("A save is already awaiting host confirmation".into());
++        }
++        if self.session.documents().len() != 1 || self.session.active_index() != Some(0) {
++            return Err("The host editor requires exactly one active document".into());
++        }
++        let uid = self.host_bound_uid.ok_or("No host document is open")?;
++        let snapshot = self.session.host_save_snapshot(uid).map_err(|e| e.to_string())?;
++        if snapshot.bytes.len() > MAX_HOST_DOCUMENT_BYTES {
++            return Err("Document exceeds the host save limit".into());
++        }
++        self.host_ticket = self.host_ticket.checked_add(1).ok_or("Save ticket counter exhausted")?;
++        let ticket = format!("designcraft:{}:{}", uid, self.host_ticket);
++        let name = self.host_name.as_deref().ok_or("Host document name is unavailable")?.to_owned();
++        let save = self.services.host_save.as_mut().ok_or("Host save transport is unavailable")?;
++        self.host_pending = Some(PendingHostSave {
++            ticket: ticket.clone(),
++            snapshot: Session::host_save_baseline(&snapshot),
++            submitted_at: self.egui_ctx.as_ref().map_or(0.0, |ctx| ctx.input(|i| i.time)),
++            timeout_reported: false,
++        });
++        if let Some(queue) = &self.services.host_events {
++            queue.lock().unwrap_or_else(|e| e.into_inner()).expect_save(Some(ticket.clone()));
++        }
++        if let Err(error) = save(&ticket, &name, &snapshot.bytes) {
++            self.host_pending = None;
++            if let Some(queue) = &self.services.host_events {
++                queue.lock().unwrap_or_else(|e| e.into_inner()).expect_save(None);
++            }
++            return Err(format!("Host did not accept the save: {error}"));
++        }
++        self.ui.status = "Saving…".into();
++        if let Some(ctx) = &self.egui_ctx {
++            ctx.request_repaint();
++            ctx.request_repaint_after(std::time::Duration::from_secs(120));
++        }
++        Ok(json!({"pending": true, "ticket": ticket}))
++    }
++
++    fn process_host_events(&mut self, ctx: &egui::Context) {
++        let Some(queue) = self.services.host_events.clone() else { return };
++        let events = queue.lock().unwrap_or_else(|e| e.into_inner()).drain();
++        for event in events {
++            match event {
++                HostEvent::Open { name, bytes } => {
++                    if self.host_bound_uid.is_some()
++                        || !self.session.documents().is_empty()
++                        || bytes.len() > MAX_HOST_DOCUMENT_BYTES
++                        || !name.to_ascii_lowercase().ends_with(".designcraft")
++                    {
++                        self.status_error("Host open", "only one .designcraft document is supported");
++                        continue;
++                    }
++                    if !designcraft_engine::cmd::is_native_designcraft(&bytes) {
++                        self.status_error("Host open", "not a native DesignCraft package");
++                        continue;
++                    }
++                    self.host_opening = true;
++                    let result = self.open_file("file.openBytes", json!({"name": name, "base64": designcraft_engine::cmd::base64_encode(&bytes)}));
++                    self.host_opening = false;
++                    match result {
++                        Ok(_) if self.session.documents().len() == 1 => {
++                            if let Some(doc) = self.session.active().filter(|d| d.path.is_none()) {
++                                self.host_bound_uid = Some(doc.uid);
++                                self.host_name = Some(name);
++                            } else {
++                                self.status_error("Host open", "opened document is not eligible for host editing");
++                            }
++                        }
++                        Ok(_) => self.status_error("Host open", "the file opened more than one document"),
++                        Err(error) => self.status_error("Host open", error),
++                    }
++                }
++                HostEvent::SaveResult { ticket, ok, error } => {
++                    if !self.host_pending.as_ref().is_some_and(|p| p.ticket == ticket) {
++                        continue;
++                    }
++                    queue.lock().unwrap_or_else(|e| e.into_inner()).expect_save(None);
++                    let Some(pending) = self.host_pending.take() else { continue };
++                    if !ok {
++                        self.status_error("Save failed", error.unwrap_or_else(|| "host rejected the save".into()));
++                        continue;
++                    }
++                    match self.session.acknowledge_host_save(pending.snapshot) {
++                        Ok(true) => self.ui.status = "Earlier changes saved; newer edits remain".into(),
++                        Ok(false) => self.ui.status = "Saved to file host".into(),
++                        Err(error) => self.status_error("Save acknowledgement", error),
++                    }
++                }
++            }
++        }
++        let now = ctx.input(|i| i.time);
++        let timed_out = if let Some(pending) = self.host_pending.as_mut() {
++            if !pending.timeout_reported && now - pending.submitted_at >= 120.0 {
++                pending.timeout_reported = true;
++                true
++            } else {
++                false
++            }
++        } else {
++            false
++        };
++        if timed_out {
++            self.status_error("Save outcome unknown", "no durable confirmation arrived; do not retry until host state is checked");
++        }
++        let dirty = self.session.documents().iter().any(|d| d.is_dirty()) || self.host_pending.is_some();
++        if self.host_dirty_sent != Some(dirty) {
++            if let Some(report) = self.services.host_dirty.as_mut() {
++                if report(dirty).is_ok() {
++                    self.host_dirty_sent = Some(dirty);
++                }
++            }
++        }
++    }
++
+     /// Quit: close the window the way its close button does, so unsaved documents ask first.
+     pub fn request_quit(&mut self) {
+         self.quit_requested = true;
+@@ -1416,6 +1627,9 @@ impl DesignApp {
+     /// exists (the event that launched the app); the first ready frame opens them, each as a new
+     /// document through `file.open`, as File › Open does.
+     pub fn open_documents_later(&mut self, paths: impl IntoIterator<Item = String>) {
++        if self.services.host_mode {
++            return;
++        }
+         self.os_documents.extend(paths);
+     }
+ 
+@@ -1440,6 +1654,9 @@ impl DesignApp {
+     /// that can't be opened or placed gets an alert with the reason, as well as the status line.
+     /// A successful import with warnings keeps the document and shows the warnings in an alert.
+     pub fn open_file(&mut self, cmd: &str, params: Value) -> Result<Value, String> {
++        if self.services.host_mode && !self.host_opening {
++            return Err("Open requests must be selected in the host file browser".into());
++        }
+         let file = match params.get("path").and_then(Value::as_str) {
+             Some(path) => std::path::Path::new(path).file_name().map_or_else(|| path.to_string(), |n| n.to_string_lossy().to_string()),
+             None => params.get("name").and_then(Value::as_str).unwrap_or_default().to_string(),
+@@ -1450,6 +1667,9 @@ impl DesignApp {
+     /// [`Self::open_file`] for a command whose params don't name the file: `file` is shown in the
+     /// alert or warnings.
+     pub fn open_named_file(&mut self, cmd: &str, params: Value, file: String) -> Result<Value, String> {
++        if self.services.host_mode && !self.host_opening {
++            return Err("Open requests must be selected in the host file browser".into());
++        }
+         let r = self.run(cmd, params);
+         if let Err(e) = &r {
+             let title = if cmd == "file.place" { "Can't Place the File" } else { "Can't Open the File" };
+diff --git c/crates/ui-egui/src/tests_host_save.rs w/crates/ui-egui/src/tests_host_save.rs
+new file mode 100644
+index 00000000..e00ba40f
+--- /dev/null
++++ w/crates/ui-egui/src/tests_host_save.rs
+@@ -0,0 +1,92 @@
++use crate::{DesignApp, HostEvent, HostEventQueue, Services};
++use designcraft_engine::Session;
++use serde_json::json;
++use std::sync::{Arc, Mutex};
++
++fn app_with_host() -> (DesignApp, HostEventQueue, Arc<Mutex<Vec<(String, Vec<u8>)>>>) {
++    let queue = HostEventQueue::default();
++    let sent = Arc::new(Mutex::new(Vec::new()));
++    let sent_save = sent.clone();
++    let mut app = DesignApp::new(
++        Session::new(),
++        Services {
++            host_mode: true,
++            host_events: Some(queue.clone()),
++            host_save: Some(Box::new(move |ticket, _name, bytes| {
++                sent_save.lock().unwrap_or_else(|e| e.into_inner()).push((ticket.to_owned(), bytes.to_vec()));
++                Ok(())
++            })),
++            ..Default::default()
++        },
++    );
++    app.session.execute("file.new", &json!({})).unwrap();
++    app.host_bound_uid = Some(app.session.active().unwrap().uid);
++    app.host_name = Some("layout.designcraft".into());
++    (app, queue, sent)
++}
++
++#[test]
++fn host_save_waits_for_matching_durable_ack_and_keeps_later_edits_dirty() {
++    let (mut app, queue, sent) = app_with_host();
++    app.run("frame.create", json!({"rect": [10, 10, 100, 100]})).unwrap();
++    assert!(app.session.active().unwrap().is_dirty());
++    app.run("app.save", json!({})).unwrap();
++    assert_eq!(sent.lock().unwrap().len(), 1);
++    let (ticket, bytes) = sent.lock().unwrap()[0].clone();
++    assert!(app.session.active().unwrap().is_dirty());
++
++    assert!(!queue.lock().unwrap().enqueue(HostEvent::SaveResult { ticket: "unknown".into(), ok: true, error: None }));
++    app.session
++        .edit(|doc, _| {
++            doc.title = "later edit".into();
++            Ok(())
++        })
++        .unwrap();
++    assert!(queue.lock().unwrap().enqueue(HostEvent::SaveResult { ticket, ok: true, error: None }));
++    app.process_host_events(&egui::Context::default());
++    assert!(app.session.active().unwrap().is_dirty());
++    let saved = designcraft_engine::cmd::from_bytes(&bytes).unwrap();
++    assert_ne!(saved.title, "later edit");
++    assert_eq!(app.ui.status, "Earlier changes saved; newer edits remain");
++}
++
++#[test]
++fn host_mode_refuses_document_replacement_and_save_as_and_keeps_failed_save_dirty() {
++    let (mut app, queue, sent) = app_with_host();
++    app.run("frame.create", json!({"rect": [10, 10, 100, 100]})).unwrap();
++    assert!(app.run("file.new", json!({})).is_err());
++    assert!(app.run("file.saveAs", json!({"path": "/tmp/nope.designcraft"})).is_err());
++    assert!(app.run("file.saveACopy", json!({"path": "/tmp/copy.designcraft"})).is_err());
++    assert!(app.run("app.saveCopyDialog", json!({})).is_err());
++    assert!(app.open_file("file.open", json!({"path": "/tmp/second.designcraft"})).is_err());
++    assert!(app.open_named_file("file.openRecent", json!({"index": 0}), "second.designcraft".into()).is_err());
++    assert!(app.pick_and_open("open").is_err());
++    for command in ["version.duplicate", "branch.open", "collab.join", "data.merge"] {
++        assert!(app.run(command, json!({})).is_err(), "{command} must be refused in host mode");
++    }
++
++    app.run("app.save", json!({})).unwrap();
++    let ticket = sent.lock().unwrap()[0].0.clone();
++    assert!(queue.lock().unwrap().enqueue(HostEvent::SaveResult { ticket, ok: false, error: Some("conflict".into()) }));
++    app.process_host_events(&egui::Context::default());
++    assert!(app.session.active().unwrap().is_dirty());
++    assert!(app.host_pending.is_none());
++}
++
++#[test]
++fn host_open_accepts_one_native_designcraft_document() {
++    let mut source = Session::new();
++    source.execute("file.new", &json!({"title": "from host"})).unwrap();
++    source.execute("frame.create", &json!({"rect": [10, 10, 100, 100]})).unwrap();
++    let bytes = source.host_save_snapshot(source.active().unwrap().uid).unwrap().bytes;
++    let queue = HostEventQueue::default();
++    assert!(queue.lock().unwrap().enqueue(HostEvent::Open { name: "from-host.designcraft".into(), bytes: bytes.clone() }));
++    let mut app = DesignApp::new(Session::new(), Services { host_mode: true, host_events: Some(queue.clone()), ..Default::default() });
++    app.process_host_events(&egui::Context::default());
++    assert_eq!(app.session.documents().len(), 1);
++    assert!(app.host_bound_uid.is_some());
++    assert!(!app.session.active().unwrap().is_dirty());
++    assert!(queue.lock().unwrap().enqueue(HostEvent::Open { name: "second.designcraft".into(), bytes }));
++    app.process_host_events(&egui::Context::default());
++    assert_eq!(app.session.documents().len(), 1);
++}

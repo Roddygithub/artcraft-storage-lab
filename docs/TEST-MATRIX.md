@@ -193,7 +193,9 @@ Patch, exact source pin, checks and evidence limits: `docs/reviews/GR-020/README
 | 13.3 | Package manifest integrity | all packaged source/attribution hashes match | [x] `sha256sum -c SHA256SUMS` from `integration/rust/craft-platform/` passes (19 entries) |
 | 13.4 | Independent bounded review | pre-copy caps close DesignCraft review P2 | [x] Luna high review PASS; browser tests compile-only; see `docs/reviews/GR-021/TRANSPORT-PRECOPY-REVIEW.md` |
 | 13.5 | Repeated Open compatibility and shared budget | same-session OpenRequest works; repeated buffers remain bounded across transport/listener instances | [~] Native cumulative byte/message test passes; WASM sharing test compiles; Luna high round 4 found no functional issue; browser tests not executed; see `TRANSPORT-OPEN-ADMISSION-REVIEW.md` |
-| 13.6 | DesignCraft application patch review | adapter is safe with hardened transport pin | [ ] Pending repin to new immutable package commit and exact-patch re-review |
+| 13.6 | DesignCraft application host-save checks | snapshot opens, matching durable ACK cleans only captured revision; failures/replacements stay dirty/refused | [x] Five focused Rust 1.95 tests and locked WASM check pass; see `docs/reviews/GR-021/DESIGNCRAFT-HOST-SAVE.md` |
+| 13.7 | DesignCraft exact-patch review | no blocker/major in adapter after transport repin | [x] Luna high R3 PROVISIONAL no code-level blocker/major; P3 peak serialization-memory limit remains; see `DESIGNCRAFT-REVIEW-LUNA-HIGH-R3.md` |
+| 13.8 | DesignCraft Seafile browser version/reopen | saved document is persisted as a Seafile version and reopened from Seafile | [ ] NOT VERIFIED; patch not in dispatcher |
 
 This package fix does not establish browser runtime, Seafile persistence, or
 application-level open/edit/save/reopen behavior.

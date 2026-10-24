@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; shared transport and app adapters conti
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; GR-016/017/018/019/020 evidence is on main; GR-021 shared transport now bounds pre-copy allocations and repeated Open events while retaining in-session Open; app repins/reviews pending; no upstream changes
+WORKTREE:   main-only workflow; GR-021 transport update is pushed; DesignCraft host-save patch is repinned and bounded-reviewed; EffectCraft initial-open/retry fix awaits final review; FilmCraft prototype checks are in progress; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-021 — shared transport pre-copy and repeated-Open bounds; 7 native tests, WASM test compilation, checksums, and Luna high round-4 bounded review pass; browser tests were not run; DesignCraft app repin/re-review pending; Seafile runtime remains NOT VERIFIED
+CURRENT GR: GR-021/022/023 — shared transport commit 91836a9 is on main; DesignCraft exact patch has 5 Rust 1.95 tests, WASM check, and bounded Luna review pass with one documented peak-serialization-memory limitation; EffectCraft and FilmCraft remain in progress; browser/Seafile runtime remains NOT VERIFIED
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -97,17 +97,13 @@ OPEN GAPS:
   DeckCraft browser runtime or Seafile dispatch/version/reopen is verified. The
   full workspace test suite did not complete; `xtask ci` stops at existing
   Clippy findings outside the changed files. See `docs/reviews/GR-020/README.md`.
-- GR-021 prototypes a one-document DesignCraft Web host-save adapter. Five
-  focused engine/UI tests and the Rust 1.95 locked WASM check passed in the
-  author's scratch checkout. Review found oversized and repeated Open payloads
-  could be copied before app-level rejection. The shared transport now caps
-  incoming bytes and strings before copying and applies cumulative byte/message
-  budgets shared across same-origin/app transports, preserving in-session Open.
-  Seven native transport tests, WASM test compilation, checksums, and Luna high
-  round-4 bounded review pass; browser tests were compiled but not run. The
-  DesignCraft patch still needs repinning to this transport commit and a fresh
-  exact-patch review. Browser messaging and Seafile version/reopen remain NOT
-  VERIFIED; see `docs/reviews/GR-021/`.
+- GR-021 prototypes a one-document DesignCraft Web host-save adapter over the
+  shared transport at `91836a9`. Five focused Rust 1.95 tests, the locked WASM
+  check, formatting and diff checks pass. Luna high R3 found no code-level
+  blocker or major on the exact patch. A P3 resource limit remains: the 64 MiB
+  outbound guard runs after serialization allocation, so it does not bound
+  peak memory for larger documents. Browser messaging and Seafile
+  version/reopen remain NOT VERIFIED; see `docs/reviews/GR-021/`.
 - The isolated synthetic Seafile runtime flows currently documented are for
   WordCraft, GridCraft, VectorCraft, PdfCraft and CADCraft. VectorCraft uses its
   page API, not the common `?host=parent` contract. DeckCraft now has a local
@@ -122,9 +118,10 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- commit and push the reviewed GR-021 transport update, then repin DesignCraft,
-  EffectCraft and FilmCraft prototypes to its immutable revision and run exact
-  patch reviews; add any app to Seafile dispatch only after runtime evidence
+- finish exact review of the EffectCraft initial-open/reload fix and the
+  FilmCraft WASM check/review; record each app patch and evidence separately
+- add any app to Seafile dispatch only after synthetic browser and Seafile
+  version/reopen evidence exists
 - continue app-by-app adapters from the GR-016 seam inventory; WordCraft,
   GridCraft, PdfCraft and CADCraft now use the immutable packaged transport
   revision and compile from clean pinned-source checkouts with Rust 1.95

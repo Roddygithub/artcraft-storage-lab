@@ -1,5 +1,19 @@
 # HISTORY
 
+## 2026-10-24 — GR-021 DesignCraft host-save prototype
+
+* Added a local one-document DesignCraft adapter over `craft-platform`
+  `91836a9ebad5ffcd8f1966fb4f36dc84387f2cdd`. It opens native `.designcraft`
+  bytes without a local path, serializes a captured snapshot, and marks it
+  clean only after the matching host ACK. Save As and multi-document flows are
+  refused.
+* Five focused Rust 1.95 tests, the locked WASM check, formatting and diff checks
+  pass. Luna high R3 found no code-level blocker or major and verified the exact
+  patch SHA. The known P3 limit is that the 64 MiB outbound cap runs after
+  serialization allocates its buffer.
+* No browser messaging or Seafile version/reopen test has run, and the patch is
+  not in the dispatcher. See `docs/reviews/GR-021/`.
+
 ## 2026-10-24 — GR-021 cumulative Open admission
 
 * Extended the shared browser transport's pre-copy limits to repeated Open
