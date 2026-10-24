@@ -374,9 +374,9 @@ Known risks:    NOT PUBLISHED. The upstream hard gate holds until GPT REVIEW PAS
 Status:      PROTOTYPE IN PROGRESS; not a candidate; bounded Sol low review PASS with minor notes
 Branch/SHA:  main / `bdbea5faa7e8b1cdd4c1e526cd3b212e712a0789` (gateway compatibility update pushed); source changes remain in scratch clones
 Scope:       inventory all 13 ArtCraft Web app seams; standardize transport; adapt WordCraft and GridCraft first
-Evidence:    docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md and README.md
-Tests:       craft-platform 6 tests + strict clippy + WASM checks pass; WordCraft/GridCraft Chromium synthetic-host edit/ack/reopen and rejection checks pass; GridCraft in-app Open and Rust 1.95 WASM check pass using a temporary local path dependency
-Open:        remaining app-specific seams and acknowledgement gaps; security/deployment coverage; single-file Open boundary; three minor review notes
+Evidence:    docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md, README.md, REVIEW-PORTABLE-CRAFT-PLATFORM-20261024.md
+Tests:       standalone craft-platform metadata, 6 native tests and WASM check pass; WordCraft/GridCraft Chromium synthetic-host edit/ack/reopen and rejection checks pass; app builds still used scratch local dependency
+Open:        exact immutable git pins for WordCraft/GridCraft/CADCraft patches and clean app builds; remaining app-specific seams and acknowledgement gaps; security/deployment coverage; single-file Open boundary
 GPT review:  NOT REQUESTED; existing project verdict remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch was published
 
@@ -405,6 +405,12 @@ Tests:       7 focused native acknowledgement tests, Rust 1.95 WASM check, forma
 Open:        lifecycle test gaps remain MINOR for this bounded prototype; file-list click, exact editor-to-gateway payload hash, browser timeout/response loss, deployment security and portable shared dependency are NOT VERIFIED
 GPT review:  NOT REQUESTED; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch was published
+
+Update 2026-10-24: `craft-platform` is now packaged as a standalone source
+artifact with preserved MIT/Apache notices. Sol low's bounded package review
+found no blocker/major; its metadata lockfile minor was fixed and the checks
+were rerun. The app patch files still contain absolute `/tmp` paths and remain
+non-portable until pinned to the artifact's committed SHA.
 ```
 
 ### GR-018 — CADCraft durable host-save acknowledgement
@@ -412,7 +418,7 @@ Publication: LOCKED; no upstream issue, PR, RFC or patch was published
 ```text
 Status:      BOUNDED LOCAL PROTOTYPE REVIEW PASS (GPT-6.1 Sol low round 4); no project-level GPT change
 Base:        storytold/cadcraft `7bf5905ac97316a7896de8cbc12d243f57b09bd8`
-Transport:   GR-016 `craft-platform` scratch checkout; absolute `/tmp` dependency remains a portability/publication gate
+Transport:   standalone `craft-platform` source artifact is packaged and its metadata/native/WASM checks pass; GR-016/GR-018 app patch manifests still need an exact git revision in a follow-up commit (no repository commit SHA exists in this worktree)
 Scope:       ticketed save/saveResult adapter; dirty state follows host durable acknowledgement
 Evidence:    docs/reviews/GR-018/README.md, cadcraft-host-save.patch, REVIEW-SOL-LOW-R2.md through REVIEW-SOL-LOW-R4.md, CADCRAFT-BROWSER-ACK-SMOKE-20261024.md, CADCRAFT-SEAFILE-E2E-20261024.md
 Tests:       Rust 1.95 WASM check; 8 focused acknowledgement tests; 344 engine library tests; fmt/diff checks; local Chromium synthetic-host and isolated synthetic-Seafile edit/save/history/fresh-reopen runs

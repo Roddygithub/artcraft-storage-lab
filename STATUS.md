@@ -73,9 +73,10 @@ OPEN GAPS:
   A separate isolated synthetic Seafile run used a real Seahub library click,
   saved a circle edit as a new history entry/file ID, and reopened it in a fresh
   CADCraft instance. The Seafile readback hash is recorded; exact
-  editor-to-gateway bytes were not captured. The shared transport remains an
-  absolute scratch path, the bundle used `wasm-opt=0`, and timeout/security
-  paths remain unverified, so this is not standalone or publication-ready.
+  editor-to-gateway bytes were not captured. The bundle used `wasm-opt=0`, and
+  timeout/security paths remain unverified, so this is not publication-ready.
+  The standalone shared transport artifact now builds in this repository; the
+  stored app patch still needs a second commit to pin its exact git revision.
   Evidence is in `docs/reviews/GR-018/`.
 - GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
 - GR-016 WordCraft and GridCraft now both have reproduced shared-transport Seafile save/version/reopen flows on the isolated synthetic stack. GridCraft also recalculated `SUM(B2:B2)` after B2 changed to 1337, persisted a new Seafile version, and reopened showing 1337. GR-018 CADCraft now has a separate synthetic Seafile history/reopen run. Exact outbound-payload hashing and optimized-bundle performance remain open. These synthetic runs do not establish public deployment readiness or all-app support.
@@ -88,8 +89,10 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- replace the shared transport scratch path with a pinned/distributable source
-  before treating app patches as portable
+- commit the standalone shared transport artifact, then pin GR-016/GR-018 app
+  manifests to that exact commit in a follow-up before treating app patches as
+  portable; package review found no blocker/major, and the metadata-lock minor
+  was fixed
 - reproduce CADCraft save/version/reopen against isolated synthetic Seafile;
   current CADCraft browser smoke uses only in-memory host storage
 - continue remaining Craft Web adapters from the GR-016 per-app seam inventory
@@ -97,8 +100,9 @@ NEXT:
   current T3 Chromium preview verifies Open-request guidance and dirty-state
   preservation only
 - continue app-by-app seam implementation and evidence; do not infer all-app support from the WordCraft/GridCraft synthetic Seafile runs
-- the GR-016 shared transport dependency remains a scratch/local-path prototype;
-  no upstream dependency or patch has been published
+- the standalone GR-016 transport artifact is present, but stored app patches
+  still need an exact git revision in a follow-up commit; no upstream dependency
+  or patch has been published
 - keep later app adapters scoped to their observed per-app open/serialize/save
   seams; a common transport does not create an editor serializer or durable ack
 - keep Seafile/provider persistence in the connector and editor lifecycle in

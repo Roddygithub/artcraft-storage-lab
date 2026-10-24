@@ -1,5 +1,21 @@
 # HISTORY
 
+## 2026-10-24 — Standalone GR-016 craft-platform source artifact
+
+* Packaged the GR-016 craft-platform snapshot under
+  `integration/rust/craft-platform`, preserving the MIT/Apache licenses and
+  NOTICE attribution and replacing workspace-inherited Cargo settings with
+  explicit standalone metadata.
+* Added a lockfile and `scripts/check-craft-platform.sh`; metadata, six native
+  tests, and the browser-feature WASM check pass without the `/tmp` checkout.
+* The GR-016/GR-018 stored app manifests still need a follow-up exact git rev
+  after this artifact is committed. No project GPT verdict or upstream
+  readiness changed.
+* A bounded independent Sol low review found no blocker/major; its minor
+  metadata-lock finding was fixed and the standalone check was rerun. App patch
+  pins and clean app builds remain open. See
+  `docs/reviews/GR-016/REVIEW-PORTABLE-CRAFT-PLATFORM-20261024.md`.
+
 ## 2026-10-24 — GR-018 CADCraft host-save acknowledgement prototype
 
 * Added a bounded patch for CADCraft Web that sends serialized drawing saves
@@ -13,10 +29,10 @@
 * Rust 1.95 formatting and wasm32 check pass; eight focused tests and all 344
   CADCraft engine library tests pass. No browser CADCraft runtime or Seafile
   save/version/reopen test was run.
-* The patch still references `craft-platform` through an absolute `/tmp` path.
-  The transport must become a pinned distributable dependency before the patch
-  is portable or publishable. The overall project GPT FAIL and upstream lock
-  remain unchanged. Details: `docs/reviews/GR-018/`.
+* A standalone `craft-platform` artifact is now packaged in this repository and
+  builds without the scratch checkout. The stored patch still awaits a second
+  commit to pin that artifact's exact git revision. The overall project GPT
+  FAIL and upstream lock remain unchanged. Details: `docs/reviews/GR-018/`.
 * Follow-up local Chromium smoke used the built CADCraft WASM and a synthetic
   in-memory host: a real canvas circle edit produced a ticketed 17,504-byte
   save, the host hashed those exact received bytes and acknowledged them, the

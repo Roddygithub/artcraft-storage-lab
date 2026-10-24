@@ -104,9 +104,9 @@ are the executable part of it.
 
 | # | Test | Expected | Result |
 | --- | --- | --- | --- |
-| 8.1 | Opaque save ticket round-trip, one-time ack, bounded pending queue | JS-safe string IDs; duplicate/unknown results rejected; at most 64 pending saves | [~] 4 host protocol unit tests pass in scratch `craft-libs` checkout; code not yet in candidate |
+| 8.1 | Opaque save ticket round-trip, one-time ack, bounded pending queue | JS-safe string IDs; duplicate/unknown results rejected; at most 64 pending saves | [~] 4 host protocol unit tests pass in standalone packaged crate using `./scripts/check-craft-platform.sh`; app patches are not yet pinned to its commit |
 | 8.2 | Parent message origin/source validation | exact origin and parent source required | [~] native predicate tests pass; actual browser message source not exercised |
-| 8.3 | Shared browser transport compilation | Rust/WASM transport builds | [~] `cargo check -p craft-platform --features browser --target wasm32-unknown-unknown` passes in scratch checkout |
+| 8.3 | Shared browser transport compilation | Rust/WASM transport builds | [~] Standalone packaged crate WASM check passes through `./scripts/check-craft-platform.sh`; app patch portability remains pending an exact git revision |
 | 8.4 | WordCraft and GridCraft adapters compile with shared transport | both pinned apps build for WASM | [~] `cargo check -p wordcraft-web --target wasm32-unknown-unknown` and GridCraft equivalent pass using a temporary local path dependency |
 | 8.5 | Browser editor saves only become clean after durable host ack | failed/stale/unknown responses keep document dirty | [~] Chromium smoke tests passed for WordCraft and GridCraft against a synthetic `sessionStorage` host; both apps stayed dirty after explicit host rejection |
 | 8.6 | Browser app reopen from saved bytes after shared refactor | app displays the saved edit | [~] fresh iframe reopen passed for both apps; XLSX ZIP/formula integrity checked |
@@ -116,6 +116,7 @@ are the executable part of it.
 | 8.10 | Seafile single-file host handles Craft `openRequest` | explain that another document must be opened from Seafile; preserve dirty state and do not broaden the current file capability | [x] T3 Chromium preview with synthetic same-origin frame: guidance shown and `dirty=true` retained; no Seafile file picker is implemented |
 | 8.11 | GridCraft Seafile save-version-reopen flow after shared refactor | saved workbook survives fresh app reopen from Seafile | [x] Synthetic Seafile runtime 2026-10-24; new history/file ID, valid XLSX readback, A1 edit visible after fresh GridCraft load. Separate B2=42→1337 edit recalculated `SUM(B2:B2)` to 1337, was versioned, read back and verified in a fresh editor. Scratch build used `data-wasm-opt="0"`; exact editor→gateway byte hash and optimized bundle remain unverified. See GR-016 GridCraft E2E report. |
 | 8.12 | Independent review of GR-016 Seafile evidence | no blocker/major in bounded evidence review | [x] Nemotron re-review accepted the updated WordCraft/GridCraft evidence with minor qualifications. Formula recalculation is verified; outbound byte hash and optimized bundle remain limitations. See `REVIEW-NEMOTRON-GRIDCRAFT-E2E-R2-20261024.md`. |
+| 8.13 | Standalone craft-platform artifact | no scratch checkout; metadata, native tests and browser WASM check pass | [~] `./scripts/check-craft-platform.sh` passes; bounded Sol low package review had no blocker/major, minor lockfile finding fixed. App patch Git pins and clean app builds remain open; see `REVIEW-PORTABLE-CRAFT-PLATFORM-20261024.md` |
 
 GridCraft now declares Rust 1.95 in the scratch prototype to match current
 dependency MSRVs. Full commands, warnings and exact pinned SHAs are in

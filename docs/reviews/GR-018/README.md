@@ -19,11 +19,19 @@ the GR-016 `craft-platform` prototype.
 
 Patch SHA-256: `9026384e7441a12b4eb955f93f7df6845e057a737c031349206abb5f7e810acd`.
 
-The scratch manifest points to `/tmp/artcraft-gr016-craft-libs/crates/platform`.
-That dependency is not present as a reproducible revision in this bundle, so a
-standalone build is not possible. Treat this as a local prototype patch only;
-the shared transport must be integrated through its own reviewed work item
-before this patch can be distributed or submitted upstream.
+The standalone `craft-platform` source snapshot is now packaged at
+[`integration/rust/craft-platform`](../../../integration/rust/craft-platform)
+and exposed through a minimal root Cargo workspace for future git dependencies.
+It has a runnable metadata/native-test/WASM-build check at
+[`scripts/check-craft-platform.sh`](../../../scripts/check-craft-platform.sh).
+The package received a bounded independent review with no blocker/major; see
+the GR-016 packaging review.
+The stored CADCraft patch still has its historical `/tmp` path because this
+worktree has no artifact commit SHA to pin in Cargo. Make the patch portable in
+a second commit: first commit the crate artifact, then replace the patch's path
+with a `git` dependency pinned to that exact commit and refresh its SHA-256.
+Until then, the CADCraft app patch remains a review artifact, not a standalone
+app build or distributable upstream patch.
 
 ## Behavior in the patch
 

@@ -24,11 +24,27 @@ The app sources were checked out at:
 | `storytold/wordcraft` | `00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d` | existing lab GR-014 bridge patch |
 | `storytold/gridcraft` | `06920de8da609c19de7446945cfc62b844691efd` | existing lab GR-010 durable-ack patch |
 
-All checkouts and code changes are under `/tmp/artcraft-gr016-*`; they are not
-commits or branches in the upstream repositories. App manifests currently use a
-local path to the scratch `craft-platform` checkout solely to make these checks
-reproducible. That path must be replaced by a coordinated, real git revision
-before any patch series can be considered applicable.
+All app checkouts and code changes are under `/tmp/artcraft-gr016-*`; they are
+not commits or branches in the upstream repositories. The GR-016 `craft-platform`
+source snapshot is now packaged independently at
+[`integration/rust/craft-platform`](../../../integration/rust/craft-platform),
+based on `craft-libs` SHA `f180fc0d35d521c5d18e118c881d3efde1ec1eee` plus the
+recorded GR-016 working-tree changes. A minimal root Cargo workspace exposes
+the nested package for later git dependencies without inheriting crate settings.
+Its standalone metadata, native tests and
+WASM browser feature can be checked with
+[`scripts/check-craft-platform.sh`](../../../scripts/check-craft-platform.sh).
+GPT-6.1 Sol low independently reviewed the package with no blocker/major; its
+minor lockfile finding was fixed by adding `--locked` to metadata. See
+[`REVIEW-PORTABLE-CRAFT-PLATFORM-20261024.md`](REVIEW-PORTABLE-CRAFT-PLATFORM-20261024.md).
+
+The stored WordCraft/GridCraft patch manifests still contain the scratch path:
+a valid Cargo `git + rev` cannot point at this artifact until it exists in a
+repository commit. Use two commits when making these patches portable: first
+commit the standalone artifact; then set both manifests to the repository URL
+and that exact first commit SHA, and refresh the patch checksums. No branch
+dependency or guessed revision is valid. Until that second step, the app patch
+series remain review artifacts and are not independently applicable.
 
 The exact scratch diffs are preserved in [`patches/`](patches/):
 `craft-libs-shared-transport.patch`, `wordcraft-shared-transport.patch`, and

@@ -1,0 +1,41 @@
+[package]
+name = "craft-platform"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+repository = "https://github.com/Roddygithub/artcraft-storage-lab"
+description = "Small platform lifecycle services for the Craft suite"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+dbg_macro = "warn"
+todo = "warn"
+
+[features]
+default = []
+dialogs = []
+appearance = ["dep:zbus", "dep:futures-lite", "dep:async-channel", "dep:async-io", "dep:async-process"]
+browser = ["dep:wasm-bindgen", "dep:js-sys", "dep:web-sys"]
+egui = ["dep:egui"]
+
+[dependencies]
+egui = { version = "0.36", default-features = false, optional = true }
+
+[target.'cfg(all(unix, not(target_os = "macos"), not(target_arch = "wasm32")))'.dependencies]
+zbus = { version = "5", default-features = false, features = ["async-io"], optional = true }
+futures-lite = { version = "2", optional = true }
+async-channel = { version = "2", optional = true }
+async-io = { version = "2", optional = true }
+async-process = { version = "2", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { version = "0.2", optional = true }
+js-sys = { version = "0.3", optional = true }
+web-sys = { version = "0.3", features = ["Window", "Document", "HtmlElement", "HtmlAnchorElement", "Blob", "BlobPropertyBag", "Url", "Node", "Element", "Event", "EventTarget", "Location", "MessageEvent"], optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.3"
+wasm-bindgen-futures = "0.4"
