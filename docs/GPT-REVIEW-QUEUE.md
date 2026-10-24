@@ -497,6 +497,20 @@ Publication: no upstream publication; project and public deployment readiness un
 Evidence:    `docs/reviews/GR-021/TRANSPORT-OPEN-ADMISSION-REVIEW.md`
 ```
 
+### GR-024 — ignore malformed host save acknowledgements
+
+```text
+Status:      bounded shared-transport parser fix; project GPT verdict remains FAIL on 0edbe524
+Base:        local main `ee140f37be49517e2e35a542fec0fa9453cba27b`
+Change:      ignore `saveResult` with missing/non-boolean `ok`; keep valid true/false behavior and public API unchanged
+Review:      independent read-only review verified exact diff/hash; no functional issue; test-coverage follow-up for valid true was closed
+Tests:       7 native tests, WASM `--tests` compile, all 19 checksums, formatting and diff checks pass; browser tests not run
+Open:        immutable commit/pin update for consuming app patches; browser and Seafile runtime remain NOT VERIFIED
+GPT review:  not a project candidate; project remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC or patch published
+Evidence:    `docs/reviews/GR-024/`
+```
+
 ### GR-022 — EffectCraft host-save acknowledgement prototype
 
 ```text

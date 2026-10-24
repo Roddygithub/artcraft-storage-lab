@@ -88,7 +88,9 @@ and parent source, owns the message listener, transfers bytes, and tracks
 bounded one-time save acknowledgements. Incoming Open bytes and metadata are
 size-checked before conversion/copy, with cumulative byte and message budgets
 shared across the app runtime so in-session Open remains available without
-unbounded copies.
+unbounded copies. A `saveResult` without a boolean `ok` is ignored, leaving the
+ticket pending so the app can treat the outcome as unknown instead of retrying
+after an ambiguous response.
 See `PROVENANCE.md` for the pinned source snapshot and packaging details. This
 local artifact does not establish an upstream release or an app integration
 contract.

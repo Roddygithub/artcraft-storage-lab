@@ -1,5 +1,18 @@
 # HISTORY
 
+## 2026-10-25 — GR-024 malformed host save acknowledgement handling
+
+* Changed the shared browser transport to ignore `saveResult` messages whose
+  `ok` field is absent or not a JavaScript boolean. Valid success/failure ACKs
+  keep the same public shape; malformed replies leave app tickets pending so
+  the save outcome remains unknown instead of triggering an unsafe retry.
+* Added parser coverage for malformed values plus valid `true` and `false`.
+  Seven native tests, WASM test-target compilation, 19 package checksums,
+  formatting and diff checks pass. Browser execution remains NOT VERIFIED.
+* An independent read-only review verified the exact diff and found no
+  functional issue; app consumers still need to pin this committed revision.
+  See `docs/reviews/GR-024/`.
+
 ## 2026-10-24 — GR-021 DesignCraft host-save prototype
 
 * Added a local one-document DesignCraft adapter over `craft-platform`

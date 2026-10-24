@@ -9,7 +9,9 @@ ArrayBuffer/Uint8Array lengths and metadata strings before copying them into
 Rust-owned buffers, and bounds cumulative Open bytes and message count per
 app runtime before payload copies, shared across transport instances. The source checkout's own `crates/platform` Cargo manifest inherited
 workspace package, dependency, and lint keys; this artifact replaces those
-inheritance entries with their explicit values so it can build independently.
+inheritance entries with their explicit values so it can build independently. A malformed host `saveResult` with a
+missing or non-boolean `ok` field is ignored rather than converted into a false failure acknowledgement; the save ticket
+therefore remains pending until a valid acknowledgement or its timeout/unknown-outcome path.
 The repository root has a minimal Cargo workspace that exposes this nested
 package to future Cargo `git` dependencies; it defines no inherited settings.
 

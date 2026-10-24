@@ -196,9 +196,11 @@ Patch, exact source pin, checks and evidence limits: `docs/reviews/GR-020/README
 | 13.6 | DesignCraft application host-save checks | snapshot opens, matching durable ACK cleans only captured revision; failures/replacements stay dirty/refused | [x] Five focused Rust 1.95 tests and locked WASM check pass; see `docs/reviews/GR-021/DESIGNCRAFT-HOST-SAVE.md` |
 | 13.7 | DesignCraft exact-patch review | no blocker/major in adapter after transport repin | [x] Luna high R3 PROVISIONAL no code-level blocker/major; P3 peak serialization-memory limit remains; see `DESIGNCRAFT-REVIEW-LUNA-HIGH-R3.md` |
 | 13.8 | DesignCraft Seafile browser version/reopen | saved document is persisted as a Seafile version and reopened from Seafile | [ ] NOT VERIFIED; patch not in dispatcher |
+| 13.9 | Malformed host save acknowledgements | missing/non-boolean `ok` does not consume a ticket as a false ACK; valid true/false retain behavior | [x] Parser tests cover malformed values and valid booleans; WASM test target compiled but was not browser-executed; 7 native tests and 19 checksums pass; see `docs/reviews/GR-024/` |
 
-This package fix does not establish browser runtime, Seafile persistence, or
-application-level open/edit/save/reopen behavior.
+GR-024 does not establish browser runtime, Seafile persistence, or
+application-level open/edit/save/reopen behavior. Its immutable pin must be
+adopted by app patches after the transport commit is created.
 
 ## 9. How results are recorded
 

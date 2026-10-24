@@ -105,21 +105,9 @@ impl HostTransport {
                 };
                 callback(HostMessage::Open { name, bytes });
             } else if kind == format!("{app}:saveResult") {
-                let Ok(ticket_value) = string_field(&data, "ticket", MAX_TICKET_UTF16_UNITS) else {
-                    return;
-                };
-                let Some(ticket) = SaveTicket::new(ticket_value) else {
-                    return;
-                };
-                let Ok(ok) = Reflect::get(&data, &JsValue::from_str("ok")) else {
-                    return;
-                };
-                let error = string_field(&data, "error", MAX_ERROR_UTF16_UNITS).ok();
-                callback(HostMessage::SaveResult {
-                    ticket,
-                    ok: ok.as_bool().unwrap_or(false),
-                    error,
-                });
+                if let Some(message) = parse_save_result(&data) {
+                    callback(message);
+                }
             }
         });
         window.add_event_listener_with_callback("message", handler.as_ref().unchecked_ref())?;
@@ -269,6 +257,16 @@ fn read_bytes(value: &JsValue, max_bytes: usize) -> Option<Vec<u8>> {
     }
 }
 
+fn parse_save_result(data: &JsValue) -> Option<HostMessage> {
+    let ticket_value = string_field(data, "ticket", MAX_TICKET_UTF16_UNITS).ok()?;
+    let ticket = SaveTicket::new(ticket_value)?;
+    let ok = Reflect::get(data, &JsValue::from_str("ok"))
+        .ok()?
+        .as_bool()?;
+    let error = string_field(data, "error", MAX_ERROR_UTF16_UNITS).ok();
+    Some(HostMessage::SaveResult { ticket, ok, error })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -311,5 +309,36 @@ mod tests {
             string_field(object.as_ref(), "field", 10).ok().as_deref(),
             Some("0123456789")
         );
+    }
+
+    #[wasm_bindgen_test]
+    fn malformed_save_result_ack_is_ignored_instead_of_becoming_failure() {
+        for malformed in [
+            JsValue::UNDEFINED,
+            JsValue::NULL,
+            JsValue::from_str("false"),
+            JsValue::from_f64(0.0),
+        ] {
+            let object = Object::new();
+            assert!(
+                Reflect::set(&object, &"ticket".into(), &JsValue::from_str("ticket-1")).is_ok()
+            );
+            assert!(Reflect::set(&object, &"ok".into(), &malformed).is_ok());
+            assert!(parse_save_result(object.as_ref()).is_none());
+        }
+
+        let object = Object::new();
+        assert!(Reflect::set(&object, &"ticket".into(), &JsValue::from_str("ticket-1")).is_ok());
+        assert!(Reflect::set(&object, &"ok".into(), &JsValue::FALSE).is_ok());
+        assert!(matches!(
+            parse_save_result(object.as_ref()),
+            Some(HostMessage::SaveResult { ok: false, .. })
+        ));
+
+        assert!(Reflect::set(&object, &"ok".into(), &JsValue::TRUE).is_ok());
+        assert!(matches!(
+            parse_save_result(object.as_ref()),
+            Some(HostMessage::SaveResult { ok: true, .. })
+        ));
     }
 }

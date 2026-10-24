@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; shared transport and app adapters conti
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; GR-021 transport update is pushed; DesignCraft host-save patch is repinned and bounded-reviewed; EffectCraft initial-open/retry fix awaits final review; FilmCraft prototype checks are in progress; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft evidence is pushed; GR-024 malformed-ACK fix is reviewed locally and awaiting its immutable main commit; EffectCraft/FilmCraft patches are in remediation after independent findings; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-021/022/023 — shared transport commit 91836a9 is on main; DesignCraft exact patch has 5 Rust 1.95 tests, WASM check, and bounded Luna review pass with one documented peak-serialization-memory limitation; EffectCraft and FilmCraft remain in progress; browser/Seafile runtime remains NOT VERIFIED
+CURRENT GR: GR-021/022/023/024 — DesignCraft evidence is committed; GR-024 fixes malformed save ACK parsing and awaits push; EffectCraft/FilmCraft have actionable guard/history findings being remediated; browser/Seafile runtime remains NOT VERIFIED
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -104,6 +104,11 @@ OPEN GAPS:
   outbound guard runs after serialization allocation, so it does not bound
   peak memory for larger documents. Browser messaging and Seafile
   version/reopen remain NOT VERIFIED; see `docs/reviews/GR-021/`.
+- GR-024 changes the shared transport parser to ignore malformed save ACKs,
+  preserving pending/unknown outcome semantics. The bounded review and package
+  checks pass; browser execution was not run. App patches must pin the committed
+  transport revision before their final exact-patch review. Evidence:
+  `docs/reviews/GR-024/`.
 - The isolated synthetic Seafile runtime flows currently documented are for
   WordCraft, GridCraft, VectorCraft, PdfCraft and CADCraft. VectorCraft uses its
   page API, not the common `?host=parent` contract. DeckCraft now has a local
