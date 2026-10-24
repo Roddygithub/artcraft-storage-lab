@@ -469,6 +469,21 @@ GPT review:  NOT REQUESTED as a project candidate; project remains GPT REVIEW FA
 Publication: LOCKED; no upstream issue, PR, RFC, or patch was published
 ```
 
+### GR-021 — DesignCraft host-save acknowledgement prototype
+
+```text
+Status:      local prototype only; project GPT verdict remains FAIL on 0edbe524
+Base:        storytold/designcraft 80d13911b2d20fbb5cd9398696627bb3a715417b
+Transport:   DesignCraft review R1 found a P2 allocation gap; shared parser fix has independent bounded PASS; app patch repin pending
+Patch:       initial local patch SHA c92f88e399b3e4d2c457c70900cf34c213f718870dc6f4e33a5b1ae49d9fbe86 is superseded when repinned
+Scope:       one pathless native .designcraft document; serialized snapshot save with durable ticket ACK; no Save As
+Tests:       2 engine + 3 UI tests and locked WASM check pass as reported by author; shared transport 6 native tests and WASM test compilation pass
+Independent: Luna high R1 FAIL on exact pre-repin patch due to pre-copy transport allocation; fixed in shared package and bounded package review PASS; DesignCraft exact-patch R2 pending
+Open:        browser transport runtime, Seafile version/reopen, and production security NOT VERIFIED
+GPT review:  not a project candidate; project remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC, or patch published
+```
+
 ## GPT review instruction (for the future session)
 
 ```text

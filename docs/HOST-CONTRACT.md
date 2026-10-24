@@ -369,13 +369,13 @@ saved. **The integration layer must never pretend a save succeeded.**
 | wordcraft | upstream baseline: no | `download: Fn(...) -> Result<(), String>` **+ `async_saves`** | local GR-014 bridge patch and isolated synthetic Seafile edit/save/version/reopen are reproduced; upstream adoption and broader failure/security coverage remain open |
 | deckcraft | no (upstream) | local GR-020 patch adds single-file host save ACK; not browser/Seafile verified | review the local adapter, then test runtime before generalizing |
 | vectorcraft | no | has a *different* mechanism (`window.vectorcraft`, a promise API) — see §6 | decide whether to port the bridge or adapt the page API |
-| designcraft | no | `download` present, `open_async` present, no `async_saves` | port the bridge; check the save hook's signature |
+| designcraft | upstream: no; GR-021 local prototype pending exact-patch re-review | byte serializer and dirty state exist; local prototype adds snapshot ACK | one pathless native document per iframe; browser/Seafile E2E remains unverified |
 | photocraft | no | `inbox` present, no `download` | port the bridge; the save hook may not exist yet |
 | figcraft | upstream: no; local GR-019 prototype only | upstream `Services` is picker/download-only; local patch adds pathless `.figcraft` snapshot ACK | browser and Seafile E2E remain NOT VERIFIED; host Save As/branches/previews are out of first-slice scope |
 | cadcraft | yes | existing bridge replaces the engine delivery hook | migrate to the shared crate and verify durable save-result semantics |
 | filmcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
 | lightcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
-| effectcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
+| effectcraft | upstream private API; local GR-022 prototype under review | local pathless `.ecproj` ticketed snapshot ACK | browser/Seafile runtime remains unverified |
 | soundcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
 
 ### 4.1 The upstream patch shape (GR-014 candidate)

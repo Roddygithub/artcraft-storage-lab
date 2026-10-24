@@ -1,5 +1,20 @@
 # HISTORY
 
+## 2026-10-24 — GR-021 shared host-message allocation bounds
+
+* Hardened the shared browser host transport to reject oversized
+  ArrayBuffer/Uint8Array payloads before copying and oversized metadata strings
+  before Rust conversion. App-specific limits still apply after transport
+  admission.
+* Added WASM browser tests for oversize rejection and made the package check
+  compile those tests. Six native tests, the WASM browser-feature test compile,
+  formatting, checksum and whitespace checks pass. The browser tests were not
+  executed because no browser runner is installed.
+* Independent Luna high review returned bounded PASS. This fixes the P2 raised
+  during GR-021 DesignCraft review; the DesignCraft app patch still needs to be
+  repinned and re-reviewed. See
+  `docs/reviews/GR-021/TRANSPORT-PRECOPY-REVIEW.md`.
+
 ## 2026-10-24 — GR-020 DeckCraft host-save acknowledgement prototype
 
 * Added a local DeckCraft Web adapter on the immutable shared `craft-platform`

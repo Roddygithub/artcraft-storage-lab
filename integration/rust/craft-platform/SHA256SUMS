@@ -8,7 +8,7 @@ b4628bbe7b9d307ba985d59d73b715df38d5d2319159034c996f38045075343a  ./NOTICE
 34795f485d28d1495cbbe7975d8f8841e7d24a80563a0fadda9b4d78f11e7c68  ./src/appearance.rs
 2502c7e3b9b9d7e2295634e0c76ffc5e68dae3e0ea25acd6dcac5ea3b40fbe89  ./src/appearance/portal/appearance_bus_tests.rs
 615d0b1bc56ac1582f93aff24022d0c299c6693873bb9bca9950387a7a267c18  ./src/browser.rs
-e4e177876a336140375569d9961f35d14fd9ed93cf0236bca9f96740826da0de  ./src/browser/host.rs
+5bdb17aab84fea45ae51cdad7de25b15e8992065b79a6460d54a018ee5553657  ./src/browser/host.rs
 48acc3e0b427f269ea3a2770e55edb7ee83ec29f490aa087d1c103c77900faca  ./src/dialog_outcome.rs
 2ead6e6bbe97e9181c47d220ec67a7ee6738ef48254b4799f74b7348bb1c58f7  ./src/dialogs.rs
 c0c23a6fd88e4b7c2f90dd1ac6e004575f73d069baa38cdb43cf414ed27b8265  ./src/host_protocol.rs
