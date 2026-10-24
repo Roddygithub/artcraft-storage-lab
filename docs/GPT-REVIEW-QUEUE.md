@@ -376,9 +376,21 @@ Branch/SHA:  main / `bdbea5faa7e8b1cdd4c1e526cd3b212e712a0789` (gateway compatib
 Scope:       inventory all 13 ArtCraft Web app seams; standardize transport; adapt WordCraft and GridCraft first
 Evidence:    docs/reviews/GR-016/APP-SEAM-AUDITS-20261024.md and README.md
 Tests:       craft-platform 6 tests + strict clippy + WASM checks pass; WordCraft/GridCraft Chromium synthetic-host edit/ack/reopen and rejection checks pass; GridCraft in-app Open and Rust 1.95 WASM check pass using a temporary local path dependency
-Open:        Seafile E2E after refactor, single-file Open boundary, three minor review notes, remaining app-specific seams
+Open:        remaining app-specific seams and acknowledgement gaps; security/deployment coverage; single-file Open boundary; three minor review notes
 GPT review:  NOT REQUESTED; existing project verdict remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch was published
+
+Update 2026-10-24: WordCraft and GridCraft now each have synthetic Seahub/Seafile
+edit → durable save → new version → readback → fresh editor reopen evidence after
+the shared-transport refactor. The WordCraft run used an actual Seahub file-list
+open; GridCraft used the Seahub file route. A GridCraft `SUM(B2:B2)` formula was
+also recalculated after B2 changed to 1337 and verified after durable save and
+fresh reopen. Exact editor-to-gateway payload hashing and optimized bundle
+performance remain unverified. The bounded Nemotron re-review accepted the
+updated evidence with minor qualifications; see
+`docs/reviews/GR-016/REVIEW-NEMOTRON-GRIDCRAFT-E2E-R2-20261024.md`. Reports:
+`docs/reviews/GR-016/SEAFILE-WORDCRAFT-SHARED-TRANSPORT-E2E-20261024.md` and
+`docs/reviews/GR-016/SEAFILE-GRIDCRAFT-SHARED-TRANSPORT-E2E-20261024.md`.
 ```
 
 ### GR-017 — PdfCraft durable host-save acknowledgement

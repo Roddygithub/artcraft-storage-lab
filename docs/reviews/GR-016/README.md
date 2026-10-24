@@ -97,6 +97,26 @@ Seafile persistence or a production topology.
 | WordCraft | Opened `tests/fixtures/synthetic.docx`; typed `GR016HostAck`; observed `dirty=true`; Ctrl+S sent serialized DOCX; parent stored 5,287 bytes and acknowledged; editor became clean. A fresh iframe reopened the stored DOCX and rendered `GR016HostAck`. The extracted DOCX passes `unzip -t`; `word/document.xml` contains the edit. A second edit followed by a synthetic rejection surfaced the error and left the editor dirty. SHA-256: `bb2ac3a46dc234027049a7c6aeae9f18f9c26614007a565fed05b2c5c94d0f7f`. |
 | GridCraft | Opened `tests/fixtures/synthetic.xlsx`; changed cell A1 to `HostAck`; observed `dirty=true`; Ctrl+S sent 4,132 bytes and the parent acknowledged; the source became clean. A fresh iframe reopened the stored workbook and displayed `HostAck`. The extracted XLSX passes `unzip -t`, retains the `SUM(B2:B2)` formula and cached value 42. A second edit followed by rejection displayed the host error and left the workbook edited/dirty. SHA-256: `2a53ca82774d961462b5125bc2ddf0772c6ba3c71c801376d8a9042c260c136c`. |
 
+### WordCraft and GridCraft shared transport through synthetic Seafile
+
+On 2026-10-24, the WordCraft GR-016 adapter was built from its pinned scratch
+checkout and loaded through the real synthetic Seahub file route and local
+Seafile gateway. The operator edited `synthetic.docx`, WordCraft showed dirty,
+Ctrl+S produced a new Seafile head/file ID and history entry, and WordCraft
+returned to Saved. An API download was a valid DOCX containing the edit; after
+the editor was unloaded, a fresh Seahub file-list open rendered the edit. Full
+IDs, hashes, build mode, and limits are in
+[`SEAFILE-WORDCRAFT-SHARED-TRANSPORT-E2E-20261024.md`](SEAFILE-WORDCRAFT-SHARED-TRANSPORT-E2E-20261024.md).
+
+The WordCraft and GridCraft shared-transport adapters have both now completed
+synthetic Seafile save-version-reopen runs. GridCraft changed A1 and reopened
+with the edit, then changed B2 from 42 to 1337 and verified that B3's
+`SUM(B2:B2)` recalculated, was saved as a new version, and reopened at 1337.
+The editor-to-gateway save-message bytes were not independently hashed. Both
+functional release builds used scratch `data-wasm-opt="0"`; the optional
+`wasm-opt -Oz` pass and production bundle performance remain unverified. No
+production service, ONLYOFFICE setting, or upstream repository was changed.
+
 After the first review, GridCraft's `open_async` adapter was changed to send an
 `openRequest` to the parent. On the Rust 1.95 release bundle, Ctrl+O in the
 editor produced one host request; the harness returned stored workbook bytes
@@ -117,10 +137,12 @@ concurrent writers. Extracted output files from this run remain under `/tmp`.
 
 ## Open issues before broader adoption
 
-1. **No Seafile E2E was run on these refactored adapters.** The browser tests
-   above use `sessionStorage`; previous synthetic Seafile evidence is against
-   prior app bridge patches, not this transport refactor. Re-run the Seafile
-   workflow before claiming that the shared transport is wired to Seafile.
+1. WordCraft and GridCraft now both have bounded synthetic Seafile E2E evidence
+   after the shared-transport refactor. One GridCraft `SUM(B2:B2)` formula was
+   recalculated after B2 changed from 42 to 1337 and verified after Seafile
+   save/reopen; broader formula compatibility remains NOT VERIFIED. Concurrent
+   external writes, public security controls, and runtime authorization edge
+   cases remain NOT VERIFIED.
 2. **GridCraft MSRV:** the audited base declared Rust 1.90, while the current
    dependency graph requires 1.95. A Rust 1.90 WASM check failed on those
    dependency MSRV declarations; the scratch patch raises GridCraft to 1.95 and
@@ -134,12 +156,24 @@ concurrent writers. Extracted output files from this run remain under `/tmp`.
 4. The tests do not yet exercise wrong-source browser events, listener teardown,
    timeout/retry, concurrent saves within one app, permission revocation, or
    response loss.
-5. The configured Nemotron review lane was interrupted after an extended run
-   without a result. A fresh independent GPT-6.1 Sol low review of this bounded
+5. The earlier configured Nemotron remediation lane was interrupted after an
+   extended run without a result. A separate free Nemotron evidence review
+   accepted the WordCraft runtime record with minor qualifications; the supplied
+   numeric metadata was independently corrected against Seafile. GridCraft is
+   outside that review scope. See `REVIEW-NEMOTRON-E2E-20261024.md`. A fresh
+   independent GPT-6.1 Sol low review of the bounded GridCraft Open/MSRV/ack
    remediation returned provisional PASS with three minor findings. The first
    same-model Luna review remains a provisional FAIL in the history and is not
    counted as independent. Full report:
    [`REVIEW-SOL-LOW-R3.md`](REVIEW-SOL-LOW-R3.md).
+   The combined WordCraft/GridCraft E2E evidence review first returned
+   PROVISIONAL FAIL on payload-hash, formula-recalculation and optimizer gaps.
+   A follow-up runtime save/reopen exercised the formula; Nemotron's second
+   round accepted the bounded evidence with minor qualifications. The payload
+   hash and optimized bundle remain open limitations. Reports:
+   [`REVIEW-NEMOTRON-GRIDCRAFT-E2E-20261024.md`](REVIEW-NEMOTRON-GRIDCRAFT-E2E-20261024.md)
+   and
+   [`REVIEW-NEMOTRON-GRIDCRAFT-E2E-R2-20261024.md`](REVIEW-NEMOTRON-GRIDCRAFT-E2E-R2-20261024.md).
 6. The gateway's editing session is scoped to the single file selected in
    Seahub. It handles an app `openRequest` by telling the user to return to
    Seafile and select another document; it does not browse the library or

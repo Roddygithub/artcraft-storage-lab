@@ -1,5 +1,36 @@
 # HISTORY
 
+## 2026-10-24 — GR-016 shared transport on synthetic Seafile: WordCraft and GridCraft
+
+* Built the pinned GR-016 WordCraft Rust/WASM adapter and exercised it through
+  the patched isolated Seahub file route and local Seafile gateway. A real
+  browser edit reached WordCraft's host save path, created a new Seafile head,
+  file ID and history entry, and was read back as a valid DOCX containing the
+  edit. A fresh Seahub file-list open rendered that edit.
+* The runtime stack used synthetic data and loopback-only services. The WASM
+  optimizer was disabled for this functional run after its `-Oz` pass consumed
+  several minutes; the Rust release build itself succeeded. No production
+  service, ONLYOFFICE configuration, or upstream repository was changed.
+* A separate GridCraft Web/WASM run edited XLSX cell A1, received a durable host
+  result, created a new Seafile version, and reopened with the cell edit shown.
+  A follow-up changed B2 from 42 to 1337; GridCraft recalculated B3's
+  `SUM(B2:B2)` to 1337, saved another Seafile version, and a fresh editor load
+  displayed the recalculated value. The returned XLSX remained valid and its
+  formula and cached result matched. Exact editor-to-gateway bytes were not
+  independently hashed; the optional wasm-opt pass was skipped. Evidence:
+  `docs/reviews/GR-016/SEAFILE-GRIDCRAFT-SHARED-TRANSPORT-E2E-20261024.md`.
+* A combined bounded Nemotron evidence review returned PROVISIONAL FAIL: it
+  accepted the runtime flows but flagged the missing outbound-byte hash,
+  untested formula recalculation, and non-optimized bundle. The formula concern
+  was then tested and reproduced as described above. Hash-boundary capture and
+  optimized-bundle performance remain open. A second bounded independent
+  review accepted the updated evidence with minor qualifications; it did not
+  change the overall GPT status or establish deployment/upstream readiness.
+  See `docs/reviews/GR-016/REVIEW-NEMOTRON-GRIDCRAFT-E2E-R2-20261024.md`.
+* Both runs are synthetic/loopback evidence only. Other ArtCraft apps, public
+  security controls and overall project GPT status remain open. The DOCX evidence
+  is in `docs/reviews/GR-016/SEAFILE-WORDCRAFT-SHARED-TRANSPORT-E2E-20261024.md`.
+
 ## 2026-10-24 — GR-017 PdfCraft durable host acknowledgement prototype
 
 * Started a bounded PdfCraft adapter on pinned upstream SHA

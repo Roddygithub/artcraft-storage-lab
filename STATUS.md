@@ -1,11 +1,11 @@
 # STATUS
 
 ```text
-PHASE:      GPT-6.1 Sol FAIL on 0edbe52; GR-016 transport and GR-017 PdfCraft bounded prototype continue
+PHASE:      GPT-6.1 Sol FAIL on 0edbe52; GR-016 shared transport reproduced with WordCraft and GridCraft on synthetic Seafile
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main clean and pushed with GR-017 bounded review evidence; PdfCraft source remains a scratch patch
+WORKTREE:   main-only workflow; GR-016 E2E evidence and bounded re-review are pending commit; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-017 — PdfCraft durable save acknowledgement prototype; project GPT status remains FAIL
+CURRENT GR: GR-016 — shared-transport WordCraft DOCX and GridCraft XLSX synthetic Seafile runtime verification; other apps remain open; project GPT status remains FAIL
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -62,6 +62,7 @@ OPEN GAPS:
   Seafile; persistence/versioning remains NOT VERIFIED. Evidence is in
   `docs/reviews/GR-017/`.
 - GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
+- GR-016 WordCraft and GridCraft now both have reproduced shared-transport Seafile save/version/reopen flows on the isolated synthetic stack. GridCraft also recalculated `SUM(B2:B2)` after B2 changed to 1337, persisted a new Seafile version, and reopened showing 1337. The independent evidence review's formula finding is addressed; exact outbound-payload hashing and optimized-bundle performance remain open. These synthetic runs do not establish public deployment readiness or all-app support.
 - Sol low's interim review found a possible 32-bit fingerprint collision in VectorCraft polling. The host now compares exact serialized bytes; the focused synthetic Chromium collision test passes, and the isolated Seafile-backed VectorCraft flow was rerun successfully after the fix (695 B saved/read back byte-identically and reopened with the new path). See the GR-012 post-fix runtime report.
 - Nemotron independently returned a bounded PASS for that exact-byte fix. A later synthetic Chromium test now verifies failed-write retry; VectorCraft still lacks a full dirty signal, concurrent-save coverage and CSP/sandbox controls. This does not establish common-contract support or an overall project PASS.
 - the first E2E browser run used a same-origin proxy; a separate-origin loopback
@@ -76,8 +77,7 @@ NEXT:
 - rerun the Playwright protocol suite when its dependency is available; the
   current T3 Chromium preview verifies Open-request guidance and dirty-state
   preservation only
-- reproduce WordCraft/GridCraft save-version-reopen with the shared transport
-  in the isolated Seafile stack before claiming connector compatibility
+- continue app-by-app seam implementation and evidence; do not infer all-app support from the WordCraft/GridCraft synthetic Seafile runs
 - the Chromium tests use synthetic `sessionStorage`, not Seafile, and the app
   dependency is still a temporary local path
 - keep later app adapters scoped to their observed per-app open/serialize/save
