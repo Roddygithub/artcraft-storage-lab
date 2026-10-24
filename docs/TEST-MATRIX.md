@@ -144,9 +144,10 @@ Patch, commands and limits: `docs/reviews/GR-017/README.md`.
 | 10.1 | CADCraft host adapter compiles for wasm32 | pinned adapter compiles with ticketed host transport | [x] Rust 1.95 `cargo check -p cadcraft-web --target wasm32-unknown-unknown --locked --offline` passed; dependency is a temporary absolute path |
 | 10.2 | Save acknowledgement engine behavior | success, rejection, stale edit, expiry cancellation, capacity and overlap rules preserve data integrity | [x] 8 focused `host_ack_tests` pass, including undo to acknowledged snapshot |
 | 10.3 | CADCraft engine regression suite | existing engine behavior remains intact | [x] 344 `cadcraft-engine` library tests pass |
-| 10.4 | Timeout scheduling, export feedback and source/origin validation | browser host protocol behaves correctly | [ ] Not run in a browser; source-level behavior bounded-reviewed by Sol, with these runtime paths still unverified |
-| 10.5 | CADCraft save → Seafile new version → close/reopen | saved CAD drawing persists and reopens with edit intact | [ ] NOT VERIFIED; no CADCraft browser or Seafile E2E performed |
-| 10.6 | Independent bounded code review | no blocker/major correctness issue in exact patch | [x] GPT-6.1 Sol low round 4 PASS; local prototype only; `/tmp` transport path remains a publication/reproducibility gate |
+| 10.4 | CADCraft browser save ACK and fresh-editor reopen | edit serializes, host receives/hash-checks bytes, ACK clears dirty, fresh editor reopens saved bytes | [x] Local Chromium synthetic-host smoke 2026-10-24; 17,504 bytes, SHA-256 recorded, circle visible after fresh editor reopen. No Seafile persistence. See `CADCRAFT-BROWSER-ACK-SMOKE-20261024.md` |
+| 10.5 | CADCraft timeout scheduling, failure ACK, export feedback and origin/source rejection | browser host protocol handles negative and adversarial paths | [ ] NOT VERIFIED in browser; source-level behavior bounded-reviewed by Sol, runtime paths remain untested |
+| 10.6 | CADCraft save → Seafile new version → close/reopen | saved CAD drawing persists and reopens with edit intact | [ ] NOT VERIFIED; no CADCraft Seafile E2E performed |
+| 10.7 | Independent bounded code review | no blocker/major correctness issue in exact patch | [x] GPT-6.1 Sol low round 4 PASS; local prototype only; `/tmp` transport path remains a publication/reproducibility gate |
 
 Patch and bounded-review reports: `docs/reviews/GR-018/`.
 

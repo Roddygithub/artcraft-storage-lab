@@ -17,6 +17,12 @@
   The transport must become a pinned distributable dependency before the patch
   is portable or publishable. The overall project GPT FAIL and upstream lock
   remain unchanged. Details: `docs/reviews/GR-018/`.
+* Follow-up local Chromium smoke used the built CADCraft WASM and a synthetic
+  in-memory host: a real canvas circle edit produced a ticketed 17,504-byte
+  save, the host hashed those exact received bytes and acknowledged them, the
+  editor became clean, and a fresh iframe reopened the circle. No Seafile
+  version was created; optimized wasm-opt output and Seafile persistence remain
+  unverified. See `docs/reviews/GR-018/CADCRAFT-BROWSER-ACK-SMOKE-20261024.md`.
 
 ## 2026-10-24 — GR-016 shared transport on synthetic Seafile: WordCraft and GridCraft
 
