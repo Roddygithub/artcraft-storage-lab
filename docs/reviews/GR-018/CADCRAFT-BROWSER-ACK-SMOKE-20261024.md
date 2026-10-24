@@ -37,12 +37,25 @@ save/version test, not a project-level GPT verdict, and not deployment evidence.
 
 Screenshot: [`runtime/cadcraft-host-ack-reopen.png`](runtime/cadcraft-host-ack-reopen.png).
 
+## Negative acknowledgement and retry
+
+A second Chromium run used a fresh editor and drawing. After a real circle edit,
+the synthetic host rejected ticket `cadcraft:1` with `ok:false`. The host
+observed dirty states `[false, true]`; it received no clean transition for the
+rejected save, and its attempt record had `accepted=false`. Ctrl+S then submitted
+a new ticket (`cadcraft:2`) for the same 17,505-byte document. The host accepted
+that retry and the editor reported `dirty=false`. The two payload hashes were
+identical, as no edit occurred between the failed save and retry.
+
+Screenshot of the rejected state: [`runtime/cadcraft-host-ack-rejected-dirty.png`](runtime/cadcraft-host-ack-rejected-dirty.png).
+
 ## Limits
 
-This verifies a real CADCraft Web/WASM edit, host message delivery, content
-hashing at the browser-message boundary, successful ACK handling, dirty-state
-transition, and a fresh-editor reopen from the same in-memory bytes. The
-synthetic host did not persist bytes to Seafile or create a version. Save
-failure, stale/late ACK, origin rejection, timeout scheduling, and standalone
-download/native regressions were not exercised in this browser run. The absolute
-scratch dependency still prevents a standalone build from this repository.
+This verifies real CADCraft Web/WASM edits, host message delivery, content
+hashing at the browser-message boundary, success and failure ACK handling,
+dirty-state transitions, retry after rejection, and a fresh-editor reopen from
+the same in-memory bytes. The synthetic host did not persist bytes to Seafile or
+create a version. Stale/late ACK, origin rejection, timeout scheduling, and
+standalone download/native regressions were not exercised in these browser
+runs. The absolute scratch dependency still prevents a standalone build from
+this repository.

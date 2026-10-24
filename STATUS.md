@@ -68,9 +68,11 @@ OPEN GAPS:
   four rounds of remediation; Rust 1.95 WASM check and 344 engine tests pass.
   A local Chromium synthetic-host smoke now reproduces a real circle edit,
   ticketed 17,504-byte save, SHA-256 of the received message bytes, successful
-  ACK, dirty=false, and fresh editor reopen with the circle visible. This is
-  NOT Seafile persistence/version evidence. Its shared transport is still an
-  absolute scratch path, so the patch is not standalone or publication-ready.
+  ACK, dirty=false, and fresh editor reopen with the circle visible. A second
+  run rejected the first save, observed dirty remain true, and accepted a retry.
+  These are NOT Seafile persistence/version evidence. Its shared transport is
+  still an absolute scratch path, so the patch is not standalone or
+  publication-ready.
   Evidence is in `docs/reviews/GR-018/`.
 - GR-012 VectorCraft SVG has a reproduced synthetic Seafile click/edit/save/version/history/reopen flow; it uses VectorCraft's page API, not the common `?host=parent` contract. The 13-app source seam inventory is now recorded in GR-016, but runtime coverage remains limited to the documented WordCraft, GridCraft and VectorCraft flows.
 - GR-016 WordCraft and GridCraft now both have reproduced shared-transport Seafile save/version/reopen flows on the isolated synthetic stack. GridCraft also recalculated `SUM(B2:B2)` after B2 changed to 1337, persisted a new Seafile version, and reopened showing 1337. The independent evidence review's formula finding is addressed; exact outbound-payload hashing and optimized-bundle performance remain open. These synthetic runs do not establish public deployment readiness or all-app support.

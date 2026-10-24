@@ -22,7 +22,9 @@
   save, the host hashed those exact received bytes and acknowledged them, the
   editor became clean, and a fresh iframe reopened the circle. No Seafile
   version was created; optimized wasm-opt output and Seafile persistence remain
-  unverified. See `docs/reviews/GR-018/CADCRAFT-BROWSER-ACK-SMOKE-20261024.md`.
+  unverified. A second browser run rejected a save, confirmed dirty remained
+  true, then accepted a retry. See
+  `docs/reviews/GR-018/CADCRAFT-BROWSER-ACK-SMOKE-20261024.md`.
 
 ## 2026-10-24 — GR-016 shared transport on synthetic Seafile: WordCraft and GridCraft
 
