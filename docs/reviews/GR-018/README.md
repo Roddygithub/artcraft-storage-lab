@@ -17,7 +17,7 @@ the GR-016 `craft-platform` prototype.
 |---|---|---|
 | `storytold/cadcraft` | `7bf5905ac97316a7896de8cbc12d243f57b09bd8` | [`cadcraft-host-save.patch`](cadcraft-host-save.patch) |
 
-Patch SHA-256: `cb85f2ed0493333d4e3dfa6df959cbc85e460ca208c4f07d9e59f740525a516e`.
+Patch SHA-256: `38d1e6943107a68d2a0fb20e82fbab14297b2c50487de9387cc03fdb7ed066d7`.
 
 The standalone `craft-platform` source snapshot is now packaged at
 [`integration/rust/craft-platform`](../../../integration/rust/craft-platform)
@@ -26,8 +26,8 @@ It has a runnable metadata/native-test/WASM-build check at
 [`scripts/check-craft-platform.sh`](../../../scripts/check-craft-platform.sh).
 The package received a bounded independent review with no blocker/major; see
 the GR-016 packaging review.
-The CADCraft patch pins `craft-platform` to repository revision
-`90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`. It applies to a clean CADCraft
+The current stored CADCraft patch pins `craft-platform` to repository revision
+`56c5e16d79b77751106173c13111ef4fe0a2c0ec`. It applies to a clean CADCraft
 checkout and passes the Rust 1.95 locked WASM check. Exact commands and all four
 app patch hashes are recorded in
 [`../GR-016/PORTABLE-APP-PATCHES-20261024.md`](../GR-016/PORTABLE-APP-PATCHES-20261024.md).
@@ -75,12 +75,21 @@ for the exact patch hash above and confirmed the timeout messages distinguish
 drawing, export, and mixed operations. Findings and review scope are recorded
 in `REVIEW-SOL-LOW-R1.md` through `REVIEW-SOL-LOW-R4.md`.
 
-**NOT VERIFIED:** browser-host behavior, save confirmation in a browser, Seafile
-The separate synthetic Seafile run reproduced a browser save, Seafile version,
-and fresh reopen; its full record is in
+**NOT VERIFIED:** browser-host behavior and the editor save-confirmation UI in
+the synthetic Seafile topology. The separate isolated synthetic Seafile run
+reproduced a browser save, Seafile version, and fresh reopen; its full record is in
 [`CADCRAFT-SEAFILE-E2E-20261024.md`](CADCRAFT-SEAFILE-E2E-20261024.md).
 
 **NOT VERIFIED:** browser timeout/failure and adversarial-origin paths,
 production authorization, exact editor-to-gateway byte identity, optimized
 bundle performance, and standalone reproducibility. This work does not change
 overall project, public deployment, or upstream readiness.
+
+## Transport re-pin follow-up
+
+The stored patch was regenerated from the exact base with `craft-platform`
+pinned to `56c5e16d79b77751106173c13111ef4fe0a2c0ec`. The repin-only round ran
+3 focused engine acknowledgement tests and the Rust 1.95 locked WASM check;
+formatting, `git diff --check`, and reverse applicability passed. An independent
+exact review confirmed base, hash, pin, and no regression in the reviewed save
+paths. The reviewer did not rerun the build or tests.

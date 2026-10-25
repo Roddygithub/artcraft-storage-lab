@@ -429,9 +429,9 @@ GR-016 portable app report.
 ```text
 Status:      BOUNDED LOCAL PROTOTYPE REVIEW PASS (GPT-6.1 Sol low round 4); no project-level GPT change
 Base:        storytold/cadcraft `7bf5905ac97316a7896de8cbc12d243f57b09bd8`
-Transport:   standalone `craft-platform` source artifact pinned at `90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`; CADCraft clean-checkout locked WASM check passes
+Transport:   `craft-platform` pinned at `56c5e16d79b77751106173c13111ef4fe0a2c0ec`; repin exact review found no blocker/major
 Scope:       ticketed save/saveResult adapter; dirty state follows host durable acknowledgement
-Evidence:    docs/reviews/GR-018/README.md, cadcraft-host-save.patch, REVIEW-SOL-LOW-R2.md through REVIEW-SOL-LOW-R4.md, CADCRAFT-BROWSER-ACK-SMOKE-20261024.md, CADCRAFT-SEAFILE-E2E-20261024.md
+Evidence:    docs/reviews/GR-018/README.md, cadcraft-host-save.patch, REVIEW-SOL-LOW-R2.md through REVIEW-SOL-LOW-R4.md, REVIEW-TRANSPORT-REPIN-R1.md, CADCRAFT-BROWSER-ACK-SMOKE-20261024.md, CADCRAFT-SEAFILE-E2E-20261024.md
 Tests:       Rust 1.95 WASM check; 8 focused acknowledgement tests; 344 engine library tests; fmt/diff checks; local Chromium synthetic-host and isolated synthetic-Seafile edit/save/history/fresh-reopen runs
 Open:        Synthetic CADCraft Seafile version/reopen is reproduced; browser failure/timeout/security paths remain NOT VERIFIED; exact editor-to-gateway byte hash and optimized bundle remain open
 GPT review:  NOT REQUESTED as a project candidate; project remains GPT REVIEW FAIL on 0edbe524

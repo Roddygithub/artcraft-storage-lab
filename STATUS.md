@@ -137,8 +137,8 @@ OPEN GAPS:
 - public deployment is NOT READY; upstream remains LOCKED
 
 NEXT:
-- finish the CADCraft transport re-pin and independent exact review; record its
-  patch and evidence separately
+- continue the FigCraft transport re-pin review; CADCraft is repinned to
+  `56c5e16` and its exact bounded review is recorded
 - implement and review SoundCraft and PhotoCraft host-save adapters; neither is
   in Seafile dispatch until browser and Seafile version/reopen evidence exists
 - add any app to Seafile dispatch only after synthetic browser and Seafile

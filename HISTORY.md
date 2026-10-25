@@ -1,3 +1,14 @@
+## 2026-10-25 — GR-018 CADCraft transport re-pin
+
+* Updated the stored CADCraft host-save patch and lockfile to pin
+  `craft-platform` `56c5e16`. The CADCraft source behavior is unchanged from the
+  previously reviewed GR-018 implementation.
+* Three focused engine acknowledgement tests, the locked Rust 1.95 WASM check,
+  formatting, diff and reverse-apply checks pass per implementer. Independent
+  exact review matched the base/hash/pin and found no blocker/major; it did not
+  rerun tests or builds. Browser/Seafile runtime evidence remains the earlier
+  synthetic reproduction, not a result of the repin. See `docs/reviews/GR-018/`.
+
 ## 2026-10-25 — GR-026 PhotoCraft host integration assessment
 
 * Audited `storytold/photocraft` at exact SHA
