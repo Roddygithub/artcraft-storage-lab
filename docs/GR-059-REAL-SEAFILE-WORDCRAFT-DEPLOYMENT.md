@@ -1,7 +1,7 @@
 # GR-059 — Real synthetic Seafile WordCraft deployment and roundtrip
 
-Date: 2026-10-25  
-Status: **GPT REVIEW PENDING**  
+Date: 2026-10-25
+Status: **GPT REVIEW PENDING**
 Scope: one explicitly synthetic DOCX in the owner-managed Seafile instance; one-file allowlist; WordCraft candidate from GR-055. No production content or unrelated libraries were edited.
 
 ## Result
