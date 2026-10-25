@@ -1,0 +1,53 @@
+$ python3 docs/reviews/GR-054/verify_manifest.py
+PASS: 55 source pins match base and working files
+Local operational assets NOT CHECKED; use --local-static-root to recheck
+exit=0
+
+$ python3 docs/reviews/GR-054/verify_manifest.py --local-static-root /home/roddy/Projects/artcraft-storage-lab/integration/static
+PASS: 55 source pins match base and working files
+PASS: 82 local files, per-file Git tracking/ignore status, and index links match inventory
+Known missing PhotoCraft index target remains missing; provenance/readiness NOT VERIFIED
+exit=0
+
+PASS: negative test changes one expected source digest in a temporary inventory; verifier exits 1 with both working/base mismatch; temporary files removed
+
+PASS: Python AST syntax and inventory JSON parse (no bytecode/build output)
+
+$ sha256sum -c SHA256SUMS
+../../../Cargo.lock: OK
+../../../Cargo.toml: OK
+./Cargo.toml: OK
+./LICENSE-APACHE: OK
+./LICENSE-MIT: OK
+./NOTICE: OK
+./README.md: OK
+./src/appearance.rs: OK
+./src/appearance/portal/appearance_bus_tests.rs: OK
+./src/browser.rs: OK
+./src/browser/host.rs: OK
+./src/dialog_outcome.rs: OK
+./src/dialogs.rs: OK
+./src/host_protocol.rs: OK
+./src/lib.rs: OK
+./src/process.rs: OK
+./tests/browser_downloads.rs: OK
+./tests/browser_harness.js: OK
+./tests/dialog_lifecycle.rs: OK
+exit=0
+
+$ sha256sum -c SHA256SUMS
+onlyoffice-editor-saved-status.png: OK
+onlyoffice-file-list-reopen.png: OK
+onlyoffice-storage-reopen.png: OK
+seafile-readback.json: OK
+sanitized-runtime-transcript.txt: OK
+exit=0
+
+PASS: balanced fenced blocks in six changed/new Markdown documents; new-document relative links resolve
+No repository Markdown lint configuration or dedicated doc-check command found.
+
+PASS: 14 present default-index SRI attributes match SHA-384; known missing target: photocraft/photocraft-web-840a87a8cfbe4217_bg.wasm
+
+$ git diff --check
+exit=0
+PASS: all new GR-054 files have final newline and no trailing whitespace (git diff --check excludes untracked files)

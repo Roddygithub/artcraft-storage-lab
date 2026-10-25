@@ -1,0 +1,590 @@
+{
+  "source_base": "1c7914bf1e166ac4731a1c9b11dce649210eed70",
+  "source_files": {
+    ".gitignore": "1ab290054195dcf7e0e2ecb85575b6ecfb0fc41aa1ec34d7d526b6f948cbcc51",
+    "Cargo.lock": "1ebe498bea8cbfd11a2c2d2d5da14f9a69776cde42af5e2eb433b7bdd219527c",
+    "Cargo.toml": "685d6f97ec9b9eca8745e9c9aec0bcccc76172c3c60a33123b2c3c8be2ab983b",
+    "docs/reviews/GR-010/gridcraft-0.10.0-durable-save-ack.patch": "232ab1686efe36fde87e16ef565a59993423a5b19ac3b1e67cde706f7581dca8",
+    "docs/reviews/GR-014/DIFF.patch": "b4be07c2cbc988e3e7e61f6708a0087e233e92435a198aa009a1fae45d82f166",
+    "docs/reviews/GR-015/seafile-server-12.0.14.patch": "69abef7b322721ce9d5a2c9cdb55f7812ce44acd9dd3db199416997c1b729c9e",
+    "docs/reviews/GR-015/seahub-12.0.14.patch": "3ace48b53d8ed8468384f75b50f47f49ae19d780ee912a97905258f08b6f8eab",
+    "docs/reviews/GR-016/patches/craft-libs-shared-transport.patch": "8f155dfe5508de32b05162d8ef851a00b738cfc551908e15c70b9aedd0f0a468",
+    "docs/reviews/GR-016/patches/gridcraft-shared-transport.patch": "20b219e7f53d7fd0e2fa1c84033cef3d72b22e6f69fe4c4cbcab5ffff077945f",
+    "docs/reviews/GR-016/patches/wordcraft-shared-transport.patch": "1c0bba26de821d1d54c161c5954bc8a5b0f5d7df71be7c4488c473b753842afc",
+    "docs/reviews/GR-017/patches/pdfcraft-durable-host-ack.patch": "6d50eb1f45e81f2037948cd6160878feb2d87eb0881d167f0fc1d290e4450562",
+    "docs/reviews/GR-018/cadcraft-host-save.patch": "38d1e6943107a68d2a0fb20e82fbab14297b2c50487de9387cc03fdb7ed066d7",
+    "docs/reviews/GR-019/figcraft-shared-host-save.patch": "954850ba5aff7362e776b2331a5a5ff54bf9d71374d7b29bc856c2b7a47c4798",
+    "docs/reviews/GR-020/deckcraft-host-save-ack.patch": "8d7f98468ce446add5357e10ed8e10e729eb3306fee359d320f09805acc3ee4a",
+    "docs/reviews/GR-021/designcraft-host-save-ack.patch": "519c03180b17f035ef8fbfcd08a85bda312f6f0721bfbdf9dc1d9d5992fdf972",
+    "docs/reviews/GR-022/effectcraft-host-save.patch": "4e0a1799e36209e1234a1b3ff504ab5ed647cf3bd066af6dec90dacd46ab7407",
+    "docs/reviews/GR-023/filmcraft-host-save-ack.patch": "16158f500b2ec12f93c8fcb14867e0b452030dbb338b2d4d7fa8612850a694d4",
+    "docs/reviews/GR-025/soundcraft-host-save.patch": "f8f9da024b80b3292cca1a60ee69eaf4e19c450d7582fac582596fd11aebc331",
+    "docs/reviews/GR-026/photocraft-core-slice-r2.patch": "4ca7ea1e88bf215f80e6edc137417b8b21d0302e82b9a7a496ffd4e60b0cd3e4",
+    "docs/reviews/GR-027/symphonia-0.6.1-compat.patch": "e4a63489cfdfc0fd3cfc347a1998347bd92bb0b682ac9a25d1051f887e357e6b",
+    "docs/reviews/GR-028/cpal-0.18.2-compat.patch": "ff1ced58251397b8077f92ee9b92c7cae1ada25a8a7fe9068c50ba7cdad5901c",
+    "docs/reviews/GR-029/craft-ui-egui-0.37-compat.patch": "5cf2728d20ed74d9fe0521543280d77ce9ef1a5efd3b6f3db3862b6363b06292",
+    "docs/reviews/GR-029/soundcraft-egui-0.37-build-lock.patch": "d86d74198de55f7f98a4a381d1d18183013f9195c046dd0f56667cbc305f0743",
+    "docs/reviews/GR-029/soundcraft-egui-0.37-compat.patch": "af31ccc5d69ea1e9577e0a7f989077ccafd9e40cfe3643a2e8c8f934cc6fa098",
+    "docs/reviews/GR-032/photocraft-host-save.patch": "487935d8f6db33cf82c85f8d9c8aa0686016612510f15cf34f6b3f05a2c53fe7",
+    "docs/reviews/GR-036/photocraft-host-repaint.patch": "e3af083933f035ddb557f67a1d3d148a9056780dc46c135e93f1722e5acf584e",
+    "integration/README.md": "584ef4fad75305cc14c77fec003cc50ddbf6eb1dae9e9341cbd0511a4821403f",
+    "integration/config/dispatch.json": "ebf2b0438aba8b784315dc3417231c9e6a6066e44304c57b6a9dc219c40f4a4d",
+    "integration/gateway/__init__.py": "d63d957cfdeac34a2d0e056999a3b22f7386f72ebbfcec23dacbfa534dff853d",
+    "integration/gateway/__main__.py": "5c9f49a76f63208b0929f7be9cb618912c56517a8d6e054fb0e344171007f906",
+    "integration/gateway/hostpage.py": "1c6d713ade6760739dfe8f406ac349f47c2363c58c310778694b14768d0f4d8b",
+    "integration/gateway/seafile.py": "b43b9f0e84789cb5b13aa1a2fbef97d651ff241e45393752ba68a95650cd6e53",
+    "integration/gateway/server.py": "ec92b08b94235b049915ea465a8a4c043ed83684a22d64ae3803bdd5b73fe829",
+    "integration/gateway/sessions.py": "1d4a7674fd16eb8c89032a8dab36e2b0d99d19d6e04f1869fa629c12409e01d1",
+    "integration/rust/craft-platform/Cargo.toml": "32815f074476255476ab5dc9e8769ddbaa6c373c98dacb1f8f14a92af96214b3",
+    "integration/rust/craft-platform/LICENSE-APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+    "integration/rust/craft-platform/LICENSE-MIT": "2f42c0cafc8ad394d91373fe1f342aee5453850b151a51405c68cae9ada86d26",
+    "integration/rust/craft-platform/NOTICE": "b4628bbe7b9d307ba985d59d73b715df38d5d2319159034c996f38045075343a",
+    "integration/rust/craft-platform/PROVENANCE.md": "2e7b4d0c33023b98a215cea4303fd419d29455858b12f937c7b0f8ad1354dbd1",
+    "integration/rust/craft-platform/README.md": "e1133988d58fb951ed78f98938e46d891f72d6632081b1d1451d4e09446cc080",
+    "integration/rust/craft-platform/SHA256SUMS": "3b02c87bd9392c76eecaedd7697610a941133ff064b31de8cfce804582cb8b4e",
+    "integration/rust/craft-platform/src/appearance.rs": "34795f485d28d1495cbbe7975d8f8841e7d24a80563a0fadda9b4d78f11e7c68",
+    "integration/rust/craft-platform/src/appearance/portal/appearance_bus_tests.rs": "2502c7e3b9b9d7e2295634e0c76ffc5e68dae3e0ea25acd6dcac5ea3b40fbe89",
+    "integration/rust/craft-platform/src/browser.rs": "615d0b1bc56ac1582f93aff24022d0c299c6693873bb9bca9950387a7a267c18",
+    "integration/rust/craft-platform/src/browser/host.rs": "c45c37c7267e25328b4ae6d21db195b70476065df295b520d86dbf7734c3b404",
+    "integration/rust/craft-platform/src/dialog_outcome.rs": "48acc3e0b427f269ea3a2770e55edb7ee83ec29f490aa087d1c103c77900faca",
+    "integration/rust/craft-platform/src/dialogs.rs": "2ead6e6bbe97e9181c47d220ec67a7ee6738ef48254b4799f74b7348bb1c58f7",
+    "integration/rust/craft-platform/src/host_protocol.rs": "6025899f78188e537ef6534f4ba96aacb9a06604b970353185c7ce969101b2c2",
+    "integration/rust/craft-platform/src/lib.rs": "6a0e69f6348cd1a830a6d8ccf8f0f18728963cf0e9c6755a7b9b399a83641582",
+    "integration/rust/craft-platform/src/process.rs": "d527a2c10d0ae332ccb69ceebb676b65fb678f94c16946c017978aa81ced3ace",
+    "integration/rust/craft-platform/tests/browser_downloads.rs": "a3c9897633c467b3f73da0bd7875820f01e71e903f7d59f43ea43a42140175ef",
+    "integration/rust/craft-platform/tests/browser_harness.js": "34fda5aca406dd4aca9152de999456f05e65e163aa94fae32439e54d7d73890f",
+    "integration/rust/craft-platform/tests/dialog_lifecycle.rs": "ac8fac7b860006c4ffd92dd848ee58279878bf959c7427d0531f40391ffa5684",
+    "scripts/craft_web_zip.py": "3f4866e14ccd2f82b0acb0c5c8ddb1df1ccaf3595ed9206c33c02baad1be184b",
+    "scripts/fetch-craft-web.sh": "460a1b87a61654470ec8a9893606c3e01486747b486da8abaa96988db4ec49a4"
+  },
+  "local_root_observed": "/home/roddy/Projects/artcraft-storage-lab/integration/static",
+  "local_parent_head": "1c7914bf1e166ac4731a1c9b11dce649210eed70",
+  "local_files": {
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/.htaccess": {
+      "sha256": "c92d61b428bff284fce08dc57f0255261476397f2cba5836c833974eded5c725",
+      "bytes": 495,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/ARTIFACT-PROVENANCE.txt": {
+      "sha256": "19ce555f9255e64dcd9493deb83e1ae386a93652b8d39fef636c36a3b52dee95",
+      "bytes": 378,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/HOSTING.md": {
+      "sha256": "77ae3e6252c357dfe917d47de515f1707321b00d99339412aefa1c42ab6c3b7c",
+      "bytes": 4179,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/LICENSE-APACHE": {
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/LICENSE-MIT": {
+      "sha256": "fc257de83c44ae49e4aad1cf777b886794be3ac9c8d00c010ef55935d5bbeba5",
+      "bytes": 1101,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/README.md": {
+      "sha256": "808c2e00b532d47e080ff6107a57214ad4b3b1bdac0c6607f9642da65786d5ac",
+      "bytes": 26825,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/_headers": {
+      "sha256": "e3e253de74fb99a761fc91d4dec4b81ad6a1022b29c98761b5ac1e8ba5aff05a",
+      "bytes": 326,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/index.html": {
+      "sha256": "9a9ca2bee08356cd901c00d14e34fa6c2e38c695e0785ab397ae7f55dc079fcc",
+      "bytes": 1604,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/wordcraft-fa59e09a3f921e03.ico": {
+      "sha256": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225",
+      "bytes": 18378,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/wordcraft-web-8edbd1aaf3363941.js": {
+      "sha256": "2c63d04120d248cf1830c22801f1db35147e1e59886d77d7ab27cf961d849614",
+      "bytes": 164941,
+      "tracked": false,
+      "ignored": true
+    },
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/wordcraft-web-8edbd1aaf3363941_bg.wasm": {
+      "sha256": "a4a289fc4fc37150543814339751a74642060b9a8e1e3a5d2a87e369f07d215a",
+      "bytes": 45628236,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/.htaccess": {
+      "sha256": "c92d61b428bff284fce08dc57f0255261476397f2cba5836c833974eded5c725",
+      "bytes": 495,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/HOSTING.md": {
+      "sha256": "5d3e37f28108b50c9da14c3a2255a60f2d1b68b986632a1ed5153a9f8c277b5a",
+      "bytes": 4102,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/LICENSE-APACHE": {
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/LICENSE-MIT": {
+      "sha256": "a87109bbb1ad43ca3920a5d7ff3806863b7e8470a73f4ded97a1447ac93333f5",
+      "bytes": 1101,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/README.md": {
+      "sha256": "fc090567153040d23a342c8bb1eda0b63013825736e1c115d4f6b8703b6a7c2c",
+      "bytes": 23138,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/_headers": {
+      "sha256": "e3e253de74fb99a761fc91d4dec4b81ad6a1022b29c98761b5ac1e8ba5aff05a",
+      "bytes": 326,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/gridcraft-45f84b7721cb79a9.ico": {
+      "sha256": "f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07",
+      "bytes": 26895,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/gridcraft-web-a862b19ca88ea5df.js": {
+      "sha256": "d95343e37a003a436512ebf05a8c1ec77e3123ac7af27c8a3d61d3013a410a8b",
+      "bytes": 160353,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/gridcraft-web-a862b19ca88ea5df_bg.wasm": {
+      "sha256": "823bdc868268261b93180d539210069ed8027e3c58487d3fa9a5a4e839db3554",
+      "bytes": 18932615,
+      "tracked": false,
+      "ignored": true
+    },
+    "gridcraft/index.html": {
+      "sha256": "cc4258d5b6f5418f2c4f8794819e7d25b6fece61bf4356e2e64d568ba413a042",
+      "bytes": 1604,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/.htaccess": {
+      "sha256": "c92d61b428bff284fce08dc57f0255261476397f2cba5836c833974eded5c725",
+      "bytes": 495,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/HOSTING.md": {
+      "sha256": "a15e4b5b50d7f5c59ee2490ebc5654880fe9c6e399ccdf6154dc1cafe317ef36",
+      "bytes": 4604,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/LICENSE-APACHE": {
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/LICENSE-MIT": {
+      "sha256": "cd7032ea33b71427f188e34ffb4aee9d6868a57fd196037c5c8b2be03a2a0352",
+      "bytes": 1100,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/NOTICE": {
+      "sha256": "496946cff190a3fec32fe0241ea60d40539c73a9da1865073eb0c73ee822c8d5",
+      "bytes": 4184,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/README.md": {
+      "sha256": "28286148c7f0ac9bbb2247994b0e8cd83f4946b9e99264bf0cb76657c2e00226",
+      "bytes": 38146,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/_headers": {
+      "sha256": "e3e253de74fb99a761fc91d4dec4b81ad6a1022b29c98761b5ac1e8ba5aff05a",
+      "bytes": 326,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/index.html": {
+      "sha256": "1574042de6fcc5a7ba494664fecfcaeb93903b99db0539f0865dfa24fa53fb46",
+      "bytes": 1210,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/pdfcraft-web-2faa2bc762f98c12.js": {
+      "sha256": "aa607caaac01fb75433a4f4f2322e8b6c1332a00239bbe10d3c51ead99b04515",
+      "bytes": 165222,
+      "tracked": false,
+      "ignored": true
+    },
+    "pdfcraft/pdfcraft-web-2faa2bc762f98c12_bg.wasm": {
+      "sha256": "63caadb98c3decbdd61f1f7cbda5f6d3a6131bc34c1fb329437abd55607c2835",
+      "bytes": 39154172,
+      "tracked": false,
+      "ignored": true
+    },
+    "photocraft/.trunk-lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tracked": false,
+      "ignored": true
+    },
+    "photocraft/index.html": {
+      "sha256": "e49904620d4e17e49b2f1b39dba4c45db9c16a72bd25f827118346e3257a4a4d",
+      "bytes": 2320,
+      "tracked": false,
+      "ignored": true
+    },
+    "photocraft/photocraft-web-5251a55206c25672.js": {
+      "sha256": "9269838cd5fbbf3c9df7c1fd01dd73e0b1edc959e20c7897a911de20090cacf6",
+      "bytes": 177649,
+      "tracked": false,
+      "ignored": true
+    },
+    "photocraft/photocraft-web-cbd436f9a105b44d_bg.wasm": {
+      "sha256": "f67193223bc7367bade2bca00e105ee856eafc892eda538a2112a86df13f155b",
+      "bytes": 26342447,
+      "tracked": false,
+      "ignored": true
+    },
+    "soundcraft/.trunk-lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tracked": false,
+      "ignored": true
+    },
+    "soundcraft/ai.storyteller.soundcraft-4f86cc0f1d19c49f.png": {
+      "sha256": "b91bbf89680d702f8931d1a033465697ce814e2f62a9fdbadc4f4b76a1295dfe",
+      "bytes": 4252,
+      "tracked": false,
+      "ignored": true
+    },
+    "soundcraft/host-fixture.scraftz": {
+      "sha256": "76bbe6c76e03768b877eae0836d8f5fcc20424a183d8f4fda4efcd322118984a",
+      "bytes": 66201744,
+      "tracked": false,
+      "ignored": true
+    },
+    "soundcraft/host-smoke.html": {
+      "sha256": "532f195313aa300e93db3cfc009e9f3cdfdec7fabbf7c51f5135028b48352e0d",
+      "bytes": 2721,
+      "tracked": false,
+      "ignored": true
+    },
+    "soundcraft/index.html": {
+      "sha256": "d3555a07841abeb83472a79105299e5ebd5f1ee8183af185d73d66bfdb284432",
+      "bytes": 2700,
+      "tracked": false,
+      "ignored": true
+    },
+    "soundcraft/soundcraft-web-4155a64cbebbeb93_bg.wasm": {
+      "sha256": "c45d655fbb85ab115b03db7ff03a6f0d42c8c56eccce882b30dfabd1284cf264",
+      "bytes": 22358112,
+      "tracked": false,
+      "ignored": true
+    },
+    "soundcraft/soundcraft-web-c3f262f265311041.js": {
+      "sha256": "39163c52ec78914bfe87dce8da481d0245be59d9114ffb18719531a09eef5fe5",
+      "bytes": 173800,
+      "tracked": false,
+      "ignored": true
+    },
+    "soundcraft/source-index.html": {
+      "sha256": "6f3dbd27efb495b2d8bcb17a2db4448c06ab103faf3c946ad71f38439a1e6688",
+      "bytes": 2057,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/.htaccess": {
+      "sha256": "2660940c9af97845dfd475cf1daa2ff1df18afb0bd91471e74e60d677fab2c6a",
+      "bytes": 530,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/ASSETS.md": {
+      "sha256": "b5984bf651ed6c7bbc054571500882b7c192d35a996aaa9cc88f9a2142e7f41e",
+      "bytes": 62270,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/HOSTING.md": {
+      "sha256": "73aa2e811441de59c633718b479f2bc9427942998eb752b65b5a6a6646ea4cd4",
+      "bytes": 5107,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/LICENSE-APACHE": {
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/LICENSE-MIT": {
+      "sha256": "8b6025dc4b707e0fb08b9c2054096f1be3ae61529399aa2c348dec676562dc71",
+      "bytes": 1103,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/NOTICE": {
+      "sha256": "f8a36e6679c3268658acb03775902cf70cd003f3dda277caf4f5fde7d361e508",
+      "bytes": 7053,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/OFL-biz-ud-mincho.txt": {
+      "sha256": "ef0ed524b3bd012f37015e986809eed6f67905456ebfc1ebd7fcc2765282ee01",
+      "bytes": 4408,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/OFL-biz-ud-pgothic.txt": {
+      "sha256": "e753d7155d53c747d037a445e584c8ecfca6dd79846db610417e282a736b28bc",
+      "bytes": 4408,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/OFL-noto-sans-arabic.txt": {
+      "sha256": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96",
+      "bytes": 4382,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/OFL-noto-sans-cjk-sc.txt": {
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "bytes": 4301,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/OFL-noto-sans-georgian.txt": {
+      "sha256": "8c02263c5d73d40544f9ed91e30c4e947407057a3cc430d7b786189aeceff6df",
+      "bytes": 4384,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/OFL-noto-sans-thai.txt": {
+      "sha256": "2e98fd23a52d253db8612cd5942c8f2ff4111b21d2367050fdca91d8ccc374a0",
+      "bytes": 4380,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/OFL-shippori-mincho.txt": {
+      "sha256": "41fba056279be5f45ff9a99e44b7b53897b42732f5806d8e666e0ab49ac6bd38",
+      "bytes": 4399,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/README.md": {
+      "sha256": "29233c1656793134e60302788512bb956f87a5b890f0f93f03b6cfb1a364a9b2",
+      "bytes": 24514,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/_headers": {
+      "sha256": "dbca09da27d94b05de8b5f3ca1b933d3390f18f5cf64669b0910acb672e39968",
+      "bytes": 414,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/fonts/5a1c559bb539583c/NotoSansThai.ttf": {
+      "sha256": "5a1c559bb539583c8a1fd99d1c5b9491e5e14478c9cd2bd0970d5c3096cc9ef8",
+      "bytes": 218652,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/fonts/5a1c559bb539583c/OFL.txt": {
+      "sha256": "2e98fd23a52d253db8612cd5942c8f2ff4111b21d2367050fdca91d8ccc374a0",
+      "bytes": 4380,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/fonts/63111b5b2e074dd4/NotoSansArabic.ttf": {
+      "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
+      "bytes": 844676,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/fonts/63111b5b2e074dd4/OFL.txt": {
+      "sha256": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96",
+      "bytes": 4382,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/fonts/dc591156f36842d3/NotoSansGeorgian.ttf": {
+      "sha256": "dc591156f36842d38996c4a7a17fee9bb58e45da3e2cac7a31b7d33de700adb9",
+      "bytes": 231988,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/fonts/dc591156f36842d3/OFL.txt": {
+      "sha256": "8c02263c5d73d40544f9ed91e30c4e947407057a3cc430d7b786189aeceff6df",
+      "bytes": 4384,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/index.html": {
+      "sha256": "55f3e447e46af2d38be31efb4d9fe6a53944d11b3a90db82efbeae55faf7800f",
+      "bytes": 2513,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-cmap/LICENSE-APACHE": {
+      "sha256": "0cec06e0e55fbc3dc5cee4fca9b607f66cb8f4e4dbcf3b3c013594dd156732e9",
+      "bytes": 10173,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-cmap/LICENSE-MIT": {
+      "sha256": "51b50e6120c344dcc146bbd6375ca1c78e079d97c8bea76e67a53d6ff0efebac",
+      "bytes": 1063,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-cmap/LICENSE.txt": {
+      "sha256": "742665db9c8e1bc72603c6d319ca3e90b83bd6d95202f0cd4ef11068a07a9c29",
+      "bytes": 1453,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-interpret/LICENSE-APACHE": {
+      "sha256": "0cec06e0e55fbc3dc5cee4fca9b607f66cb8f4e4dbcf3b3c013594dd156732e9",
+      "bytes": 10173,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-interpret/LICENSE-MIT": {
+      "sha256": "51b50e6120c344dcc146bbd6375ca1c78e079d97c8bea76e67a53d6ff0efebac",
+      "bytes": 1063,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-interpret/assets/CGATS_LICENSE.txt": {
+      "sha256": "469d87b5fa48f8aaf69e25f4fcac3a309c97dbb7d561b917638abdb640e004d9",
+      "bytes": 6552,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-interpret/assets/LICENSE_FOXIT": {
+      "sha256": "b578cdd2345840ada550bd12519533812320d5f1d21cf4c1c7e1b1b0a31c98b7",
+      "bytes": 1553,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-jbig2/LICENSE-APACHE": {
+      "sha256": "0cec06e0e55fbc3dc5cee4fca9b607f66cb8f4e4dbcf3b3c013594dd156732e9",
+      "bytes": 10173,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-jbig2/LICENSE-MIT": {
+      "sha256": "51b50e6120c344dcc146bbd6375ca1c78e079d97c8bea76e67a53d6ff0efebac",
+      "bytes": 1063,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-syntax/LICENSE-APACHE": {
+      "sha256": "0cec06e0e55fbc3dc5cee4fca9b607f66cb8f4e4dbcf3b3c013594dd156732e9",
+      "bytes": 10173,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/licenses/pdf-backend/hayro-syntax/LICENSE-MIT": {
+      "sha256": "51b50e6120c344dcc146bbd6375ca1c78e079d97c8bea76e67a53d6ff0efebac",
+      "bytes": 1063,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/vectorcraft-web-d0094b3b031c2f0c.js": {
+      "sha256": "6fefae1599ba61e318df66e0e63defa829fe176995bde7aa796d50b5edd5f01b",
+      "bytes": 176550,
+      "tracked": false,
+      "ignored": true
+    },
+    "vectorcraft/vectorcraft-web-d0094b3b031c2f0c_bg.wasm": {
+      "sha256": "6ff3616ff6cf11723d5b453ec2a64f5410cdd3830503017d761a775c3b24254d",
+      "bytes": 73742886,
+      "tracked": false,
+      "ignored": true
+    },
+    "wordcraft/index.html": {
+      "sha256": "c607aa5e707ac1ccb680c3ec9d5d2f951166a23dff4f8099571d2095120b3598",
+      "bytes": 1604,
+      "tracked": false,
+      "ignored": true
+    },
+    "wordcraft/wordcraft-fa59e09a3f921e03.ico": {
+      "sha256": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225",
+      "bytes": 18378,
+      "tracked": false,
+      "ignored": true
+    },
+    "wordcraft/wordcraft-web-2afd9dce3f994b7f.js": {
+      "sha256": "fe62980e5df0989bb9766fd40f130076c3db979bf8ae780a95f01c6a3e7fa6b0",
+      "bytes": 172457,
+      "tracked": false,
+      "ignored": true
+    },
+    "wordcraft/wordcraft-web-fb90ec805f7fe330_bg.wasm": {
+      "sha256": "c559957bb12e87cd535f7844d449d2b8abd5a3a8d91f933bd42f11051fa590f1",
+      "bytes": 61654782,
+      "tracked": false,
+      "ignored": true
+    }
+  },
+  "index_links": {
+    "candidates/wordcraft/v0.10.0-46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05/index.html": {
+      "./wordcraft-fa59e09a3f921e03.ico": true,
+      "./wordcraft-web-8edbd1aaf3363941.js": true,
+      "./wordcraft-web-8edbd1aaf3363941_bg.wasm": true
+    },
+    "gridcraft/index.html": {
+      "./gridcraft-45f84b7721cb79a9.ico": true,
+      "./gridcraft-web-a862b19ca88ea5df.js": true,
+      "./gridcraft-web-a862b19ca88ea5df_bg.wasm": true
+    },
+    "pdfcraft/index.html": {
+      "./pdfcraft-web-2faa2bc762f98c12.js": true,
+      "./pdfcraft-web-2faa2bc762f98c12_bg.wasm": true
+    },
+    "photocraft/index.html": {
+      "./photocraft-web-5251a55206c25672.js": true,
+      "./photocraft-web-840a87a8cfbe4217_bg.wasm": false
+    },
+    "soundcraft/index.html": {
+      "./ai.storyteller.soundcraft-4f86cc0f1d19c49f.png": true,
+      "./soundcraft-web-4155a64cbebbeb93_bg.wasm": true,
+      "./soundcraft-web-c3f262f265311041.js": true
+    },
+    "vectorcraft/index.html": {
+      "./vectorcraft-web-d0094b3b031c2f0c.js": true,
+      "./vectorcraft-web-d0094b3b031c2f0c_bg.wasm": true
+    },
+    "wordcraft/index.html": {
+      "./wordcraft-fa59e09a3f921e03.ico": true,
+      "./wordcraft-web-2afd9dce3f994b7f.js": true,
+      "./wordcraft-web-fb90ec805f7fe330_bg.wasm": true
+    }
+  }
+}

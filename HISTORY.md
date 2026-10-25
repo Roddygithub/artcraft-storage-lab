@@ -1,3 +1,22 @@
+## 2026-10-25 — GR-054 current source and local asset inventory
+
+- Pinned clean source base `1c7914bf1e166ac4731a1c9b11dce649210eed70`;
+  recorded dispatch, 55 source/patch hashes and all 82 parent-local static files
+  read-only. Clean worktree has no static assets; local assets are ignored and
+  untracked. No copying, build, promotion, service, credential or upstream access.
+- Four dispatched bundles have present index targets but lack exact matched
+  source/patch/transport provenance; NOT VERIFIED, not candidate-ready.
+  Non-dispatch PhotoCraft has a missing WASM target. Staged WordCraft release
+  provenance is kept separate from the default WordCraft tree.
+- Reconciled historical 95d review claims with GR-040: isolated synthetic
+  ONLYOFFICE preservation proven; production/deployment and other types/versions
+  remain open. Project GPT verdict INCOMPLETE; no new PASS.
+- Stdlib verifier checks source-base/current pins and optionally all parent-local
+  bytes/status/linkage. Evidence and checks: `docs/reviews/GR-054/`.
+  Independent R1–R2 reviews: bounded PROVISIONAL PASS, no remaining findings;
+  R1 wording note corrected. Project GPT remains INCOMPLETE; GR-054 queued for
+  project-level review.
+
 ## 2026-10-25 — GR-053 credential redirect guard
 
 - Added stdlib redirect rejection for Authorization, recognized credential query

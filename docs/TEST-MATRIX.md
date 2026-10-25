@@ -7,6 +7,27 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-054 — current inventory boundary
+
+Current source snapshot: `1c7914bf1e166ac4731a1c9b11dce649210eed70`;
+95d8983 is a historical reviewed candidate. Existing runtime rows below describe
+recorded historical runs, not a replay of this snapshot plus current local assets.
+Project GPT remains INCOMPLETE; GR-054 independent R1–R2 bounded reviews are
+PROVISIONAL PASS. No current source-plus-assets replay is claimed.
+
+| Check | Result | Scope |
+| --- | --- | --- |
+| Dispatch/source inventory | [x] 55 pinned source/patch files match base and current files | Stdlib verifier; no services or builds |
+| Parent-local inventory | [x] 82 file hashes/sizes, ignored/untracked state and seven index maps match | Optional read-only verifier; clean worktree has no static tree |
+| Dispatched asset provenance | [ ] NOT VERIFIED for all four default bundles | Existing historical pins/runtime evidence cannot be bound to current JS/WASM/index bytes |
+| Local index linkage | [~] Four dispatched apps link present JS/WASM | Static inspection only; non-dispatch PhotoCraft index points at missing WASM |
+| Current source-plus-assets browser/Seafile replay | [ ] NOT VERIFIED | No new browser or Seafile test performed |
+| ONLYOFFICE preservation reconciliation | [x] GR-040 isolated synthetic stack proves DOCX preservation | Production/deployment, other types/versions remain NOT VERIFIED |
+
+Evidence: [manifest](GR-054-CURRENT-CANDIDATE-MANIFEST.md),
+[checks and verifier](reviews/GR-054/README.md). Inventory PASS is not a
+candidate-readiness or provenance PASS.
+
 ## 1. DOCX — WordCraft (GR-006, mandatory MVP)
 
 | # | Test | Expected | Result |

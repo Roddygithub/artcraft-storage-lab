@@ -1,5 +1,26 @@
 # GPT Review Queue
 
+## GR-054 — Current candidate manifest (bounded independent review passed)
+
+Exact current **source** snapshot: `1c7914bf1e166ac4731a1c9b11dce649210eed70`.
+R1–R2 bounded independent reviews are PROVISIONAL PASS. Project GPT review is
+pending; project verdict remains **INCOMPLETE**, upstream publication **LOCKED**.
+
+[Manifest](GR-054-CURRENT-CANDIDATE-MANIFEST.md) and
+[evidence](reviews/GR-054/README.md) separate clean tracked source (no static
+assets) from 82 ignored/untracked parent-local static files. Four dispatched
+bundles lack matched exact source/patch/transport evidence: NOT VERIFIED,
+not candidate-ready. GR-054 performs no build, promotion or service access.
+
+95d8983 and older candidate assertions below are historical. GR-040 closes
+ONLYOFFICE preservation on the isolated synthetic patched stack (DOCX, actual
+Document Server 8.0.1-31, two saves/versions/fresh file-list reopen). Earlier
+per-run “ONLYOFFICE unverified” statements do not remain an unqualified current
+blocker. Production/deployment, other file types/versions, security/authorization,
+server compatibility, exact editor asset provenance/protocol and distribution
+remain open; no current-source runtime replay or new GPT verdict is claimed.
+
+
 ## GR-053 — Credential redirect guard
 
 **BOUNDED INDEPENDENT R1–R2: PROVISIONAL PASS, no blocker/major; GPT REVIEW
@@ -195,7 +216,7 @@ other document types and versions, deployment security, and callback-byte
 identity remain NOT VERIFIED. Overall GPT REVIEW stays INCOMPLETE and upstream
 publication stays locked.
 
-## Latest first-pass result — 2026-10-25
+## Historical first-pass result — 2026-10-25 (95d8983)
 
 ```text
 Candidate: 95d89835b2b1d06fd098c586469ed03b8fd0549e
@@ -203,17 +224,21 @@ Reviewer: GPT-6.1 Sol (low)
 Verdict: INCOMPLETE — GPT REVIEW PASS not granted
 Report: docs/reviews/GPT-FIRST-PASS-95D8983.md
 Synthetic DOCX MVP: demonstrated on isolated patched Seafile C-fileserver stack
-Open gates: ONLYOFFICE regression, security/authorization cases, server compatibility,
+Open gates at review time: ONLYOFFICE regression, security/authorization cases, server compatibility,
             pinned editor assets/protocol check, distribution/licensing decision
 Upstream publication: LOCKED
 ```
 
-This result supersedes the old “no Seafile E2E” objection for the candidate's
+GR-040 subsequently closes the isolated synthetic ONLYOFFICE gate above;
+production/deployment and other types/versions remain NOT VERIFIED. GR-054
+identifies the current source snapshot and unresolved operational asset identity.
+
+This historical result supersedes the old “no Seafile E2E” objection for the candidate's
 remediation evidence; it does not erase the historical FAIL on `0edbe52` or
 establish production readiness. The current test matrix corrects the stale
 GridCraft formula-recalculation entries based on the later GR-016 runtime report.
 
-## Latest candidate result — 2026-10-23
+## Historical candidate result — 2026-10-23
 
 ```text
 Candidate: 0edbe524b4fa321b0f73f8601afef390e7f785e6

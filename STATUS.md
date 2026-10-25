@@ -1,6 +1,27 @@
 # STATUS
 
-## CURRENT GR: GR-053 — credential redirects
+## CURRENT GR: GR-054 — exact candidate inventory
+
+Current source snapshot: `1c7914bf1e166ac4731a1c9b11dce649210eed70`.
+Documentation/evidence inventory independently reviewed (R1–R2 bounded
+PROVISIONAL PASS, no remaining findings). Project GPT verdict remains
+**INCOMPLETE**; GR-054 is queued for project-level GPT review.
+GR-054 work-item status: **GPT REVIEW PENDING**.
+The clean source has no `integration/static/`; the parent checkout has 82
+ignored/untracked local files inventoried read-only. All four dispatched app
+bundles lack matched exact source/patch/transport provenance: **NOT VERIFIED**,
+not candidate-ready. PhotoCraft is not dispatched and has a missing WASM index
+target. No build, promotion, service or production access.
+
+GR-040 proves ONLYOFFICE preservation on the isolated synthetic patched stack
+(two browser edits/versions and fresh file-list reopen). Production/deployment,
+other types/versions and security remain **NOT VERIFIED**. Earlier unqualified
+ONLYOFFICE blockers below are historical per-run limitations, superseded only
+within GR-040's bounded scope. Historical test results do not constitute a
+replay of this exact current source-plus-assets combination.
+See `docs/GR-054-CURRENT-CANDIDATE-MANIFEST.md`, `docs/reviews/GR-054/`.
+
+## PREVIOUS GR: GR-053 — credential redirects
 
 Credential-bearing API and signed-link redirects fail closed; public redirects
 remain enabled. Local regression and gateway checks pass. Independent R1–R2
@@ -10,11 +31,11 @@ Seafile redirects NOT VERIFIED. Evidence:
 
 
 ```text
-PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local main
-BRANCH:     main
+PHASE:      project GPT INCOMPLETE; historical GPT first pass on 95d8983
+SOURCE BASE: local main at 1c7914bf; implementation worktree t3/gr054-candidate-manifest
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
-CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038/039 and are not project-level GPT-reviewed
-WORKTREE:   main-only workflow; GR-048 FigCraft browser smoke completed from isolated worktree based on main `32069b9`; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; GR-044 through GR-048 cover DeckCraft, DesignCraft, EffectCraft, FilmCraft and FigCraft host-save browser runtime; no upstream changes
+CURRENT SOURCE CANDIDATE: 1c7914bf1e166ac4731a1c9b11dce649210eed70; GR-054 inventory; not project-level GPT-reviewed or deployment-ready
+HISTORICAL WORK: GR-048 FigCraft browser smoke completed from isolated worktree based on main `32069b9`; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; GR-044 through GR-048 cover DeckCraft, DesignCraft, EffectCraft, FilmCraft and FigCraft host-save browser runtime; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -23,7 +44,7 @@ ARCHITECT:  artcraft-architect        (nvidia/z-ai/glm-5.3#thinking)
 IMPLEMENTER:artcraft-worker           (nvidia/z-ai/glm-5.3-flash#thinking)
 REVIEWER:   artcraft-reviewer         (nvidia/nvidia/nemotron-3-ultra-550b-a55b#high)
 
-FREE REVIEW: PASS (2 rounds, both remediated) — see docs/reviews/REVIEW-0*.md
+FREE REVIEW: PROVISIONAL PASS (2 rounds, both remediated) — see docs/reviews/REVIEW-0*.md
 GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              c76a7594cc43ba2a6cf56de2232836f008a97863,
              d9ef476e6fbcb04c9a9e23cfe235812167d1f27c, and
@@ -31,7 +52,10 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-053 — credential redirect isolation.
+CURRENT GR: GR-054 — documentation/evidence inventory, bounded R1–R2 reviews
+PROVISIONAL PASS; awaiting commit/push and project GPT review.
+
+PREVIOUS GR: GR-053 — credential redirect isolation.
 Loopback tests prove urllib redirects credential-bearing requests and signed
 file-server links are refused before a second host receives the request; public
 credential-free redirects still work. Independent R1–R2 bounded reviews are
@@ -127,7 +151,7 @@ remains excluded from dispatch. Cargo build/temp paths use the persistent home
 filesystem. Production security, deployed ONLYOFFICE compatibility, optimized output and
 project-level GPT PASS remain NOT VERIFIED; details are in `docs/reviews/GR-037/`.
 
-FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
+FREE REVIEW: PROVISIONAL PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
                     two-editor save race reproduced afterward; Nemotron also
                     returned FAIL on `36c0bc0`; see review reports
