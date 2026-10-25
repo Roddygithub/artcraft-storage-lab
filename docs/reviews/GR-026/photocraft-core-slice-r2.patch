@@ -1,0 +1,126 @@
+diff --git c/crates/engine/src/lib.rs w/crates/engine/src/lib.rs
+index 4a3521073..6dc49c79f 100644
+--- c/crates/engine/src/lib.rs
++++ w/crates/engine/src/lib.rs
+@@ -201,6 +201,8 @@ pub(crate) fn active_layer_of(s: &Session) -> std::result::Result<&photocraft_do
+ #[derive(Clone, Debug)]
+ pub struct DocState {
+     pub doc: Arc<Document>,
++    /// Unique identity for this open incarnation of the document.
++    incarnation: Arc<()>,
+     pub history: History,
+     /// The primary ("key") layer: what single-layer commands act on. Always a member of
+     /// `selected_layers` when set.
+@@ -254,7 +256,34 @@ pub struct DocState {
+     pub(crate) source_snapshot: Option<u64>,
+ }
+ 
++/// An immutable document value and revision captured together for an external save.
++/// Create one with [`DocState::saved_snapshot`], serialize [`Self::document`], then pass
++/// the same value to [`Session::acknowledge_saved_snapshot`] only after that write is durable.
++#[derive(Clone, Debug)]
++pub struct SavedSnapshot {
++    document: Arc<Document>,
++    revision: u64,
++    incarnation: Arc<()>,
++}
++
++impl SavedSnapshot {
++    /// The exact immutable document value captured for serialization.
++    pub fn document(&self) -> &Document {
++        &self.document
++    }
++
++    /// The document revision represented by [`Self::document`].
++    pub fn revision(&self) -> u64 {
++        self.revision
++    }
++}
++
+ impl DocState {
++    /// Capture the current document and revision as one immutable save snapshot.
++    pub fn saved_snapshot(&self) -> SavedSnapshot {
++        SavedSnapshot { document: Arc::clone(&self.doc), revision: self.revision, incarnation: Arc::clone(&self.incarnation) }
++    }
++
+     /// Trim the history to its budget, counting the tiles only History panel snapshots hold
+     /// against it too (#4530). Returns how many states were dropped.
+     pub fn trim_history(&mut self) -> usize {
+@@ -275,6 +304,7 @@ impl DocState {
+         history.set_current_layers(LayerTarget { active: active_layer, selected: active_layer.into_iter().collect() });
+         Self {
+             doc: Arc::new(doc),
++            incarnation: Arc::new(()),
+             history,
+             active_layer,
+             selected_layers: active_layer.into_iter().collect(),
+@@ -581,6 +611,22 @@ impl Session {
+     pub fn active_mut(&mut self) -> Option<&mut DocState> {
+         self.active.and_then(|i| self.docs.get_mut(i))
+     }
++
++    /// Acknowledge that `snapshot` was durably saved outside PhotoCraft. The baseline advances
++    /// only to the captured revision, so edits made after capture remain dirty. Returns an error
++    /// if that document incarnation is no longer open or the snapshot is inconsistent with its revision.
++    pub fn acknowledge_saved_snapshot(&mut self, snapshot: SavedSnapshot) -> Result<()> {
++        let st = self
++            .docs
++            .iter_mut()
++            .find(|st| st.doc.id == snapshot.document.id && Arc::ptr_eq(&st.incarnation, &snapshot.incarnation))
++            .ok_or(EngineError::Other("saved document incarnation is no longer open".into()))?;
++        if snapshot.revision > st.revision {
++            return Err(EngineError::Other("saved snapshot revision is newer than the open document".into()));
++        }
++        st.saved_revision = st.saved_revision.max(snapshot.revision);
++        Ok(())
++    }
+     pub fn set_active(&mut self, index: usize) -> bool {
+         if index < self.docs.len() {
+             self.active = Some(index);
+@@ -1111,3 +1157,6 @@ mod tests;
+ 
+ #[cfg(test)]
+ mod fx_mode_tests;
++
++#[cfg(test)]
++mod saved_snapshot_tests;
+diff --git c/crates/ui-egui/src/file_open.rs w/crates/ui-egui/src/file_open.rs
+index 19d8819e3..ea17f226b 100644
+--- c/crates/ui-egui/src/file_open.rs
++++ w/crates/ui-egui/src/file_open.rs
+@@ -89,6 +89,13 @@ pub fn display_name(path: &str) -> String {
+ }
+ 
+ impl PhotocraftApp {
++    /// Open host-supplied document bytes without treating the host name as a filesystem path.
++    /// The name is used for display only; this method does not bind a save path or add Open Recent.
++    /// This is a Rust API, not a browser transport entry point.
++    pub fn open_file_pathless(&mut self, host_name: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
++        self.open_bytes_from(&display_name(host_name), bytes, None)
++    }
++
+     /// Open `bytes` read from the file at `path`: the document is named after the file, keeps
+     /// `path` for File › Save unless it is a derivative preview, and `path` goes to the top of Open Recent. Returns the import
+     /// warnings (also shown to the user).
+diff --git c/crates/ui-egui/src/file_open/tests.rs w/crates/ui-egui/src/file_open/tests.rs
+index 099caf58c..96994387b 100644
+--- c/crates/ui-egui/src/file_open/tests.rs
++++ w/crates/ui-egui/src/file_open/tests.rs
+@@ -80,6 +80,17 @@ fn open_file_sets_name_path_and_recent() {
+     assert!(app.ui.notices.is_empty());
+ }
+ 
++#[test]
++fn pathless_host_open_uses_name_without_binding_or_recent_entry() {
++    let (mut app, _) = app_with(Vec::new());
++    let warnings = app.open_file_pathless("/host/library/cat.psd", b"x").unwrap();
++    assert!(warnings.is_empty());
++    let st = app.session.active().unwrap();
++    assert_eq!(st.doc.name, "cat.psd");
++    assert!(st.path.is_none());
++    assert!(app.ui.recent_files.is_empty());
++}
++
+ #[test]
+ fn affinity_preview_does_not_acquire_the_source_path_even_when_renamed() {
+     for automation in [false, true] {

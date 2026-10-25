@@ -1,15 +1,16 @@
 # GR-026 — PhotoCraft host integration assessment
 
-**Status:** implementation stopped at the bounded-slice gate; minimal design
-recorded. No PhotoCraft source patch was produced, and this is not a project
-verdict or upstream authorization.
+**Status:** pathless-open/snapshot-ACK core implemented as a local patch and
+independently reviewed PROVISIONAL PASS after fixing stale ACK identity and
+patch application format. The full host adapter is not implemented. This is not
+a project verdict or upstream authorization.
 
 | Field | Value |
 |---|---|
 | Audited source | `storytold/photocraft` `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` |
 | Required shared transport | `craft-platform` `56c5e16d79b77751106173c13111ef4fe0a2c0ec` |
-| Code patch | None; a pathless-open plus revision-ack seam needs changes across the app shell, UI save lifecycle and engine state |
-| Evidence | [`README.md`](reviews/GR-026/README.md) |
+| Code patch | [`photocraft-core-slice-r2.patch`](reviews/GR-026/photocraft-core-slice-r2.patch), SHA-256 `4ca7ea1e88bf215f80e6edc137417b8b21d0302e82b9a7a496ffd4e60b0cd3e4` |
+| Evidence | [`README.md`](reviews/GR-026/README.md), [independent R2](reviews/GR-026/REVIEW-INDEPENDENT-R2.md) |
 
 ## Decision
 
@@ -52,8 +53,6 @@ The smallest safe next implementation is a pathless, one-document host mode:
 This remains a design only. Seafile authorization, browser protocol execution,
 version creation and fresh-editor reopen are **NOT VERIFIED**.
 
-The pinned shared transport's seven Rust 1.95 unit tests and locked WASM test
-target check pass. Rust 1.95 `cargo fmt --check` reports formatting differences
-in unchanged package files, so no formatter was applied. This does not verify
-a PhotoCraft app build or implementation; exact commands and outcomes are in
-`docs/reviews/GR-026/README.md`.
+The core patch is a necessary primitive only. It does not implement browser
+transport, the async UI save lifecycle, or Seafile integration. Browser protocol,
+authorization, version creation and fresh-editor reopen remain **NOT VERIFIED**.

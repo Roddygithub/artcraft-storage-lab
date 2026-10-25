@@ -1,9 +1,29 @@
 # GR-026 evidence — PhotoCraft host integration
 
-**Result:** bounded implementation not attempted. Source inspection found that
-safe durable semantics require app-level changes beyond an isolated browser
-adapter. No downloaded source, app patch, production access, upstream action or
-project-level PASS is part of this result.
+**Result:** bounded core stage implemented locally; the full browser host adapter
+is still not implemented. The pathless-open/snapshot-ACK patch is a provisional
+PASS after remediation of stale acknowledgements across close/reopen and patch
+format. Browser transport, Seafile durability and project-level readiness are
+**NOT VERIFIED**.
+
+## Core stage patch
+
+| Item | Value |
+|---|---|
+| Base | `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` |
+| Patch | [`photocraft-core-slice-r2.patch`](photocraft-core-slice-r2.patch) |
+| SHA-256 | `4ca7ea1e88bf215f80e6edc137417b8b21d0302e82b9a7a496ffd4e60b0cd3e4` |
+| Review | [Independent R2](REVIEW-INDEPENDENT-R2.md): PROVISIONAL PASS |
+| Tests | Engine snapshot tests 4/4, pathless UI test 1/1 and locked Web WASM check pass in this session |
+
+The patch adds a pathless byte-open API and captures the document revision plus
+a unique open-incarnation token in `SavedSnapshot`. A durable ACK advances only
+the saved revision of that exact open document. Closing and reopening a document
+with a reused ID creates a different incarnation, so an old ACK is rejected.
+The standard `git apply --check` succeeds against the clean pinned base.
+
+This is only an engine/UI core seam; it adds no browser message listener or
+Seafile write path. No production access or upstream action was performed.
 
 ## Exact source and shared transport
 
@@ -28,14 +48,12 @@ No PhotoCraft files were edited.
 
 | Check | Result |
 |---|---|
-| Exact source SHA | PASS, command and output recorded above |
-| Rust 1.95 locked shared-transport tests | PASS: `cargo +1.95.0 test --manifest-path integration/rust/craft-platform/Cargo.toml --locked`; 7 unit tests passed |
-| Rust 1.95 locked WASM check | PASS for the shared transport only: `cargo +1.95.0 check --manifest-path integration/rust/craft-platform/Cargo.toml --locked --features browser --target wasm32-unknown-unknown --tests` |
-| Rust 1.95 format check | FAIL on unchanged shared-transport files: `cargo +1.95.0 fmt --manifest-path integration/rust/craft-platform/Cargo.toml -- --check` reports pre-existing formatting differences across the package; no formatter changes were applied |
-| Rust 1.95 locked WASM PhotoCraft app check | NOT RUN: no patch/app integration was produced, so an app build would not verify an implementation |
-| Diff whitespace check | PASS: `git diff --check` |
-| Focused PhotoCraft host lifecycle tests | NOT RUN: there is no implementation to test |
+| Exact source SHA | PASS: patch applies to clean `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` checkout |
+| Engine snapshot ACK tests | PASS: 4 tests, including same-ID close/reopen stale ACK rejection |
+| UI pathless-open regression | PASS: `cargo +1.95.0 test --locked -p photocraft-ui-egui pathless_host_open_uses_name_without_binding_or_recent_entry`; 1 test |
+| Rust 1.95 locked WASM PhotoCraft app check | PASS after incarnation-token addition: `cargo +1.95.0 check --locked -p photocraft-web --target wasm32-unknown-unknown` |
+| Format and diff whitespace checks | PASS for the current checkout |
+| Independent exact review | R2 PROVISIONAL PASS; reviewer could not run tests due `/tmp` quota |
 | Browser host / Seafile version / reopen | NOT VERIFIED |
-| Independent code review | NOT APPLICABLE: no code patch; review of this design remains open |
 
-See `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md` for the minimal implementation design.
+See `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md` for the remaining implementation design.

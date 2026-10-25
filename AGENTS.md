@@ -37,6 +37,13 @@ new version" works in the browser, with no manual download and no manual upload?
 10. **Evidence over assertion.** Every non-obvious claim needs a source
     (file:line, URL, command output). Unverified claims are marked
     `NOT VERIFIED`.
+11. **Keep Rust build artifacts off `/tmp`.** `/tmp` is a size-limited tmpfs on
+    the development machine. Cargo is configured globally to use persistent
+    cache/temp directories; do not override `CARGO_TARGET_DIR` or `TMPDIR` to a
+    path under `/tmp`. If a test checkout lives under `/tmp`, use Cargo normally
+    so it still writes build output to the persistent cache. Remove only stale
+    generated target caches, never a directory that an active Cargo process is
+    using.
 
 ## Agent routing
 

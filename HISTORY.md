@@ -1,3 +1,33 @@
+## 2026-10-25 — GR-028 SoundCraft playback compatibility slice
+
+* Added a local CPAL 0.18.2 compatibility patch for native and WASM playback;
+  both target checks and 36 unit tests were rerun successfully in this session.
+  Independent R1 found no API-semantic issue but was incomplete because its
+  review checkout lacked the SoundCraft base. Full SoundCraft Web WASM still
+  fails in unchanged UI code because pinned craft-ui uses egui 0.36 while
+  SoundCraft uses egui 0.37.
+* Browser, Seafile version/reopen and production behavior remain NOT VERIFIED.
+
+## 2026-10-25 — GR-027 SoundCraft Symphonia compatibility slice
+
+* Added the locked Symphonia 0.6.1 API port without dependency changes. Five
+  review rounds remediated marker-scope, ftyp bounds, null-codec selection, and
+  zero-padded MP4 preflight findings. Exact R5 review is PROVISIONAL PASS; 57
+  audio-io tests and locked audio-io WASM check pass.
+* Full SoundCraft Web WASM, browser, and Seafile save/version/reopen remain NOT
+  VERIFIED.
+
+## 2026-10-25 — GR-025 SoundCraft host-save prototype review
+
+* Added a ticketed host-save path for one pathless `.scraftz` session. The
+  independent review found and the follow-up fixed a local picker/drop route
+  that could replace the host-bound session. R2 source review found no new
+  blocker/major but did not rerun the UI tests.
+* The Web build and UI regression remain blocked by base dependency/API
+  mismatches in Symphonia 0.6.1 and CPAL 0.18.2; GR-027/028 track their local
+  compatibility work. Browser, Seafile version and fresh reopen are NOT
+  VERIFIED. See `docs/reviews/GR-025/`.
+
 ## 2026-10-25 — GR-019 FigCraft transport re-pin
 
 * Updated the stored FigCraft host-save patch to pin `craft-platform`
@@ -32,6 +62,17 @@
   `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`. No app build/test, browser flow,
   Seafile version/reopen, production access or upstream publication was claimed.
   See `docs/reviews/GR-026/`.
+
+## 2026-10-25 — GR-026 PhotoCraft pathless-open/snapshot-ACK core
+
+* Added a pathless open API and snapshot ACK tied to a unique document-open
+  incarnation. The regression closes and reopens the same document ID, then
+  verifies the old ACK is rejected and the replacement remains dirty.
+* Fixed the patch hunk counts; ordinary `git apply --check` passes on the exact
+  pinned base. Four engine tests, the pathless-open UI test, and locked PhotoCraft
+  Web WASM check pass. Independent R2 review is PROVISIONAL PASS; its test run
+  hit `/tmp` quota. Browser transport and Seafile version/reopen remain
+  unverified.
 
 ## 2026-10-25 — GR-022 EffectCraft host-save prototype
 

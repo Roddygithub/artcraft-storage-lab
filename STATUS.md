@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; shared transport and app adapters conti
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft host-save prototype is in progress; PhotoCraft pathless-open/revision-ACK core is now in a bounded implementation lane; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has an exact provisional PASS; GR-028 CPAL semantic review is incomplete because its reviewer lacked the SoundCraft base checkout, while local native/WASM playback checks and 36 tests pass; full Web WASM still hits the egui 0.36/0.37 mismatch; PhotoCraft GR-026 core patch has a provisional independent PASS and engine 4/4, UI 1/1 tests plus locked Web WASM check pass; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-020/021/022/023/024 — DeckCraft, DesignCraft, EffectCraft and FilmCraft patches use 56c5e16; EffectCraft GR-022 has an exact bounded review PASS; SoundCraft is underway; PhotoCraft GR-026 has a source audit; pathless-open/revision-ACK core implementation is underway, with no browser adapter yet; browser/Seafile runtime remains NOT VERIFIED
+CURRENT GR: GR-020/021/022/023/024 — DeckCraft, DesignCraft, EffectCraft and FilmCraft patches use 56c5e16; EffectCraft GR-022 has an exact bounded review PASS; SoundCraft GR-025 has a bounded source review; GR-027 passed bounded exact review after five rounds; GR-028 playback patch has an incomplete independent semantic review. Full Web WASM still fails in unchanged SoundCraft/craft-ui egui 0.36/0.37 code. PhotoCraft GR-026 pathless-open/snapshot-ACK core has an incarnation guard and provisional independent PASS; no browser host adapter yet; browser/Seafile runtime remains NOT VERIFIED
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -117,12 +117,21 @@ OPEN GAPS:
   guard. Independent round 2 exact review found no blocker/major. Browser,
   durable Seafile version and fresh reopen remain NOT VERIFIED; see
   `docs/reviews/GR-023/`.
-- GR-026 audited PhotoCraft `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` and
-  stopped without an app patch: its public open API binds names as local paths,
-  its download writer is deliberately unconfirmed, and safe host binding needs
-  pathless-open, revision-ACK and replacement-route guards across app layers.
-  The minimal design is recorded; PhotoCraft host save, browser behavior and
-  Seafile version/reopen are NOT VERIFIED. See `docs/reviews/GR-026/`.
+- GR-025 SoundCraft has a ticketed host-save source prototype, and the local
+  picker/drop replacement bypass was fixed and independently source-reviewed.
+  The Symphonia audio crate now builds/tests on native and WASM (GR-027 exact
+  provisional PASS); CPAL playback also checks on native/WASM and has 36 tests
+  passing in GR-028, whose independent review found no CPAL API semantic issue
+  but could not verify exact applicability or reproduce reported commands. The full Web WASM build
+  now reaches a separate egui 0.36/0.37 mismatch in unchanged UI/dependency code.
+  Host browser messaging and Seafile version/reopen remain NOT VERIFIED; do not
+  add SoundCraft to dispatch. See `docs/reviews/GR-025/`, `GR-027/`, `GR-028/`.
+- GR-026 now has a bounded core patch for pathless open and revision ACK, with
+  per-open incarnation identity to reject ACKs after close/reopen with a reused
+  document ID. Independent R2 review is provisional PASS; engine 4/4 pass, UI
+  and post-change WASM checks are pending. It is not a host adapter: browser
+  behavior and Seafile version/reopen remain NOT VERIFIED. See
+  `docs/reviews/GR-026/`.
 - The isolated synthetic Seafile runtime flows currently documented are for
   WordCraft, GridCraft, VectorCraft, PdfCraft and CADCraft. VectorCraft uses its
   page API, not the common `?host=parent` contract. DeckCraft now has a local
@@ -139,9 +148,11 @@ OPEN GAPS:
 NEXT:
 - FigCraft and CADCraft are repinned to `56c5e16`; exact bounded repin reviews
   are recorded
-- finish the SoundCraft host-save prototype and the PhotoCraft pathless-open /
-  revision-ACK core; neither app enters Seafile dispatch without browser and
-  Seafile version/reopen evidence
+- resolve the separate SoundCraft/craft-ui egui 0.36/0.37 mismatch before
+  claiming full Web WASM, then revalidate the host adapter. Extend PhotoCraft
+  GR-026 from its provisional pathless-open/snapshot-ACK core to guarded async
+  UI save routing and browser transport. Neither app enters dispatch without
+  browser and Seafile version/reopen evidence
 - add any app to Seafile dispatch only after synthetic browser and Seafile
   version/reopen evidence exists
 - continue app-by-app adapters from the GR-016 seam inventory; WordCraft,

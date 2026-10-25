@@ -541,15 +541,54 @@ Publication: LOCKED; no upstream issue, PR, RFC or patch published
 Evidence:    `docs/reviews/GR-023/`
 ```
 
+### GR-025 — SoundCraft host-save acknowledgement prototype
+
+```text
+Status:      PROVISIONAL source review; R1 local-open bypass fixed; WASM blocked by pinned-base API mismatch
+Base:        storytold/soundcraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`
+Transport:   `craft-platform` `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
+Patch SHA:   `f8f9da024b80b3292cca1a60ee69eaf4e19c450d7582fac582596fd11aebc331`
+Review:      R1 found local picker/drop replacement bypass; R2 confirms guard closes it, no new blocker/major by inspection
+Tests:       2 host-save ledger tests pass; UI regression/WASM do not build on base errors in Symphonia 0.6.1 and CPAL 0.18.2
+Open:        GR-027 ports Symphonia, GR-028 addresses CPAL; full WASM/browser/Seafile version/reopen NOT VERIFIED; output cap after allocation
+GPT review:  not a project candidate; overall project remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC or patch published
+Evidence:    `docs/GR-025-SOUNDCRAFT-HOST-SAVE.md`, `docs/reviews/GR-025/`
+```
+
+### GR-027 — SoundCraft Symphonia 0.6.1 compatibility
+
+```text
+Status:      PROVISIONAL PASS, bounded audio-crate patch; exact independent R5 review found no findings
+Base:        storytold/soundcraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`
+Patch SHA:   `e4a63489cfdfc0fd3cfc347a1998347bd92bb0b682ac9a25d1051f887e357e6b`
+Tests:       57 soundcraft-audio-io tests; locked native/WASM crate checks pass
+Open:        full SoundCraft Web WASM blocked after CPAL by egui 0.36/0.37 mismatch; browser/Seafile NOT VERIFIED
+Publication: LOCKED; no upstream changes
+Evidence:    `docs/reviews/GR-027/`
+```
+
+### GR-028 — SoundCraft CPAL 0.18.2 playback compatibility
+
+```text
+Status:      local patch candidate; independent R1 incomplete (no semantic API finding; exact base/builds not verified)
+Base:        storytold/soundcraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`
+Patch SHA:   `ff1ced58251397b8077f92ee9b92c7cae1ada25a8a7fe9068c50ba7cdad5901c`
+Tests:       implementer reports 36 soundcraft-playback tests and locked native/WASM checks pass; independent reproduction unavailable
+Open:        full SoundCraft Web WASM hits unchanged egui/craft-ui 0.36/0.37 API/type mismatch; browser/Seafile NOT VERIFIED
+Publication: LOCKED; no upstream changes
+Evidence:    `docs/reviews/GR-028/`
+```
+
 ### GR-026 — PhotoCraft host integration assessment
 
 ```text
-Status:      source audit/design recorded; pathless-open and revision-ACK engine core implementation underway; no browser adapter yet
+Status:      bounded pathless-open/snapshot-ACK core PROVISIONAL PASS; no browser adapter yet
 Base:        storytold/photocraft `a02f2ee41059d3312e7ff24a5af5edcac7b6435a`
 Transport:   future app dependency must pin `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
 Finding:     `open_file(path, bytes)` binds the name as a local path; browser download uses `write_unconfirmed: true`; pathless binding and revision ACK require app-layer seams and route guards
-Tests:       audit inspected exact source SHA; focused core tests and Rust 1.95 app WASM check pending the stage-1 implementation
-Open:        complete core implementation, browser messaging, Seafile version creation and fresh reopen NOT VERIFIED
+Tests:       4 engine tests, 1 pathless-open UI test, Rust 1.95 locked PhotoCraft Web WASM check pass
+Open:        browser messaging, async UI save lifecycle, Seafile version creation and fresh reopen NOT VERIFIED
 GPT review:  not a project candidate; overall project verdict unchanged
 Publication: LOCKED; no upstream issue, PR, RFC or patch published
 Evidence:    `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`, `docs/reviews/GR-026/`

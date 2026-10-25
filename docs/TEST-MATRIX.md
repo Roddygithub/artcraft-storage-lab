@@ -243,10 +243,43 @@ Patch, commands, and limits: `docs/reviews/GR-022/`.
 | # | Test | Expected | Result |
 |---|---|---|---|
 | 16.1 | Audit immutable PhotoCraft source | Findings refer to the requested exact SHA | [x] `storytold/photocraft` SHA `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` inspected; evidence in `docs/reviews/GR-026/README.md` |
-| 16.2 | Pathless open and revision-specific saved-baseline core | host names are not native paths; ACK only confirms the captured revision | [ ] IMPLEMENTATION IN PROGRESS; the audit found the existing open/write seams insufficient |
-| 16.3 | Rust 1.95 locked WASM app check and focused host tests | Exact patch builds and lifecycle tests pass | [ ] NOT RUN; no app patch exists |
+| 16.2 | Pathless open and revision-specific saved-baseline core | host names are not native paths; ACK only confirms the captured revision/incarnation | [x] R2 patch adds pathless open and per-open Arc identity; independent bounded PROVISIONAL PASS |
+| 16.3 | Rust 1.95 focused engine/UI tests and Web WASM check | core stale/current/close-reopen ACK behavior, pathless open, and app compile pass | [x] Engine 4/4, UI 1/1, locked `photocraft-web` WASM check pass |
 | 16.4 | Browser host flow / Seafile version / fresh reopen | Persisted edit reopens from new host session | [ ] NOT VERIFIED |
+| 16.5 | ACK after closing and reopening same document ID | old ticket cannot modify a replacement document incarnation | [x] Incarnation-token regression is present and engine test passes; independent R2 review confirms source fix |
 
-GR-026 first records an implementation stop with a minimal design; the core
-pathless-open/revision-ACK stage is now underway. This is not yet a PhotoCraft
-host adapter or project-level PASS. See `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`.
+The core patch fixes stale-ACK identity and standard patch applicability. It is
+not yet a PhotoCraft browser host adapter or project-level PASS. See
+`docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`.
+
+
+## 17. SoundCraft host-save prototype (GR-025)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 17.1 | Host snapshot ACK ledger | exact success ACK clears only captured state; failure/retry/timeout remain safe | [x] 2 focused host-save ledger tests pass; independent source review found no new blocker/major |
+| 17.2 | Local picker/drop cannot replace host-bound session | dirty content and history remain unchanged | [ ] Regression added but not executed: test target blocked by existing base Symphonia 0.6.1 API errors |
+| 17.3 | SoundCraft Web WASM build | pinned host adapter builds for browser target | [ ] BLOCKED: GR-027 audio and GR-028 playback now compile separately; full Web build reaches egui 0.36/0.37 mismatch in pinned craft-ui/UI |
+| 17.4 | Browser host messaging and Seafile version/reopen | durable saved edit reopens from a fresh session | [ ] NOT VERIFIED; adapter is not in dispatch |
+
+Patch, review, base-build blockers and limits: `docs/reviews/GR-025/`.
+
+
+## 18. SoundCraft Symphonia compatibility (GR-027)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 18.1 | Symphonia 0.6.1 audio crate native suite | Decoder, format and malformed-input behavior pass | [x] 57 tests pass |
+| 18.2 | Audio crate WASM check | Audio crate compiles for browser target | [x] Rust 1.95 locked check passes |
+| 18.3 | Root container / MP4 preflight edge cases | Markers only select root format; ftyp bounds and padded offset are checked; null codec skipped | [x] Regressions added; GR-027 exact review R5 provisional PASS |
+
+## 19. SoundCraft CPAL playback compatibility (GR-028)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 19.1 | Playback native and WASM checks | Locked CPAL 0.18.2 APIs compile | [x] Reran in this session; both pass |
+| 19.2 | Playback native unit tests | Playback/recording behavior remains covered | [x] Reran in this session; 36 pass |
+| 19.3 | Full SoundCraft Web WASM | App and host adapter compile | [ ] BLOCKED by separate egui 0.36/0.37 mismatch in existing UI/dependency code |
+| 19.4 | Browser host save / Seafile version / fresh reopen | Durable version and edit survive reopen | [ ] NOT VERIFIED |
+
+Independent CPAL patch review: `docs/reviews/GR-028/REVIEW-INDEPENDENT-R1.md`.

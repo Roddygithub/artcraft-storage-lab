@@ -1,0 +1,481 @@
+--- a/crates/audio-io/src/symph.rs
++++ b/crates/audio-io/src/symph.rs
+@@ -3,20 +3,21 @@
+ use std::io::Cursor;
+ use std::panic::{AssertUnwindSafe, catch_unwind};
+ 
+-use symphonia::core::audio::SampleBuffer;
+-use symphonia::core::codecs::{
+-    CODEC_TYPE_AAC, CODEC_TYPE_ADPCM_G722, CODEC_TYPE_ADPCM_G726, CODEC_TYPE_ADPCM_G726LE, CODEC_TYPE_ADPCM_IMA_QT, CODEC_TYPE_ADPCM_IMA_WAV,
+-    CODEC_TYPE_ADPCM_MS, CODEC_TYPE_ALAC, CODEC_TYPE_FLAC, CODEC_TYPE_MP1, CODEC_TYPE_MP2, CODEC_TYPE_MP3, CODEC_TYPE_NULL, CODEC_TYPE_OPUS,
+-    CODEC_TYPE_PCM_ALAW, CODEC_TYPE_PCM_F32BE, CODEC_TYPE_PCM_F32LE, CODEC_TYPE_PCM_F64BE, CODEC_TYPE_PCM_F64LE, CODEC_TYPE_PCM_MULAW,
+-    CODEC_TYPE_VORBIS, CodecParameters, CodecType, DecoderOptions,
++use symphonia::core::audio::sample::SampleFormat as SymSampleFormat;
++use symphonia::core::codecs::CodecParameters;
++use symphonia::core::codecs::audio::well_known::{
++    CODEC_ID_AAC, CODEC_ID_ADPCM_G722, CODEC_ID_ADPCM_G726, CODEC_ID_ADPCM_G726LE, CODEC_ID_ADPCM_IMA_QT, CODEC_ID_ADPCM_IMA_WAV, CODEC_ID_ADPCM_MS,
++    CODEC_ID_ALAC, CODEC_ID_FLAC, CODEC_ID_MP1, CODEC_ID_MP2, CODEC_ID_MP3, CODEC_ID_OPUS, CODEC_ID_PCM_ALAW, CODEC_ID_PCM_F32BE, CODEC_ID_PCM_F32LE,
++    CODEC_ID_PCM_F64BE, CODEC_ID_PCM_F64LE, CODEC_ID_PCM_MULAW, CODEC_ID_VORBIS,
+ };
++use symphonia::core::codecs::audio::{AudioCodecParameters, AudioDecoderOptions, CODEC_ID_NULL_AUDIO};
+ use symphonia::core::errors::Error as SymError;
+-use symphonia::core::formats::{FormatOptions, FormatReader};
+-use symphonia::core::io::{MediaSourceStream, MediaSourceStreamOptions, ReadBytes};
++use symphonia::core::formats::probe::Hint;
++use symphonia::core::formats::{FormatOptions, FormatReader, Track};
++use symphonia::core::io::{MediaSourceStream, MediaSourceStreamOptions};
+ use symphonia::core::meta::MetadataOptions;
+-use symphonia::core::probe::Instantiate;
+ 
+-use crate::pcm::{MAX_DECODE_SAMPLES, be_u32};
++use crate::pcm::{be_u32, be_u64};
+ use crate::{AudioBuffer, AudioError, AudioInfo, FileFormat, Result, SampleFormat};
+ 
+ /// The most frames a packet may declare: decoders allocate a packet's frames up front, and ALAC
+@@ -42,112 +43,187 @@
+     Empty(AudioInfo),
+ }
+ 
+-/// Symphonia's probe loop (`Probe::format`, whose hint 0.5 ignores), checking the container it
+-/// finds before its reader allocates whatever the file claims.
++/// Locate and skip the leading ID3v2 tag before handing the stream to Symphonia. In particular,
++/// this avoids asking a metadata reader to allocate a frame using an untrusted ID3 size.
++fn id3v2_len(bytes: &[u8]) -> Option<usize> {
++    if bytes.get(..3)? != b"ID3" {
++        return None;
++    }
++    let size = bytes.get(6..10)?.iter().fold(0usize, |acc, &x| (acc << 7) | usize::from(x & 0x7f));
++    Some(10usize.saturating_add(size))
++}
++
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++enum Container {
++    Caf,
++    Mp4,
++    Flac,
++    Wav,
++}
++
++fn has_top_level_ftyp(bytes: &[u8]) -> bool {
++    let mut pos = 0usize;
++    while pos.checked_add(8).is_some_and(|end| end <= bytes.len()) {
++        let Some(size) = be_u32(bytes, pos) else { return false };
++        let Some(kind) = bytes.get(pos + 4..pos + 8) else { return false };
++        let (header, size) = if size == 1 {
++            let Some(size) = be_u64(bytes, pos + 8) else { return false };
++            (16usize, size)
++        } else {
++            (8usize, u64::from(size))
++        };
++        let Ok(size) = usize::try_from(size) else { return false };
++        if size < header || size > bytes.len() - pos || size == 0 {
++            return false;
++        }
++        if kind == b"ftyp" {
++            let Some(payload_size) = size.checked_sub(header) else { return false };
++            return payload_size >= 8 && (payload_size - 8) % 4 == 0;
++        }
++        let Some(next) = pos.checked_add(size) else { return false };
++        pos = next;
++    }
++    false
++}
++
++/// Identify only root containers. Searching the whole file lets arbitrary marker bytes in tags
++/// or audio payloads trigger the wrong parser's preflight checks.
++fn container(bytes: &[u8]) -> Option<(Container, usize)> {
++    // An MP4 atom starts with a binary size, often zero-prefixed; recognize it before treating
++    // leading zero bytes as padding.
++    if has_top_level_ftyp(bytes) {
++        return Some((Container::Mp4, 0));
++    }
++    // For zero-padded MP4, the first non-zero size byte can be inside its 32-bit size field.
++    // Try the at-most-four possible starts for that header, but only across an all-zero prefix.
++    let first_nonzero = bytes.iter().position(|&byte| byte != 0)?;
++    for start in first_nonzero.saturating_sub(3)..=first_nonzero {
++        if bytes[..start].iter().all(|&byte| byte == 0) && has_top_level_ftyp(bytes.get(start..)?) {
++            return Some((Container::Mp4, start));
++        }
++    }
++    // Symphonia accepts zero-padded streams. Match only the first non-padding byte, never a
++    // coincidental marker buried in metadata or an encoded audio packet.
++    let start = first_nonzero;
++    let bytes = bytes.get(start..)?;
++    if bytes.starts_with(b"caff") {
++        return Some((Container::Caf, start));
++    }
++    if bytes.starts_with(b"fLaC") {
++        return Some((Container::Flac, start));
++    }
++    if bytes.starts_with(b"RIFF") {
++        return Some((Container::Wav, start));
++    }
++
++    if has_top_level_ftyp(bytes) {
++        return Some((Container::Mp4, start));
++    }
++    None
++}
++
+ fn open(bytes: &[u8]) -> Result<Opened> {
+-    let mut mss = MediaSourceStream::new(Box::new(Cursor::new(bytes.to_vec())), MediaSourceStreamOptions::default());
+-    let fmt_opts = FormatOptions { enable_gapless: true, ..FormatOptions::default() };
+-    loop {
+-        let found = symphonia::default::get_probe().next(&mut mss).map_err(map_err)?;
+-        let at = usize::try_from(mss.pos()).unwrap_or(usize::MAX);
+-        let head = bytes.get(at..).unwrap_or_default();
+-        match (found, head.get(..10)) {
+-            (Instantiate::Format(reader), _) => {
+-                match head.get(..4) {
+-                    Some(b"caff") => crate::caf::check(bytes, at)?,
+-                    Some(b"ftyp") => crate::mp4::check(bytes, at.saturating_sub(4))?,
+-                    Some(b"fLaC") => {
+-                        crate::flac::check_metadata(bytes, at)?;
+-                        if let Some(info) = crate::flac::empty_stream_info(bytes, at) {
+-                            return Ok(Opened::Empty(info));
+-                        }
+-                    }
+-                    Some(b"RIFF") => crate::wav::check_info(bytes, at)?,
+-                    _ => {}
+-                }
+-                return reader(mss, &fmt_opts).map(Opened::Reader).map_err(map_err);
+-            }
+-            // Tags aren't used, and symphonia allocates whatever an ID3v2 frame claims: skip it.
+-            (Instantiate::Metadata(_), Some([b'I', b'D', b'3', _, _, _, size @ ..])) => {
+-                let size = size.iter().fold(0u64, |v, &x| (v << 7) | u64::from(x & 0x7f));
+-                mss.ignore_bytes(10 + size).map_err(|e| AudioError::Malformed(e.to_string()))?;
+-            }
+-            (Instantiate::Metadata(tag), _) => {
+-                tag(&MetadataOptions::default()).read_all(&mut mss).map_err(map_err)?;
++    let mut bytes = bytes;
++    while let Some(len) = id3v2_len(bytes) {
++        if len > bytes.len() {
++            return Err(AudioError::Malformed("truncated ID3v2 tag".into()));
++        }
++        bytes = bytes.get(len..).unwrap_or_default();
++    }
++
++    // Preserve bounded preflight checks before Symphonia allocates from container fields.
++    match container(bytes) {
++        Some((Container::Caf, at)) => crate::caf::check(bytes, at)?,
++        Some((Container::Mp4, at)) => crate::mp4::check(bytes, at)?,
++        Some((Container::Flac, at)) => {
++            crate::flac::check_metadata(bytes, at)?;
++            if let Some(info) = crate::flac::empty_stream_info(bytes, at) {
++                return Ok(Opened::Empty(info));
+             }
+         }
++        Some((Container::Wav, at)) => crate::wav::check_info(bytes, at)?,
++        None => {}
+     }
++
++    let mss = MediaSourceStream::new(Box::new(Cursor::new(bytes.to_vec())), MediaSourceStreamOptions::default());
++    let reader = symphonia::default::get_probe().probe(&Hint::new(), mss, FormatOptions::default(), MetadataOptions::default()).map_err(map_err)?;
++    Ok(Opened::Reader(reader))
+ }
+ 
+-fn format_from_codec(codec: CodecType, detected: FileFormat) -> FileFormat {
++fn format_from_codec(codec: symphonia::core::codecs::audio::AudioCodecId, detected: FileFormat) -> FileFormat {
+     if detected != FileFormat::Other {
+         return detected;
+     }
+     match codec {
+-        c if c == CODEC_TYPE_FLAC => FileFormat::Flac,
+-        c if c == CODEC_TYPE_MP3 || c == CODEC_TYPE_MP2 || c == CODEC_TYPE_MP1 => FileFormat::Mp3,
+-        c if c == CODEC_TYPE_AAC => FileFormat::Aac,
+-        c if c == CODEC_TYPE_ALAC => FileFormat::Alac,
+-        c if c == CODEC_TYPE_VORBIS => FileFormat::Ogg,
++        CODEC_ID_FLAC => FileFormat::Flac,
++        CODEC_ID_MP1 | CODEC_ID_MP2 | CODEC_ID_MP3 => FileFormat::Mp3,
++        CODEC_ID_AAC => FileFormat::Aac,
++        CODEC_ID_ALAC => FileFormat::Alac,
++        CODEC_ID_VORBIS => FileFormat::Ogg,
+         _ => FileFormat::Other,
+     }
+ }
+ 
+-fn sample_format_of(p: &CodecParameters) -> SampleFormat {
+-    let c = p.codec;
+-    if c == CODEC_TYPE_PCM_F32LE || c == CODEC_TYPE_PCM_F32BE {
++fn sample_format_of(p: &AudioCodecParameters) -> SampleFormat {
++    let lossy = [
++        CODEC_ID_MP1,
++        CODEC_ID_MP2,
++        CODEC_ID_MP3,
++        CODEC_ID_AAC,
++        CODEC_ID_VORBIS,
++        CODEC_ID_OPUS,
++        CODEC_ID_ADPCM_MS,
++        CODEC_ID_ADPCM_IMA_WAV,
++        CODEC_ID_ADPCM_IMA_QT,
++        CODEC_ID_ADPCM_G722,
++        CODEC_ID_ADPCM_G726,
++        CODEC_ID_ADPCM_G726LE,
++        CODEC_ID_PCM_ALAW,
++        CODEC_ID_PCM_MULAW,
++    ];
++    if lossy.contains(&p.codec) {
++        return SampleFormat::Compressed;
++    }
++    if matches!(p.sample_format, Some(SymSampleFormat::F32)) || p.codec == CODEC_ID_PCM_F32LE || p.codec == CODEC_ID_PCM_F32BE {
+         return SampleFormat::Float32;
+     }
+-    if c == CODEC_TYPE_PCM_F64LE || c == CODEC_TYPE_PCM_F64BE {
++    if matches!(p.sample_format, Some(SymSampleFormat::F64)) || p.codec == CODEC_ID_PCM_F64LE || p.codec == CODEC_ID_PCM_F64BE {
+         return SampleFormat::Float64;
+     }
+-    let lossy = [
+-        CODEC_TYPE_MP1,
+-        CODEC_TYPE_MP2,
+-        CODEC_TYPE_MP3,
+-        CODEC_TYPE_AAC,
+-        CODEC_TYPE_VORBIS,
+-        CODEC_TYPE_OPUS,
+-        CODEC_TYPE_ADPCM_MS,
+-        CODEC_TYPE_ADPCM_IMA_WAV,
+-        CODEC_TYPE_ADPCM_IMA_QT,
+-        CODEC_TYPE_ADPCM_G722,
+-        CODEC_TYPE_ADPCM_G726,
+-        CODEC_TYPE_ADPCM_G726LE,
+-        CODEC_TYPE_PCM_ALAW,
+-        CODEC_TYPE_PCM_MULAW,
+-    ];
+-    let lossless = !lossy.contains(&c);
+-    match (lossless, p.bits_per_sample) {
+-        (true, Some(1..=8)) => SampleFormat::Int8,
+-        (true, Some(9..=16)) => SampleFormat::Int16,
+-        (true, Some(17..=24)) => SampleFormat::Int24,
+-        (true, Some(25..=32)) => SampleFormat::Int32,
++    match p.bits_per_sample {
++        Some(1..=8) => SampleFormat::Int8,
++        Some(9..=16) => SampleFormat::Int16,
++        Some(17..=24) => SampleFormat::Int24,
++        Some(25..=32) => SampleFormat::Int32,
+         _ => SampleFormat::Compressed,
+     }
+ }
+ 
+-fn info_of(reader: &dyn FormatReader, detected: FileFormat) -> Result<(u32, AudioInfo)> {
+-    let track = reader
+-        .tracks()
+-        .iter()
+-        .find(|t| t.codec_params.codec != CODEC_TYPE_NULL)
+-        .ok_or_else(|| AudioError::Unsupported("no decodable audio track".into()))?;
+-    let p = &track.codec_params;
++fn first_audio_track(tracks: &[Track]) -> Option<&Track> {
++    tracks.iter().find(|track| track.codec_params.as_ref().and_then(CodecParameters::audio).is_some_and(|params| params.codec != CODEC_ID_NULL_AUDIO))
++}
++
++fn audio_params(reader: &dyn FormatReader) -> Result<(u32, AudioCodecParameters, AudioInfo)> {
++    let track = first_audio_track(reader.tracks()).ok_or_else(|| AudioError::Unsupported("no decodable audio track".into()))?;
++    let p = track.codec_params.as_ref().and_then(|p| p.audio()).cloned().ok_or_else(|| AudioError::Unsupported("no decodable audio track".into()))?;
+     let sample_rate = p.sample_rate.filter(|&r| r > 0).ok_or_else(|| AudioError::Malformed("unknown sample rate".into()))?;
+-    let channels = p.channels.map(|c| c.count()).unwrap_or(0);
++    let channels = p.channels.as_ref().map(|c| c.count()).unwrap_or(0);
+     let channels = u16::try_from(channels).map_err(|_| AudioError::Unsupported("too many channels".into()))?;
+-    Ok((
+-        track.id,
+-        AudioInfo {
+-            format: format_from_codec(p.codec, detected),
+-            sample_format: sample_format_of(p),
+-            sample_rate,
+-            channels,
+-            frames: p.n_frames.unwrap_or(0),
+-            bwf: None,
+-        },
+-    ))
++    let info = AudioInfo {
++        format: FileFormat::Other,
++        sample_format: sample_format_of(&p),
++        sample_rate,
++        channels,
++        frames: track.num_frames.unwrap_or(0),
++        bwf: None,
++    };
++    Ok((track.id, p, info))
++}
++
++fn info_of(reader: &dyn FormatReader, detected: FileFormat) -> Result<(u32, AudioCodecParameters, AudioInfo)> {
++    let (track_id, params, mut info) = audio_params(reader)?;
++    info.format = format_from_codec(params.codec, detected);
++    Ok((track_id, params, info))
+ }
+ 
+ /// Decode the whole first audio track. When `count_only`, samples are counted but not stored.
+@@ -159,33 +235,27 @@
+             return Ok((info, buf));
+         }
+     };
+-    let (track_id, mut info) = info_of(reader.as_ref(), detected)?;
+-    if let Some(n) = reader.tracks().iter().find(|t| t.id == track_id).and_then(|t| t.codec_params.n_frames) {
++    let (track_id, params, mut info) = info_of(reader.as_ref(), detected)?;
++    if let Some(n) = reader.tracks().iter().find(|t| t.id == track_id).and_then(|t| t.num_frames) {
+         let total = n.saturating_mul(u64::from(info.channels.max(1)));
+-        if !count_only && total > MAX_DECODE_SAMPLES {
++        if !count_only && total > crate::pcm::MAX_DECODE_SAMPLES {
+             return Err(AudioError::TooLarge(format!("{total} samples exceeds the decode limit")));
+         }
+     }
+-    let params = reader
+-        .tracks()
+-        .iter()
+-        .find(|t| t.id == track_id)
+-        .map(|t| t.codec_params.clone())
+-        .ok_or_else(|| AudioError::Malformed("track vanished".into()))?;
+-    let alac = params.extra_data.as_deref().filter(|_| params.codec == CODEC_TYPE_ALAC).and_then(|d| be_u32(d, 0));
++    let alac = params.extra_data.as_deref().filter(|_| params.codec == CODEC_ID_ALAC).and_then(|d| be_u32(d, 0));
+     if params.max_frames_per_packet.into_iter().chain(alac.map(u64::from)).any(|n| n > MAX_PACKET_FRAMES) {
+         return Err(AudioError::Malformed("the file declares packets far longer than any codec uses".into()));
+     }
+-    let mut decoder = symphonia::default::get_codecs().make(&params, &DecoderOptions::default()).map_err(map_err)?;
++    let mut decoder = symphonia::default::get_codecs().make_audio_decoder(&params, &AudioDecoderOptions::default().gapless(true)).map_err(map_err)?;
+ 
+     let mut planar: Vec<Vec<f32>> = Vec::new();
++    let mut decoded_planar: Vec<Vec<f32>> = Vec::new();
+     let mut frames: u64 = 0;
+-    let mut sbuf: Option<SampleBuffer<f32>> = None;
+     let mut errors = 0usize;
+     loop {
+         let packet = match reader.next_packet() {
+-            Ok(p) => p,
+-            Err(SymError::IoError(e)) if e.kind() == std::io::ErrorKind::UnexpectedEof => break,
++            Ok(Some(p)) => p,
++            Ok(None) => break,
+             Err(SymError::ResetRequired) => break,
+             Err(e) => {
+                 if frames == 0 {
+@@ -195,7 +265,7 @@
+                 break;
+             }
+         };
+-        if packet.track_id() != track_id {
++        if packet.track_id != track_id {
+             continue;
+         }
+         let decoded = match decoder.decode(&packet) {
+@@ -211,33 +281,23 @@
+             Err(SymError::IoError(_)) => break,
+             Err(e) => return Err(map_err(e)),
+         };
+-        let spec = *decoded.spec();
+-        let ch = spec.channels.count();
++        let ch = decoded.spec().channels().count();
+         if ch == 0 {
+             continue;
+         }
+         if planar.is_empty() {
+-            // The decoded stream is authoritative for the channel count.
+             info.channels = u16::try_from(ch).map_err(|_| AudioError::Unsupported("too many channels".into()))?;
+             planar = (0..ch).map(|_| Vec::new()).collect();
+         }
+         let n = decoded.frames() as u64;
+         frames = frames.saturating_add(n);
+-        if frames.saturating_mul(ch as u64) > MAX_DECODE_SAMPLES {
++        if frames.saturating_mul(ch as u64) > crate::pcm::MAX_DECODE_SAMPLES {
+             return Err(AudioError::TooLarge("decoded audio exceeds the 4 GiB limit".into()));
+         }
+-        if count_only {
+-            continue;
+-        }
+-        let needed = decoded.capacity() as u64;
+-        let sb = match &mut sbuf {
+-            Some(sb) if sb.capacity() >= decoded.capacity() * ch => sb,
+-            _ => sbuf.insert(SampleBuffer::<f32>::new(needed, spec)),
+-        };
+-        sb.copy_interleaved_ref(decoded);
+-        for frame in sb.samples().chunks_exact(ch) {
+-            for (dst, &s) in planar.iter_mut().zip(frame) {
+-                dst.push(if s.is_finite() { s } else { 0.0 });
++        if !count_only {
++            decoded.copy_to_vecs_planar(&mut decoded_planar);
++            for (channel, samples) in planar.iter_mut().zip(&decoded_planar) {
++                channel.extend(samples.iter().map(|&s| if s.is_finite() { s } else { 0.0 }));
+             }
+         }
+     }
+@@ -258,7 +318,7 @@
+             Opened::Reader(reader) => reader,
+             Opened::Empty(info) => return Ok(info),
+         };
+-        let (_, info) = info_of(reader.as_ref(), detected)?;
++        let (_, _, info) = info_of(reader.as_ref(), detected)?;
+         if info.frames > 0 && info.channels > 0 {
+             return Ok(info);
+         }
+@@ -270,3 +330,76 @@
+ pub(crate) fn decode(bytes: &[u8], detected: FileFormat) -> Result<(AudioInfo, AudioBuffer)> {
+     guarded(|| run(bytes, detected, false))
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::{BitDepth, EncodeOptions, encode};
++
++    #[test]
++    fn symphonia_decodes_synthetic_flac_and_reports_frames() {
++        let input = AudioBuffer { sample_rate: 48_000, channels: vec![vec![0.0, 0.25, -0.5, 0.75], vec![0.1, -0.2, 0.3, -0.4]] };
++        let bytes = encode(&input, &EncodeOptions { format: FileFormat::Flac, bit_depth: BitDepth::Int24, dither: false, bwf: None })
++            .expect("synthetic FLAC encoding");
++        let (info, decoded) = decode(&bytes, FileFormat::Flac).expect("Symphonia FLAC decoding");
++        assert_eq!(info.format, FileFormat::Flac);
++        assert_eq!(info.sample_rate, 48_000);
++        assert_eq!(info.channels, 2);
++        assert_eq!(info.frames, 4);
++        assert_eq!(decoded.frames(), 4);
++        assert!((decoded.channels[0][1] - 0.25).abs() < 0.0001);
++        assert!((decoded.channels[1][2] - 0.3).abs() < 0.0001);
++    }
++
++    #[test]
++    fn symphonia_rejects_truncated_id3_before_metadata_allocation() {
++        let malformed = b"ID3\x04\0\0\x7f\x7f\x7f\x7f";
++        assert!(open(malformed).is_err());
++    }
++
++    #[test]
++    fn container_preflight_ignores_markers_outside_root_boxes() {
++        assert_eq!(container(b"RIFF\0\0\0\0WAVEdata caff"), Some((Container::Wav, 0)));
++        assert_eq!(container(b"ID3 metadata fLaC audio"), None);
++        let mut padded_caf = vec![0; 100];
++        padded_caf.extend_from_slice(b"caff\0\x01");
++        assert_eq!(container(&padded_caf), Some((Container::Caf, 100)));
++
++        let mut mp4 = Vec::from([0, 0, 0, 12]);
++        mp4.extend_from_slice(b"free");
++        mp4.extend_from_slice(b"skip");
++        mp4.extend_from_slice(&[0, 0, 0, 16]);
++        mp4.extend_from_slice(b"ftyp");
++        mp4.extend_from_slice(b"M4A ");
++        mp4.extend_from_slice(&[0; 4]);
++        assert_eq!(container(&mp4), Some((Container::Mp4, 0)));
++
++        let mut padded_mp4 = vec![0; 100];
++        padded_mp4.extend_from_slice(&mp4);
++        assert_eq!(container(&padded_mp4), Some((Container::Mp4, 100)));
++
++        let mut nested = Vec::from([0, 0, 0, 16]);
++        nested.extend_from_slice(b"free");
++        nested.extend_from_slice(b"ftyp");
++        nested.extend_from_slice(b"data");
++        assert_eq!(container(&nested), None);
++
++        assert_eq!(container(b"\0\0\0\x08ftyp"), None);
++        assert_eq!(container(b"\0\0\0\xffftypM4A "), None);
++    }
++
++    #[test]
++    fn audio_track_selection_skips_null_codec_tracks() {
++        let mut unknown = AudioCodecParameters::new();
++        let mut decodable = AudioCodecParameters::new();
++        decodable.for_codec(CODEC_ID_MP3);
++        let mut tracks = [Track::new(1), Track::new(2)];
++        tracks[0].codec_params = Some(CodecParameters::Audio(unknown.clone()));
++        tracks[1].codec_params = Some(CodecParameters::Audio(decodable));
++
++        assert_eq!(first_audio_track(&tracks).map(|track| track.id), Some(2));
++        unknown.for_codec(CODEC_ID_MP3);
++        tracks[0].codec_params = Some(CodecParameters::Audio(unknown));
++        assert_eq!(first_audio_track(&tracks).map(|track| track.id), Some(1));
++    }
++}

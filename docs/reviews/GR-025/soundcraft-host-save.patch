@@ -1,0 +1,562 @@
+diff --git c/Cargo.lock w/Cargo.lock
+index eb578a2..f174b2a 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
+@@ -887,6 +887,16 @@ name = "craft-docpath"
+ version = "0.1.0"
+ source = "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab?rev=56c5e16d79b77751106173c13111ef4fe0a2c0ec#56c5e16d79b77751106173c13111ef4fe0a2c0ec"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-ui"
+ version = "0.1.0"
+@@ -3903,6 +3913,7 @@ dependencies = [
+ name = "soundcraft-web"
+ version = "0.12.1"
+ dependencies = [
++ "craft-platform",
+  "eframe",
+  "egui 0.37.0",
+  "js-sys",
+diff --git c/Cargo.toml w/Cargo.toml
+index b0fda5d..770c74e 100644
+--- c/Cargo.toml
++++ w/Cargo.toml
+@@ -46,6 +46,7 @@ cpal = "0.18"
+ 
+ # Which file paths stored in a session may be opened.
+ craft-docpath = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "82a24b006eefa036b43c09a67fb9a3fbd17ffe63" }
++craft-platform = { version = "0.1.0", git = "https://github.com/Roddygithub/artcraft-storage-lab", rev = "56c5e16d79b77751106173c13111ef4fe0a2c0ec", features = ["browser"] }
+ 
+ # ui
+ craft-ui = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "5c874d51eeb3de70e735c8ce87a59a7dedd47675", features = ["serde"] }
+diff --git c/apps/soundcraft-web/Cargo.toml w/apps/soundcraft-web/Cargo.toml
+index 50ff3aa..a5bdf7e 100644
+--- c/apps/soundcraft-web/Cargo.toml
++++ w/apps/soundcraft-web/Cargo.toml
+@@ -18,6 +18,7 @@ soundcraft-engine = { workspace = true }
+ soundcraft-ui-egui = { workspace = true }
+ soundcraft-playback = { workspace = true }
+ soundcraft-model = { workspace = true }
++craft-platform = { workspace = true }
+ egui = { workspace = true }
+ log = { workspace = true }
+ serde_json = { workspace = true }
+diff --git c/apps/soundcraft-web/src/host_save.rs w/apps/soundcraft-web/src/host_save.rs
+new file mode 100644
+index 0000000..0d3a4d6
+--- /dev/null
++++ w/apps/soundcraft-web/src/host_save.rs
+@@ -0,0 +1,106 @@
++use std::time::Duration;
++
++#[derive(Debug, PartialEq, Eq)]
++pub enum AckResult {
++    Unknown,
++    Rejected,
++    SavedCurrent,
++    SavedStale,
++}
++
++struct Pending<T> {
++    ticket: String,
++    snapshot: T,
++    started_ms: f64,
++}
++
++/// One outstanding host save. Timeout means unknown commit state and blocks retry.
++pub struct HostSaveLedger<T> {
++    pending: Option<Pending<T>>,
++    unknown: bool,
++}
++
++impl<T> Default for HostSaveLedger<T> {
++    fn default() -> Self {
++        Self { pending: None, unknown: false }
++    }
++}
++
++impl<T> HostSaveLedger<T> {
++    pub fn can_start(&self) -> bool {
++        !self.unknown && self.pending.is_none()
++    }
++
++    pub fn is_unknown(&self) -> bool {
++        self.unknown
++    }
++
++    pub fn is_pending(&self) -> bool {
++        self.pending.is_some()
++    }
++
++    pub fn start(&mut self, ticket: String, snapshot: T, now_ms: f64) -> Result<(), T> {
++        if !self.can_start() || ticket.is_empty() || ticket.len() > 256 {
++            return Err(snapshot);
++        }
++        self.pending = Some(Pending { ticket, snapshot, started_ms: now_ms });
++        Ok(())
++    }
++
++    pub fn acknowledge(&mut self, ticket: &str, ok: bool, is_current: impl FnOnce(&T) -> bool) -> AckResult {
++        if !self.pending.as_ref().is_some_and(|pending| pending.ticket == ticket) {
++            return AckResult::Unknown;
++        }
++        let Some(pending) = self.pending.take() else { return AckResult::Unknown };
++        if !ok {
++            AckResult::Rejected
++        } else if is_current(&pending.snapshot) {
++            AckResult::SavedCurrent
++        } else {
++            AckResult::SavedStale
++        }
++    }
++
++    pub fn expire(&mut self, now_ms: f64, timeout: Duration) -> bool {
++        if self.pending.as_ref().is_some_and(|pending| now_ms - pending.started_ms >= timeout.as_millis() as f64) {
++            self.pending = None;
++            self.unknown = true;
++            true
++        } else {
++            false
++        }
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn ticket_ack_is_single_use_and_failed_save_can_retry() {
++        let mut ledger = HostSaveLedger::default();
++        assert!(ledger.start("soundcraft:1".into(), 7, 0.0).is_ok());
++        assert!(ledger.is_pending());
++        assert!(!ledger.is_unknown());
++        assert!(!ledger.can_start());
++        assert_eq!(ledger.acknowledge("unknown", true, |_| true), AckResult::Unknown);
++        assert!(!ledger.can_start());
++        assert_eq!(ledger.acknowledge("soundcraft:1", false, |_| true), AckResult::Rejected);
++        assert_eq!(ledger.acknowledge("soundcraft:1", true, |_| true), AckResult::Unknown);
++        assert!(ledger.can_start());
++    }
++
++    #[test]
++    fn only_an_acknowledged_unchanged_snapshot_is_clean_and_timeout_locks_retry() {
++        let mut ledger = HostSaveLedger::default();
++        assert!(ledger.start("soundcraft:1".into(), 7, 0.0).is_ok());
++        assert_eq!(ledger.acknowledge("soundcraft:1", true, |snapshot| *snapshot == 7), AckResult::SavedCurrent);
++        assert!(ledger.start("soundcraft:2".into(), 8, 1.0).is_ok());
++        assert_eq!(ledger.acknowledge("soundcraft:2", true, |snapshot| *snapshot == 7), AckResult::SavedStale);
++        assert!(ledger.start("soundcraft:3".into(), 9, 2.0).is_ok());
++        assert!(ledger.expire(120_002.0, Duration::from_secs(120)));
++        assert_eq!(ledger.acknowledge("soundcraft:3", true, |_| true), AckResult::Unknown);
++        assert!(!ledger.can_start());
++        assert!(!ledger.expire(120_003.0, Duration::from_secs(120)));
++    }
++}
+diff --git c/apps/soundcraft-web/src/main.rs w/apps/soundcraft-web/src/main.rs
+index 6e52278..e3f9c7f 100644
+--- c/apps/soundcraft-web/src/main.rs
++++ w/apps/soundcraft-web/src/main.rs
+@@ -18,6 +18,8 @@
+ //! empty session instead of the demo.
+ #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
+ 
++mod host_save;
++
+ #[cfg(target_arch = "wasm32")]
+ mod web;
+ 
+diff --git c/apps/soundcraft-web/src/web.rs w/apps/soundcraft-web/src/web.rs
+index 0d9b648..d9f2407 100644
+--- c/apps/soundcraft-web/src/web.rs
++++ w/apps/soundcraft-web/src/web.rs
+@@ -1,5 +1,8 @@
+ //! The browser shell: the eframe web runner around [`SoundApp`].
+ 
++use crate::host_save::{AckResult, HostSaveLedger};
++use craft_platform::browser::host::{HostListener, HostMessage, HostTransport};
++use craft_platform::host_protocol::SaveTicket;
+ use soundcraft_engine::{Engine, io};
+ use soundcraft_ui_egui::dialogs::Dialog;
+ use soundcraft_ui_egui::sampler_window::SampleRead;
+@@ -11,6 +14,8 @@ use wasm_bindgen::JsCast as _;
+ 
+ const CANVAS_ID: &str = "soundcraft_canvas";
+ const LOADING_ID: &str = "soundcraft_loading";
++const MAX_HOST_SAVE_BYTES: usize = 64 * 1024 * 1024;
++const HOST_SAVE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(120);
+ 
+ pub fn start() {
+     eframe::WebLogger::init(log::LevelFilter::Info).ok();
+@@ -24,6 +29,45 @@ pub fn start() {
+             log::error!("missing <canvas id=\"{CANVAS_ID}\">");
+             return;
+         };
++        let host_requested = query().split(['?', '&']).any(|part| part == "host=parent");
++        let host_events = Rc::new(RefCell::new(Vec::new()));
++        let host_state = Rc::new(RefCell::new(HostSaveState::default()));
++        let host = if host_requested {
++            match HostTransport::current("soundcraft") {
++                Ok(Some(transport)) => {
++                    let events = host_events.clone();
++                    match transport.listen(move |message| events.borrow_mut().push(message)) {
++                        Ok(listener) => {
++                            if let Err(error) = transport.post_ready("0.1") {
++                                log::error!("SoundCraft host ready failed: {error:?}");
++                                None
++                            } else {
++                                Some(HostRuntime { transport, _listener: listener, events: host_events.clone(), state: host_state.clone() })
++                            }
++                        }
++                        Err(error) => {
++                            log::error!("SoundCraft host listener failed: {error:?}");
++                            None
++                        }
++                    }
++                }
++                Ok(None) => {
++                    log::error!("host=parent requires a same-origin parent frame");
++                    None
++                }
++                Err(error) => {
++                    log::error!("SoundCraft host setup failed: {error:?}");
++                    None
++                }
++            }
++        } else {
++            None
++        };
++        let host_save = host.as_ref().map(|runtime| {
++            let transport = runtime.transport.clone();
++            let state = runtime.state.clone();
++            Box::new(move |engine: &mut Engine| request_host_save(engine, &transport, &state)) as Box<dyn FnMut(&mut Engine) -> Result<(), String>>
++        });
+         let mut options = eframe::WebOptions::default();
+         if query().contains("webgl")
+             && let eframe::egui_wgpu::WgpuSetup::CreateNew(create) = &mut options.wgpu_options.wgpu_setup
+@@ -38,10 +82,10 @@ pub fn start() {
+                     if let Some(rs) = &cc.wgpu_render_state {
+                         log::info!("soundcraft-web: wgpu backend {:?}", rs.adapter.get_info().backend);
+                     }
+-                    let engine = if query().contains("empty") { Engine::default() } else { soundcraft_engine::demo::demo_engine() };
++                    let engine = if host_requested || query().contains("empty") { Engine::default() } else { soundcraft_engine::demo::demo_engine() };
+                     let player = soundcraft_playback::Player::new(Arc::new(engine.session().clone()));
+-                    let app = SoundApp::new(engine, Some(player), Services::default());
+-                    Ok(Box::new(WebShell { app, inbox: Rc::default(), samples: Rc::default() }))
++                    let app = SoundApp::new(engine, Some(player), Services { host_bound: host_requested, host_save, ..Services::default() });
++                    Ok(Box::new(WebShell { app, inbox: Rc::default(), samples: Rc::default(), host, host_requested }))
+                 }),
+             )
+             .await;
+@@ -115,6 +159,123 @@ struct WebShell {
+     app: SoundApp,
+     inbox: Inbox,
+     samples: SampleInbox,
++    host: Option<HostRuntime>,
++    host_requested: bool,
++}
++
++#[derive(Default)]
++struct HostSaveState {
++    opened: bool,
++    next_ticket: u64,
++    ledger: HostSaveLedger<Arc<soundcraft_model::Session>>,
++    last_dirty: Option<bool>,
++}
++
++struct HostRuntime {
++    transport: HostTransport,
++    _listener: HostListener,
++    events: Rc<RefCell<Vec<HostMessage>>>,
++    state: Rc<RefCell<HostSaveState>>,
++}
++
++fn request_host_save(engine: &mut Engine, transport: &HostTransport, state: &Rc<RefCell<HostSaveState>>) -> Result<(), String> {
++    let mut state = state.borrow_mut();
++    if !state.opened {
++        return Err("No host-bound .scraftz session is open".into());
++    }
++    if state.ledger.is_unknown() {
++        return Err("Previous save outcome is unknown; reopen the host document before saving again".into());
++    }
++    if state.ledger.is_pending() {
++        return Err("A host save is already pending".into());
++    }
++    if !engine.is_dirty() {
++        return Err("The host-bound session has no unsaved changes".into());
++    }
++    let snapshot = engine.session_arc();
++    let (bytes, _) = io::session_bundle(&snapshot).map_err(|error| error.to_string())?;
++    if bytes.len() > MAX_HOST_SAVE_BYTES {
++        return Err(format!("Host save exceeds the {} MiB limit", MAX_HOST_SAVE_BYTES / (1024 * 1024)));
++    }
++    state.next_ticket = state.next_ticket.checked_add(1).ok_or("Host save ticket space exhausted")?;
++    let ticket = SaveTicket::new(format!("soundcraft:{}", state.next_ticket)).ok_or("Invalid host save ticket")?;
++    let name = format!("{}.{}", io::sanitize_name(&snapshot.name), io::BUNDLE_EXTENSION);
++    transport.post_save(&ticket, &name, &bytes, false).map_err(|error| format!("Host save handoff failed: {error:?}"))?;
++    state
++        .ledger
++        .start(ticket.as_str().to_owned(), snapshot, js_sys::Date::now())
++        .map_err(|_| "A host save is already pending or its outcome is unknown".to_string())?;
++    Ok(())
++}
++
++impl WebShell {
++    fn handle_host(&mut self) {
++        let Some(host) = &self.host else {
++            if self.host_requested {
++                self.app.ui.status = "Host mode unavailable: SoundCraft requires a same-origin parent frame".into();
++            }
++            return;
++        };
++        let events = std::mem::take(&mut *host.events.borrow_mut());
++        for event in events {
++            match event {
++                HostMessage::Open { name, bytes } => {
++                    if host.state.borrow().opened {
++                        self.app.ui.status = "Opening another host document is unsupported in this session".into();
++                    } else if !name.to_ascii_lowercase().ends_with(".scraftz") {
++                        self.app.ui.status = "SoundCraft host mode accepts one .scraftz session".into();
++                    } else if !bytes.starts_with(b"PK\x03\x04") {
++                        self.app.ui.status = "The host document is not a valid .scraftz bundle".into();
++                    } else {
++                        match io::open_session_bytes(&mut self.app.engine, &name, &bytes) {
++                            Ok(missing) => {
++                                host.state.borrow_mut().opened = true;
++                                self.app.engine.path = None;
++                                self.app.ui.status = if missing.is_empty() {
++                                    format!("Opened {name} from host")
++                                } else {
++                                    format!("Opened {name}; missing media: {}", missing.join(", "))
++                                };
++                                let _ = host.transport.post_dirty(self.app.engine.is_dirty());
++                                host.state.borrow_mut().last_dirty = Some(self.app.engine.is_dirty());
++                            }
++                            Err(error) => self.app.ui.status = error.to_string(),
++                        }
++                    }
++                }
++                HostMessage::SaveResult { ticket, ok, error } => {
++                    let live = self.app.engine.session_arc();
++                    let result = host.state.borrow_mut().ledger.acknowledge(ticket.as_str(), ok, |snapshot| Arc::ptr_eq(snapshot, &live));
++                    match result {
++                        AckResult::Unknown => self.app.ui.status = "Ignored unknown or duplicate host save acknowledgement".into(),
++                        AckResult::Rejected => {
++                            let reason = error.unwrap_or_else(|| "host rejected the save".into());
++                            self.app.ui.status = format!("Host save failed: {reason}");
++                        }
++                        AckResult::SavedCurrent => {
++                            self.app.engine.mark_clean();
++                            self.app.ui.status = "Saved — host confirmed the new version".into();
++                            let dirty = self.app.engine.is_dirty();
++                            let _ = host.transport.post_dirty(dirty);
++                            host.state.borrow_mut().last_dirty = Some(dirty);
++                        }
++                        AckResult::SavedStale => {
++                            self.app.ui.status = "Host saved the snapshot; newer edits remain unsaved".into();
++                        }
++                    }
++                }
++            }
++        }
++        let mut state = host.state.borrow_mut();
++        if state.ledger.expire(js_sys::Date::now(), HOST_SAVE_TIMEOUT) {
++            self.app.ui.status = "Host save timed out; outcome is unknown. Reopen the host document before saving again".into();
++        }
++        let dirty = self.app.engine.is_dirty();
++        if state.opened && state.last_dirty != Some(dirty) {
++            let _ = host.transport.post_dirty(dirty);
++            state.last_dirty = Some(dirty);
++        }
++    }
+ }
+ 
+ impl WebShell {
+@@ -193,6 +354,7 @@ impl WebShell {
+ 
+ impl eframe::App for WebShell {
+     fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
++        self.handle_host();
+         self.take_drops(ctx);
+         self.take_path_prompt(ctx);
+         let pending = std::mem::take(&mut *self.inbox.borrow_mut());
+diff --git c/crates/ui-egui/src/dialogs.rs w/crates/ui-egui/src/dialogs.rs
+index d752c16..374bd15 100644
+--- c/crates/ui-egui/src/dialogs.rs
++++ w/crates/ui-egui/src/dialogs.rs
+@@ -198,6 +198,10 @@ const OPEN_PENDING: &str = "ui.open_pending_session";
+ /// Opens a session the browser read as bytes (picked or dropped), asking first when the open one
+ /// has changes. The read finishes later than the pick, so the question is asked only now.
+ pub fn open_session_bytes(app: &mut SoundApp, name: String, bytes: Vec<u8>) {
++    if app.services.host_bound {
++        app.ui.status = "Opening another session is unavailable for this host-bound session".into();
++        return;
++    }
+     if crate::bounce::refuses_session_switch(app) {
+         return;
+     }
+@@ -651,7 +655,7 @@ pub fn show(app: &mut SoundApp, ctx: &egui::Context) {
+     }
+     if let Some(then) = save_first {
+         keep = false;
+-        if !app.dialogs.open_for_command(&app.engine, "session.save") {
++        if app.services.host_bound || !app.dialogs.open_for_command(&app.engine, "session.save") {
+             action = Some(("session.save".into(), json!({})));
+         }
+         app.dialogs.after_save = Some(then);
+diff --git c/crates/ui-egui/src/lib.rs w/crates/ui-egui/src/lib.rs
+index 3fdd989..adb5eee 100644
+--- c/crates/ui-egui/src/lib.rs
++++ w/crates/ui-egui/src/lib.rs
+@@ -195,6 +195,9 @@ pub struct Services {
+     pub pick_open: Option<Box<dyn Fn(&str, &[&str]) -> Option<String>>>,
+     pub pick_save: Option<Box<dyn Fn(&str, &str) -> Option<String>>>,
+     pub pick_folder: Option<Box<dyn Fn(&str) -> Option<String>>>,
++    /// Restrict this app instance to one parent-owned session and its async save callback.
++    pub host_bound: bool,
++    pub host_save: Option<Box<dyn FnMut(&mut Engine) -> Result<(), String>>>,
+ }
+ 
+ /// File-system-safe folder name for a plugin id (`clap:com.x.y` → `clap_com.x.y`).
+@@ -416,6 +419,25 @@ impl SoundApp {
+ 
+     /// Run a command; errors go to the status line. Returns the result.
+     pub fn run(&mut self, id: &str, params: Value) -> Result<Value, String> {
++        if self.services.host_bound {
++            if matches!(
++                id,
++                "session.new"
++                    | "session.open"
++                    | "session.close"
++                    | "session.revert"
++                    | "session.save_as"
++                    | "session.save_copy"
++                    | "session.save_template"
++            ) {
++                return Err(format!("{id} is unavailable for this host-bound session"));
++            }
++            if id == "session.save" {
++                self.capture_plugin_states();
++                return self.services.host_save.as_mut().ok_or_else(|| "host save is unavailable".to_string())?(&mut self.engine)
++                    .map(|()| Value::Null);
++            }
++        }
+         if matches!(id, "session.new" | "session.open" | "session.close" | "session.revert") && bounce::refuses_session_switch(self) {
+             return Err(self.ui.status.clone());
+         }
+@@ -1331,6 +1353,28 @@ mod tests {
+     use super::{Services, SoundApp, automation_step_due};
+     use serde_json::json;
+ 
++    #[test]
++    fn host_bound_session_routes_save_and_refuses_replacement_and_save_as() {
++        let calls = std::rc::Rc::new(std::cell::Cell::new(0));
++        let seen = calls.clone();
++        let mut services = Services { host_bound: true, ..Services::default() };
++        services.host_save = Some(Box::new(move |_| {
++            seen.set(seen.get() + 1);
++            Ok(())
++        }));
++        let mut app = SoundApp::new(soundcraft_engine::demo::demo_engine(), None, services);
++        app.engine.execute("mix.mute", &json!({"track": "Kick"})).unwrap();
++        app.run("session.save", json!({})).unwrap();
++        assert_eq!(calls.get(), 1);
++        assert!(app.engine.is_dirty(), "requesting a host save is not a durable acknowledgement");
++        for command in
++            ["session.new", "session.open", "session.close", "session.revert", "session.save_as", "session.save_copy", "session.save_template"]
++        {
++            assert!(app.run(command, json!({})).is_err(), "{command}");
++        }
++        assert!(app.engine.is_dirty());
++    }
++
+     #[test]
+     fn new_session_stops_playback_and_the_old_clock() {
+         for (command, params) in [
+diff --git c/crates/ui-egui/src/menus.rs w/crates/ui-egui/src/menus.rs
+index 99e4b50..de06e7b 100644
+--- c/crates/ui-egui/src/menus.rs
++++ w/crates/ui-egui/src/menus.rs
+@@ -473,6 +473,19 @@ pub fn invoke_menu(app: &mut SoundApp, id: &str, path: &str) {
+         app.ui.audiosuite = p.get("process").and_then(Value::as_str).map(str::to_string);
+         return;
+     }
++    if app.services.host_bound
++        && matches!(
++            id,
++            "session.new" | "session.open" | "session.close" | "session.revert" | "session.save_as" | "session.save_copy" | "session.save_template"
++        )
++    {
++        let _ = app.run(id, json!({}));
++        return;
++    }
++    if id == "session.save" && app.services.host_bound {
++        let _ = app.run(id, json!({}));
++        return;
++    }
+     if wants_dialog(id) && app.dialogs.open_for_command(&app.engine, id) {
+         return;
+     }
+@@ -492,6 +505,10 @@ pub fn invoke_menu(app: &mut SoundApp, id: &str, path: &str) {
+ /// Keyboard shortcut for a dialog command, or one that would close a modified session: open its
+ /// dialog. Returns true when handled.
+ pub fn invoke_shortcut_dialog(app: &mut SoundApp, id: &str) -> bool {
++    if app.services.host_bound && id.starts_with("session.") {
++        let _ = app.run(id, json!({}));
++        return true;
++    }
+     (wants_dialog(id) && app.dialogs.open_for_command(&app.engine, id)) || crate::dialogs::ask_to_save(app, id, &json!({}))
+ }
+ 
+diff --git c/crates/ui-egui/tests/save_changes.rs w/crates/ui-egui/tests/save_changes.rs
+index caa0561..d279c92 100644
+--- c/crates/ui-egui/tests/save_changes.rs
++++ w/crates/ui-egui/tests/save_changes.rs
+@@ -5,7 +5,11 @@ use soundcraft_ui_egui::dialogs::Dialog;
+ use soundcraft_ui_egui::{Services, SoundApp, dialogs, menus};
+ 
+ fn harness() -> Harness<'static, SoundApp> {
+-    let app = SoundApp::new(soundcraft_engine::demo::demo_engine(), None, Services::default());
++    harness_with_services(Services::default())
++}
++
++fn harness_with_services(services: Services) -> Harness<'static, SoundApp> {
++    let app = SoundApp::new(soundcraft_engine::demo::demo_engine(), None, services);
+     Harness::builder().with_size(egui::vec2(1600.0, 1000.0)).build_ui_state(
+         |ui, app: &mut SoundApp| {
+             let ctx = ui.ctx().clone();
+@@ -130,6 +134,24 @@ fn a_session_read_in_the_browser_asks_before_replacing_a_modified_one() {
+     assert!(h.state().engine.session().tracks.is_empty());
+ }
+ 
++#[test]
++fn a_host_bound_session_refuses_browser_open_without_discarding_dirty_data() {
++    let mut h = harness_with_services(Services { host_bound: true, ..Services::default() });
++    let tracks = h.state().engine.session().tracks.len();
++    mute_kick(&mut h);
++    assert!(h.state().engine.is_dirty());
++
++    open_bytes(&mut h);
++
++    assert_eq!(h.state().engine.session().tracks.len(), tracks);
++    assert!(h.state().engine.session().track_by_name("Kick").unwrap().mixer.mute);
++    assert!(h.state().engine.is_dirty(), "refused local open keeps host document edits dirty");
++    assert!(h.state().dialogs.open.is_none());
++    assert!(h.state().ui.status.contains("host-bound"));
++    h.state_mut().run("edit.undo", json!({})).unwrap();
++    assert!(!h.state().engine.session().track_by_name("Kick").unwrap().mixer.mute, "host document undo history remains");
++}
++
+ #[test]
+ fn save_in_the_question_saves_before_opening_a_session_read_in_the_browser() {
+     let dir = std::env::temp_dir().join(format!("soundcraft-save-changes-bytes-{}", std::process::id()));
