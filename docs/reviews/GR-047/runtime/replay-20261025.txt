@@ -1,0 +1,49 @@
+GR-047 supplemental Chromium replay — 2026-10-25
+
+Scope: loopback-only preview of the cached GR-023 FilmCraft Web build and the
+synthetic parent harness. This is an additional replay, not Seafile evidence.
+The browser page reported FilmCraft 0.12.0 and used WebGL2 with Chromium's
+SwiftShader software rasterizer.
+
+Browser network log (T3 Preview snapshot; all requests succeeded):
+  GET /host.html?run=2                                      200
+  GET /index.html?host=parent&empty&noworkers&nogpuworkers&nosw&webgl&fresh&gr047=1  200
+  GET /filmcraft_web.js?v=fc26a11788c5a228                  200
+  GET /filmcraft_web_bg.wasm?v=fc26a11788c5a228             200
+  GET /GR-047-synthetic.fcproj                              200
+  GET /index.html?host=parent&empty&noworkers&nogpuworkers&nosw&webgl&fresh&gr047=2  200
+  GET /filmcraft_web.js?v=fc26a11788c5a228                  200
+  GET /filmcraft_web_bg.wasm?v=fc26a11788c5a228             200
+
+The browser fetched these same response URLs again with cache disabled and
+hashed the response bodies in-page. The results matched the packaged WASM,
+JS, HTML and fixture hashes recorded in the main report:
+  index.html                 5,077 bytes  87feed442b67fadd423ce5118b3b6c52225f714068383836401386e041f768c1
+  filmcraft_web.js          181,439 bytes  1211b1a44d994158c133493e820385853b62a90f8511897e6d1cb97a2fec90e6
+  filmcraft_web_bg.wasm  37,637,092 bytes  342d877787bb684a834fc6a6bac38eb63717c0551a1f75fbc15eb2134d56718b
+  GR-047-synthetic.fcproj     3,301 bytes  7b9747511b3a2382bfe09667aa29d4a55dabc39b74ca25962c4c033d0296813a
+
+Separate pre-packaging build output verification (shell `stat` and `sha256sum`):
+  /home/roddy/.cache/cargo-target/wasm32-unknown-unknown/release/filmcraft_web.wasm
+  40,913,852 bytes  c1ccf010da400943fbe29c79287a5fa72194b3f8426befa5f608c6e646549d87
+This un-packaged output is not committed due to its size; the reproduction
+recipe rebuilds it, and the cache artifact's hash was checked on 2026-10-25.
+
+Replay actions/results:
+  FilmCraft ready version: 0.12.0
+  API edit: graphics.newText("GR-047 review replay edit") -> {clip: 9, layer: 0}
+  Before save: dirty=true
+  Ctrl+S: ticket filmcraft:1, 6,466 bytes, SHA-256
+    696131b0914761d044675bfc3ac81168ddb04deec6d8a8d80bb8e39908eeb86d
+  Synthetic parent ACK: matching ticket, ok=true; editor dirty=false
+  Fresh iframe reopen from the in-memory save bytes: reopened-clean, dirty=false
+
+Capture: filmcraft-review-replay.png (SHA-256
+f50fcb65de32e53d68081686cd262f933d7485d962daa818b879b42c24b0e2a9). It shows
+the edited text rendered in the fresh iframe and the parent state above it.
+
+The 6,466-byte replay payload differs from the original 6,468-byte smoke
+payload because the replay used a different text string. Neither payload was
+persisted outside the browser page. The cached WASM build outputs are not
+committed; their response-body hashes and this browser network snapshot are
+retained here. No Seafile, production, or ONLYOFFICE system was accessed.

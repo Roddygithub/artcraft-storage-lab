@@ -213,8 +213,9 @@ immutable transport revision `56c5e16d79b77751106173c13111ef4fe0a2c0ec`.
 | 14.2 | UI Save/Save All/ACK lifecycle | matching host ACK clears only captured state; failure, stale and unknown ACKs stay dirty | [x] 3 focused UI tests pass after final host-close guard |
 | 14.3 | Host mode lifecycle guards | create-from-template, close-all, save-as-template and direct project close cannot bypass binding | [x] engine/UI regression assertions present; independent source review confirms |
 | 14.4 | Rust/WASM compile and formatting | pinned app builds with transport revision `56c5e16` | [x] Rust 1.95 locked WASM check, fmt and diff checks pass per implementer |
-| 14.5 | Browser host messaging | real iframe Open/Save/ACK works in browser | [ ] NOT VERIFIED |
-| 14.6 | Seafile version and fresh reopen | saved edit survives durable Seafile write and new editor instance | [ ] NOT VERIFIED; app not in dispatcher |
+| 14.5 | Browser host messaging | real iframe Open/Save/ACK works in browser | [x] GR-047 original run and supplemental Chromium replay; three bounded independent reviews PROVISIONAL PASS, no findings remain. Replay retains response-body hashes and R3 independently checked the separate pre-packaging WASM cache hash; historical continuity remains NOT VERIFIED. See `docs/GR-047-FILMCRAFT-WASM-SMOKE.md` |
+| 14.6 | Seafile version and fresh reopen | saved edit survives durable Seafile write and new editor instance | [ ] NOT VERIFIED; GR-047 parent held bytes in memory only; app not in dispatcher |
+| 14.7 | Fresh iframe host-only reopen | new editor instance opens captured bytes and renders the edit | [x] GR-047: fresh iframe opened the captured bytes and visibly rendered `GR-047 visible edit passed`; no Seafile write. See `docs/GR-047-FILMCRAFT-WASM-SMOKE.md` |
 
 Patch, review and limitations: `docs/reviews/GR-023/README.md`.
 

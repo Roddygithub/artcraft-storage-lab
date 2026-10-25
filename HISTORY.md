@@ -368,6 +368,34 @@
 
 # HISTORY
 
+## 2026-10-25 — GR-047 FilmCraft browser host-save smoke
+
+* Built and ran the actual GR-023 patched FilmCraft Web/WASM from source pin
+  `fa550ce2d07bdfee6b1d7b6835e8abc8c6913d00` with transport pin
+  `56c5e16d79b77751106173c13111ef4fe0a2c0ec`; the regenerated source diff
+  matched the stored patch SHA-256.
+* Chromium opened a synthetic native `.fcproj`; a visible text edit became
+  dirty, Ctrl+S emitted 6,468 bytes, matching `filmcraft:1` ACK cleared dirty,
+  and a fresh iframe rendered the saved edit. The parent retained bytes in
+  memory only.
+* Seafile version creation/readback, dispatcher, production behavior and
+  ONLYOFFICE were not exercised. No independent review, commit or upstream
+  write was performed. Evidence: `docs/GR-047-FILMCRAFT-WASM-SMOKE.md` and
+  `docs/reviews/GR-047/`.
+
+## 2026-10-25 — GR-047 review evidence follow-up
+
+* Independent R1/R2 bounded reviews found no blocker or major issue. R1's
+  browser asset evidence gap was addressed with a retained Chromium response
+  hash/network transcript and fresh-iframe replay screenshot.
+* R2's minor about the distinct pre-packaging WASM hash was addressed by
+  verifying the 40,913,852-byte cache artifact and clarifying its distinction
+  from the 37,637,092-byte packaged WASM. R3 returned bounded PROVISIONAL PASS
+  with no findings; historical continuity with the original build remains
+  unverified.
+* Seafile version/readback, dispatch, deployment, and ONLYOFFICE remain
+  **NOT VERIFIED**; no project-level GPT PASS or upstream permission follows.
+
 ## 2026-10-25 — GR-023 FilmCraft host-save prototype
 
 * Added a one-document FilmCraft Web host-save adapter over the shared

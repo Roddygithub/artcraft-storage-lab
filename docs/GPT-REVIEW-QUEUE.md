@@ -1,5 +1,22 @@
 # GPT Review Queue
 
+## GR-047 — FilmCraft host-save browser runtime smoke
+
+The exact GR-023 patched FilmCraft WASM opened a synthetic native `.fcproj`
+in Chromium. An in-app visible text edit became dirty; Ctrl+S emitted 6,468
+bytes (SHA-256 `891cc9648eab2496acbac908a3694f878dada101da3575673697e0faeb764e84`);
+the same-origin parent ACKed matching ticket `filmcraft:1`, and the editor
+reported clean. A fresh iframe reopened the captured bytes and rendered the
+edit. The parent retained bytes in memory only; Seafile version/reopen, dispatch
+and deployment remain NOT VERIFIED. Exact pins, hashes and commands are in
+`docs/GR-047-FILMCRAFT-WASM-SMOKE.md` and `docs/reviews/GR-047/`. Independent
+reviews R1, R2 and R3 returned bounded PROVISIONAL PASS with no remaining
+findings. The R2 note about the separate pre-packaging WASM hash was resolved
+with an independent cache hash check and clearer artifact distinction; the
+review notes that historical continuity is not established. Seafile remains
+NOT VERIFIED. Work-item state: **GPT REVIEW PENDING**; upstream publication
+remains locked.
+
 ## GR-046 — EffectCraft host-save browser runtime smoke
 
 The exact GR-022 patched EffectCraft WASM opened a native synthetic `.ecproj`
@@ -669,7 +686,7 @@ Transport:   craft-platform `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
 Patch SHA:   `16158f500b2ec12f93c8fcb14867e0b452030dbb338b2d4d7fa8612850a694d4`
 Review:      independent bounded R2 source review found no blocker/major; tests/builds were not rerun by reviewer
 Tests:       engine 4/4; UI 3/3; Rust 1.95 locked WASM; fmt/diff checks pass per implementer
-Open:        browser messaging, authorization, Seafile version creation and fresh reopen NOT VERIFIED; not in dispatch
+Open:        GR-047 verifies actual-WASM browser messaging and fresh in-memory iframe reopen; authorization and durable Seafile version/reopen remain NOT VERIFIED; not in dispatch
 GPT review:  not a project candidate; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch published
 Evidence:    `docs/reviews/GR-023/`

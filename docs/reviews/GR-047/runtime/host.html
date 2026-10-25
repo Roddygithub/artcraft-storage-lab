@@ -1,0 +1,68 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>GR-047 FilmCraft host-save smoke</title>
+<style>body{font:14px system-ui;margin:12px}iframe{width:100%;height:720px;border:1px solid #888}</style>
+<h1>GR-047 synthetic FilmCraft host</h1>
+<pre id="log">waiting for FilmCraft…</pre>
+<div id="mount"></div>
+<script>
+const logEl = document.querySelector('#log');
+const log = (key, value) => { window.gr047[key] = value; logEl.textContent = JSON.stringify(window.gr047, (k,v) => v instanceof Uint8Array ? `[Uint8Array ${v.byteLength} bytes]` : v, 2); };
+window.gr047 = {phase:'initializing', savedBytes:null, savedTicket:null, dirty:null, ready:null, reopened:false, editResult:null};
+let generation = 0;
+let pendingOpen = null;
+function frame(bytes) {
+  generation++;
+  const old = document.querySelector('iframe');
+  if (old) old.remove();
+  const f = document.createElement('iframe');
+  f.id = 'editor';
+  f.src = `/index.html?host=parent&empty&noworkers&nogpuworkers&nosw&webgl&fresh&gr047=${generation}`;
+  document.querySelector('#mount').append(f);
+  pendingOpen = bytes || null;
+  return f;
+}
+let first = true;
+frame(null);
+addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== document.querySelector('iframe')?.contentWindow) return;
+  const m = event.data;
+  if (!m || typeof m.type !== 'string') return;
+  if (m.type === 'filmcraft:ready') {
+    log('ready', m.version);
+    if (first) {
+      first = false;
+      fetch('/GR-047-synthetic.fcproj').then(r => { if (!r.ok) throw Error(`fixture HTTP ${r.status}`); return r.arrayBuffer(); }).then(bytes => {
+        log('inputBytes', bytes.byteLength);
+        pendingOpen = bytes;
+        document.querySelector('iframe').contentWindow.postMessage({type:'filmcraft:open',name:'GR-047-synthetic.fcproj',bytes}, location.origin);
+        log('phase','opened');
+      }).catch(e => log('error',String(e)));
+    } else if (pendingOpen) {
+      const bytes = pendingOpen;
+      pendingOpen = null;
+      document.querySelector('iframe').contentWindow.postMessage({type:'filmcraft:open',name:'GR-047-synthetic.fcproj',bytes}, location.origin);
+      log('phase','reopened');
+    }
+  } else if (m.type === 'filmcraft:dirty') {
+    log('dirty',m.dirty);
+    if (generation > 1 && m.dirty === false) { log('reopened',true); log('phase','reopened-clean'); }
+  } else if (m.type === 'filmcraft:save') {
+    const bytes = new Uint8Array(m.bytes);
+    window.gr047.savedBytes = bytes;
+    window.gr047.savedTicket = m.ticket;
+    window.gr047.savedName = m.name;
+    window.gr047.saveAs = m.saveAs;
+    window.gr047.savedSize = bytes.byteLength;
+    log('phase','save-captured');
+    crypto.subtle.digest('SHA-256',bytes).then(b => window.gr047.saveSha256=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''));
+    document.querySelector('iframe').contentWindow.postMessage({type:'filmcraft:saveResult',ticket:m.ticket,ok:true},location.origin);
+  }
+});
+window.gr047.reopen = () => {
+  const bytes = window.gr047.savedBytes;
+  if (!(bytes instanceof Uint8Array)) throw Error('no captured save bytes');
+  frame(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength));
+  log('phase','fresh-iframe-reopen-requested');
+};
+</script>
