@@ -6,6 +6,15 @@ and does not trust the free-model verdicts.
 Nothing may be published upstream (issue, PR, RFC in `storytold/*`, Seafile or
 Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 
+## GR-043 — expired editing session during browser save
+
+The real gateway `/open/` and `/session/<sid>/save` routes are exercised in
+Chromium with a synthetic editor and adapter. After TTL expiry, save returns
+404 with reopen guidance, host dirty state stays true, the editor receives a
+negative `saveResult`, and the fake Seafile writer receives no call. Evidence
+and limits: `docs/GR-043-SESSION-EXPIRY.md` and `docs/reviews/GR-043/README.md`.
+Independent bounded review: PROVISIONAL PASS, no findings (`docs/reviews/GR-043/INDEPENDENT-REVIEW-R1.md`). This does not verify Seafile capability expiry or revoke semantics, nor change the project-level INCOMPLETE verdict.
+
 ## GR-042 — browser enforcement of dynamic host-page CSP
 
 `tests/test_gr042_hostpage_csp_browser.py` uses Chromium against the real

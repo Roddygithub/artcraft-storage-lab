@@ -32,7 +32,7 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | 2.2 | Network loss during save | save fails cleanly, document stays dirty | [ ] |
 | 2.3 | Interrupted upload | no partial version is committed | [ ] |
 | 2.4 | Double save / overlapping editor tickets | no lost update or false clean state | [x] Two real WordCraft editors saved concurrently through the bridge; one got a durable version, the loser got 409 and stayed dirty; fresh editor reopen confirmed the winner. This is separate tabs, not two overlapping tickets in one editor. See isolated runtime evidence |
-| 2.5 | Expired session | the save is refused with an explicit "session expired", not a generic error | [ ] |
+| 2.5 | Expired session | the save is refused with an explicit "session expired", not a generic error | [x] GR-043 Chromium ages a real in-memory gateway session past its TTL, then verifies actual `/save` returns 404 with reopen guidance, dirty remains true, the iframe receives `saveResult ok:false`, and the fake Seafile writer is never called. Real Seafile token expiry remains NOT VERIFIED (`docs/GR-043-SESSION-EXPIRY.md`) |
 | 2.6 | Invalid / forged token | the request is rejected; nothing is read or written | [ ] |
 | 2.7 | Permission revoked while editing | the save is refused | [~] patched Django save route refused a cached edit capability after current permission changed from `rw` to `r`; Seafile RPC/storage were synthetic |
 | 2.8 | File deleted while editing | the save is refused with "file no longer exists" | [ ] |

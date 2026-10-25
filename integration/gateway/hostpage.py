@@ -297,6 +297,7 @@ window.addEventListener("message", async (event) => {
       saveRevision = dirtyRevision;
       let ok = false;
       let error = "the save did not happen";
+      let sessionUnavailable = false;
       try {
         const resp = await fetch("/session/" + SID + "/save", {
           method: "POST",
@@ -305,6 +306,8 @@ window.addEventListener("message", async (event) => {
           body: bytes,
         });
         const result = await resp.json();
+        sessionUnavailable = result.error ===
+          "the editing session expired or is unavailable; return to Seafile and reopen the file";
         ok = !!resp.ok && result.ok === true;
         if (!ok) {
           error = result.error || ("HTTP " + resp.status);
@@ -331,7 +334,9 @@ window.addEventListener("message", async (event) => {
         // The app shows this message to the user, so it must not carry the
         // internals (paths, ids, upstream answers). The full error stays in the
         // host page's console and in the service's log.
-        const shown = ok ? "" : "the file could not be stored";
+        const shown = ok ? "" : (sessionUnavailable
+          ? "this editing session expired or is unavailable; return to Seafile and reopen the file"
+          : "the file could not be stored");
         toCraft("saveResult", { ticket: ticket, ok: ok, error: shown });
       }
       window.__saveInFlight = false;

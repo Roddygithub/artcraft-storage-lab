@@ -1,3 +1,13 @@
+## 2026-10-25 — GR-043 expired-session save refusal
+
+* Added a Chromium regression that expires the actual gateway session between
+  host open and save. The real save route returns 404 with reopen guidance,
+  keeps the editor dirty, sends a negative acknowledgement and makes no
+  synthetic Seafile write.
+* Documented evidence in `docs/reviews/GR-043/`; real Seafile token expiry,
+  permission revocation and production behavior remain **NOT VERIFIED**.
+  GPT review is pending and no upstream or production state changed.
+
 ## 2026-10-25 — GR-042 browser-enforced dynamic host CSP
 
 * Added a Chromium check that posts a synthetic Seafile capability through the

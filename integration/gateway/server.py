@@ -308,7 +308,11 @@ class Handler(BaseHTTPRequestHandler):
             sid = path.split("/")[2]
             session = gateway.sessions.get(sid)
             if session is None:
-                return self._json(404, {"ok": False, "error": "unknown or expired session"})
+                return self._json(404, {
+                    "ok": False,
+                    "error": "the editing session expired or is unavailable; "
+                             "return to Seafile and reopen the file",
+                })
             data = self._read_body(limit=gateway.max_bytes)
             if data is None:
                 return self._json(413, {"ok": False, "error": "the document is larger than the limit"})

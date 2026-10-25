@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local ma
 BRANCH:     main
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
 CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038/039 and are not project-level GPT-reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP now has dynamic-host Chromium enforcement coverage in GR-042; GR-041 bounds staged Craft Web ZIP download and extraction; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -22,7 +22,12 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-042 — Chromium enforces the CSP on the real dynamic `POST /open/`
+CURRENT GR: GR-043 — Chromium verifies an expired in-memory gateway session is
+refused during save: actual 404 with reopen guidance, dirty preserved,
+`saveResult ok:false`, and no fake Seafile write. Real token expiry and Seafile
+behavior remain **NOT VERIFIED**. See `docs/GR-043-SESSION-EXPIRY.md`.
+
+GR-042 — Chromium enforces the CSP on the real dynamic `POST /open/`
 response using synthetic loopback services: the configured Seafile ancestor is
 allowed, a nested foreign ancestor is blocked, nonce script/style execute, and
 no CSP violation fires in the allowed host page. Craft bundle, production,
