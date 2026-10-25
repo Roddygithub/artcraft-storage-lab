@@ -1,5 +1,16 @@
 # GPT Review Queue
 
+## GR-052 — Ambiguous upstream save response reconciliation
+
+**BOUNDED INDEPENDENT R1–R3: PROVISIONAL PASS, no blocker/major; GPT REVIEW
+PENDING.** Based on `a7804a23183c3bc5680028b0a88ac24e4eeb3a86`. Ten synthetic
+tests, including a lock-contention retry after
+reconciliation, plus GR-049/050 and gateway checks pass. Only
+status=None save errors reconcile through bounded exact bytes and user-bound
+identity/permission/current-head reads. No second write. Real Seafile/browser
+NOT VERIFIED; no project GPT PASS claimed.
+Evidence: `docs/GR-052-UPSTREAM-SAVE-RECONCILIATION.md`, `docs/reviews/GR-052/`.
+
 ## GR-051 — Browser committed-save response-loss retry
 
 **BOUNDED INDEPENDENT REVIEW: PROVISIONAL PASS, no blocker/major; GPT REVIEW

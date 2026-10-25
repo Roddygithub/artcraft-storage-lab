@@ -1,3 +1,15 @@
+## 2026-10-25 — GR-052 ambiguous upstream save response reconciliation
+
+- Only status=None from the upstream save triggers user-bound detail/content/detail
+  reads. Exact bytes, editable permission, identity and stable current file/head
+  confirm success through the existing receipt path; no second write occurs.
+- Ten native synthetic tests, including a contended concurrent retry after
+  reconciliation, plus GR-049/050 and existing gateway checks pass.
+  Evidence: `docs/GR-052-UPSTREAM-SAVE-RECONCILIATION.md`, `docs/reviews/GR-052/`.
+- Independent R1–R3 bounded reviews: PROVISIONAL PASS, no blocker/major; the
+  concurrency-test and test-count notes were corrected. GPT REVIEW PENDING.
+  Real Seafile/browser and project GPT PASS remain NOT VERIFIED.
+
 ## 2026-10-25 — GR-051 browser committed-save retry
 
 - Added loopback Chromium proof using actual Handler/Gateway/hostpage.render,

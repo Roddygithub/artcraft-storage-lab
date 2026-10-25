@@ -1,0 +1,15 @@
+test_change_during_content_read (__main__.UpstreamSaveLossTests.test_change_during_content_read) ... ok
+test_changed_user_repo_or_path (__main__.UpstreamSaveLossTests.test_changed_user_repo_or_path) ... ok
+test_committed_bytes_confirm_and_retry_without_write (__main__.UpstreamSaveLossTests.test_committed_bytes_confirm_and_retry_without_write) ... ok
+test_concurrent_retry_after_reconciliation_reuses_receipt (__main__.UpstreamSaveLossTests.test_concurrent_retry_after_reconciliation_reuses_receipt) ... ok
+test_different_bytes_do_not_confirm (__main__.UpstreamSaveLossTests.test_different_bytes_do_not_confirm) ... ok
+test_known_errors_are_not_reconciled (__main__.UpstreamSaveLossTests.test_known_errors_are_not_reconciled) ... ok
+test_missing_current_identity (__main__.UpstreamSaveLossTests.test_missing_current_identity) ... ok
+test_missing_read_capability (__main__.UpstreamSaveLossTests.test_missing_read_capability) ... ok
+test_read_failures (__main__.UpstreamSaveLossTests.test_read_failures) ... ok
+test_revoked_permission (__main__.UpstreamSaveLossTests.test_revoked_permission) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.007s
+
+OK

@@ -224,9 +224,16 @@ class Gateway:
                         or detail.get("head_commit_id") != receipt[2]["version"]):
                     raise SeafileError("conflict", status=409)
                 return dict(receipt[2]), 200
-            saved = self.seafile.thirdparty_file_save(
-                session.access_token, session.file_id, session.head_commit_id,
-                session.name, data)
+            try:
+                saved = self.seafile.thirdparty_file_save(
+                    session.access_token, session.file_id, session.head_commit_id,
+                    session.name, data)
+            except SeafileError as exc:
+                if exc.status is not None:
+                    raise
+                # A lost transport response may follow a durable commit. Never
+                # write again here: confirm exact bytes through user-bound reads.
+                saved = self._reconcile_save(session, data)
         except AttributeError:
             return {"ok": False, "error": "user-bound Seafile save is unavailable"}, 503
         except SeafileError as exc:
@@ -256,6 +263,35 @@ class Gateway:
         }
         session.last_save = (digest, len(data), result)
         return dict(result), 200
+
+    def _reconcile_save(self, session, data):
+        detail = self.seafile.user_file_detail(
+            session.repo_id, session.path, session.user, session.access_token)
+        file_id = detail.get("id")
+        head = detail.get("head_commit_id")
+        can_edit = detail.get("can_edit")
+        if not isinstance(can_edit, bool):
+            can_edit = detail.get("permission") in EDITABLE_PERMISSIONS
+        if not can_edit:
+            raise SeafileError("permission revoked", status=403)
+        if not isinstance(file_id, str) or not file_id or not isinstance(head, str) or not head:
+            raise SeafileError("missing current file identity", status=502)
+        content = self.seafile.thirdparty_file_content(
+            session.access_token, file_id, max_bytes=self.max_bytes)
+        if content != data:
+            raise SeafileError("unconfirmed save content", status=502)
+        # Content reads bind the file id; recheck the repository head and
+        # authorization too, so a concurrent change cannot advance our baseline.
+        current = self.seafile.user_file_detail(
+            session.repo_id, session.path, session.user, session.access_token)
+        can_edit = current.get("can_edit")
+        if not isinstance(can_edit, bool):
+            can_edit = current.get("permission") in EDITABLE_PERMISSIONS
+        if not can_edit:
+            raise SeafileError("permission revoked", status=403)
+        if current.get("id") != file_id or current.get("head_commit_id") != head:
+            raise SeafileError("conflict", status=409)
+        return {"file_id": file_id, "head_commit_id": head}
 
 
 class Handler(BaseHTTPRequestHandler):

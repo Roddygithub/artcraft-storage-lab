@@ -489,3 +489,22 @@ Evidence: `docs/reviews/GR-050/`. GPT REVIEW PENDING; no project-level verdict.
 
 Evidence: `docs/reviews/GR-051/`; `tests/test_gr051_browser_save_retry.py`.
 GR-049/050 and gateway checks pass. GPT REVIEW PENDING; no project verdict.
+
+## GR-052. Ambiguous upstream save response loss
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Fake commit then status=None; exact user-bound reread | Success, current IDs, clean, receipt; identical retry adds no write | [x] Native synthetic test |
+| Different current bytes | 502, no receipt, dirty and old baseline; retry CAS conflicts | [x] Native synthetic test |
+| Revoked permission / token bound to another user, repo or path | 403, no baseline advance or receipt | [x] Native synthetic tests |
+| Info/content auth, missing file, transport or service failure | Safe 403/404/502; no receipt or baseline advance | [x] Native synthetic tests |
+| Missing content API / missing current IDs | 503/502, fail closed | [x] Native synthetic tests |
+| File/head, permission or user changes during content read | 409/403, fail closed | [x] Native synthetic tests |
+| Known 409/403/400/502 from save | No reconciliation content read; existing error mapping retained | [x] Native synthetic tests |
+| Identical retry contends while response-loss reconciliation is pending | Retry waits on session lock, reuses receipt, causes no second upstream write | [x] Event-gated lock-contention test; repeated 25 times |
+| Existing GR-049/050 and gateway suite | Existing behavior intact | [x] PASS |
+| Real Seafile / browser / ONLYOFFICE | Complete MVP | [ ] NOT VERIFIED; untouched |
+| Independent review | Separate reviewer | [x] R1–R3 PROVISIONAL PASS, no blocker/major |
+
+Evidence: `docs/reviews/GR-052/`; `tests/test_gr052_upstream_save_loss.py`.
+PROVISIONAL implementation; GPT REVIEW PENDING; no project GPT PASS.

@@ -1,0 +1,7 @@
+$ python3 -m py_compile integration/gateway/server.py tests/test_gr052_upstream_save_loss.py
+exit=0
+
+$ git diff --check a7804a23183c3bc5680028b0a88ac24e4eeb3a86
+exit=0
+
+Concurrency regression stress: test_gr052_upstream_save_loss.py passed 25 consecutive runs.

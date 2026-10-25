@@ -22,7 +22,17 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-051 — loopback Chromium post-commit response-loss/retry proof
+CURRENT GR: GR-052 — ambiguous upstream save response reconciliation.
+Synthetic native tests confirm exact bounded user-bound reread after status=None;
+permission/identity/head/read failures fail closed, no second write. GR-049/050
+and gateway checks pass. Independent R1–R3 bounded reviews: PROVISIONAL PASS,
+no blocker/major; minor test/docs notes were remediated. GPT REVIEW PENDING.
+Implementation is locally validated; real Seafile/browser behavior remains
+NOT VERIFIED, and no project GPT PASS is claimed.
+Real Seafile/browser MVP remains NOT VERIFIED.
+See `docs/GR-052-UPSTREAM-SAVE-RECONCILIATION.md`, `docs/reviews/GR-052/`.
+
+PREVIOUS GR: GR-051 — loopback Chromium post-commit response-loss/retry proof
 based on 5a1ceb66; synthetic editor (not actual WASM), FakeSeafile (not
 real). First fetch fails/ticket-1 negative/dirty; user retry ticket-2 returns
 receipt HTTP 200 with one fake write; editor and host confirm clean. GR-049/050
