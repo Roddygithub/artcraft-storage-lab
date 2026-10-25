@@ -1,7 +1,7 @@
-diff --git a/Cargo.lock b/Cargo.lock
-index 27cb0d4..c5db6f9 100644
---- a/Cargo.lock
-+++ b/Cargo.lock
+diff --git c/Cargo.lock w/Cargo.lock
+index 27cb0d4..71809f4 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
 @@ -904,6 +904,16 @@ name = "craft-docpath"
  version = "0.1.0"
  source = "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
@@ -9,7 +9,7 @@ index 27cb0d4..c5db6f9 100644
 +[[package]]
 +name = "craft-platform"
 +version = "0.1.0"
-+source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=90c261de22ef75c4c7c5c5cd1c712d483be0bbc8#90c261de22ef75c4c7c5c5cd1c712d483be0bbc8"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=56c5e16d79b77751106173c13111ef4fe0a2c0ec#56c5e16d79b77751106173c13111ef4fe0a2c0ec"
 +dependencies = [
 + "js-sys",
 + "wasm-bindgen",
@@ -27,22 +27,22 @@ index 27cb0d4..c5db6f9 100644
   "eframe",
   "egui",
   "figcraft-collab-net",
-diff --git a/Cargo.toml b/Cargo.toml
-index 95c956d..13f9585 100644
---- a/Cargo.toml
-+++ b/Cargo.toml
+diff --git c/Cargo.toml w/Cargo.toml
+index 95c956d..783fbca 100644
+--- c/Cargo.toml
++++ w/Cargo.toml
 @@ -37,6 +37,7 @@ craft-docpath = { version = "0.1.0", git = "https://github.com/storytold/craft-l
  # Who draws the window frame on Linux — the compositor or the app — so every Craft app shows the
  # same native titlebar per desktop (craft-libs). The `egui` feature adds `decorate`/`decorations`.
  craft-window = { git = "https://github.com/storytold/craft-libs", rev = "1f805378d454dac48b5c214029d254055fdf961b", features = ["egui"] }
-+craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8", package = "craft-platform" }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "56c5e16d79b77751106173c13111ef4fe0a2c0ec", package = "craft-platform" }
  
  # foundation
  kurbo = { version = "0.13", features = ["serde"] }
-diff --git a/apps/figcraft-web/Cargo.toml b/apps/figcraft-web/Cargo.toml
+diff --git c/apps/figcraft-web/Cargo.toml w/apps/figcraft-web/Cargo.toml
 index ffd44f3..707e1f4 100644
---- a/apps/figcraft-web/Cargo.toml
-+++ b/apps/figcraft-web/Cargo.toml
+--- c/apps/figcraft-web/Cargo.toml
++++ w/apps/figcraft-web/Cargo.toml
 @@ -17,6 +17,7 @@ path = "src/main.rs"
  figcraft-engine = { workspace = true }
  figcraft-ui-egui = { workspace = true }
@@ -51,11 +51,11 @@ index ffd44f3..707e1f4 100644
  egui = { workspace = true }
  log = { workspace = true }
  
-diff --git a/apps/figcraft-web/src/host.rs b/apps/figcraft-web/src/host.rs
+diff --git c/apps/figcraft-web/src/host.rs w/apps/figcraft-web/src/host.rs
 new file mode 100644
 index 0000000..c1c5bac
 --- /dev/null
-+++ b/apps/figcraft-web/src/host.rs
++++ w/apps/figcraft-web/src/host.rs
 @@ -0,0 +1,96 @@
 +//! Thin browser adapter for the shared Craft host transport.
 +
@@ -153,10 +153,10 @@ index 0000000..c1c5bac
 +            .map_err(|e| format!("Couldn't report FigCraft dirty state: {e:?}"))
 +    }
 +}
-diff --git a/apps/figcraft-web/src/main.rs b/apps/figcraft-web/src/main.rs
+diff --git c/apps/figcraft-web/src/main.rs w/apps/figcraft-web/src/main.rs
 index 7eed2ff..71b236d 100644
---- a/apps/figcraft-web/src/main.rs
-+++ b/apps/figcraft-web/src/main.rs
+--- c/apps/figcraft-web/src/main.rs
++++ w/apps/figcraft-web/src/main.rs
 @@ -20,6 +20,8 @@
  //! The link carries the session's secret; a fragment is never sent to the web host, but the address
  //! bar and the browser history keep it, so the URL is as private as the link itself.
@@ -166,10 +166,10 @@ index 7eed2ff..71b236d 100644
  #[cfg(any(target_arch = "wasm32", test))]
  mod query;
  #[cfg(test)]
-diff --git a/apps/figcraft-web/src/web.rs b/apps/figcraft-web/src/web.rs
+diff --git c/apps/figcraft-web/src/web.rs w/apps/figcraft-web/src/web.rs
 index f08ca90..63661e7 100644
---- a/apps/figcraft-web/src/web.rs
-+++ b/apps/figcraft-web/src/web.rs
+--- c/apps/figcraft-web/src/web.rs
++++ w/apps/figcraft-web/src/web.rs
 @@ -1,7 +1,7 @@
  //! The browser shell: web `Services` and the eframe web runner.
  
@@ -229,10 +229,10 @@ index f08ca90..63661e7 100644
      /// An `<input type="file">` taking `exts`, clicked; its file is read once picked.
      fn pick_open_contents(&mut self, _title: &str, exts: &[&str]) -> Option<ContentsFuture> {
          let accept = exts.iter().map(|e| format!(".{e}")).collect::<Vec<_>>().join(",");
-diff --git a/crates/engine/src/cmd/file.rs b/crates/engine/src/cmd/file.rs
+diff --git c/crates/engine/src/cmd/file.rs w/crates/engine/src/cmd/file.rs
 index 7380711..568396a 100644
---- a/crates/engine/src/cmd/file.rs
-+++ b/crates/engine/src/cmd/file.rs
+--- c/crates/engine/src/cmd/file.rs
++++ w/crates/engine/src/cmd/file.rs
 @@ -817,6 +817,22 @@ impl FileSnapshot {
          branch_tabs_saved(s, self.uid);
          Ok(true)
@@ -301,11 +301,11 @@ index 7380711..568396a 100644
 +        assert!(session.ds().unwrap().is_dirty());
 +    }
 +}
-diff --git a/crates/ui-egui/src/host_save_tests.rs b/crates/ui-egui/src/host_save_tests.rs
+diff --git c/crates/ui-egui/src/host_save_tests.rs w/crates/ui-egui/src/host_save_tests.rs
 new file mode 100644
 index 0000000..3e33896
 --- /dev/null
-+++ b/crates/ui-egui/src/host_save_tests.rs
++++ w/crates/ui-egui/src/host_save_tests.rs
 @@ -0,0 +1,100 @@
 +use std::{cell::RefCell, rc::Rc};
 +
@@ -407,10 +407,10 @@ index 0000000..3e33896
 +    app.save();
 +    assert_eq!(state.borrow().saves.len(), save_count, "an unsupported active tab must not save the bound file");
 +}
-diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
+diff --git c/crates/ui-egui/src/lib.rs w/crates/ui-egui/src/lib.rs
 index c93333b..ba7c70b 100644
---- a/crates/ui-egui/src/lib.rs
-+++ b/crates/ui-egui/src/lib.rs
+--- c/crates/ui-egui/src/lib.rs
++++ w/crates/ui-egui/src/lib.rs
 @@ -117,6 +117,8 @@ mod home_recents_tests;
  #[cfg(test)]
  mod home_tests;
@@ -708,10 +708,10 @@ index c93333b..ba7c70b 100644
      }
  
      /// Every [`AUTOSAVE_SECS`], each open document with unsaved changes since its last version
-diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
+diff --git c/crates/ui-egui/src/menus.rs w/crates/ui-egui/src/menus.rs
 index 9659c6b..193f013 100644
---- a/crates/ui-egui/src/menus.rs
-+++ b/crates/ui-egui/src/menus.rs
+--- c/crates/ui-egui/src/menus.rs
++++ w/crates/ui-egui/src/menus.rs
 @@ -115,6 +115,10 @@ pub fn record_recent(app: &mut FigApp, key: &str) {
  /// Run a menu, shortcut or palette action by id: actions that need the UI (dialogs, panels, the
  /// clipboard) are handled here, the rest go to the engine.

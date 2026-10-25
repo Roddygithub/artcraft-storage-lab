@@ -17,9 +17,10 @@ unknown and does not retry automatically.
 
 The patch is based on upstream FigCraft
 `8d790607ff1ad40e32343ca2116d8fdcf3244c8d` and pins `craft-platform` at
-`90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`. It is stored as
+`56c5e16d79b77751106173c13111ef4fe0a2c0ec`. The patch includes the original
+GR-019 app changes plus this immutable dependency pin. It is stored as
 [`figcraft-shared-host-save.patch`](figcraft-shared-host-save.patch); SHA-256:
-`e2a55885642960cadb0a7f6dc77894f6d53c43625abc701c4cc02db2543dc366`.
+`954850ba5aff7362e776b2331a5a5ff54bf9d71374d7b29bc856c2b7a47c4798`.
 
 ## Reproduction
 
@@ -62,3 +63,13 @@ through an unexpected path.
   events, and production security controls were not runtime-tested.
 - Upstream FigCraft and production Seafile were not modified. Upstream issue,
   PR, and RFC publication remain locked pending project GPT PASS.
+
+## Transport re-pin follow-up
+
+The first repin review mistook the full patch against upstream for a repin-only
+diff. A follow-up compared the exact artifact with the previously accepted
+GR-019 patch after normalizing path prefixes and transport revisions: all source
+hunks match, and only the manifest/lock pin changes. The reviewer matched the
+full patch hash and confirmed the pinned malformed-ACK behavior; tests/builds
+were not rerun. The earlier minor about retrying failed dirty-state reports
+remains. See [`REVIEW-TRANSPORT-REPIN-R2.md`](REVIEW-TRANSPORT-REPIN-R2.md).

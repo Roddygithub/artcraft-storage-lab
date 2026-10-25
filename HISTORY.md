@@ -1,3 +1,15 @@
+## 2026-10-25 — GR-019 FigCraft transport re-pin
+
+* Updated the stored FigCraft host-save patch to pin `craft-platform`
+  `56c5e16`. The full patch retains the previously reviewed GR-019 app changes;
+  an independent comparison confirmed no new source hunks beyond the manifest
+  and lock pin.
+* Engine 3/3 and UI 1/1 focused tests, locked Rust 1.95 WASM check, formatting,
+  diff and reverse-apply checks pass per implementer. Repin review round 2
+  found no new blocker/major; its reviewer did not rerun tests/builds. The known
+  minor dirty-report retry issue and lack of browser/Seafile E2E remain. See
+  `docs/reviews/GR-019/`.
+
 ## 2026-10-25 — GR-018 CADCraft transport re-pin
 
 * Updated the stored CADCraft host-save patch and lockfile to pin
