@@ -22,7 +22,13 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-048 — exact GR-019 patched FigCraft built as optimized actual
+CURRENT GR: GR-049 — gateway last-successful-save receipt implemented;
+6 focused retry tests and existing gateway checks pass. Independent R1 bounded
+review is PROVISIONAL PASS, no findings. Actual network-loss/browser/Seafile
+runtime NOT VERIFIED. GPT REVIEW PENDING; no project GPT PASS.
+See `docs/GR-049-IDEMPOTENT-SAVE-RETRY.md` and `docs/reviews/GR-049/`.
+
+PREVIOUS GR: GR-048 — exact GR-019 patched FigCraft built as optimized actual
 Web/WASM and passed a bounded synthetic browser open/edit/save/ACK/clean/fresh
 iframe reopen smoke. Captured 3,464 bytes under `figcraft:1`; the rectangle
 remained visible after reopen. Parent bytes were memory-only. Durable Seafile

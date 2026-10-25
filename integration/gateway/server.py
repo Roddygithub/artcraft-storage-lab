@@ -11,6 +11,7 @@ The service holds the Seafile credential. The browser never does.
 """
 
 import base64
+import hashlib
 import io
 import ipaddress
 import json
@@ -169,6 +170,10 @@ class Gateway:
 
     def document(self, session):
         """The bytes of the document being edited."""
+        with session.lock:
+            return self._document_locked(session)
+
+    def _document_locked(self, session):
         if session.access_token:
             data = self.seafile.thirdparty_file_content(
                 session.access_token, session.file_id, max_bytes=self.max_bytes)
@@ -186,6 +191,10 @@ class Gateway:
         fails closed until an upstream endpoint supplies both; a gateway lock
         cannot protect against external writers.
         """
+        with session.lock:
+            return self._save_locked(session, data, name)
+
+    def _save_locked(self, session, data, name):
         if not session.can_edit or not session.user_authorized:
             return {"ok": False, "error": "you do not have permission to edit this file"}, 403
         if name is not None and name != session.name:
@@ -195,9 +204,26 @@ class Gateway:
         if not payload_matches_name(session.name, data):
             return {"ok": False, "error": "saved content does not match the original document type"}, 400
 
+        digest = hashlib.sha256(data).digest()
+        receipt = session.last_save
+
         # Seahub re-authorizes the user and the fileserver atomically checks the
         # opened file id and repository head before committing the new version.
         try:
+            if receipt is not None and receipt[:2] == (digest, len(data)):
+                # A receipt acknowledges an already committed save, but never
+                # substitutes for current user-bound authorization or freshness.
+                detail = self.seafile.user_file_detail(
+                    session.repo_id, session.path, session.user, session.access_token)
+                can_edit = detail.get("can_edit")
+                if not isinstance(can_edit, bool):
+                    can_edit = detail.get("permission") in EDITABLE_PERMISSIONS
+                if not can_edit:
+                    raise SeafileError("permission revoked", status=403)
+                if (detail.get("id") != receipt[2]["file_id"]
+                        or detail.get("head_commit_id") != receipt[2]["version"]):
+                    raise SeafileError("conflict", status=409)
+                return dict(receipt[2]), 200
             saved = self.seafile.thirdparty_file_save(
                 session.access_token, session.file_id, session.head_commit_id,
                 session.name, data)
@@ -222,12 +248,14 @@ class Gateway:
         session.file_id = saved["file_id"]
         session.head_commit_id = saved["head_commit_id"]
         session.unsaved = False
-        return {
+        result = {
             "ok": True,
             "file_id": session.file_id,
             "version": session.head_commit_id,
             "message": "saved",
-        }, 200
+        }
+        session.last_save = (digest, len(data), result)
+        return dict(result), 200
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -326,8 +354,10 @@ class Handler(BaseHTTPRequestHandler):
             if session is None:
                 return self._json(404, {"ok": False, "error": "unknown or expired session"})
             body = self._read_body(limit=64) or b""
-            session.unsaved = body.strip().lower() in (b"true", b"1")
-            return self._json(200, {"ok": True, "unsaved": session.unsaved})
+            with session.lock:
+                session.unsaved = body.strip().lower() in (b"true", b"1")
+                result = {"ok": True, "unsaved": session.unsaved}
+            return self._json(200, result)
 
         return self._json(404, {"ok": False, "error": "not found"})
 

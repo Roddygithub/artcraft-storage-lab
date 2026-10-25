@@ -1,0 +1,11 @@
+test_changed_payload_uses_cas (__main__.SaveRetryTests.test_changed_payload_uses_cas) ... ok
+test_concurrent_identical_saves_share_receipt (__main__.SaveRetryTests.test_concurrent_identical_saves_share_receipt) ... ok
+test_discarded_response_retry (__main__.SaveRetryTests.test_discarded_response_retry) ... ok
+test_failed_save_does_not_create_receipt (__main__.SaveRetryTests.test_failed_save_does_not_create_receipt) ... ok
+test_replay_rechecks_permission_identity_and_freshness (__main__.SaveRetryTests.test_replay_rechecks_permission_identity_and_freshness) ... ok
+test_replay_revalidates_payload_and_local_authorization (__main__.SaveRetryTests.test_replay_revalidates_payload_and_local_authorization) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.003s
+
+OK

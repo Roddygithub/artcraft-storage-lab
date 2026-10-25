@@ -1,3 +1,15 @@
+## 2026-10-25 — GR-049 gateway committed-save retry
+
+- Added a bounded per-session digest/length/result receipt and session locking.
+  Identical retries recheck user-bound permission and current file/head before
+  acknowledging the committed result; changed bytes retain upstream CAS.
+- Six synthetic regressions and existing gateway unit checks pass; syntax and
+  diff checks pass. Direct-call discarded-result simulation only: actual
+  network-loss/browser/Seafile runtime NOT VERIFIED. Production/upstream untouched.
+- Evidence: `docs/GR-049-IDEMPOTENT-SAVE-RETRY.md`, `docs/reviews/GR-049/`.
+  Independent R1 bounded review: PROVISIONAL PASS, no findings. GPT review
+  pending; no project GPT PASS or upstream publication authorization.
+
 ## 2026-10-25 — GR-048 FigCraft browser host-save smoke
 
 - Applied the exact accepted GR-019 patch to clean FigCraft `8d790607`;

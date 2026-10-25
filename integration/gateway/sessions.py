@@ -17,10 +17,13 @@ import time
 class Session:
     __slots__ = ("sid", "repo_id", "path", "name", "file_id", "head_commit_id", "user", "can_edit",
                  "user_authorized",
-                 "created", "last_seen", "access_token", "app", "unsaved")
+                 "created", "last_seen", "access_token", "app", "unsaved",
+                 "lock", "last_save")
 
     def __init__(self, sid, repo_id, path, name, file_id, user, can_edit,
                  user_authorized, access_token, app, head_commit_id=""):
+        self.lock = threading.RLock()
+        self.last_save = None  # (SHA-256 digest, byte length, successful result); no bytes
         self.sid = sid
         self.repo_id = repo_id
         self.path = path
@@ -46,6 +49,10 @@ class Session:
         return time.time() - self.last_seen
 
     def as_dict(self):
+        with self.lock:
+            return self._as_dict_locked()
+
+    def _as_dict_locked(self):
         return {
             "sid": self.sid,
             "repo_id": self.repo_id,

@@ -1,5 +1,14 @@
 # GPT Review Queue
 
+## GR-049 — Gateway committed-save retry
+
+**BOUNDED INDEPENDENT REVIEW: PROVISIONAL PASS, no findings; GPT REVIEW
+PENDING.** The receipt/locking change is based on `7238bc85`; 6 focused tests
+and existing gateway unit checks pass. Direct-call discarded-result simulation,
+not actual network-loss runtime. Real Seafile/browser behavior NOT VERIFIED.
+No project GPT PASS or upstream publication authorization.
+Evidence: `docs/GR-049-IDEMPOTENT-SAVE-RETRY.md`, `docs/reviews/GR-049/`.
+
 ## GR-048 — FigCraft host-save browser runtime smoke
 
 **GPT REVIEW PENDING.** Exact GR-019 patch / base `8d790607` /

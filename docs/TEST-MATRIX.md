@@ -445,3 +445,19 @@ without blocker/major; final wording MINOR corrected afterward. See
 | 29.10 | Independent exact review of GR-041 | No blocker/major remains in bounded candidate ingestion | [x] Nemotron R3 PROVISIONAL PASS; cleanup trap verified; live release fetch and protocol compatibility remain NOT VERIFIED |
 
 See `docs/GR-038-CRAFT-ASSET-INGESTION.md` and `docs/ASSET-INGESTION.md`.
+
+
+## GR-049. Gateway committed-save retry
+
+| Test | Expected | Result |
+|---|---|---|
+| Discard committed result, save identical bytes again | Same result, one write, no retained document bytes | [x] Synthetic regression |
+| Concurrent same-session identical saves | Two acknowledgments, one upstream save | [x] Synthetic regression |
+| Changed bytes / external head | Updated IDs passed to CAS; external change refused | [x] Synthetic regression |
+| Replay validation / permission / identity / freshness | Invalid payload/name/size and unauthorized or stale replay refused | [x] Synthetic regression |
+| Upstream error | No false receipt; reauthorization errors fail closed | [x] Synthetic regression |
+| Existing gateway security and two-session CAS race | Existing checks pass | [x] `python3 tests/test_gateway_unit.py` |
+| Actual response loss / browser / Seafile new version and reopen | Reproduce full runtime | [ ] NOT VERIFIED |
+| Independent review | Separate bounded reviewer | [x] PROVISIONAL PASS R1, no findings; network/runtime gaps remain |
+
+Run `python3 tests/test_gr049_save_retry.py`; evidence in `docs/reviews/GR-049/`.
