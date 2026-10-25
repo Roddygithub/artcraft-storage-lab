@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local ma
 BRANCH:     main
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
 CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038/039 and are not project-level GPT-reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 adds and unit-tests nonce CSP on the dynamic host page; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 adds and unit-tests nonce CSP on the dynamic host page; GR-041 bounds staged Craft Web ZIP download and extraction; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -22,7 +22,16 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-040 — A real browser regression on the isolated synthetic stack
+CURRENT GR: GR-041 — Candidate ZIP downloads are capped at 256 MiB with a
+30-second socket timeout and 15-minute total deadline; extraction is capped at
+1 GiB and 10,000 entries. Eight standard-library tests cover byte/count limits,
+ZIP64/multi-disk, duplicate and unsafe paths, symlinks, malformed ZIPs and
+timeout behavior. Active static app trees are not touched; host protocol
+compatibility remains **NOT VERIFIED**. Independent exact round 3 returned
+bounded PROVISIONAL PASS, no blocker/major. See
+`docs/GR-038-CRAFT-ASSET-INGESTION.md`.
+
+GR-040 — A real browser regression on the isolated synthetic stack
 confirms ONLYOFFICE still edits, saves two Seafile versions, and reopens both
 edits from the library file list. Production/deployed ONLYOFFICE and security
 remain **NOT VERIFIED**. Independent evidence review: bounded PROVISIONAL

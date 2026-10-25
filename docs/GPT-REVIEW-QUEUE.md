@@ -6,6 +6,20 @@ and does not trust the free-model verdicts.
 Nothing may be published upstream (issue, PR, RFC in `storytold/*`, Seafile or
 Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 
+## GR-041 — bounded Craft Web asset staging
+
+The GR-038 fetcher now caps the release ZIP download at 256 MiB, socket timeout
+at 30 seconds, total download deadline at 15 minutes, extracted bytes at 1 GiB,
+and archive entries at 10,000. It preflights central-directory metadata,
+rejects ZIP64/multi-disk, duplicate/path/special-file entries, and keeps
+candidate-only staging. Eight focused standard-library tests are recorded in
+`tests/test_gr041_craft_zip_limits.py` and `docs/GR-038-CRAFT-ASSET-INGESTION.md`.
+Independent exact round 3 returned bounded PROVISIONAL PASS, no blocker/major;
+see `docs/reviews/GR-041/INDEPENDENT-REVIEW-R3.md`. Round 2's cleanup finding
+was a misread because `trap cleanup EXIT` was already present. Host-protocol
+compatibility and live release retrieval remain NOT VERIFIED. No upstream or
+service state changed.
+
 ## GR-039 — gateway host-page CSP
 
 Implementation and unit evidence are recorded in

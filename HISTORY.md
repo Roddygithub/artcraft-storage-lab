@@ -1,3 +1,15 @@
+## 2026-10-25 — GR-041 bounded Craft Web asset staging
+
+* Added a 256 MiB streaming download cap and a 1 GiB extracted-content cap to
+  the GR-038 staging fetcher. ZIP path and symlink checks and candidate-only
+  staging are retained; no active `integration/static/<app>` tree is touched.
+* Added eight focused standard-library tests for byte/count limits, deadline,
+  ZIP64/multi-disk, duplicate/unsafe-path/symlink rejection and malformed
+  archives. Independent exact review round 3 returned bounded PROVISIONAL PASS,
+  no blocker/major; host protocol compatibility remains NOT VERIFIED.
+* No service or upstream state changed. See
+  `docs/GR-038-CRAFT-ASSET-INGESTION.md`.
+
 ## 2026-10-25 — GR-040 synthetic ONLYOFFICE regression
 
 * Reproduced the existing Seafile → ONLYOFFICE browser path on a loopback-only

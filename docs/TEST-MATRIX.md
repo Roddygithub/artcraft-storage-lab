@@ -424,15 +424,19 @@ Bounded synthetic evidence only; independent review was PROVISIONAL ACCEPT
 without blocker/major; final wording MINOR corrected afterward. See
 `docs/reviews/GR-037/`.
 
-## 29. Craft Web asset ingestion safety (GR-038)
+## 29. Craft Web asset ingestion safety (GR-038, GR-041)
 
 | # | Test | Expected | Result |
 |---|---|---|---|
 | 29.1 | Release selection | A caller names an exact release tag and digest; no mutable `latest` lookup | [x] WordCraft v0.10.0 selected explicitly |
 | 29.2 | Pinned archive integrity and basic layout | Digest matches; one-root ZIP contains root `index.html` and WASM | [x] Exact WordCraft release passed digest and layout validation |
-| 29.3 | Unsafe ZIP rejection | Traversal, symlink, ambiguous root, missing index/WASM archives are rejected | [~] Guards are present by inspection; negative archive cases were not executed |
+| 29.3 | Unsafe ZIP rejection | Traversal, absolute/backslash paths, duplicate names, symlinks, ambiguous roots, and missing index/WASM are rejected | [x] `python3 tests/test_gr041_craft_zip_limits.py` exercises each listed negative case |
 | 29.4 | Active build safety | Fetching must not overwrite dispatcher-selected `integration/static/<app>/` | [x] Output staged under `integration/static/candidates/wordcraft/`; promotion is separate; final move uses no-clobber semantics |
 | 29.5 | Host protocol compatibility | Staged release passes Open/Save/ACK app smoke before promotion | [ ] NOT VERIFIED; candidate is not promoted |
-| 29.6 | Independent review | No blocker/major remains in the asset-ingestion change | [x] Luna High bounded re-review: provisional ACCEPT; negative ZIP cases remain unexecuted |
+| 29.6 | Independent review of original GR-038 | No blocker/major remains in the original staged-fetch change | [x] Luna High bounded GR-038 re-review: provisional ACCEPT; predates GR-041 |
+| 29.7 | Download byte limit and deadline | Exact limit accepted; larger download refused; slow download ends within bounded deadline plus one socket timeout | [x] Synthetic stream verifies byte cap, reduced total-deadline behavior and 30-second socket timeout |
+| 29.8 | Extracted byte and entry limits | Exact total/count accepted; greater declared/streamed total or entry count refused | [x] Synthetic ZIPs verify exact byte cap and reject entry count before `ZipFile` construction |
+| 29.9 | Malformed and conflicting ZIP metadata | Malformed, ZIP64, multi-disk, duplicate and unsafe-path entries are rejected | [x] `python3 tests/test_gr041_craft_zip_limits.py`; EOCD boundary cases covered with synthetic records |
+| 29.10 | Independent exact review of GR-041 | No blocker/major remains in bounded candidate ingestion | [x] Nemotron R3 PROVISIONAL PASS; cleanup trap verified; live release fetch and protocol compatibility remain NOT VERIFIED |
 
 See `docs/GR-038-CRAFT-ASSET-INGESTION.md` and `docs/ASSET-INGESTION.md`.

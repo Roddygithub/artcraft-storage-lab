@@ -13,7 +13,6 @@ if [[ $# -eq 0 || $(($# % 3)) -ne 0 ]]; then
 fi
 
 command -v gh >/dev/null || { echo "gh is required" >&2; exit 1; }
-command -v curl >/dev/null || { echo "curl is required" >&2; exit 1; }
 command -v python3 >/dev/null || { echo "python3 is required" >&2; exit 1; }
 
 candidate_root="$STATIC/candidates"
@@ -67,43 +66,13 @@ while (($#)); do
 
   tmp=$(mktemp -d "$app_root/.stage.XXXXXX")
   echo "==> $repo@$tag/$asset"
-  curl --fail --location --silent --show-error -o "$tmp/$asset" "$url"
+  python3 "$HERE/scripts/craft_web_zip.py" download "$url" "$tmp/$asset"
   printf '%s  %s\n' "${expected,,}" "$tmp/$asset" | sha256sum --check --status || {
     echo "SHA-256 mismatch for $url" >&2
     exit 1
   }
 
-  root=$(python3 - "$tmp/$asset" "$tmp/unpacked" <<'PY'
-import stat
-import sys
-import zipfile
-from pathlib import PurePosixPath
-
-archive, destination = sys.argv[1:]
-with zipfile.ZipFile(archive) as zf:
-    infos = zf.infolist()
-    roots = set()
-    for info in infos:
-        name = info.filename
-        path = PurePosixPath(name)
-        mode = info.external_attr >> 16
-        if (not name or "\\" in name or path.is_absolute()
-                or ".." in path.parts or stat.S_ISLNK(mode)):
-            raise SystemExit(f"unsafe ZIP entry: {name!r}")
-        if path.parts:
-            roots.add(path.parts[0])
-    if len(roots) != 1:
-        raise SystemExit("web asset must contain exactly one top-level directory")
-    root = roots.pop()
-    names = {PurePosixPath(i.filename).as_posix() for i in infos}
-    if f"{root}/index.html" not in names:
-        raise SystemExit("web asset has no root index.html")
-    if not any(n.startswith(root + "/") and n.endswith(".wasm") for n in names):
-        raise SystemExit("web asset contains no WASM module")
-    zf.extractall(destination)
-    print(root)
-PY
-  )
+  root=$(python3 "$HERE/scripts/craft_web_zip.py" extract "$tmp/$asset" "$tmp/unpacked")
   mv -- "$tmp/unpacked/$root" "$tmp/staged"
   cat > "$tmp/staged/ARTIFACT-PROVENANCE.txt" <<EOF
 repository: $repo
