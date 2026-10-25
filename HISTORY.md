@@ -1,3 +1,21 @@
+## 2026-10-25 — GR-034 PhotoCraft gateway payload validation
+
+* Added gateway `.pcraft` type validation that requires exactly one nonempty
+  root `manifest.json` in the ZIP central directory. The check does not
+  decompress any members; malformed, missing-root, and nested-only manifest
+  cases are rejected. `Gateway.save` rejects an invalid `.pcraft` before its
+  Seafile save method is called.
+* `python3 tests/test_gateway_unit.py` passes, including acceptance of the
+  project-native PhotoCraft fixture. `git diff --check` is recorded in the
+  GR-034 assessment.
+* Added duplicate-root and empty-root manifest rejection tests after the initial
+  independent reviewer noted that those code paths were not explicit in the
+  test suite. Nemotron 3 Ultra R2 returned a bounded PROVISIONAL PASS after the
+  remediation; the review did not rerun tests or access services.
+* The PhotoCraft dispatcher, Seahub patches/configuration, app bundles and
+  services were not changed. Seafile runtime was unavailable and not accessed.
+* Scope and limits: `docs/GR-034-PHOTOCRAFT-GATEWAY-VALIDATION.md`.
+
 ## 2026-10-25 — GR-033 PhotoCraft browser host-protocol smoke
 
 * Reproduced the actual PhotoCraft Web/WASM host protocol in a same-origin

@@ -14,6 +14,7 @@ import threading
 import zipfile
 import io
 import http.client
+import warnings
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import urllib.parse
 
@@ -42,6 +43,7 @@ class FakeSeafile:
         self.obj_id = obj_id
         self.content = content
         self.written = []
+        self.save_calls = 0
         self.detail_calls = 0
         self.user = "alice"
         self.head_id = "head-a"
@@ -74,6 +76,7 @@ class FakeSeafile:
         return self.content
 
     def thirdparty_file_save(self, access_token, expected_id, expected_head, name, data):
+        self.save_calls += 1
         if self.save_detail_barrier:
             barrier = self.save_detail_barrier
             self.save_detail_calls += 1
@@ -149,6 +152,14 @@ def valid_docx():
                          "<Types><Override ContentType="
                          "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"
                          "/></Types>")
+    return out.getvalue()
+
+
+def zip_payload(entries):
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_STORED) as archive:
+        for name, data in entries:
+            archive.writestr(name, data)
     return out.getvalue()
 
 
@@ -313,6 +324,43 @@ def main():
         archive.writestr("Audio Files/clip.wav", b"no session document")
     check("SoundCraft bundle without a root session is rejected",
           not payload_matches_name("synthetic.scraftz", invalid_soundcraft.getvalue()))
+
+    # ---- PhotoCraft native bundle shape ---------------------------------
+    pcraft_fixture = os.path.join(os.path.dirname(__file__), "..", "docs", "reviews",
+                                  "GR-033", "runtime", "photocraft-smoke.pcraft")
+    with open(pcraft_fixture, "rb") as handle:
+        native_pcraft = handle.read()
+    check("the project-native PhotoCraft fixture has the expected ZIP manifest",
+          payload_matches_name("synthetic.pcraft", native_pcraft))
+    check("malformed .pcraft ZIP is rejected",
+          not payload_matches_name("synthetic.pcraft", b"not a ZIP archive"))
+    missing_manifest = zip_payload([("thumb.png", b"png")])
+    check(".pcraft ZIP without a root manifest is rejected",
+          not payload_matches_name("synthetic.pcraft", missing_manifest))
+    nested_manifest = zip_payload([("nested/manifest.json", b"{}")])
+    check("nested manifest is not accepted as the .pcraft root manifest",
+          not payload_matches_name("synthetic.pcraft", nested_manifest))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        duplicate_manifest = zip_payload([("manifest.json", b"{}"),
+                                          ("manifest.json", b"{}")])
+    check("duplicate exact-root manifests are rejected",
+          not payload_matches_name("synthetic.pcraft", duplicate_manifest))
+    empty_manifest = zip_payload([("manifest.json", b"")])
+    check("empty exact-root manifest is rejected",
+          not payload_matches_name("synthetic.pcraft", empty_manifest))
+
+    invalid_pcraft = nested_manifest
+    seafile = FakeSeafile()
+    gw = make_gateway(seafile)
+    pcraft_session = gw.sessions.create(
+        repo_id="repo", path="/a.pcraft", name="a.pcraft", file_id="aaaa",
+        user="alice", can_edit=True, user_authorized=True, access_token="user-token",
+        app="photocraft", head_commit_id="head-a")
+    result, status = gw.save(pcraft_session, invalid_pcraft, name="a.pcraft")
+    check("invalid .pcraft save is refused before calling Seafile",
+          status == 400 and result["ok"] is False and seafile.save_calls == 0
+          and seafile.written == [], f"HTTP {status}; save calls={seafile.save_calls}")
 
     # ---- Seafile capability URLs do not escape through browser errors -----
     upstream = ThreadingHTTPServer(("127.0.0.1", 0), UpstreamErrorHandler)

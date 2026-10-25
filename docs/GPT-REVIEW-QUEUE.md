@@ -657,6 +657,20 @@ Dispatch:    PhotoCraft remains excluded; no project GPT PASS or upstream public
 Review:      Nemotron 3 Ultra PROVISIONAL ACCEPT; no blocker/major; reviewer did not rerun browser or builds
 ```
 
+### GR-034 — PhotoCraft gateway payload validation
+
+```text
+Status:      gateway-only validation; Nemotron 3 Ultra R2 bounded PROVISIONAL PASS
+Base:        repository main at 39b6944; native format source storytold/photocraft a02f2ee41059d3312e7ff24a5af5edcac7b6435a
+Change:      `.pcraft` validation requires exactly one nonempty exact root `manifest.json` in ZIP central-directory metadata; no decompression
+Tests:       `python3 tests/test_gateway_unit.py` passes; malformed ZIP, missing/nested/duplicate/empty manifest, native fixture acceptance and invalid save-before-write are covered
+Limits:      shape check only; no manifest JSON/CRC/semantic validation; Seafile runtime unavailable and NOT VERIFIED
+Dispatch:    unchanged; `.pcraft` intentionally not added to integration/config/dispatch.json
+Review:      R1 MINOR test gap (duplicate/empty manifest) fixed; R2 confirmed coverage by source inspection, no tests rerun
+Publication: no upstream action, service/config change or Seafile access
+Evidence:    `docs/GR-034-PHOTOCRAFT-GATEWAY-VALIDATION.md`
+```
+
 ## GPT review instruction (for the future session)
 
 ```text

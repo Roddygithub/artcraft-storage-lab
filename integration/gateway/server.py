@@ -15,6 +15,7 @@ import io
 import mimetypes
 import os
 import posixpath
+import struct
 import urllib.parse
 import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -59,6 +60,17 @@ def payload_matches_name(name, data):
                             and "\\" not in item.filename]
             return len(sessions) == 1 and sessions[0].file_size > 0
         except (OSError, RuntimeError, zipfile.BadZipFile):
+            return False
+    if ext == "pcraft":
+        try:
+            with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                manifests = [item for item in archive.infolist()
+                             if item.filename == "manifest.json"]
+            # ponytail: metadata-only ceiling; semantic manifest validation
+            # stays in PhotoCraft so the gateway never decompresses payloads.
+            return len(manifests) == 1 and manifests[0].file_size > 0
+        except (OSError, RuntimeError, ValueError, EOFError,
+                zipfile.BadZipFile, struct.error):
             return False
     if ext in {"docx", "xlsx", "pptx"}:
         try:

@@ -362,3 +362,18 @@ Patch hash, exact base, review request and limits: `docs/reviews/GR-032/` and
 This smoke does not add PhotoCraft to the Seafile dispatch and is not a Seafile
 MVP or project GPT PASS. Evidence and limits: `docs/GR-033-PHOTOCRAFT-BROWSER-SMOKE.md`
 and `docs/reviews/GR-033/`.
+
+## 25. PhotoCraft gateway payload validation (GR-034)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 25.1 | Native `.pcraft` fixture validation | PhotoCraft's generated ZIP with root `manifest.json` is accepted | [x] Project-native GR-033 fixture passes metadata-only validation |
+| 25.2 | Malformed ZIP validation | Malformed `.pcraft` ZIP is rejected without an exception escaping | [x] Focused gateway unit check passes |
+| 25.3 | Root manifest requirement | Missing, nested-only, duplicate, or empty exact-root `manifest.json` is rejected | [x] Four focused cases pass |
+| 25.4 | Save-path rejection | Invalid `.pcraft` is refused before Seafile write | [x] Gateway returns status 400; fake Seafile save calls=0 and no writes |
+| 25.5 | Seafile runtime/version check | A valid `.pcraft` writes a durable new version and reopens from Seafile | [ ] NOT VERIFIED; Seafile runtime unavailable and not accessed; `.pcraft` remains excluded from dispatch |
+| 25.6 | Independent bounded review | Validation and focused tests have no blocker/major finding | [x] Nemotron 3 Ultra R2 PROVISIONAL PASS; initial MINOR test gap remediated |
+
+The validator inspects ZIP central-directory metadata only; it does not
+decompress/parse `manifest.json` or verify member CRC/data. Full limits and
+source reference: `docs/GR-034-PHOTOCRAFT-GATEWAY-VALIDATION.md`.
