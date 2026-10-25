@@ -1,0 +1,42 @@
+$ git rev-parse HEAD
+32069b9d42e3b36b34402d6faa1de1d6dfb5a4d4
+exit=0
+$ git rev-parse main
+32069b9d42e3b36b34402d6faa1de1d6dfb5a4d4
+exit=0
+$ git status --short
+?? docs/reviews/GR-048/
+exit=0
+$ sha256sum docs/reviews/GR-019/figcraft-shared-host-save.patch
+954850ba5aff7362e776b2331a5a5ff54bf9d71374d7b29bc856c2b7a47c4798  docs/reviews/GR-019/figcraft-shared-host-save.patch
+exit=0
+$ git -C /home/roddy/.cache/artcraft-figcraft-gr048 rev-parse HEAD
+8d790607ff1ad40e32343ca2116d8fdcf3244c8d
+exit=0
+$ git -C /home/roddy/.cache/artcraft-figcraft-gr048 diff --no-ext-diff --src-prefix=c/ --dst-prefix=w/ | sha256sum
+f3307d041d48845a3eaacfdc242656ab01aa589b2aab70815f8004b8c73c7094
+$ rustc +1.95.0 --version
+rustc 1.95.0 (59807616e 2026-04-14)
+exit=0
+$ cargo +1.95.0 --version
+cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+exit=0
+$ trunk --version
+trunk 0.22.0
+exit=0
+$ cat /home/roddy/.cargo/config.toml
+# Keep Rust build outputs on the persistent home filesystem, not the /tmp tmpfs.
+[build]
+target-dir = "/home/roddy/.cache/cargo-target"
+
+# Build scripts and test processes use this location for temporary files.
+[env]
+TMPDIR = { value = "/home/roddy/.cache/cargo-tmp", force = true }
+exit=0
+# Initial regenerated diff above excluded newly added untracked files.
+# Include them with intent-to-add (no content modification):
+$ git -C /home/roddy/.cache/artcraft-figcraft-gr048 add -N apps/figcraft-web/src/host.rs crates/ui-egui/src/host_save_tests.rs
+exit=0
+$ git -C /home/roddy/.cache/artcraft-figcraft-gr048 diff --no-ext-diff --src-prefix=c/ --dst-prefix=w/ | sha256sum
+954850ba5aff7362e776b2331a5a5ff54bf9d71374d7b29bc856c2b7a47c4798  -
+exit=0

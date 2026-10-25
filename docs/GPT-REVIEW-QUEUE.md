@@ -1,5 +1,17 @@
 # GPT Review Queue
 
+## GR-048 — FigCraft host-save browser runtime smoke
+
+**GPT REVIEW PENDING.** Exact GR-019 patch / base `8d790607` /
+transport `56c5e16d`, optimized actual WASM build and bounded T3 Chromium
+same-origin open → visible rectangle edit → 3,464 ticketed save bytes → matching
+synthetic ACK → clean → fresh iframe reopen. Parent retained bytes only in
+memory. Durable Seafile version/readback/reopen, dispatch and deployment remain
+NOT VERIFIED. No project GPT PASS or upstream publication authorization.
+Evidence: `docs/GR-048-FIGCRAFT-WASM-SMOKE.md`, `docs/reviews/GR-048/`.
+Independent free R1 returned PROVISIONAL PASS, no blocker/major; warning/setup
+MINOR observations and recorder clarifications are in that evidence directory.
+
 ## GR-047 — FilmCraft host-save browser runtime smoke
 
 The exact GR-023 patched FilmCraft WASM opened a synthetic native `.fcproj`
@@ -598,7 +610,7 @@ Transport:   craft-platform pinned at 56c5e16d79b77751106173c13111ef4fe0a2c0ec; 
 Scope:       one pathless .figcraft file per iframe; ticketed snapshot save ACK; no host Save As
 Evidence:    docs/reviews/GR-019/README.md and figcraft-shared-host-save.patch
 Tests:       3 engine tests, 1 synthetic-host UI test, Rust 1.95 locked WASM check, patch apply check, fmt/diff checks
-Open:        browser postMessage runtime, Seafile dispatch/version/reopen, timeout runtime, and deployment security NOT VERIFIED
+Open:        GR-048 verifies actual-WASM browser host-only runtime; durable Seafile dispatch/version/reopen, timeout runtime, and deployment security NOT VERIFIED
 Independent: Sol low rounds 1 and 2 returned FAIL; round 3 returned bounded PASS for the original implementation; transport repin R1 scope objection was closed in R2 after comparison against the accepted patch. Full-patch SHA `954850ba5aff7362e776b2331a5a5ff54bf9d71374d7b29bc856c2b7a47c4798`; one MINOR remains for retrying failed dirty-state reports; no project GPT PASS, Seafile E2E, or upstream authorization
 GPT review:  NOT REQUESTED as a project candidate; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC, or patch published

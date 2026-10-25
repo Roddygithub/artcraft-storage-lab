@@ -1,0 +1,318 @@
+{
+  "preAck": {
+    "dirty": true,
+    "phase": "save-captured-awaiting-explicit-ack",
+    "size": 3464,
+    "ticket": "figcraft:1",
+    "sha256": "aacce408951c464cc453b33be53280069cca7dfcf52b65c0e961bb2e93ac8ca0",
+    "events": [
+      {
+        "generation": 1,
+        "type": "figcraft:ready"
+      },
+      {
+        "generation": 1,
+        "type": "figcraft:dirty",
+        "dirty": false
+      },
+      {
+        "generation": 1,
+        "type": "figcraft:dirty",
+        "dirty": true
+      },
+      {
+        "generation": 1,
+        "type": "figcraft:save",
+        "ticket": "figcraft:1",
+        "size": 3464
+      }
+    ]
+  },
+  "postAck": {
+    "dirty": false,
+    "ackTicket": "figcraft:1",
+    "events": [
+      {
+        "generation": 1,
+        "type": "figcraft:ready"
+      },
+      {
+        "generation": 1,
+        "type": "figcraft:dirty",
+        "dirty": false
+      },
+      {
+        "generation": 1,
+        "type": "figcraft:dirty",
+        "dirty": true
+      },
+      {
+        "generation": 1,
+        "type": "figcraft:save",
+        "ticket": "figcraft:1",
+        "size": 3464
+      },
+      {
+        "generation": 1,
+        "type": "figcraft:dirty",
+        "dirty": false
+      }
+    ]
+  },
+  "runtime": {
+    "verification": {
+      "result": "bounded synthetic transport PASS",
+      "size": 3464,
+      "sha256": "aacce408951c464cc453b33be53280069cca7dfcf52b65c0e961bb2e93ac8ca0",
+      "ticket": "figcraft:1",
+      "dirty": false,
+      "reopened": true
+    },
+    "state": {
+      "phase": "reopened-clean",
+      "savedBytes": "[3464 bytes]",
+      "savedTicket": "figcraft:1",
+      "dirty": false,
+      "ready": "0.10.0",
+      "reopened": true,
+      "editResult": null,
+      "events": [
+        {
+          "generation": 1,
+          "type": "figcraft:ready"
+        },
+        {
+          "generation": 1,
+          "type": "figcraft:dirty",
+          "dirty": false
+        },
+        {
+          "generation": 1,
+          "type": "figcraft:dirty",
+          "dirty": true
+        },
+        {
+          "generation": 1,
+          "type": "figcraft:save",
+          "ticket": "figcraft:1",
+          "size": 3464
+        },
+        {
+          "generation": 1,
+          "type": "figcraft:dirty",
+          "dirty": false
+        },
+        {
+          "generation": 2,
+          "type": "figcraft:ready"
+        },
+        {
+          "generation": 2,
+          "type": "figcraft:dirty",
+          "dirty": false
+        }
+      ],
+      "inputBytes": 268,
+      "savedName": "synthetic.figcraft",
+      "saveAs": false,
+      "savedSize": 3464,
+      "saveSha256": "aacce408951c464cc453b33be53280069cca7dfcf52b65c0e961bb2e93ac8ca0",
+      "dirtyBeforeAck": true,
+      "ackTicket": "figcraft:1"
+    }
+  },
+  "responseHashes": [
+    {
+      "path": "/host.html",
+      "status": 200,
+      "size": 4162,
+      "sha256": "51c08f4ab2db88a666e94ba58f3b1821d1814fd9840bd1f09440a60bfb551080"
+    },
+    {
+      "path": "/index.html",
+      "status": 200,
+      "size": 1586,
+      "sha256": "a68fe13168b32940e6b6eb40401b2e47edfafae3bb4cbb09bbcfaff124c59686"
+    },
+    {
+      "path": "/figcraft-web-5ec5dab2f432876d.js",
+      "status": 200,
+      "size": 168530,
+      "sha256": "66543f78ecdf1a3da5eb7251c01e7aa4fb2b3a974c6c28d2f267e564665b0418"
+    },
+    {
+      "path": "/figcraft-web-d41c15af7fe3eaf3_bg.wasm",
+      "status": 200,
+      "size": 23480217,
+      "sha256": "029d1e23bb231c307c4d51e3ffafc7cd92052edf35833e3e38bb95b9b0ebc757"
+    },
+    {
+      "path": "/synthetic.figcraft",
+      "status": 200,
+      "size": 268,
+      "sha256": "899204d7ab596e9efd9d86df7935474ef15df0bc2cbb80a8798ad8ce102b3d8a"
+    }
+  ],
+  "snapshot": {
+    "url": "http://localhost:18748/host.html",
+    "title": "GR-048 FigCraft host-save smoke",
+    "loading": false,
+    "visibleText": "GR-048 synthetic FigCraft host — MEMORY ONLY, no Seafile\n{\n  \"phase\": \"reopened-clean\",\n  \"savedBytes\": \"[Uint8Array 3464 bytes]\",\n  \"savedTicket\": \"figcraft:1\",\n  \"dirty\": false,\n  \"ready\": \"0.10.0\",\n  \"reopened\": true,\n  \"editResult\": null,\n  \"events\": [\n    {\n      \"generation\": 1,\n      \"type\": \"figcraft:ready\"\n    },\n    {\n      \"generation\": 1,\n      \"type\": \"figcraft:dirty\",\n      \"dirty\": false\n    },\n    {\n      \"generation\": 1,\n      \"type\": \"figcraft:dirty\",\n      \"dirty\": true\n    },\n    {\n      \"generation\": 1,\n      \"type\": \"figcraft:save\",\n      \"ticket\": \"figcraft:1\",\n      \"size\": 3464\n    },\n    {\n      \"generation\": 1,\n      \"type\": \"figcraft:dirty\",\n      \"dirty\": false\n    },\n    {\n      \"generation\": 2,\n      \"type\": \"figcraft:ready\"\n    },\n    {\n      \"generation\": 2,\n      \"type\": \"figcraft:dirty\",\n      \"dirty\": false\n    }\n  ],\n  \"inputBytes\": 268,\n  \"savedName\": \"synthetic.figcraft\",\n  \"saveAs\": false,\n  \"savedSize\": 3464,\n  \"saveSha256\": \"aacce408951c464cc453b33be53280069cca7dfcf52b65c0e961bb2e93ac8ca0\",\n  \"dirtyBeforeAck\": true,\n  \"ackTicket\": \"figcraft:1\"\n}",
+    "interactiveElements": [],
+    "consoleEntries": [
+      {
+        "level": "warning",
+        "text": "The `integrity` attribute is currently ignored for preload destinations that do not support subresource integrity. See https://crbug.com/981419 for more information",
+        "timestamp": "2026-10-25T16:52:15.005Z"
+      },
+      {
+        "level": "warning",
+        "text": "[egui_wgpu] egui-wgpu-0.36.2/src/lib.rs:461: Software rasterizer detected - loss of performance expected. backend: Gl, device_type: Cpu, name: \"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\", driver_info: \"WebGL 2.0 (OpenGL ES 3.0 Chromium)\", subgroup_size: 4..=128, transient_saves_memory: None, limit_bucket: None",
+        "timestamp": "2026-10-25T16:52:15.253Z"
+      },
+      {
+        "level": "info",
+        "text": "[figcraft_web::web] figcraft-web/src/web.rs:35: figcraft-web: wgpu backend Gl",
+        "timestamp": "2026-10-25T16:52:15.308Z"
+      },
+      {
+        "level": "info",
+        "text": "[eframe::web::web_runner] eframe-0.36.2/src/web/web_runner.rs:94: event handlers installed.",
+        "timestamp": "2026-10-25T16:52:15.310Z"
+      },
+      {
+        "level": "warning",
+        "text": "[eframe::web::app_runner] eframe-0.36.2/src/web/app_runner.rs:337: Unhandled egui viewport command: SetTheme(SystemDefault) - not implemented in web backend",
+        "timestamp": "2026-10-25T16:52:15.343Z"
+      },
+      {
+        "level": "warning",
+        "text": "The `integrity` attribute is currently ignored for preload destinations that do not support subresource integrity. See https://crbug.com/981419 for more information",
+        "timestamp": "2026-10-25T16:52:41.893Z"
+      },
+      {
+        "level": "warning",
+        "text": "[egui_wgpu] egui-wgpu-0.36.2/src/lib.rs:461: Software rasterizer detected - loss of performance expected. backend: Gl, device_type: Cpu, name: \"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\", driver_info: \"WebGL 2.0 (OpenGL ES 3.0 Chromium)\", subgroup_size: 4..=128, transient_saves_memory: None, limit_bucket: None",
+        "timestamp": "2026-10-25T16:52:42.051Z"
+      },
+      {
+        "level": "info",
+        "text": "[figcraft_web::web] figcraft-web/src/web.rs:35: figcraft-web: wgpu backend Gl",
+        "timestamp": "2026-10-25T16:52:42.101Z"
+      },
+      {
+        "level": "info",
+        "text": "[eframe::web::web_runner] eframe-0.36.2/src/web/web_runner.rs:94: event handlers installed.",
+        "timestamp": "2026-10-25T16:52:42.103Z"
+      },
+      {
+        "level": "warning",
+        "text": "[eframe::web::app_runner] eframe-0.36.2/src/web/app_runner.rs:337: Unhandled egui viewport command: SetTheme(SystemDefault) - not implemented in web backend",
+        "timestamp": "2026-10-25T16:52:42.136Z"
+      }
+    ],
+    "networkEntries": [
+      {
+        "url": "http://localhost:18748/",
+        "method": "GET",
+        "status": null,
+        "failed": true,
+        "errorText": "net::ERR_CONNECTION_REFUSED",
+        "timestamp": "2026-10-25T16:43:38.911Z"
+      },
+      {
+        "url": "http://localhost:18748/host.html",
+        "method": "GET",
+        "status": 200,
+        "failed": false,
+        "timestamp": "2026-10-25T16:52:14.954Z"
+      },
+      {
+        "url": "http://localhost:18748/index.html?host=parent&webgl&gr048=1",
+        "method": "GET",
+        "status": 200,
+        "failed": false,
+        "timestamp": "2026-10-25T16:52:14.992Z"
+      },
+      {
+        "url": "http://localhost:18748/figcraft-web-d41c15af7fe3eaf3_bg.wasm",
+        "method": "GET",
+        "status": 200,
+        "failed": false,
+        "timestamp": "2026-10-25T16:52:15.009Z"
+      },
+      {
+        "url": "http://localhost:18748/figcraft-web-5ec5dab2f432876d.js",
+        "method": "GET",
+        "status": 200,
+        "failed": false,
+        "timestamp": "2026-10-25T16:52:15.015Z"
+      },
+      {
+        "url": "http://localhost:18748/synthetic.figcraft",
+        "method": "GET",
+        "status": 200,
+        "failed": false,
+        "timestamp": "2026-10-25T16:52:15.961Z"
+      },
+      {
+        "url": "http://localhost:18748/index.html?host=parent&webgl&gr048=2",
+        "method": "GET",
+        "status": 200,
+        "failed": false,
+        "timestamp": "2026-10-25T16:52:41.873Z"
+      },
+      {
+        "url": "http://localhost:18748/figcraft-web-d41c15af7fe3eaf3_bg.wasm",
+        "method": "GET",
+        "status": 200,
+        "failed": false,
+        "timestamp": "2026-10-25T16:52:41.893Z"
+      },
+      {
+        "url": "http://localhost:18748/figcraft-web-5ec5dab2f432876d.js",
+        "method": "GET",
+        "status": 200,
+        "failed": false,
+        "timestamp": "2026-10-25T16:52:41.897Z"
+      }
+    ],
+    "actionTimeline": [
+      {
+        "id": "5a7549d5-5236-4a8c-b677-1b1eda028941",
+        "action": "navigate",
+        "status": "succeeded",
+        "startedAt": "2026-10-25T16:52:14.899Z",
+        "completedAt": "2026-10-25T16:52:15.022Z"
+      },
+      {
+        "id": "7e9b0dee-b5b3-4e5f-b49b-c8b460f550be",
+        "action": "click",
+        "status": "succeeded",
+        "startedAt": "2026-10-25T16:52:25.524Z",
+        "completedAt": "2026-10-25T16:52:25.538Z"
+      },
+      {
+        "id": "2effcdfd-f0cb-4359-b6d6-502c3b2a833d",
+        "action": "press",
+        "status": "succeeded",
+        "startedAt": "2026-10-25T16:52:25.748Z",
+        "completedAt": "2026-10-25T16:52:26.064Z"
+      },
+      {
+        "id": "2c895240-7a80-45b4-89ad-68414b8cb721",
+        "action": "press",
+        "status": "succeeded",
+        "startedAt": "2026-10-25T16:52:30.052Z",
+        "completedAt": "2026-10-25T16:52:30.056Z"
+      }
+    ],
+    "screenshot": {
+      "mimeType": "image/png",
+      "width": 1280,
+      "height": 933
+    },
+    "screenshotPath": "/home/roddy/.t3/userdata/browser-artifacts/browser-screenshot-localhost-mvo2g7sa-e001f5b5.png",
+    "accessibilityTree": "- generic [ref=t3-6ee74dbd-9g-e1] [box=12,19,1416,971]:\n  - heading \"GR-048 synthetic FigCraft host — MEMORY ONLY, no Seafile\" [level=1] [ref=t3-6ee74dbd-9g-e2] [box=12,19,1416,33]\n  - generic [ref=t3-6ee74dbd-9g-e3] [box=12,70,1416,180]: \"{ \\\"phase\\\": \\\"reopened-clean\\\", \\\"savedBytes\\\": \\\"[Uint8Array 3464 bytes]\\\", \\\"savedTicket\\\": \\\"figcraft:1\\\", \\\"dirty\\\": false, \\\"ready\\\": \\\"0.10.0\\\", \\\"reopened\\\": true, \\\"editResult\\\": null, \\\"events\\\": [ { \\\"generation\\\": 1, \\\"type\\\": \\\"figcraft:ready\\\" }, { \\\"generation\\\": 1, \\\"type\\\": \\\"figcraft:dirty\\\", \\\"dirty\\\": false }, { \\\"generation\\\": 1, \\\"type\\\": \\\"figcraft:dirty\\\", \\\"dirty\\\": true }, { \\\"generation\\\": 1, \\\"type\\\": \\\"figcraft:save\\\", \\\"ticket\\\": \\\"figcraft:1\\\", \\\"size\\\": 3464 }, { \\\"generation\\\": 1, \\\"type\\\": \\\"figcraft:dirty\\\", \\\"dirty\\\": false }, { \\\"generation\\\": 2, \\\"type\\\": \\\"figcraft:ready\\\" }, { \\\"generation\\\": 2, \\\"type\\\": \\\"figcraft:dirty\\\", \\\"dirty\\\": false } ], \\\"inputBytes\\\": 268, \\\"savedName\\\": \\\"synthetic.figcraft\\\", \\\"saveAs\\\": false, \\\"savedSize\\\": 3464, \\\"saveSha256\\\": \\\"aacce408951c464cc453b33be53280069cca7dfcf52b65c0e961bb2e93ac8ca0\\\", \\\"dirtyBeforeAck\\\": true, \\\"ackTicket\\\": \\\"figcraft:1\\\" }\"\n  - iframe [active] [ref=t3-6ee74dbd-9g-e6] [box=12,264,1418,722]:\n    - textbox [ref=t3-6ee74dbd-9g-f2e3] [box=0,0,5,3]"
+  }
+}

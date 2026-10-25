@@ -1,3 +1,18 @@
+## 2026-10-25 — GR-048 FigCraft browser host-save smoke
+
+- Applied the exact accepted GR-019 patch to clean FigCraft `8d790607`;
+  built optimized actual Web/WASM against transport `56c5e16d` with persistent
+  Cargo caches and the configured wasm-opt pass.
+- T3 collaborative Chromium opened a synthetic native fixture, created a
+  visible rectangle through UI input, emitted 3,464 save bytes, stayed dirty
+  before matching ACK, became clean, and reopened the captured bytes visibly
+  in a fresh iframe. Parent storage was memory-only; durable Seafile remains
+  NOT VERIFIED. No upstream or production changes; no commit/push in this task.
+- Evidence: `docs/GR-048-FIGCRAFT-WASM-SMOKE.md`, `docs/reviews/GR-048/`.
+  Independent free R1: PROVISIONAL PASS, no blocker/major; warnings/setup
+  MINOR observations retained. Status: GPT REVIEW PENDING.
+
+
 ## 2026-10-25 — GR-046 EffectCraft browser host-save smoke
 
 * Built the exact GR-022 patched EffectCraft Web/WASM from pinned source and
@@ -10,6 +25,7 @@
   production and ONLYOFFICE remain **NOT VERIFIED**. Independent R1/R2 reviews
   returned bounded PROVISIONAL PASS with no remaining findings. No upstream
   changes.
+
 
 ## 2026-10-25 — GR-045 DesignCraft browser host-save smoke
 

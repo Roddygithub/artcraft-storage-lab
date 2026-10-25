@@ -1,0 +1,9 @@
+$ (cwd=/home/roddy/.t3/worktrees/artcraft-storage-lab/t3-c9395ab1) python3 docs/reviews/GR-048/check_evidence.py
+PASS: retained positive-flow evidence, host/fixture response hashes, accepted patch hash
+exit=0
+$ (cwd=/home/roddy/.t3/worktrees/artcraft-storage-lab/t3-c9395ab1) git diff --check
+exit=0
+$ (cwd=/home/roddy/.cache/artcraft-figcraft-gr048) git diff --check
+exit=0
+$ (cwd=/home/roddy/.cache/artcraft-figcraft-gr048) git apply --reverse --check /home/roddy/.t3/worktrees/artcraft-storage-lab/t3-c9395ab1/docs/reviews/GR-019/figcraft-shared-host-save.patch
+exit=0

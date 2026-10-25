@@ -50,10 +50,14 @@ through an unexpected path.
 
 ## Limits
 
-- **NOT VERIFIED:** browser `postMessage` runtime for FigCraft, Seafile routing,
-  durable Seafile version/history creation, or a fresh reopen from Seafile.
-- The patch is not added to `integration/config/dispatch.json`; no deployable
-  FigCraft bundle was built or installed.
+- GR-048 verifies browser `postMessage` runtime on the exact patched optimized
+  actual-WASM build with a synthetic memory-only parent: open, visible rectangle
+  edit, ticketed save bytes, matching ACK, clean and fresh iframe reopen. See
+  [`GR-048 report`](../../GR-048-FIGCRAFT-WASM-SMOKE.md).
+- **NOT VERIFIED:** Seafile routing, durable Seafile version/history creation,
+  or a fresh reopen from Seafile.
+- The patch is not added to `integration/config/dispatch.json`; GR-048 built a local optimized
+  FigCraft bundle for the synthetic smoke; no production bundle was installed.
 - The current host page answers `openRequest` with instructions to return to
   Seahub; it does not implement a Seafile picker for switching documents.
 - This first slice accepts one `.figcraft` file per iframe and deliberately

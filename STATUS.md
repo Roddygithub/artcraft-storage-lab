@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local ma
 BRANCH:     main
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
 CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038/039 and are not project-level GPT-reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; GR-044 through GR-047 cover DeckCraft, DesignCraft, EffectCraft and FilmCraft host-save browser runtime; no upstream changes
+WORKTREE:   main-only workflow; GR-048 FigCraft browser smoke completed from isolated worktree based on main `32069b9`; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; GR-044 through GR-048 cover DeckCraft, DesignCraft, EffectCraft, FilmCraft and FigCraft host-save browser runtime; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -22,17 +22,15 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-047 — Chromium loaded the exact GR-023 patched FilmCraft
-WASM from source pin `fa550ce2` with transport `56c5e16d`. It opened a native
-synthetic `.fcproj`, rendered an in-app text edit, captured 6,468 save bytes,
-accepted matching ticket `filmcraft:1`, reported clean, and visibly reopened the
-edit in a fresh iframe. The parent kept bytes in memory only. Durable Seafile
-version/readback, dispatch and deployment remain **NOT VERIFIED**. Independent
-R1/R2/R3 reviews were bounded PROVISIONAL PASS with no remaining findings; R3
-independently checked the pre-packaging WASM hash and artifact distinction.
-Historical continuity with the original build is NOT VERIFIED. See
-`docs/GR-047-FILMCRAFT-WASM-SMOKE.md` and
-`docs/reviews/GR-047/`.
+CURRENT GR: GR-048 — exact GR-019 patched FigCraft built as optimized actual
+Web/WASM and passed a bounded synthetic browser open/edit/save/ACK/clean/fresh
+iframe reopen smoke. Captured 3,464 bytes under `figcraft:1`; the rectangle
+remained visible after reopen. Parent bytes were memory-only. Durable Seafile
+version/readback, dispatch and deployment remain **NOT VERIFIED**. GPT REVIEW
+PENDING; independent free R1 PROVISIONAL PASS, no blocker/major. No project
+GPT PASS. The task worktree was left uncommitted for parent review as requested;
+the lab integration is recorded in project history and review queue.
+See `docs/GR-048-FIGCRAFT-WASM-SMOKE.md` and `docs/reviews/GR-048/`.
 
 GR-043 — Chromium verifies an expired in-memory gateway session is
 refused during save: actual 404 with reopen guidance, dirty preserved,
@@ -149,7 +147,8 @@ OPEN GAPS:
   Three engine snapshot tests and one synthetic-host UI lifecycle test pass;
   Rust 1.95 WASM check and clean-base patch application pass. It is restricted
   to one `.figcraft` file per iframe and refuses host Save As. The patch is not
-  in Seafile dispatch and has no browser or Seafile runtime evidence. Sol low
+  in Seafile dispatch. GR-048 now verifies actual-WASM browser transport with
+  a synthetic memory-only parent; durable Seafile remains NOT VERIFIED. Sol low
   rounds 1 and 2 found one-document scope bypasses (including duplicate and
   live-session commands) plus a startup-reporting issue. The latest patch
   blocks those dispatches; focused tests/WASM checks pass and Sol low round 3
