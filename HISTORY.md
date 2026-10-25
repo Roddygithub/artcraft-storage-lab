@@ -1,3 +1,20 @@
+## 2026-10-25 — GR-039 dynamic host-page CSP
+
+* Added a per-response cryptographic nonce CSP to the gateway-generated
+  `/open/` host page. The parent page now defaults to deny, permits only its
+  nonce-bearing inline code, limits frames/connects to its own origin, and
+  restricts embedding to the configured Seahub origin. Invalid origin config
+  fails closed to `frame-ancestors 'none'`; CSP separators and percent-encoded
+  control characters, empty user-info, query and fragment delimiters are
+  rejected; default HTTPS port normalization is covered.
+* `python3 tests/test_gateway_unit.py`, Python bytecode compilation, and
+  `git diff --check` pass. Static Craft editor HTML, reverse-proxy behavior,
+  browser CSP enforcement and bundle compatibility remain NOT VERIFIED. Three
+  bounded independent review rounds returned PROVISIONAL PASS after two origin
+  validation findings and one documentation discrepancy were fixed. ONLYOFFICE
+  regression and project GPT PASS remain open. No Seafile production system or
+  upstream repository was changed.
+
 ## 2026-10-25 — GR-038 pinned Web asset staging
 
 * Reworked `scripts/fetch-craft-web.sh` to require an exact release tag and

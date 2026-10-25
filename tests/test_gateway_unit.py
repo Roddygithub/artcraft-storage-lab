@@ -14,6 +14,7 @@ import threading
 import zipfile
 import io
 import http.client
+import re
 import warnings
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import urllib.parse
@@ -268,6 +269,88 @@ def main():
 
     previous_seafile_origin = os.environ.get("ARTCRAFT_SEAFILE_ORIGIN")
     os.environ["ARTCRAFT_SEAFILE_ORIGIN"] = "https://seafile.example.test"
+    host_page_connection = http.client.HTTPConnection(
+        "127.0.0.1", httpd.server_port, timeout=3)
+    host_page_connection.request(
+        "POST", "/open/", urllib.parse.urlencode({"access_token": "user-token"}),
+        {"Content-Type": "application/x-www-form-urlencoded", "Origin": origin,
+         "Connection": "close"})
+    host_page_response = host_page_connection.getresponse()
+    host_page_body = host_page_response.read().decode()
+    csp_header = host_page_response.getheader("Content-Security-Policy", "")
+    host_page_connection.close()
+    script_nonce = re.search(r'<script nonce="([^"]+)"', host_page_body)
+    style_nonce = re.search(r'<style nonce="([^"]+)"', host_page_body)
+    csp_nonce = re.search(r"script-src 'nonce-([^']+)'", csp_header)
+    check("the capability host page uses a nonce-bound strict CSP",
+          host_page_response.status == 200 and script_nonce and style_nonce and csp_nonce
+          and script_nonce.group(1) == style_nonce.group(1) == csp_nonce.group(1)
+          and "default-src 'none'" in csp_header
+          and "frame-ancestors https://seafile.example.test" in csp_header,
+          f"HTTP {host_page_response.status}; CSP nonce-bound={bool(csp_nonce)}")
+
+    second_host_connection = http.client.HTTPConnection(
+        "127.0.0.1", httpd.server_port, timeout=3)
+    second_host_connection.request(
+        "POST", "/open/", urllib.parse.urlencode({"access_token": "user-token"}),
+        {"Content-Type": "application/x-www-form-urlencoded", "Origin": origin,
+         "Connection": "close"})
+    second_host_response = second_host_connection.getresponse()
+    second_host_response.read()
+    second_csp = second_host_response.getheader("Content-Security-Policy", "")
+    second_host_connection.close()
+    second_nonce = re.search(r"script-src 'nonce-([^']+)'", second_csp)
+    check("the host-page CSP nonce is fresh per response",
+          csp_nonce and second_nonce and csp_nonce.group(1) != second_nonce.group(1),
+          f"distinct nonce={bool(csp_nonce and second_nonce and csp_nonce.group(1) != second_nonce.group(1))}")
+
+    invalid_origin_values = (
+        "https://seafile.example.test" + chr(13) + chr(10) + "X-Injected: yes",
+        "https://seafile.example.test;img-src",
+        "https://seafile.example.test%0aevil",
+        "https://@seafile.example.test",
+        "https://seafile.example.test?",
+        "https://seafile.example.test#",
+    )
+    invalid_origin_responses = []
+    for invalid_origin in invalid_origin_values:
+        os.environ["ARTCRAFT_SEAFILE_ORIGIN"] = invalid_origin
+        invalid_origin_connection = http.client.HTTPConnection(
+            "127.0.0.1", httpd.server_port, timeout=3)
+        invalid_origin_connection.request(
+            "POST", "/open/", urllib.parse.urlencode({"access_token": "user-token"}),
+            {"Content-Type": "application/x-www-form-urlencoded", "Origin": origin,
+             "Connection": "close"})
+        invalid_origin_response = invalid_origin_connection.getresponse()
+        invalid_origin_response.read()
+        invalid_origin_csp = invalid_origin_response.getheader("Content-Security-Policy", "")
+        injected_header = invalid_origin_response.getheader("X-Injected")
+        invalid_origin_connection.close()
+        invalid_origin_responses.append((
+            invalid_origin_response.status == 200
+            and "frame-ancestors 'none'" in invalid_origin_csp
+            and injected_header is None
+        ))
+    check("malformed configured Seafile origins fail closed without header injection",
+          all(invalid_origin_responses),
+          f"{sum(invalid_origin_responses)}/{len(invalid_origin_values)} rejected safely")
+
+    os.environ["ARTCRAFT_SEAFILE_ORIGIN"] = "https://seafile.example.test:443"
+    default_port_connection = http.client.HTTPConnection(
+        "127.0.0.1", httpd.server_port, timeout=3)
+    default_port_connection.request(
+        "POST", "/open/?format=json",
+        urllib.parse.urlencode({"access_token": "user-token"}),
+        {"Content-Type": "application/x-www-form-urlencoded", "Origin": "https://seafile.example.test",
+         "Connection": "close"})
+    default_port_response = default_port_connection.getresponse()
+    default_port_body = default_port_response.read().decode()
+    default_port_connection.close()
+    check("configured default HTTPS port matches the browser's normalized Origin",
+          default_port_response.status == 200 and '"ok": true' in default_port_body,
+          f"HTTP {default_port_response.status}")
+    os.environ["ARTCRAFT_SEAFILE_ORIGIN"] = "https://seafile.example.test"
+
     connection = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
     connection.request("POST", "/open/?format=json",
                        urllib.parse.urlencode({"access_token": "user-token"}),

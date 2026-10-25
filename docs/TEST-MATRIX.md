@@ -92,8 +92,9 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | 6.2 | An unknown extension | the normal Seafile download/preview path is used, unchanged | [ ] |
 | 6.3 | The existing ONLYOFFICE integration still works | `.docx` opened in the ONLYOFFICE path is unaffected | [ ] NOT VERIFIED — no browser open/edit/save regression was run |
 | 6.4 | The ONLYOFFICE configuration is untouched | `seahub_settings.py` keeps `ENABLE_ONLYOFFICE = True` and the same 15 extensions | [x] SSH read-only check after removing the third-party `.xlsx` route; no ONLYOFFICE setting changed |
-| 6.5 | The integration is reachable through configured origins | ArtCraft host/Craft are same-origin; Seahub is a separate origin; only `/open/` accepts Seahub Origin | [x] Synthetic Chromium run used Seahub `:18000` and gateway/Craft `:18777`; `/open/` handoff, editor save, fresh route load and persisted bytes verified. Production TLS/proxy, CSP/CSRF and adversarial frame testing remain NOT VERIFIED |
+| 6.5 | The integration is reachable through configured origins | ArtCraft host/Craft are same-origin; Seahub is a separate origin; only `/open/` accepts Seahub Origin | [x] Synthetic Chromium run used Seahub `:18000` and gateway/Craft `:18777`; `/open/` handoff, editor save, fresh route load and persisted bytes verified. Production TLS/proxy, CSRF and adversarial-frame testing remain NOT VERIFIED; host-page CSP generation is covered by 6.7 |
 | 6.6 | Rollback | removing the added route restores the previous behaviour | [ ] |
+| 6.7 | Dynamic capability host-page CSP | nonce-bound inline code, restrictive resource policy, and only configured Seafile ancestor | [x] Gateway unit tests cover shared fresh nonce, six malformed-origin classes, and default HTTPS port normalization; three-round bounded independent review PROVISIONAL PASS. Static editor HTML, reverse-proxy behavior, and browser CSP compatibility remain NOT VERIFIED (`docs/reviews/GR-039/`) |
 
 ## 7. Security (GR-009)
 

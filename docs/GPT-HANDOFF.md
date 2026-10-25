@@ -333,12 +333,12 @@ The full list, with what is still open, is in `docs/SECURITY.md`.
 | 4 | the synthetic file-list click and DOCX save/reopen are reproduced in the isolated test; the production instance still routes to ONLYOFFICE | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
 | 5 | the gateway ran in the isolated local container for the proof; no production deployment was made | `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
 | 5b | a **leave-page warning about unsaved edits** is impossible for VectorCraft without an upstream dirty signal; the editor itself keeps unsaved work in recovery copies in the browser | `docs/reviews/GR-012/README.md` §2 |
-| 6 | GridCraft `.xlsx` and VectorCraft `.svg` save/reopen are reproduced in the synthetic stack. GridCraft formula recalculation/conflicts remain open; VectorCraft uses its private page API, not the common host contract, and lacks dirty/save events. | GR-010 and GR-012 bundles |
+| 6 | GridCraft `.xlsx` and VectorCraft `.svg` save/reopen are reproduced in the synthetic stack. One GridCraft `SUM(B2:B2)` recalculation and conflict path are also recorded; this does not establish broad formula compatibility. VectorCraft uses its private page API, not the common host contract, and lacks dirty/save events. | GR-010, GR-012 and GR-016 bundles |
 | 7 | The inspected upstream baseline still lacks host integration in most Craft apps; local WordCraft/GridCraft patches do not complete the all-app contract. **VectorCraft is driven by its own page API.** | `docs/ARTCRAFT-WEB-CAPABILITIES.md` §2.6 |
 | 7b | VectorCraft's page API has **no dirty signal and no save event**; the host polls `files()` and compares exact serialized bytes. Identical output cannot signal an editor save. The synthetic collision regression and post-fix isolated Seafile save/readback/reopen both pass. | `docs/reviews/GR-012/VECTORCRAFT-SEAFILE-E2E-20261023.md` |
 | 7c | VectorCraft keeps at most **16** saved files in the page | upstream: `apps/vectorcraft-web/src/saved_files.rs` |
 | 8 | GridCraft's upstream baseline cannot report a failed save; the local GR-010 ticketed patch addresses it and has an isolated runtime save/reopen proof | `docs/HOST-CONTRACT.md` §3.5 |
-| 9 | CSP and rate limiting are missing; origin enforcement is only locally tested, not verified behind the proxy | `docs/SECURITY.md` §7 |
+| 9 | GR-039 adds a nonce CSP to dynamic `/open/` host HTML; static editor HTML, browser bundle compatibility, proxy origin behavior and rate limiting remain unverified | `docs/SECURITY.md` §7 and `docs/GR-039-HOSTPAGE-CSP.md` |
 
 ## 11. The prepared upstream patches
 

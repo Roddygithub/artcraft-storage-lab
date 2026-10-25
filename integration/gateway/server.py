@@ -10,11 +10,15 @@ It is the piece between Seafile and a Craft web app:
 The service holds the Seafile credential. The browser never does.
 """
 
-import json
+import base64
 import io
+import ipaddress
+import json
 import mimetypes
 import os
 import posixpath
+import re
+import secrets
 import struct
 import urllib.parse
 import zipfile
@@ -346,14 +350,32 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {"ok": True, **session.as_dict()})
 
         target = gateway.dispatch[session.name.rsplit(".", 1)[-1].lower()]
+        csp_nonce = base64.b64encode(secrets.token_bytes(18)).decode("ascii")
         page = hostpage.render(
             sid=session.sid,
             app=APP_ALIASES.get(target["app"], target["app"]),
             app_url=target["url"],
             file_name=session.name,
             can_edit=session.can_edit,
+            csp_nonce=csp_nonce,
         )
-        return self._send(200, page, "text/html; charset=utf-8", {"Cache-Control": "no-store"})
+        frame_ancestors = self._configured_seafile_origin() or "'none'"
+        csp = "; ".join((
+            "default-src 'none'",
+            "base-uri 'none'",
+            "object-src 'none'",
+            "frame-ancestors " + frame_ancestors,
+            "form-action 'none'",
+            "frame-src 'self'",
+            "connect-src 'self'",
+            "img-src 'self' data: blob:",
+            "script-src 'nonce-" + csp_nonce + "'",
+            "style-src 'nonce-" + csp_nonce + "'",
+        ))
+        return self._send(200, page, "text/html; charset=utf-8", {
+            "Cache-Control": "no-store",
+            "Content-Security-Policy": csp,
+        })
 
     def _same_origin(self):
         origin = urllib.parse.urlsplit(self.headers.get("Origin") or "")
@@ -366,15 +388,59 @@ class Handler(BaseHTTPRequestHandler):
             and request_host
         )
 
+    @staticmethod
+    def _normalize_origin(value):
+        if (
+            not value or "?" in value or "#" in value
+            or any(ord(char) <= 0x20 or ord(char) == 0x7f for char in value)
+        ):
+            return None
+        try:
+            parsed = urllib.parse.urlsplit(value)
+            port = parsed.port
+        except ValueError:
+            return None
+        if not (
+            parsed.scheme.lower() in ("http", "https") and parsed.hostname
+            and parsed.netloc and not parsed.netloc.endswith(":")
+            and "@" not in parsed.netloc
+            and not parsed.path and not parsed.query and not parsed.fragment
+            and not parsed.username and not parsed.password
+        ):
+            return None
+        try:
+            host = parsed.hostname.encode("idna").decode("ascii").lower()
+        except UnicodeError:
+            return None
+        if "%" in host:  # no percent-encoded or scoped host syntax
+            return None
+        if ":" in host:  # urlsplit removes IPv6 brackets from .hostname
+            try:
+                host = f"[{ipaddress.IPv6Address(host).compressed}]"
+            except ValueError:
+                return None
+        elif re.fullmatch(r"[0-9.]+", host):
+            try:
+                host = str(ipaddress.IPv4Address(host))
+            except ValueError:
+                return None
+        elif not re.fullmatch(
+                r"(?=.{1,253}\.?$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)"
+                r"(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*\.?", host):
+            return None
+
+        scheme = parsed.scheme.lower()
+        if port == (443 if scheme == "https" else 80):
+            port = None
+        return f"{scheme}://{host}" + (f":{port}" if port is not None else "")
+
+    def _configured_seafile_origin(self):
+        return self._normalize_origin(os.environ.get("ARTCRAFT_SEAFILE_ORIGIN", ""))
+
     def _from_seafile_origin(self):
-        allowed = urllib.parse.urlsplit(os.environ.get("ARTCRAFT_SEAFILE_ORIGIN", ""))
-        origin = urllib.parse.urlsplit(self.headers.get("Origin") or "")
-        return bool(
-            allowed.scheme in ("http", "https") and allowed.netloc
-            and not allowed.path and not allowed.query and not allowed.fragment
-            and origin.scheme.lower() == allowed.scheme.lower()
-            and origin.netloc.lower() == allowed.netloc.lower()
-        )
+        allowed = self._configured_seafile_origin()
+        origin = self._normalize_origin(self.headers.get("Origin") or "")
+        return bool(allowed and origin == allowed)
 
     def _serve_static(self, path):
         gateway = self.server.gateway

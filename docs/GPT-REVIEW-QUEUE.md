@@ -6,6 +6,19 @@ and does not trust the free-model verdicts.
 Nothing may be published upstream (issue, PR, RFC in `storytold/*`, Seafile or
 Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 
+## GR-039 — gateway host-page CSP
+
+Implementation and unit evidence are recorded in
+`docs/GR-039-HOSTPAGE-CSP.md`; `python3 tests/test_gateway_unit.py` passes.
+The first independent round found a CSP-origin validation issue and a default
+HTTPS port mismatch; both were fixed. Round 2 found a low discrepancy around
+empty origin delimiters; the parser now rejects them and regression tests cover
+the cases. Round 3 returned a bounded PROVISIONAL PASS. Reports are in
+`docs/reviews/GR-039/`. Scope is only the dynamic `/open/` host page: static
+editor HTML, browser-enforced bundle compatibility, reverse-proxy behavior and
+deployment security remain NOT VERIFIED. This does not change the project-level
+INCOMPLETE verdict or unlock upstream publication.
+
 ## Latest first-pass result — 2026-10-25
 
 ```text

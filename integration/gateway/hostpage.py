@@ -25,7 +25,7 @@ _TEMPLATE = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>__TITLE__</title>
-<style>
+<style nonce="__CSP_NONCE__">
   html, body { margin:0; padding:0; height:100%; background:#f5f5f5;
                 font: 13px/1.5 system-ui, sans-serif; color:#222; }
   #frame { position:absolute; inset:0 0 34px 0; width:100%; height:calc(100% - 34px);
@@ -44,7 +44,7 @@ _TEMPLATE = """<!DOCTYPE html>
   <span id="state" class="busy">Connecting to __APP_NAME__&hellip;</span>
   <span id="meta"></span>
 </div>
-<script>
+<script nonce="__CSP_NONCE__">
 "use strict";
 const SID = __SID__;
 const APP = __APP__;          // "wordcraft"
@@ -396,11 +396,12 @@ if (!CAN_EDIT) {
 """
 
 
-def render(sid, app, app_url, file_name, can_edit):
+def render(sid, app, app_url, file_name, can_edit, csp_nonce=None):
     """Render the host page for one editing session."""
     return (
         _TEMPLATE
         .replace("__TITLE__", html.escape(file_name))
+        .replace("__CSP_NONCE__", html.escape(csp_nonce or "", quote=True))
         .replace("__APP_URL__", html.escape(app_url, quote=True))
         .replace("__APP_NAME__", html.escape(app))
         .replace("__SID__", json.dumps(sid))

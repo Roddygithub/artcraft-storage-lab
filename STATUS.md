@@ -4,8 +4,8 @@
 PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local main
 BRANCH:     main
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
-CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038 and are not project-level GPT-reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has a provisional exact-review PASS; GR-028 CPAL patch checks/tests pass locally, independent semantic review remains incomplete; GR-029 local egui 0.37 overlays passed bounded review; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 stages exact-hash Web assets without replacing active builds; no upstream changes
+CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038/039 and are not project-level GPT-reviewed
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 adds and unit-tests nonce CSP on the dynamic host page; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -22,7 +22,15 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-038 — The Web asset fetcher requires an exact release tag and SHA-256,
+CURRENT GR: GR-039 — The `/open/` capability host page sends a fresh nonce-based
+CSP and fails closed to `frame-ancestors 'none'` when the configured Seahub origin
+is invalid. Gateway unit tests pass; independent exact-patch round 3 returned a
+bounded PROVISIONAL PASS after two findings were fixed. The policy does not cover
+static Craft editor HTML or reverse-proxy behavior; browser compatibility and
+deployment security remain **NOT VERIFIED**. See `docs/GR-039-HOSTPAGE-CSP.md`
+and `docs/reviews/GR-039/`.
+
+GR-038 — The Web asset fetcher requires an exact release tag and SHA-256,
 validates archive paths, and stages under `integration/static/candidates/`
 without modifying active builds. A real release artifact passed the staging
 check; Luna High bounded re-review returned PROVISIONAL ACCEPT with no material
