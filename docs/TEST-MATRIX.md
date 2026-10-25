@@ -258,8 +258,8 @@ not yet a PhotoCraft browser host adapter or project-level PASS. See
 | # | Test | Expected | Result |
 |---|---|---|---|
 | 17.1 | Host snapshot ACK ledger | exact success ACK clears only captured state; failure/retry/timeout remain safe | [x] 2 focused host-save ledger tests pass; independent source review found no new blocker/major |
-| 17.2 | Local picker/drop cannot replace host-bound session | dirty content and history remain unchanged | [ ] Regression added but not executed: test target blocked by existing base Symphonia 0.6.1 API errors |
-| 17.3 | SoundCraft Web WASM build | pinned host adapter builds for browser target | [ ] BLOCKED: GR-027 audio and GR-028 playback now compile separately; full Web build reaches egui 0.36/0.37 mismatch in pinned craft-ui/UI |
+| 17.2 | Local picker/drop cannot replace host-bound session | dirty content and history remain unchanged | [x] Focused host-bound UI library regression passes 1/1 with GR-029 overlay |
+| 17.3 | SoundCraft Web WASM build | pinned host adapter builds for browser target | [x] Rust 1.95 locked check passes with GR-027/028 and local GR-029 egui overlays |
 | 17.4 | Browser host messaging and Seafile version/reopen | durable saved edit reopens from a fresh session | [ ] NOT VERIFIED; adapter is not in dispatch |
 
 Patch, review, base-build blockers and limits: `docs/reviews/GR-025/`.
@@ -279,7 +279,19 @@ Patch, review, base-build blockers and limits: `docs/reviews/GR-025/`.
 |---|---|---|---|
 | 19.1 | Playback native and WASM checks | Locked CPAL 0.18.2 APIs compile | [x] Reran in this session; both pass |
 | 19.2 | Playback native unit tests | Playback/recording behavior remains covered | [x] Reran in this session; 36 pass |
-| 19.3 | Full SoundCraft Web WASM | App and host adapter compile | [ ] BLOCKED by separate egui 0.36/0.37 mismatch in existing UI/dependency code |
+| 19.3 | Full SoundCraft Web WASM | App and host adapter compile | [x] Rust 1.95 locked check passes with local GR-029 craft-ui and SoundCraft compatibility patches; no upstream edits |
 | 19.4 | Browser host save / Seafile version / fresh reopen | Durable version and edit survive reopen | [ ] NOT VERIFIED |
 
 Independent CPAL patch review: `docs/reviews/GR-028/REVIEW-INDEPENDENT-R1.md`.
+
+## 20. SoundCraft egui 0.37 compatibility (GR-029)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 20.1 | craft-ui egui 0.37 port | Pinned shared UI crate builds against SoundCraft's egui 0.37 | [x] Local compatibility patch passes as part of the full app WASM check |
+| 20.2 | SoundCraft egui API port | Screenshot, wheel, widget-role and gutter-scroll APIs compile | [x] Rust 1.95 locked full Web WASM check passes after exact GR-025→027→028→029 patch sequence |
+| 20.3 | GR-025 host-save guard regression | Host Save routes through the adapter; replacement and Save As remain refused | [x] Focused UI library test passes 1/1 |
+| 20.4 | Browser/Seafile save and reopen | Actual Web/WASM editor creates a Seafile version and reopens it | [ ] NOT VERIFIED |
+| 20.5 | Independent GR-029 review | Exact patches, lock order and scoped code review | [x] Sol low R3 bounded PROVISIONAL PASS; project GPT review remains pending |
+
+Patch hashes, application order, commands and limits: `docs/reviews/GR-029/`.

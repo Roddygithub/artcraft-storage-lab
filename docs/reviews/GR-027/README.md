@@ -2,9 +2,9 @@
 
 **Status:** local compatibility patch; exact independent round-5 review is
 PROVISIONAL PASS with no findings. The audio crate builds and tests on native
-and WASM. Full SoundCraft Web WASM remains blocked after the CPAL fix by an
-egui API/type mismatch between pinned `craft-ui` and SoundCraft. Browser and
-Seafile save behavior are **NOT VERIFIED**.
+and WASM. The full SoundCraft Web WASM check now passes with the additional
+local GR-029 egui compatibility overlays. Browser and Seafile save behavior
+are **NOT VERIFIED**.
 
 | Item | Value |
 |---|---|

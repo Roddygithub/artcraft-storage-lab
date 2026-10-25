@@ -1,11 +1,24 @@
+## 2026-10-25 — GR-029 SoundCraft egui 0.37 compatibility
+
+* Added local compatibility patches for the pinned `craft-ui` and SoundCraft
+  UI code. The full Rust 1.95 locked `soundcraft-web` WASM check now passes with
+  GR-025/027/028 and both GR-029 patches applied. The focused GR-025 host-save
+  UI test passes 1/1. R2 caught an incorrect lock-patch base; the incremental
+  GR-029 lock patch was regenerated from the post-GR-025 state, the full order
+  was replayed, and the locked WASM check passed again. Independent Sol low R3
+  returned a bounded provisional PASS with no findings. Browser/Seafile E2E is
+  still NOT VERIFIED; this slice is GPT REVIEW PENDING.
+* This is build compatibility only. Browser behavior, Seafile version creation
+  and fresh reopen remain NOT VERIFIED; no upstream or production change.
+
 ## 2026-10-25 — GR-028 SoundCraft playback compatibility slice
 
 * Added a local CPAL 0.18.2 compatibility patch for native and WASM playback;
   both target checks and 36 unit tests were rerun successfully in this session.
   Independent R1 found no API-semantic issue but was incomplete because its
-  review checkout lacked the SoundCraft base. Full SoundCraft Web WASM still
-  fails in unchanged UI code because pinned craft-ui uses egui 0.36 while
-  SoundCraft uses egui 0.37.
+  review checkout lacked the SoundCraft base. Full SoundCraft Web WASM initially
+  failed because pinned craft-ui used egui 0.36 while SoundCraft uses egui
+  0.37; local GR-029 compatibility patches now clear that build blocker.
 * Browser, Seafile version/reopen and production behavior remain NOT VERIFIED.
 
 ## 2026-10-25 — GR-027 SoundCraft Symphonia compatibility slice

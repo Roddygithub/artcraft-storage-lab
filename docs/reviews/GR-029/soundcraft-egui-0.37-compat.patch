@@ -1,0 +1,174 @@
+diff --git c/crates/ui-egui/src/control.rs w/crates/ui-egui/src/control.rs
+index 13ac4c2..7e61ac4 100644
+--- c/crates/ui-egui/src/control.rs
++++ w/crates/ui-egui/src/control.rs
+@@ -30,12 +30,12 @@ impl ControlRequest {
+ }
+ 
+ pub struct PendingShot {
+-    token: u64,
+     reply: Sender<Value>,
+     path: Option<String>,
+     frames: u32,
+     sent: bool,
+     deadline_frames: u32,
++    done: std::sync::Arc<std::sync::atomic::AtomicBool>,
+ }
+ 
+ fn ok(v: Value) -> Value {
+@@ -189,7 +189,7 @@ fn handle(app: &mut SoundApp, ctx: &egui::Context, req: &ControlRequest) -> Opti
+             let unit = if line { egui::MouseWheelUnit::Line } else { egui::MouseWheelUnit::Point };
+             let d = |k: &str| f(k).clamp(-100_000.0, 100_000.0) / steps as f32;
+             let (delta, modifiers) = (egui::vec2(d("dx"), d("dy")), mods(p));
+-            let wheel = |phase, delta| egui::Event::MouseWheel { unit, delta, phase, modifiers };
++            let wheel = |phase, delta| egui::Event::MouseWheel { unit, delta, phase, modifiers, source: egui::MouseWheelSource::Unknown };
+             app.synthetic.push(egui::Event::PointerMoved(pos));
+             app.synthetic.extend((!line).then(|| wheel(egui::TouchPhase::Start, egui::Vec2::ZERO)));
+             app.synthetic.extend((0..steps).map(|_| wheel(egui::TouchPhase::Move, delta)));
+@@ -219,15 +219,13 @@ fn handle(app: &mut SoundApp, ctx: &egui::Context, req: &ControlRequest) -> Opti
+             ok(json!({}))
+         }
+         "ui.screenshot" => {
+-            static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+-            let token = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+             app.pending_shots.push(PendingShot {
+-                token,
+                 reply: req.reply.clone(),
+                 path: p.get("path").and_then(Value::as_str).map(str::to_string),
+                 frames: 0,
+                 sent: false,
+                 deadline_frames: 600,
++                done: std::sync::Arc::default(),
+             });
+             ctx.request_repaint();
+             return None;
+@@ -245,34 +243,27 @@ pub fn collect_screenshots(app: &mut SoundApp, ctx: &egui::Context) {
+     if app.pending_shots.is_empty() {
+         return;
+     }
+-    let images: Vec<(u64, std::sync::Arc<egui::ColorImage>)> = ctx.input(|i| {
+-        i.raw
+-            .events
+-            .iter()
+-            .filter_map(|e| match e {
+-                egui::Event::Screenshot { user_data, image, .. } => {
+-                    user_data.data.as_ref().and_then(|d| d.downcast_ref::<u64>()).map(|t| (*t, image.clone()))
+-                }
+-                _ => None,
+-            })
+-            .collect()
+-    });
+     let mut keep = Vec::new();
+     for mut s in std::mem::take(&mut app.pending_shots) {
+-        if let Some((_, img)) = images.iter().find(|(t, _)| *t == s.token) {
+-            let _ = s.reply.send(encode(img, s.path.as_deref()));
+-            continue;
+-        }
+         s.frames += 1;
+         if !s.sent && s.frames >= 3 {
+-            ctx.send_viewport_cmd(egui::ViewportCommand::Screenshot(egui::UserData::new(s.token)));
++            let (reply, path, done) = (s.reply.clone(), s.path.clone(), s.done.clone());
++            ctx.request_screenshot(move |image| {
++                if !done.swap(true, std::sync::atomic::Ordering::AcqRel) {
++                    let _ = reply.send(encode(&image, path.as_deref()));
++                }
++            });
+             s.sent = true;
+         }
+         if s.frames > s.deadline_frames {
+-            let _ = s.reply.send(err("no frame was presented (is the window visible?)"));
++            if !s.done.swap(true, std::sync::atomic::Ordering::AcqRel) {
++                let _ = s.reply.send(err("no frame was presented (is the window visible?)"));
++            }
+             continue;
+         }
+-        keep.push(s);
++        if !s.done.load(std::sync::atomic::Ordering::Acquire) {
++            keep.push(s);
++        }
+     }
+     app.pending_shots = keep;
+     ctx.request_repaint();
+diff --git c/crates/ui-egui/src/panels.rs w/crates/ui-egui/src/panels.rs
+index a208511..7050c60 100644
+--- c/crates/ui-egui/src/panels.rs
++++ w/crates/ui-egui/src/panels.rs
+@@ -61,12 +61,20 @@ pub fn tracks_and_groups(app: &mut SoundApp, ui: &mut Ui) {
+         s.tracks.iter().map(|x| (x.id.0, x.name.clone(), !x.hidden, x.color, s.edit.selected_tracks.contains(&x.id))).collect()
+     };
+     let hidden = egui::scroll_area::ScrollBarVisibility::AlwaysHidden;
+-    let lists =
++    let track_offset = ui.ctx().memory_mut(|m| m.data.remove_temp::<f32>(ui.make_persistent_id("tracks_scroll").with("gutter_scroll_target")));
++    let mut lists =
+         egui::ScrollArea::vertical().id_salt("tracks_scroll").max_height(total * 0.62).auto_shrink([false, false]).scroll_bar_visibility(hidden);
++    if let Some(offset) = track_offset {
++        lists = lists.vertical_scroll_offset(offset);
++    }
+     let out = lists.show(ui, |ui| {
+         for (id, name, shown, color, sel) in tracks {
+             let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 17.0), Sense::click_and_drag());
+-            resp.widget_info(|| egui::WidgetInfo::selected(egui::WidgetType::SelectableLabel, true, sel, &name));
++            resp.widget_info(|| egui::WidgetInfo::selected(egui::WidgetType::ListItem, true, sel, &name));
++            ui.ctx().accesskit_node_builder(resp.id, |node| {
++                node.clear_toggled();
++                node.set_selected(sel);
++            });
+             if sel {
+                 ui.painter().rect_filled(r, 0.0, t.row_selected);
+             }
+@@ -91,7 +99,12 @@ pub fn tracks_and_groups(app: &mut SoundApp, ui: &mut Ui) {
+     panel_header(ui, "GROUPS");
+     let groups: Vec<(u64, char, String, bool, [u8; 3])> =
+         app.engine.session().groups.iter().map(|g| (g.id.0, g.letter, g.name.clone(), g.active, g.color)).collect();
+-    let out = egui::ScrollArea::vertical().id_salt("groups_scroll").auto_shrink([false, false]).scroll_bar_visibility(hidden).show(ui, |ui| {
++    let group_offset = ui.ctx().memory_mut(|m| m.data.remove_temp::<f32>(ui.make_persistent_id("groups_scroll").with("gutter_scroll_target")));
++    let mut group_area = egui::ScrollArea::vertical().id_salt("groups_scroll").auto_shrink([false, false]).scroll_bar_visibility(hidden);
++    if let Some(offset) = group_offset {
++        group_area = group_area.vertical_scroll_offset(offset);
++    }
++    let out = group_area.show(ui, |ui| {
+         let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 17.0), Sense::hover());
+         ui.painter().text(pos2(r.min.x + 30.0, r.center().y), Align2::LEFT_CENTER, "<ALL>", regular(11.5).clone(), t.text);
+         let all = ui.interact(r, ui.id().with("group_all"), Sense::click());
+@@ -107,7 +120,7 @@ pub fn tracks_and_groups(app: &mut SoundApp, ui: &mut Ui) {
+         });
+         for (id, letter, name, active, color) in groups {
+             let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 17.0), Sense::click());
+-            resp.widget_info(|| egui::WidgetInfo::selected(egui::WidgetType::Checkbox, true, active, &name));
++            resp.widget_info(|| egui::WidgetInfo::selected(egui::WidgetType::CheckBox, true, active, &name));
+             if active {
+                 ui.painter().rect_filled(Rect::from_min_size(pos2(r.min.x + 4.0, r.min.y + 2.0), vec2(14.0, 13.0)), 1.0, rgb(color));
+             }
+@@ -160,12 +173,12 @@ fn gutter_scroll<R>(ui: &Ui, gutter: Rect, out: &egui::scroll_area::ScrollAreaOu
+     }
+     let bar = Rect::from_x_y_ranges(gutter.x_range(), out.inner_rect.y_range());
+     let (max, h) = (content - view, (bar.height() * view / content).max(20.0));
+-    let mut state = out.state;
+-    let thumb = Rect::from_min_size(pos2(bar.min.x + 2.0, bar.min.y + (bar.height() - h) * state.offset.y / max), vec2(bar.width() - 4.0, h));
++    let offset = out.state.unclamped_offset().y;
++    let thumb = Rect::from_min_size(pos2(bar.min.x + 2.0, bar.min.y + (bar.height() - h) * offset / max), vec2(bar.width() - 4.0, h));
+     let resp = ui.interact(bar, out.id.with("gutter"), Sense::click_and_drag());
+     ui.painter().rect_filled(thumb, 3.0, if resp.hovered() || resp.dragged() { t.button_hi.lerp_to_gamma(Color32::WHITE, 0.1) } else { t.button_hi });
+     let to = if resp.dragged() {
+-        Some(state.offset.y + resp.drag_delta().y * max / (bar.height() - h).max(1.0))
++        Some(offset + resp.drag_delta().y * max / (bar.height() - h).max(1.0))
+     } else if let Some(p) = resp.interact_pointer_pos().filter(|_| resp.clicked()) {
+         let page = if p.y < thumb.min.y {
+             -view
+@@ -174,13 +187,13 @@ fn gutter_scroll<R>(ui: &Ui, gutter: Rect, out: &egui::scroll_area::ScrollAreaOu
+         } else {
+             0.0
+         };
+-        Some(state.offset.y + page)
++        Some(offset + page)
+     } else {
+         None
+     };
+     if let Some(y) = to {
+-        state.offset.y = y.clamp(0.0, max);
+-        state.store(ui.ctx(), out.id);
++        ui.ctx().memory_mut(|m| m.data.insert_temp(out.id.with("gutter_scroll_target"), y.clamp(0.0, max)));
++        ui.ctx().request_repaint();
+     }
+ }
+ 

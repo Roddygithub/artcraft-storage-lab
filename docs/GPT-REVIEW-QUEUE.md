@@ -549,8 +549,8 @@ Base:        storytold/soundcraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`
 Transport:   `craft-platform` `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
 Patch SHA:   `f8f9da024b80b3292cca1a60ee69eaf4e19c450d7582fac582596fd11aebc331`
 Review:      R1 found local picker/drop replacement bypass; R2 confirms guard closes it, no new blocker/major by inspection
-Tests:       2 host-save ledger tests pass; UI regression/WASM do not build on base errors in Symphonia 0.6.1 and CPAL 0.18.2
-Open:        GR-027 ports Symphonia, GR-028 addresses CPAL; full WASM/browser/Seafile version/reopen NOT VERIFIED; output cap after allocation
+Tests:       2 host-save ledger tests and the focused UI regression pass; full WASM passes with GR-027/028/029 overlays (unpatched-base failures are historical)
+Open:        GR-027 ports Symphonia, GR-028 addresses CPAL; full WASM passes with GR-029 overlays; browser/Seafile version/reopen NOT VERIFIED; output cap after allocation
 GPT review:  not a project candidate; overall project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC or patch published
 Evidence:    `docs/GR-025-SOUNDCRAFT-HOST-SAVE.md`, `docs/reviews/GR-025/`
@@ -563,7 +563,7 @@ Status:      PROVISIONAL PASS, bounded audio-crate patch; exact independent R5 r
 Base:        storytold/soundcraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`
 Patch SHA:   `e4a63489cfdfc0fd3cfc347a1998347bd92bb0b682ac9a25d1051f887e357e6b`
 Tests:       57 soundcraft-audio-io tests; locked native/WASM crate checks pass
-Open:        full SoundCraft Web WASM blocked after CPAL by egui 0.36/0.37 mismatch; browser/Seafile NOT VERIFIED
+Open:        full SoundCraft Web WASM now passes with local GR-029 compatibility overlays; browser/Seafile NOT VERIFIED
 Publication: LOCKED; no upstream changes
 Evidence:    `docs/reviews/GR-027/`
 ```
@@ -575,9 +575,21 @@ Status:      local patch candidate; independent R1 incomplete (no semantic API f
 Base:        storytold/soundcraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`
 Patch SHA:   `ff1ced58251397b8077f92ee9b92c7cae1ada25a8a7fe9068c50ba7cdad5901c`
 Tests:       implementer reports 36 soundcraft-playback tests and locked native/WASM checks pass; independent reproduction unavailable
-Open:        full SoundCraft Web WASM hits unchanged egui/craft-ui 0.36/0.37 API/type mismatch; browser/Seafile NOT VERIFIED
+Open:        full SoundCraft Web WASM now passes with local GR-029 overlays; browser/Seafile NOT VERIFIED
 Publication: LOCKED; no upstream changes
 Evidence:    `docs/reviews/GR-028/`
+```
+
+### GR-029 — SoundCraft egui 0.37 compatibility
+
+```text
+Status:      local compatibility patches; Sol low R3 bounded PROVISIONAL PASS, no findings; GPT REVIEW PENDING
+Bases:       SoundCraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`; craft-libs `5c874d51eeb3de70e735c8ce87a59a7dedd47675`
+Patch SHA:   craft-ui `5cf2728d20ed74d9fe0521543280d77ce9ef1a5efd3b6f3db3862b6363b06292`; SoundCraft `af31ccc5d69ea1e9577e0a7f989077ccafd9e40cfe3643a2e8c8f934cc6fa098`; lock `d86d74198de55f7f98a4a381d1d18183013f9195c046dd0f56667cbc305f0743`
+Checks:      exact GR-025→027→028→029 sequence replays; locked full SoundCraft Web WASM check passes; focused host-save UI test 1/1 passes
+Open:        browser screenshot/gutter-scroll runtime and Seafile version/reopen NOT VERIFIED
+Publication: LOCKED; no upstream changes
+Evidence:    `docs/GR-029-SOUNDCRAFT-EGUI-WASM.md`, `docs/reviews/GR-029/`
 ```
 
 ### GR-026 — PhotoCraft host integration assessment

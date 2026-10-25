@@ -6,9 +6,9 @@ but could not access the base checkout. In this implementation session, the
 patch was dry-run against the clean pinned base and the listed checks were
 independently rerun. The patch changes three playback files only and adds no dependency changes. It makes the
 `soundcraft-playback` crate compile on native and WASM with locked CPAL 0.18.2.
-The full SoundCraft Web WASM build remains blocked after this patch by egui
-0.36/0.37 API/type mismatches in `soundcraft-ui-egui` and the pinned `craft-ui`
-dependency. Browser and Seafile behavior are **NOT VERIFIED**.
+The full SoundCraft Web WASM build now passes when this patch is combined with
+the local GR-029 egui 0.37 compatibility overlays. Browser and Seafile behavior
+are **NOT VERIFIED**.
 
 | Item | Value |
 |---|---|
@@ -26,7 +26,7 @@ Changes use CPAL 0.18's unified `Error`, scalar `SampleRate`, `Device::descripti
 - `cargo +1.95.0 check --locked -p soundcraft-playback --target wasm32-unknown-unknown` — PASS.
 - `cargo +1.95.0 check --locked -p soundcraft-playback` — PASS.
 - `cargo +1.95.0 test --locked -p soundcraft-playback --lib` — PASS, 36 tests.
-- The full `soundcraft-web` WASM check gets past playback but fails in unchanged UI/dependency code: 52 egui errors, including `craft-ui` pinned to egui 0.36 while SoundCraft uses egui/eframe 0.37. This is a separate compatibility gap, not included in this patch.
+- At GR-028 time, the full `soundcraft-web` WASM check got past playback but failed on 52 egui errors, including `craft-ui` pinned to egui 0.36 while SoundCraft uses egui/eframe 0.37. GR-029 closes this local build gap; its patches are separate from this CPAL patch.
 - Browser save flow, Seafile versions, reopen persistence, and production behavior are **NOT VERIFIED**.
 - The independent reviewer could not access the three SoundCraft source files
   or the stated base object from their review checkout. Patch applicability and
