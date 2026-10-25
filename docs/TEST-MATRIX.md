@@ -243,9 +243,10 @@ Patch, commands, and limits: `docs/reviews/GR-022/`.
 | # | Test | Expected | Result |
 |---|---|---|---|
 | 16.1 | Audit immutable PhotoCraft source | Findings refer to the requested exact SHA | [x] `storytold/photocraft` SHA `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` inspected; evidence in `docs/reviews/GR-026/README.md` |
-| 16.2 | Durable host save implementation | Host save stays dirty until matching durable ACK | [ ] NOT IMPLEMENTED; current open/write seams cannot safely provide pathless binding and revision-specific ACK |
+| 16.2 | Pathless open and revision-specific saved-baseline core | host names are not native paths; ACK only confirms the captured revision | [ ] IMPLEMENTATION IN PROGRESS; the audit found the existing open/write seams insufficient |
 | 16.3 | Rust 1.95 locked WASM app check and focused host tests | Exact patch builds and lifecycle tests pass | [ ] NOT RUN; no app patch exists |
 | 16.4 | Browser host flow / Seafile version / fresh reopen | Persisted edit reopens from new host session | [ ] NOT VERIFIED |
 
-GR-026 records an implementation stop with a minimal design, not a PhotoCraft
-prototype or project-level PASS. See `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`.
+GR-026 first records an implementation stop with a minimal design; the core
+pathless-open/revision-ACK stage is now underway. This is not yet a PhotoCraft
+host adapter or project-level PASS. See `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`.
