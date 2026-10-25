@@ -90,7 +90,7 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | --- | --- | --- | --- |
 | 6.1 | The extension → editor table is configurable without a code change | the table is read from configuration | [ ] |
 | 6.2 | An unknown extension | the normal Seafile download/preview path is used, unchanged | [ ] |
-| 6.3 | The existing ONLYOFFICE integration still works | `.docx` opened in the ONLYOFFICE path is unaffected | [ ] NOT VERIFIED — no browser open/edit/save regression was run |
+| 6.3 | The existing ONLYOFFICE integration still works | `.docx` opened in the ONLYOFFICE path is unaffected | [x] GR-040: actual ONLYOFFICE browser edited a synthetic DOCX twice; callbacks returned HTTP 200, Seafile history grew 3→5, and fresh file-list reopen showed both edits. Synthetic patched stack only; production/deployment compatibility remains NOT VERIFIED |
 | 6.4 | The ONLYOFFICE configuration is untouched | `seahub_settings.py` keeps `ENABLE_ONLYOFFICE = True` and the same 15 extensions | [x] SSH read-only check after removing the third-party `.xlsx` route; no ONLYOFFICE setting changed |
 | 6.5 | The integration is reachable through configured origins | ArtCraft host/Craft are same-origin; Seahub is a separate origin; only `/open/` accepts Seahub Origin | [x] Synthetic Chromium run used Seahub `:18000` and gateway/Craft `:18777`; `/open/` handoff, editor save, fresh route load and persisted bytes verified. Production TLS/proxy, CSRF and adversarial-frame testing remain NOT VERIFIED; host-page CSP generation is covered by 6.7 |
 | 6.6 | Rollback | removing the added route restores the previous behaviour | [ ] |

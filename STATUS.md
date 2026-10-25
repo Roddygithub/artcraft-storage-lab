@@ -22,7 +22,14 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-039 — The `/open/` capability host page sends a fresh nonce-based
+CURRENT GR: GR-040 — A real browser regression on the isolated synthetic stack
+confirms ONLYOFFICE still edits, saves two Seafile versions, and reopens both
+edits from the library file list. Production/deployed ONLYOFFICE and security
+remain **NOT VERIFIED**. Independent evidence review: bounded PROVISIONAL
+ACCEPT, no blocker/major, three minor limitations; see
+`docs/reviews/GR-040/INDEPENDENT-REVIEW-R1.md`. Evidence:
+`docs/reviews/GR-040/`.
+GR-039 — The `/open/` capability host page sends a fresh nonce-based
 CSP and fails closed to `frame-ancestors 'none'` when the configured Seahub origin
 is invalid. Gateway unit tests pass; independent exact-patch round 3 returned a
 bounded PROVISIONAL PASS after two findings were fixed. The policy does not cover
@@ -37,12 +44,13 @@ check; Luna High bounded re-review returned PROVISIONAL ACCEPT with no material
 finding. Host protocol compatibility is **NOT VERIFIED**; staged artifacts are
 not approved for promotion. See `docs/GR-038-CRAFT-ASSET-INGESTION.md`.
 
-LATEST E2E: GR-037 PhotoCraft’s editor message, gateway request body, and
+LATEST E2E: GR-040 confirms synthetic ONLYOFFICE preservation; see
+`docs/reviews/GR-040/`. GR-037 PhotoCraft’s editor message, gateway request body, and
 Seafile readback matched byte-for-byte (8,555 bytes; SHA-256
 `ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca`). History
 grew 2→3; a fresh Seahub route opened a new clean editor session. PhotoCraft
 remains excluded from dispatch. Cargo build/temp paths use the persistent home
-filesystem. Production security, ONLYOFFICE regression, optimized output and
+filesystem. Production security, deployed ONLYOFFICE compatibility, optimized output and
 project-level GPT PASS remain NOT VERIFIED; details are in `docs/reviews/GR-037/`.
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
@@ -70,8 +78,11 @@ VERIFIED IN LOCAL REMEDIATION:
   screenshot and limitations: `docs/reviews/GR-010/GRIDCRAFT-SEAFILE-E2E-20261023.md`.
 
 OPEN GAPS:
-- ONLYOFFICE edit/save/version/reopen regression remains NOT VERIFIED; this is
-  a non-regression check, not a change to the ArtCraft target
+- GR-040 closes ONLYOFFICE regression on the local synthetic patched stack:
+  two browser edits, two HTTP-200 callbacks, history 3→5 and a fresh library
+  click/reopen showing both edits. Production configuration, deployment
+  topology, other Document Server versions and other file types remain
+  NOT VERIFIED.
 - GridCraft's ticketed acknowledgement patch received an independent narrow
   review PASS with three minor follow-ups. Its Seafile runtime path is now
   reproduced in the isolated synthetic stack; formula recalculation, GridCraft

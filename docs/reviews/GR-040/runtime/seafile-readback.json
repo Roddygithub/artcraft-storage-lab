@@ -1,0 +1,45 @@
+{
+  "test_date": "2026-10-25",
+  "scope": "synthetic loopback-only Seahub and Seafile C-fileserver",
+  "document": "/synthetic.docx",
+  "initial": {
+    "content_id": "4013284e8809fc29b350714340e05ba4dd24ee0d",
+    "size_bytes": 5305,
+    "history_count": 3,
+    "head_commit_id": "f7c006db6b699f8aae3f9a76e785d0bbead01da4"
+  },
+  "after_first_save": {
+    "content_id": "fbacbb91d1ea637db256039225c848f3695d7a96",
+    "size_bytes": 24950,
+    "history_count": 4,
+    "head_commit_id": "d306b22d3cfbde43d3f0965e5fe89417ce08fb87",
+    "sha256": "3352c6b8daca84b279d6250ec7658a15d590b116b2f85708d905d49a6553fcac",
+    "valid_docx_zip": true,
+    "marker_present": "gr039seafilecommit"
+  },
+  "final": {
+    "content_id": "c9989d09d742f02ca70b9f7e2d3d2a18c34ee67c",
+    "size_bytes": 24960,
+    "history_count": 5,
+    "head_commit_id": "699e43932253a0abf9b58e498490aff62d382ca5",
+    "sha256": "861c00c56e1b9ae42d1d99f5ae9feed6e2d0a038178fbc6b41343e2559c9c2fa",
+    "valid_docx_zip": true,
+    "markers_present": [
+      "gr039seafilecommit",
+      "gr040onlyofficeack"
+    ]
+  },
+  "onlyoffice": {
+    "image": "docker.io/onlyoffice/documentserver",
+    "digest": "sha256:5ed447a097b368e97de8c25ba5ef53c425acfa1bb084e33b8a0de4a7a1e2099c",
+    "loaded_resource_version": "8.0.1-31",
+    "callback_post_statuses": [200, 200]
+  },
+  "fresh_reopen": {
+    "route_http": 200,
+    "file_list_click_opened_onlyoffice": true,
+    "final_markers_visible": true
+  },
+  "production_accessed": false,
+  "onlyoffice_callback_payload_hash_captured": false
+}

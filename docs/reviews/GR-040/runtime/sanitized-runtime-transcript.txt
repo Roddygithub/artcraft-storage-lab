@@ -1,0 +1,50 @@
+GR-040 synthetic ONLYOFFICE regression — sanitized transcript
+Date: 2026-10-25 (Europe/Paris)
+
+Environment
+  Seahub: local synthetic source revision dce43b88568f2963ede843a6c10cb63e2667ac88
+  C-fileserver: local synthetic source revision cc778584492f4e7132da7b47b447e5b4cd83d1bc
+  Document Server: image sha256:5ed447a097b368e97de8c25ba5ef53c425acfa1bb084e33b8a0de4a7a1e2099c
+  Loaded editor resource path: 8.0.1-31
+  Published host ports: 127.0.0.1:18000, 127.0.0.1:18082, 127.0.0.1:18777,
+                        127.0.0.1:18088
+  Test library and document: synthetic ArtCraft library /synthetic.docx
+
+Observed flow
+  1. Seahub's /lib/<synthetic-library>/file/synthetic.docx route loaded the
+     ONLYOFFICE desktop editor. Initial Seafile detail: 5,305 B, history 3.
+  2. Browser edit added gr039seafilecommit. ONLYOFFICE displayed
+     “All changes saved”. On close, Seahub's ONLYOFFICE callback POST returned
+     HTTP 200; Seafile detail changed to a new content ID, history 3 -> 4.
+  3. Reopened, added gr040onlyofficeack, observed “All changes saved”, then
+     closed. Callback POST returned HTTP 200; Seafile history changed 4 -> 5.
+  4. Authenticated Seafile API file readback returned 24,960 B, SHA-256
+     861c00c56e1b9ae42d1d99f5ae9feed6e2d0a038178fbc6b41343e2559c9c2fa.
+     The DOCX ZIP validated; document.xml contained both edit markers.
+  5. A fresh Seahub route displayed both markers. Clicking synthetic.docx from
+     the synthetic library opened a new page under /lib/.../file/synthetic.docx;
+     its ONLYOFFICE main editor displayed both markers.
+
+Network debugging and rollback
+  Initial callback attempts returned HTTP 500 because the callback worker in
+  the synthetic Seahub container could not reach the Document Server URL at
+  127.0.0.1:18088 from its own loopback. This was a test-network issue, not a
+  successful save. The synthetic Seahub container was recreated with pasta
+  --map-host-loopback=169.254.1.2, preserving its MySQL data, then a socat relay
+  bound only to container loopback forwarded 127.0.0.1:18088 to the mapped host
+  loopback. A health check through that path returned HTTP 200; subsequent
+  callback POSTs returned HTTP 200 and both versions/readbacks were verified.
+  Host port bindings remained loopback-only.
+
+  Temporary ONLYOFFICE settings and the generated env file were removed after
+  evidence capture. The running synthetic Document Server container retains
+  its test-only environment configuration; the container is local and bound to
+  loopback. The host mapping used by the synthetic container remains in place
+  while that container runs. Production Seahub, ONLYOFFICE, settings, and files
+  were untouched.
+
+Limitations
+  The browser-to-callback DOCX bytes were not separately captured or hashed.
+  The test covers one synthetic DOCX and one local Document Server version;
+  it does not establish production deployment, security topology, or general
+  ONLYOFFICE compatibility.

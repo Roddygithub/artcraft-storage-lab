@@ -1,3 +1,15 @@
+## 2026-10-25 — GR-040 synthetic ONLYOFFICE regression
+
+* Reproduced the existing Seafile → ONLYOFFICE browser path on a loopback-only
+  synthetic stack. Two UI edits produced two successful Seahub callbacks and
+  Seafile history advanced 3→5. API readback validated as DOCX; a fresh library
+  file-list click/reopen displayed both edits. Evidence and retained screenshots
+  are in `docs/reviews/GR-040/`.
+* Updated matrix row 6.3. This verifies one synthetic DOCX flow on the local
+  patched stack; deployed/production ONLYOFFICE, security topology, other file
+  types and versions remain NOT VERIFIED. No production or upstream system was
+  changed; GPT REVIEW remains INCOMPLETE.
+
 ## 2026-10-25 — GR-039 dynamic host-page CSP
 
 * Added a per-response cryptographic nonce CSP to the gateway-generated
@@ -950,6 +962,7 @@ and refusal paths. The real Seafile Web DOCX and ONLYOFFICE checks remain
 **NOT VERIFIED**. Evidence: `docs/reviews/GPT-LUNA-REMEDIATION.md`.
 
 Running log. Newest first.
+
 
 ## 2026-10-22 — the fourth review, and the GR-012 proof hardened
 

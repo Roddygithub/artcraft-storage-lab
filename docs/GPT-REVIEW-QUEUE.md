@@ -19,6 +19,21 @@ editor HTML, browser-enforced bundle compatibility, reverse-proxy behavior and
 deployment security remain NOT VERIFIED. This does not change the project-level
 INCOMPLETE verdict or unlock upstream publication.
 
+## GR-040 — synthetic ONLYOFFICE preservation regression
+
+An actual ONLYOFFICE 8.0.1-31 browser editor opened a synthetic Seafile DOCX,
+committed two edits through Seahub callbacks (HTTP 200), advanced file history
+from 3 to 5, and reopened both edits from a fresh Seahub library-list click.
+The isolated stack and exact readback evidence are in
+`docs/reviews/GR-040/`. This closes matrix row 6.3 for the tested synthetic
+stack only. Independent evidence review returned bounded PROVISIONAL ACCEPT,
+no blocker/major and three minor limitations (active test container, no
+callback-body hash, test-specific loopback workaround); see
+`docs/reviews/GR-040/INDEPENDENT-REVIEW-R1.md`. Production/deployed ONLYOFFICE,
+other document types and versions, deployment security, and callback-byte
+identity remain NOT VERIFIED. Overall GPT REVIEW stays INCOMPLETE and upstream
+publication stays locked.
+
 ## Latest first-pass result — 2026-10-25
 
 ```text
