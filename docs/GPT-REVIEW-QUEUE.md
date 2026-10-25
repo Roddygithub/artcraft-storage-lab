@@ -458,11 +458,11 @@ Publication: LOCKED; no upstream issue, PR, RFC, or patch published
 ```text
 Status:      bounded local prototype review PASS (GPT-6 Luna high round 2 on exact current patch); no project-level GPT change
 Base:        storytold/deckcraft `0f4fffcf6c71ffa16029d07ac23752fedd783547`
-Transport:   `craft-platform` pinned to `90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`
-Patch SHA:   `b00e36ecdc655b86205a8d1a87e8eb5ddf289d52320ecc19c8b130c22ab47186`
+Transport:   `craft-platform` pinned to `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
+Patch SHA:   `8d7f98468ce446add5357e10ed8e10e729eb3306fee359d320f09805acc3ee4a`
 Scope:       one host-bound presentation; ticketed serialized snapshot save; clean only after matching durable ACK; no host Save As
 Evidence:    docs/GR-020-DECKCRAFT-HOST-SAVE.md and docs/reviews/GR-020/
-Tests:       2 engine tests, 4 UI lifecycle tests, locked WASM check, fmt, assets and layers checks pass; full workspace tests did not complete
+Tests:       2 engine tests, 4 UI lifecycle tests, locked WASM check on 56c5e16, fmt, assets and layers checks pass; full workspace tests did not complete
 Open:        browser messaging and Seafile dispatch/version/fresh-reopen NOT VERIFIED; no Seafile route added
 CI:          `xtask ci` stops at pre-existing workspace Clippy finding in untouched `crates/matroska/src/demux.rs:726`; `assets`, `layers`, `wasm` and non-strict targeted Clippy pass; workspace test suite remains incomplete
 GPT review:  NOT REQUESTED as a project candidate; project remains GPT REVIEW FAIL on 0edbe524

@@ -7,9 +7,9 @@
 | Item | Value |
 |---|---|
 | DeckCraft source | `storytold/deckcraft` `0f4fffcf6c71ffa16029d07ac23752fedd783547` |
-| Shared transport | `artcraft-storage-lab` `90c261de22ef75c4c7c5c5cd1c712d483be0bbc8` (`craft-platform`) |
+| Shared transport | `artcraft-storage-lab` `56c5e16d79b77751106173c13111ef4fe0a2c0ec` (`craft-platform`) |
 | Patch | [`deckcraft-host-save-ack.patch`](deckcraft-host-save-ack.patch) |
-| Patch SHA-256 | `b00e36ecdc655b86205a8d1a87e8eb5ddf289d52320ecc19c8b130c22ab47186` |
+| Patch SHA-256 | `8d7f98468ce446add5357e10ed8e10e729eb3306fee359d320f09805acc3ee4a` |
 
 ## Scope
 
@@ -34,7 +34,7 @@ Host mode refuses additional document opens/creation, Save As, and path-based op
 | `cargo +1.95.0 xtask ci` | BLOCKED at workspace Clippy by existing `collapsible_match` in untouched `crates/matroska/src/demux.rs:726`; PDF dependency step passes |
 | `cargo +1.95.0 test --workspace` | NOT COMPLETED; UI test binary remained waiting on several long-running tests for over five minutes and was stopped. An earlier run also encountered `/tmp` quota errors; retry used a dedicated `TMPDIR` |
 
-The workspace test suite did not complete, so only the focused engine/UI tests are claimed. The checkout lacks the sibling `craft-fonts` repository; builds warn and continue without bundled project fonts. Luna high R1 reviewed the prior patch SHA `d6bdbc…ec11`; R2 reviewed the current exact patch SHA above and returned PASS with no findings. See `REVIEW-LUNA-HIGH-R2.md`.
+The workspace test suite did not complete, so only the focused engine/UI tests are claimed. The checkout lacks the sibling `craft-fonts` repository; builds warn and continue without bundled project fonts. Luna high R1 reviewed the prior source patch SHA `d6bdbc…ec11`; R2 reviewed the app source before the transport re-pin. The re-pin changes only Cargo manifest/lock revisions and has an independent exact review; see `REVIEW-LUNA-HIGH-R2.md` and `REVIEW-TRANSPORT-REPIN.md`.
 
 ## Evidence boundary
 

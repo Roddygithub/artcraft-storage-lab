@@ -2,55 +2,31 @@ diff --git i/Cargo.lock w/Cargo.lock
 index 9885eb3..b6e0d6b 100644
 --- i/Cargo.lock
 +++ w/Cargo.lock
-@@ -829,6 +829,16 @@ dependencies = [
-  "thiserror 2.0.21",
- ]
- 
+@@ -831,0 +832,10 @@ dependencies = [
 +[[package]]
 +name = "craft-platform"
 +version = "0.1.0"
-+source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=90c261de22ef75c4c7c5c5cd1c712d483be0bbc8#90c261de22ef75c4c7c5c5cd1c712d483be0bbc8"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=56c5e16d79b77751106173c13111ef4fe0a2c0ec#56c5e16d79b77751106173c13111ef4fe0a2c0ec"
 +dependencies = [
 + "js-sys",
 + "wasm-bindgen",
 + "web-sys",
 +]
 +
- [[package]]
- name = "crc32fast"
- version = "1.5.2"
-@@ -1199,6 +1209,7 @@ dependencies = [
- name = "deckcraft-web"
- version = "0.10.0"
- dependencies = [
+@@ -1201,0 +1212 @@ dependencies = [
 + "craft-platform",
-  "deckcraft-engine",
-  "deckcraft-ui-egui",
-  "eframe",
 diff --git i/Cargo.toml w/Cargo.toml
 index 1b52575..e3f77fd 100644
 --- i/Cargo.toml
 +++ w/Cargo.toml
-@@ -26,6 +26,7 @@ deckcraft-anim = { path = "crates/anim" }
- deckcraft-engine = { path = "crates/engine" }
- deckcraft-mcp = { path = "crates/mcp" }
- deckcraft-ui-egui = { path = "crates/ui-egui" }
-+craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8", package = "craft-platform" }
- deckcraft-media = { path = "crates/media" }
- # codecs (ported from FilmCraft, same owner and licence)
- deckcraft-bitstream = { path = "crates/bitstream" }
+@@ -28,0 +29 @@ deckcraft-ui-egui = { path = "crates/ui-egui" }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "56c5e16d79b77751106173c13111ef4fe0a2c0ec", package = "craft-platform" }
 diff --git i/apps/deckcraft-web/Cargo.toml w/apps/deckcraft-web/Cargo.toml
 index 7014421..a082caa 100644
 --- i/apps/deckcraft-web/Cargo.toml
 +++ w/apps/deckcraft-web/Cargo.toml
-@@ -16,6 +16,7 @@ path = "src/main.rs"
- [dependencies]
- deckcraft-engine = { workspace = true }
- deckcraft-ui-egui = { workspace = true }
+@@ -18,0 +19 @@ deckcraft-ui-egui = { workspace = true }
 +craft-platform = { workspace = true, features = ["browser"] }
- egui = { workspace = true }
- log = { workspace = true }
- serde_json = { workspace = true }
 diff --git i/apps/deckcraft-web/src/host.rs w/apps/deckcraft-web/src/host.rs
 new file mode 100644
 index 0000000..5747a6d
@@ -134,27 +110,18 @@ diff --git i/apps/deckcraft-web/src/main.rs w/apps/deckcraft-web/src/main.rs
 index 6d2b7e9..362f9ce 100644
 --- i/apps/deckcraft-web/src/main.rs
 +++ w/apps/deckcraft-web/src/main.rs
-@@ -18,6 +18,9 @@
- #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
- #![forbid(unsafe_code)]
- 
+@@ -20,0 +21,3 @@
 +#[cfg(target_arch = "wasm32")]
 +mod host;
 +
- #[cfg(target_arch = "wasm32")]
- mod web;
- 
 diff --git i/apps/deckcraft-web/src/web.rs w/apps/deckcraft-web/src/web.rs
 index dabad8a..1a7b80a 100644
 --- i/apps/deckcraft-web/src/web.rs
 +++ w/apps/deckcraft-web/src/web.rs
-@@ -36,20 +36,36 @@ pub fn start() {
-                     if let Some(rs) = &cc.wgpu_render_state {
-                         log::info!("deckcraft-web {}: wgpu backend {:?}", env!("CARGO_PKG_VERSION"), rs.adapter.get_info().backend);
-                     }
+@@ -39,2 +38,0 @@ pub fn start() {
 -                    let inbox: Inbox = Inbox::default();
 -                    let mut app = SlideApp::new(Session::new(), services(inbox.clone(), cc.egui_ctx.clone()));
-                     let q = query();
+@@ -42 +40,19 @@ pub fn start() {
 -                    if !q.contains("blank") {
 +                    let inbox: Inbox = Inbox::default();
 +                    let mut app_services = services(inbox.clone(), cc.egui_ctx.clone());
@@ -175,29 +142,14 @@ index dabad8a..1a7b80a 100644
 +                    if host_requested && host_bridge.is_none() {
 +                        app.notify("Host connection failed. Reload from the file platform before editing.");
 +                    } else if !host_requested && !q.contains("blank") {
-                         if let Err(e) = deckcraft_engine::sample::open_sample(&mut app.session) {
-                             log::error!("sample deck: {e}");
-                         }
+@@ -46 +62 @@ pub fn start() {
 -                    } else if let Err(e) = app.run("file.new", serde_json::json!({})) {
 +                    } else if !host_requested && let Err(e) = app.run("file.new", serde_json::json!({})) {
-                         log::error!("new presentation: {e}");
-                     }
-                     if q.contains("show") {
-                         app.start_show(0, false);
-                     }
+@@ -52 +68 @@ pub fn start() {
 -                    Ok(Box::new(WebShell { app, inbox }))
 +                    Ok(Box::new(WebShell { app, inbox, _host_bridge: host_bridge }))
-                 }),
-             )
-             .await;
-@@ -71,6 +87,7 @@ fn query() -> String {
- struct WebShell {
-     app: SlideApp,
-     inbox: Inbox,
+@@ -73,0 +90 @@ struct WebShell {
 +    _host_bridge: Option<crate::host::Bridge>,
- }
- 
- impl eframe::App for WebShell {
 diff --git i/crates/engine/src/external_save_tests.rs w/crates/engine/src/external_save_tests.rs
 new file mode 100644
 index 0000000..b708b55
@@ -243,10 +195,7 @@ diff --git i/crates/engine/src/lib.rs w/crates/engine/src/lib.rs
 index 418bff0..e3dac36 100644
 --- i/crates/engine/src/lib.rs
 +++ w/crates/engine/src/lib.rs
-@@ -562,6 +562,22 @@ impl Session {
-         self.active = Some(self.docs.len() - 1);
-         self.docs.len() - 1
-     }
+@@ -564,0 +565,16 @@ impl Session {
 +
 +    /// Record a host's durable commit of an exact serialized snapshot without a filesystem path.
 +    /// Returns whether the live document is still that snapshot; later edits remain dirty.
@@ -263,18 +212,9 @@ index 418bff0..e3dac36 100644
 +        }
 +        Some(clean)
 +    }
-     pub fn close_document(&mut self, i: usize) {
-         if i < self.docs.len() {
-             let d = self.docs.remove(i);
-@@ -777,6 +793,8 @@ pub(crate) fn push_undo(st: &mut DocState, e: HistoryEntry) {
-     }
- }
- 
+@@ -779,0 +796,2 @@ pub(crate) fn push_undo(st: &mut DocState, e: HistoryEntry) {
 +#[cfg(test)]
 +mod external_save_tests;
- #[cfg(test)]
- mod soak_tests;
- #[cfg(test)]
 diff --git i/crates/ui-egui/src/host_tests.rs w/crates/ui-egui/src/host_tests.rs
 new file mode 100644
 index 0000000..2e81f31
@@ -393,20 +333,11 @@ diff --git i/crates/ui-egui/src/lib.rs w/crates/ui-egui/src/lib.rs
 index eef9b1b..abd4fa5 100644
 --- i/crates/ui-egui/src/lib.rs
 +++ w/crates/ui-egui/src/lib.rs
-@@ -37,6 +37,9 @@ pub mod toast;
- pub mod uifonts;
- pub mod widgets;
- 
+@@ -39,0 +40,3 @@ pub mod widgets;
 +#[cfg(test)]
 +mod host_tests;
 +
- use std::collections::HashMap;
- use std::sync::mpsc::{Receiver, Sender};
- 
-@@ -55,6 +58,16 @@ pub type PickFn = Box<dyn FnMut(&str) -> Option<String>>;
- /// not applied to whichever document happens to be active.
- pub type OpenAsyncFn = Box<dyn FnMut(&str, u64)>;
- pub type DownloadFn = Box<dyn FnMut(&str, &[u8])>;
+@@ -57,0 +61,10 @@ pub type DownloadFn = Box<dyn FnMut(&str, &[u8])>;
 +pub type HostSaveFn = Box<dyn FnMut(&str, &str, &[u8]) -> Result<(), String>>;
 +pub type HostOpenRequestFn = Box<dyn FnMut(&str) -> Result<(), String>>;
 +pub type HostDirtyFn = Box<dyn FnMut(bool) -> Result<(), String>>;
@@ -417,13 +348,7 @@ index eef9b1b..abd4fa5 100644
 +    Open { name: String, bytes: Vec<u8> },
 +    SaveResult { ticket: String, ok: bool, error: Option<String> },
 +}
- 
- /// A file the host finished reading for the request `id` from [`SlideApp::begin_external_file`].
- #[derive(Clone, Debug)]
-@@ -200,6 +213,16 @@ const STATUS_LINGER_MS: f64 = 6000.0;
- /// Platform services injected by the host (desktop or web).
- #[derive(Default)]
- pub struct Services {
+@@ -202,0 +216,10 @@ pub struct Services {
 +    /// The app is embedded in a same-origin file-host iframe.
 +    pub host_mode: bool,
 +    /// Queue of validated parent-frame messages.
@@ -434,13 +359,7 @@ index eef9b1b..abd4fa5 100644
 +    pub host_dirty: Option<HostDirtyFn>,
 +    /// Send serialized bytes to the parent with an opaque ticket.
 +    pub host_save: Option<HostSaveFn>,
-     /// Open-file dialog for a purpose (`open`, `picture`, `audio`, `video`) → path.
-     pub pick_open: Option<PickFn>,
-     /// Save dialog with a suggested name → path.
-@@ -515,12 +538,43 @@ pub struct SlideApp {
-     next_file_id: u64,
-     /// Picks and drops whose bytes have not arrived yet.
-     pending_files: Vec<PendingFile>,
+@@ -517,0 +541,13 @@ pub struct SlideApp {
 +    host_document: Option<(u64, String)>,
 +    host_pending: Option<PendingHostSave>,
 +    host_next_ticket: u64,
@@ -454,12 +373,7 @@ index eef9b1b..abd4fa5 100644
 +    uid: u64,
 +    snapshot: std::sync::Arc<deckcraft_model::Presentation>,
 +    started_at: f64,
- }
- 
- fn grid_options_touched(p: &Value) -> bool {
-     ["spacing", "snap", "smartGuides", "gridlines", "guides"].iter().any(|k| p.get(*k).is_some())
- }
- 
+@@ -523,0 +560,18 @@ fn grid_options_touched(p: &Value) -> bool {
 +fn is_host_forbidden_command(id: &str) -> bool {
 +    matches!(
 +        id,
@@ -478,26 +392,14 @@ index eef9b1b..abd4fa5 100644
 +        || id.starts_with("collab.")
 +}
 +
- fn grid_flag(p: &Value, key: &str) -> Result<Option<bool>, String> {
-     match p.get(key) {
-         None => Ok(None),
-@@ -583,6 +637,12 @@ impl SlideApp {
-             twisting: false,
-             next_file_id: 1,
-             pending_files: Vec::new(),
+@@ -585,0 +640,6 @@ impl SlideApp {
 +            host_document: None,
 +            host_pending: None,
 +            host_next_ticket: 1,
 +            host_last_dirty: None,
 +            host_dirty_retry_at: 0.0,
 +            host_timeout_reported: false,
-         }
-     }
- 
-@@ -654,6 +714,21 @@ impl SlideApp {
-     /// Run a command by id (UI commands here, everything else in the engine). Errors show in the
-     /// status bar and are returned.
-     pub fn run(&mut self, id: &str, params: Value) -> Result<Value, String> {
+@@ -656,0 +717,15 @@ impl SlideApp {
 +        if self.services.host_mode {
 +            if is_host_forbidden_command(id) {
 +                return Err(format!("{id} is unavailable for a single host-bound presentation"));
@@ -513,13 +415,7 @@ index eef9b1b..abd4fa5 100644
 +                return Err("Save As is unavailable for a host-bound presentation".into());
 +            }
 +        }
-         let r = if UI_COMMANDS.iter().any(|c| c.0 == id) {
-             self.run_ui(id, &params)
-         } else {
-@@ -1170,6 +1245,14 @@ impl SlideApp {
-     }
- 
-     fn pick_and_open(&mut self) {
+@@ -1172,0 +1248,8 @@ impl SlideApp {
 +        if self.services.host_mode {
 +            if let Some(request) = self.services.host_open_request.as_mut()
 +                && let Err(e) = request("open")
@@ -528,47 +424,23 @@ index eef9b1b..abd4fa5 100644
 +            }
 +            return;
 +        }
-         if let Some(pick) = self.services.pick_open.as_mut() {
-             if let Some(path) = pick("open") {
-                 self.open_path_in_background(&path);
-@@ -1183,6 +1266,9 @@ impl SlideApp {
-     }
- 
-     pub fn open_path(&mut self, path: &str) -> Result<(), String> {
+@@ -1185,0 +1269,3 @@ impl SlideApp {
 +        if self.services.host_mode {
 +            return Err("Open a presentation from the file host".into());
 +        }
-         self.session.execute("file.open", &json!({"path": path})).map_err(|e| e.to_string())?;
-         self.note_recent(path);
-         Ok(())
-@@ -1279,6 +1365,10 @@ impl SlideApp {
-     }
- 
-     pub fn save_as_dialog(&mut self, format: &str) {
+@@ -1281,0 +1368,4 @@ impl SlideApp {
 +        if self.services.host_mode {
 +            self.set_status("Save As is unavailable for a host-bound presentation".to_string());
 +            return;
 +        }
-         let name = self.session.active().map(|d| d.title()).unwrap_or_else(|| "Presentation".into());
-         let ext = if format == "pptx" { "pptx" } else { "deckcraft" };
-         let suggested = format!("{name}.{ext}");
-@@ -1318,6 +1408,12 @@ impl SlideApp {
-     }
- 
-     pub fn save(&mut self) {
+@@ -1320,0 +1411,6 @@ impl SlideApp {
 +        if self.services.host_mode {
 +            if let Err(e) = self.host_save_current() {
 +                self.set_status(e);
 +            }
 +            return;
 +        }
-         if self.session.active().and_then(|d| d.path.clone()).is_some() {
-             match self.session.execute("file.save", &json!({})) {
-                 Ok(_) => self.set_status("Saved"),
-@@ -1387,6 +1483,134 @@ impl SlideApp {
-         self.apply_external_file(id, name, bytes);
-     }
- 
+@@ -1389,0 +1486,128 @@ impl SlideApp {
 +    fn host_open(&mut self, name: &str, bytes: &[u8]) {
 +        const MAX_HOST_DOCUMENT_BYTES: usize = 256 * 1024 * 1024;
 +        let extension = name.rsplit('.').next().unwrap_or_default().to_ascii_lowercase();
@@ -697,25 +569,10 @@ index eef9b1b..abd4fa5 100644
 +        }
 +    }
 +
-     fn capture_file_target(&self) -> FileTarget {
-         let Some(d) = self.session.active() else { return FileTarget::Absent };
-         let place = match d.selection.target {
-@@ -1441,6 +1665,10 @@ impl SlideApp {
-                 return;
-             }
-         };
+@@ -1443,0 +1668,4 @@ impl SlideApp {
 +        if self.services.host_mode && cmd == "file.openBytes" {
 +            self.set_status("Open presentations from the file host so the correct file remains bound");
 +            return;
 +        }
-         let params = if cmd == "slide.fromOutline" {
-             json!({"text": String::from_utf8_lossy(bytes), "markdown": name.to_ascii_lowercase().ends_with(".md")})
-         } else {
-@@ -1554,6 +1782,7 @@ impl SlideApp {
-             self.restyle = false;
-         }
-         let now = ctx.input(|i| i.time);
+@@ -1556,0 +1785 @@ impl SlideApp {
 +        self.sync_host_state(ctx, now);
-         let dt = now - self.last_time;
-         if dt > 0.0 {
-             self.perf.fps = self.perf.fps * 0.9 + (1.0 / dt).min(240.0) * 0.1;

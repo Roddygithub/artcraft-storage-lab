@@ -26,6 +26,14 @@
   functional issue; app consumers still need to pin this committed revision.
   See `docs/reviews/GR-024/`.
 
+## 2026-10-25 — GR-020 DeckCraft transport re-pin
+
+* Updated the stored DeckCraft host-save patch to transport commit `56c5e16`;
+  app source is unchanged. The locked WASM check, formatting, diff and
+  reverse-apply checks pass per implementer. Independent review confirmed the
+  exact base, hash and pin. Browser/Seafile runtime remain NOT VERIFIED; see
+  `docs/reviews/GR-020/`.
+
 ## 2026-10-24 — GR-021 DesignCraft host-save prototype
 
 * Added a local one-document DesignCraft adapter over `craft-platform`

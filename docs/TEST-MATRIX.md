@@ -175,11 +175,11 @@ Patch and limits: `docs/reviews/GR-019/README.md`.
 |---|---|---|---|
 | 12.1 | External ACK without a filesystem path | only the matching snapshot becomes the saved baseline; later edits remain dirty | [x] 2 focused `deckcraft-engine` tests pass; pathful documents are refused |
 | 12.2 | Synthetic host open/edit/save/ACK/reopen | no clean state before ACK; serialized bytes reopen with the saved edit | [x] 4 focused `deckcraft-ui-egui` tests pass, including failure ACK and edit-after-submit |
-| 12.3 | DeckCraft Web shared transport compilation | pinned adapter compiles for `wasm32-unknown-unknown` | [x] Rust 1.95 locked WASM check passes |
+| 12.3 | DeckCraft Web shared transport compilation | pinned adapter compiles for `wasm32-unknown-unknown` | [x] Rust 1.95 locked WASM check passes on pin `56c5e16` |
 | 12.4 | Host-mode single-document and Save As guards | no second document, path-open, or Save As can bypass the host binding | [x] UI dispatch and direct helpers guard the local adapter; bounded independent review PASS |
 | 12.5 | Browser messaging with real DeckCraft WASM | parent open/save/ACK exchange works in browser | [ ] NOT VERIFIED |
 | 12.6 | Seafile new version and fresh-storage reopen | saved presentation survives Seafile version creation and fresh editor load | [ ] NOT VERIFIED; DeckCraft is not in the Seafile dispatcher |
-| 12.7 | Independent bounded review | no blocker/major/minor in exact local patch | [x] GPT-6 Luna high R2 PASS on `b00e36ec…7186`; see `docs/reviews/GR-020/REVIEW-LUNA-HIGH-R2.md` |
+| 12.7 | Independent bounded review | no blocker/major/minor in exact local patch | [x] GPT-6 Luna high R2 reviewed app source; independent re-pin review verifies exact pin/artifact; see `REVIEW-TRANSPORT-REPIN.md` |
 | 12.8 | Full DeckCraft workspace CI | all xtask steps pass | [~] `assets`, `layers`, and `wasm` pass; `xtask ci` stops at existing workspace Clippy errors; full workspace tests did not complete (long-running UI tests stopped) |
 
 Patch, exact source pin, checks and evidence limits: `docs/reviews/GR-020/README.md`.
