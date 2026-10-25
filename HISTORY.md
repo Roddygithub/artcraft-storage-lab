@@ -1,3 +1,14 @@
+## 2026-10-25 — GR-042 browser-enforced dynamic host CSP
+
+* Added a Chromium check that posts a synthetic Seafile capability through the
+  real gateway `Handler._open` route. The configured Seafile ancestor can frame
+  the response; a nested disallowed outer ancestor is refused. The nonce inline
+  script and stylesheet execute, with no CSP violations on the allowed page.
+* Updated matrix row 6.7 and recorded the run in `docs/reviews/GR-042/`. Craft
+  bundle CSP, proxy behavior, production and other browsers remain
+  **NOT VERIFIED**. No Seafile or ONLYOFFICE service, production data or
+  upstream repository was touched. GPT REVIEW remains INCOMPLETE.
+
 ## 2026-10-25 — GR-041 bounded Craft Web asset staging
 
 * Added a 256 MiB streaming download cap and a 1 GiB extracted-content cap to

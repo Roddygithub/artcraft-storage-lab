@@ -6,6 +6,20 @@ and does not trust the free-model verdicts.
 Nothing may be published upstream (issue, PR, RFC in `storytold/*`, Seafile or
 Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 
+## GR-042 — browser enforcement of dynamic host-page CSP
+
+`tests/test_gr042_hostpage_csp_browser.py` uses Chromium against the real
+gateway `POST /open/` handler with loopback-only synthetic parent and Seafile
+adapter. The configured Seafile ancestor framed the host response; a foreign
+outer ancestor was refused; nonce inline script/style worked and no CSP
+violation fired in the allowed case. Run and limits: `docs/GR-042-BROWSER-CSP.md`;
+evidence: `docs/reviews/GR-042/README.md`. Independent bounded review returned
+PROVISIONAL PASS with no findings (`docs/reviews/GR-042/INDEPENDENT-REVIEW-R1.md`).
+The Craft bundle, static editor CSP,
+proxy behavior, production deployment and other browsers remain NOT VERIFIED.
+Work-item state: GPT REVIEW PENDING. This is a bounded browser test, not a
+project-level GPT verdict; upstream publication remains locked.
+
 ## GR-041 — bounded Craft Web asset staging
 
 The GR-038 fetcher now caps the release ZIP download at 256 MiB, socket timeout
