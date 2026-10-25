@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; shared transport and app adapters conti
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft and PhotoCraft host adapters are in progress; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft host-save prototype is in progress; PhotoCraft implementation is paused at a documented pathless-open/ACK design gate; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-020/021/022/023/024 — DeckCraft, DesignCraft, EffectCraft and FilmCraft patches use 56c5e16; EffectCraft GR-022 has an exact bounded review PASS; SoundCraft/PhotoCraft work is underway; browser/Seafile runtime remains NOT VERIFIED
+CURRENT GR: GR-020/021/022/023/024 — DeckCraft, DesignCraft, EffectCraft and FilmCraft patches use 56c5e16; EffectCraft GR-022 has an exact bounded review PASS; SoundCraft is underway; PhotoCraft has a bounded audit/design with no code patch; browser/Seafile runtime remains NOT VERIFIED
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -117,6 +117,12 @@ OPEN GAPS:
   guard. Independent round 2 exact review found no blocker/major. Browser,
   durable Seafile version and fresh reopen remain NOT VERIFIED; see
   `docs/reviews/GR-023/`.
+- GR-026 audited PhotoCraft `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` and
+  stopped without an app patch: its public open API binds names as local paths,
+  its download writer is deliberately unconfirmed, and safe host binding needs
+  pathless-open, revision-ACK and replacement-route guards across app layers.
+  The minimal design is recorded; PhotoCraft host save, browser behavior and
+  Seafile version/reopen are NOT VERIFIED. See `docs/reviews/GR-026/`.
 - The isolated synthetic Seafile runtime flows currently documented are for
   WordCraft, GridCraft, VectorCraft, PdfCraft and CADCraft. VectorCraft uses its
   page API, not the common `?host=parent` contract. DeckCraft now has a local

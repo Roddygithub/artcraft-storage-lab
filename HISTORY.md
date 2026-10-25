@@ -1,3 +1,15 @@
+## 2026-10-25 — GR-026 PhotoCraft host integration assessment
+
+* Audited `storytold/photocraft` at exact SHA
+  `a02f2ee41059d3312e7ff24a5af5edcac7b6435a`. Stopped without app code
+  because `open_file(path, bytes)` binds host names as local paths and the
+  browser download writer is intentionally unconfirmed; a safe host path needs
+  pathless open, revision-specific ACK and host-mode route guards.
+* Recorded the minimal Rust-only design in
+  `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`. No app build/test, browser flow,
+  Seafile version/reopen, production access or upstream publication was claimed.
+  See `docs/reviews/GR-026/`.
+
 ## 2026-10-25 — GR-022 EffectCraft host-save prototype
 
 * Added a one-document host-save adapter using `craft-platform` `56c5e16`.

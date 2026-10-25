@@ -237,3 +237,15 @@ A test that has not been run is `[ ]`, never `[x]`. A mock is not a result.
 | 15.5 | Production host authorization and security topology | permissions/origins/proxy controls verified | [ ] NOT VERIFIED |
 
 Patch, commands, and limits: `docs/reviews/GR-022/`.
+
+## 16. PhotoCraft host integration assessment (GR-026)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 16.1 | Audit immutable PhotoCraft source | Findings refer to the requested exact SHA | [x] `storytold/photocraft` SHA `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` inspected; evidence in `docs/reviews/GR-026/README.md` |
+| 16.2 | Durable host save implementation | Host save stays dirty until matching durable ACK | [ ] NOT IMPLEMENTED; current open/write seams cannot safely provide pathless binding and revision-specific ACK |
+| 16.3 | Rust 1.95 locked WASM app check and focused host tests | Exact patch builds and lifecycle tests pass | [ ] NOT RUN; no app patch exists |
+| 16.4 | Browser host flow / Seafile version / fresh reopen | Persisted edit reopens from new host session | [ ] NOT VERIFIED |
+
+GR-026 records an implementation stop with a minimal design, not a PhotoCraft
+prototype or project-level PASS. See `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`.

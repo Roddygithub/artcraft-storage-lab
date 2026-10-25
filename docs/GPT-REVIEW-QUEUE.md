@@ -541,6 +541,20 @@ Publication: LOCKED; no upstream issue, PR, RFC or patch published
 Evidence:    `docs/reviews/GR-023/`
 ```
 
+### GR-026 — PhotoCraft host integration assessment
+
+```text
+Status:      NOT IMPLEMENTED; bounded-slice gate stopped code work; minimal design recorded
+Base:        storytold/photocraft `a02f2ee41059d3312e7ff24a5af5edcac7b6435a`
+Transport:   future app dependency must pin `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
+Finding:     `open_file(path, bytes)` binds the name as a local path; browser download uses `write_unconfirmed: true`; pathless binding and revision ACK require app-layer seams and route guards
+Tests:       exact source SHA inspected; focused app tests and Rust 1.95 app WASM check NOT RUN because no patch was produced
+Open:        implementation, browser messaging, Seafile version creation and fresh reopen NOT VERIFIED
+GPT review:  not a project candidate; overall project verdict unchanged
+Publication: LOCKED; no upstream issue, PR, RFC or patch published
+Evidence:    `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`, `docs/reviews/GR-026/`
+```
+
 ## GPT review instruction (for the future session)
 
 ```text
