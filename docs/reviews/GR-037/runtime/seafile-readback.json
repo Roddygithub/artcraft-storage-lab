@@ -1,0 +1,51 @@
+{
+  "captured_utc": "2026-10-25T11:49:09Z",
+  "source": "read-only Seafile API history, detail and file-content readback after a real browser save",
+  "environment": "isolated synthetic Seahub/Seafile loopback stack; no production data",
+  "repo_id": "a1a2768f-a6ea-4e18-858f-b09e3f64a11d",
+  "path": "/photocraft-gr035.pcraft",
+  "edit": "one brush click in PhotoCraft on the existing synthetic project",
+  "history": {
+    "before_count": 2,
+    "previous_commit_id": "a19b117254ed9c0382b6a55a2cd53ccd3c33068a",
+    "previous_file_id": "555181a4a3fa85916107c4fc3af75eb13ab67373",
+    "previous_size": 4984,
+    "previous_sha256": "92e93c2b993b7de073a2c870aba522d7f9112647d9d1181d2b8592df665936b3",
+    "after_count": 3,
+    "latest_commit_id": "5dbddbbe8bc4cac69a8b585af551be2fc5f9fdea",
+    "latest_history_file_id": "2701433bec52d526ed8b48b0de317c700edff07a",
+    "current_detail_file_id": "2701433bec52d526ed8b48b0de317c700edff07a"
+  },
+  "save": {
+    "browser_message_count": 1,
+    "browser_post_count": 1,
+    "gateway_server_log_count": 1,
+    "browser_post_response_status": 200,
+    "editor_message_size": 8555,
+    "editor_message_sha256": "ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca",
+    "gateway_request_size": 8555,
+    "gateway_request_sha256": "ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca",
+    "seafile_readback_size": 8555,
+    "seafile_readback_sha256": "ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca",
+    "all_three_byte_sequences_identical": true,
+    "archive_is_valid_zip": true,
+    "archive_contains_manifest_json": true
+  },
+  "fresh_reopen": {
+    "seahub_route_reloaded": true,
+    "new_editor_session_document_get_http_status": 200,
+    "saved_session_id_sha256": "698ce132b38b91ee5aabf27097c032cb2b819b28ece37d484c3db8a1ce4c8961",
+    "fresh_session_id_sha256": "3bb6dc663aa483c8fbcc78e98a7546c47b46eb3346cc8bfad41091558384842f",
+    "session_ids_differ": true,
+    "editor_status": "photocraft-gr035.pcraft (no changes)",
+    "screenshot": "photocraft-seafile-reopen.png",
+    "screenshot_sha256": "b0ce53b8c71a481d33e5061f64277be235ced2991f9972314a8d412b5f09442f"
+  },
+  "limits": [
+    "synthetic loopback only; no production Seafile access",
+    "temporary uncommitted dispatch/configuration restored after the run",
+    "optimized production bundle and deployment security not established",
+    "ONLYOFFICE was not changed"
+  ],
+  "secrets_included": false
+}

@@ -684,6 +684,17 @@ Review:      PROVISIONAL ACCEPT; screenshot does not identify loaded WASM resour
 Evidence:    `docs/GR-035-PHOTOCRAFT-OPTIMIZED-BROWSER-SMOKE.md` and `docs/reviews/GR-035/`
 ```
 
+### GR-037 — PhotoCraft exact save-byte provenance and Seafile reopen
+
+```text
+Status:      synthetic Seafile E2E; exact bytes match at editor message, gateway body and Seafile readback; independent review PROVISIONAL ACCEPT, final wording MINOR corrected but not re-reviewed
+Base:        PhotoCraft GR-032 adapter + GR-036 repaint fix; no app source patch in this follow-up
+Flow:        Seahub open → PhotoCraft edit → Ctrl+S → version 2→3 → byte-identical Seafile readback → fresh Seahub route/new editor session
+Bytes:       8,555 at all three boundaries; SHA-256 ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca
+Limits:      synthetic loopback; wasm-opt=0; deployment/security and ONLYOFFICE regression NOT VERIFIED; PhotoCraft remains out of dispatch
+Evidence:    `docs/reviews/GR-037/`
+```
+
 ### GR-036 — PhotoCraft synthetic Seafile save/version/reopen
 
 ```text

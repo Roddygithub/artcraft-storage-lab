@@ -1,3 +1,20 @@
+## 2026-10-25 — GR-037 PhotoCraft save-byte provenance
+
+* Re-ran a real PhotoCraft Web/WASM edit and host save through isolated synthetic
+  Seahub and Seafile. The editor message, gateway request body, and Seafile
+  content readback were each 8,555 bytes with identical SHA-256
+  `ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca`.
+* Seafile history advanced from two to three versions. Reloading the Seahub
+  file route created a new editor session, fetched the document successfully,
+  and displayed it clean. The redacted API facts and screenshot are in
+  `docs/reviews/GR-037/`.
+* The runtime used a temporary synthetic dispatch and loopback-only config;
+  both were restored, the test gateway and Seafile container were stopped,
+  and temporary logs/capabilities were removed. PhotoCraft remains excluded
+  from committed dispatch. Independent bounded review returned PROVISIONAL
+  ACCEPT without blocker/major; its final wording MINOR was corrected but not
+  separately re-reviewed. No project-level GPT verdict or upstream action.
+
 ## 2026-10-25 — GR-036 PhotoCraft Seafile version and reopen
 
 * Reproduced a real PhotoCraft Web/WASM host open from a Seahub file route,

@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-036 — PhotoCraft host open/edit/save/ACK created a second Seafile history version, and a fresh Seahub route reopened the saved layer. Bounded independent review R2 returned PROVISIONAL ACCEPT without blocker/major; the README nit is fixed. The functional release build used `wasm-opt=0`; deployment/security, ONLYOFFICE regression, exact editor-to-gateway byte identity and optimized production output remain NOT VERIFIED. PhotoCraft stays out of the committed dispatch. Other app milestones remain listed below.
+CURRENT GR: GR-037 — PhotoCraft’s editor save message, gateway request body, and Seafile content readback matched byte-for-byte (8,555 bytes; SHA-256 `ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca`). Synthetic Seafile history grew 2→3; a fresh Seahub route loaded a new editor session clean. Independent bounded review returned PROVISIONAL ACCEPT without blocker/major; its final wording MINOR was corrected but not separately re-reviewed. Evidence is in `docs/reviews/GR-037/`. The local Cargo target/temp configuration now directs builds to the persistent home filesystem instead of `/tmp`. Production security, ONLYOFFICE regression, optimized production output, and project-level GPT PASS remain NOT VERIFIED. PhotoCraft stays out of the committed dispatch. Other app milestones remain listed below.
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up

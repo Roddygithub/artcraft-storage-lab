@@ -9,13 +9,15 @@ bridge, and really handing the saved bytes back.
     ARTCRAFT_GATEWAY=http://127.0.0.1:8777 \\
     python3 tests/test_browser.py <repo_id> <path> [--headed]
 
-It drives the Craft app's own Save command (the keyboard shortcut), so the
-bytes that reach Seafile are the ones the editor produced.
+It drives the Craft app's own Save command (the keyboard shortcut) and
+compares save-byte hashes at the editor message, outgoing browser request,
+and Seafile readback. The server-side gateway receipt is logged separately.
 
 Requires playwright and its chromium build:
     npm i playwright && npx playwright install chromium
 """
 
+import hashlib
 import json
 import os
 import sys
@@ -118,7 +120,43 @@ def main():
         page.route("**/open-test.html", lambda route: route.fulfill(
             status=200, content_type="text/html; charset=utf-8", body=host_page))
         # The host page fetches /session/<sid>/document and posts to /session/<sid>/save.
-        page.route("**/session/*", lambda route: route.continue_())
+        save_requests = []
+
+        def capture_session_request(route):
+            request = route.request
+            if request.method == "POST" and urllib.parse.urlsplit(request.url).path.endswith("/save"):
+                body = request.post_data_buffer or b""
+                save_requests.append({"size": len(body), "sha256": hashlib.sha256(body).hexdigest()})
+            route.continue_()
+
+        page.route("**/session/*", capture_session_request)
+
+        # Observe the bytes in the parent's postMessage listener before the
+        # host forwards them, without retaining or logging document contents.
+        capture_listener = r"""
+window.__artcraftSaveMessageCaptures = [];
+window.addEventListener("message", async (event) => {
+  const data = event.data;
+  if (event.origin !== ORIGIN || event.source !== frame.contentWindow ||
+      !data || data.type !== APP + ":save") return;
+  let bytes;
+  if (data.bytes instanceof ArrayBuffer) bytes = new Uint8Array(data.bytes);
+  else if (ArrayBuffer.isView(data.bytes))
+    bytes = new Uint8Array(data.bytes.buffer, data.bytes.byteOffset, data.bytes.byteLength);
+  else return;
+  try {
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    const hex = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join("");
+    window.__artcraftSaveMessageCaptures.push({size: bytes.byteLength, sha256: hex});
+  } catch (error) {
+    window.__artcraftSaveMessageCaptures.push({error: error.name || "Error"});
+  }
+});
+"""
+        marker = "function toCraft(type, extra) {"
+        if host_page.count(marker) != 1:
+            raise SystemExit("could not install the bounded browser save-hash observer")
+        host_page = host_page.replace(marker, capture_listener + "\n" + marker, 1)
 
         page.goto(page_url, wait_until="load")
 
@@ -198,6 +236,15 @@ def main():
         logged = next((line[:120] for line in console if "saved" in line), "")
         check("3b. the editor confirmed the save itself", confirmed, logged or "no dirty=false")
 
+        try:
+            page.wait_for_function(
+                "() => window.__artcraftSaveMessageCaptures?.length > 0", timeout=10000)
+        except Exception:
+            pass
+        app_name = page.evaluate("() => APP")
+        save_message_captures = page.evaluate(
+            "() => window.__artcraftSaveMessageCaptures || []")
+
         browser.close()
 
     # 4. the server side really has a new version
@@ -235,6 +282,9 @@ def main():
         check("5. the file Seafile holds is the one the editor produced",
               blob != original_bytes, f"{len(original_bytes)} -> {len(blob)} bytes")
 
+    readback_size = len(blob)
+    readback_hash = hashlib.sha256(blob).hexdigest()
+
     # 6. reopen the document from Seafile: the edit must still be there.
     #    A fresh session fetches the bytes Seafile holds now.
     import io
@@ -257,6 +307,24 @@ def main():
     typed = os.environ.get("ARTCRAFT_TYPED", "4242")
     check("6. the document reopened from Seafile still has the edit", typed in inside,
           f"{len(blob)} bytes; it contains {typed!r}: {typed in inside}")
+
+    browser_request = save_requests[-1] if save_requests else {}
+    if app_name == "vectorcraft":
+        byte_match = (len(save_requests) == 1 and browser_request.get("size") == readback_size
+                      and browser_request.get("sha256") == readback_hash)
+        detail = f"browser request={browser_request.get('sha256', 'missing')}; Seafile={readback_hash}"
+        check("7. browser save request and Seafile readback are byte-identical",
+              byte_match, detail)
+    else:
+        message = save_message_captures[-1] if save_message_captures else {}
+        byte_match = (len(save_requests) == 1 and len(save_message_captures) == 1
+                      and bool(message.get("sha256"))
+                      and message.get("size") == browser_request.get("size") == readback_size
+                      and message.get("sha256") == browser_request.get("sha256") == readback_hash)
+        detail = (f"message={message.get('sha256', message.get('error', 'missing'))}; "
+                  f"browser request={browser_request.get('sha256', 'missing')}; Seafile={readback_hash}")
+        check("7. editor payload, browser save request and Seafile readback are byte-identical",
+              byte_match, detail)
 
     if console:
         print("\n--- browser console ---")

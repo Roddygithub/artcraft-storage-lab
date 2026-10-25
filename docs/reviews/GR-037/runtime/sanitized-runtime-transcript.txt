@@ -1,0 +1,30 @@
+GR-037 PhotoCraft synthetic Seafile save — sanitized runtime transcript
+Environment: T3 Chromium, synthetic Seahub/Seafile loopback only.
+Raw session IDs, tokens, URLs with capabilities, and document bytes omitted.
+
+Browser DevTools console (parent-side message observer; one event):
+  GR037_SAVE_MESSAGE 8555 ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca
+
+Browser network (one POST to redacted /session/[capability]/save):
+  HTTP 200
+
+Gateway stdout (one server-side request-body digest):
+  GR037_SAVE_GATEWAY 8555 ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca
+
+Read-only Seafile API after the save:
+  history count: 2 -> 3
+  latest commit: 5dbddbbe8bc4cac69a8b585af551be2fc5f9fdea
+  previous file id: 555181a4a3fa85916107c4fc3af75eb13ab67373
+  latest history/detail file id: 2701433bec52d526ed8b48b0de317c700edff07a
+  downloaded content: 8555 bytes; SHA-256 ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca
+
+Fresh Seahub route after save:
+  a new editor session was created; SHA-256 of its capability differs from the
+  saved session capability (hashes only are in seafile-readback.json).
+  fresh session document GET: HTTP 200
+  editor status: photocraft-gr035.pcraft (no changes)
+  screenshot: photocraft-seafile-reopen.png
+
+The temporary observer/gateway instrumentation emitted only byte counts and
+SHA-256 digests. Their source changes were restored after the runtime. The raw
+gateway log and temporary dispatch were deleted during cleanup.

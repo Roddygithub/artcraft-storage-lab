@@ -407,3 +407,18 @@ Seafile E2E or a project GPT PASS. Evidence: `docs/reviews/GR-035/` and
 This is synthetic Seafile runtime evidence, not a production deployment or
 project-level GPT PASS. The temporary `.pcraft` route was outside the committed
 dispatcher. See `docs/GR-036-PHOTOCRAFT-SEAFILE-E2E.md` and `docs/reviews/GR-036/`.
+
+## 28. PhotoCraft save-byte provenance follow-up (GR-037)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 28.1 | Editor-to-host save payload hash | Hash the transferred PhotoCraft bytes before host persistence | [x] Browser message: 8,555 bytes, SHA-256 `ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca` |
+| 28.2 | Gateway request-body hash | Hash bytes received by the gateway | [x] Browser request-body capture plus one gateway server-side digest; same byte count and SHA-256 as editor message |
+| 28.3 | Seafile storage readback | Download bytes from Seafile and compare exact size/hash | [x] 8,555 bytes; exact hash match across all three boundaries; latest history file ID matches current detail |
+| 28.4 | Version and fresh reopen | New Seafile version and a new editor session load the saved content | [x] History grew 2→3; fresh Seahub route fetched the document (HTTP 200) and PhotoCraft reported clean |
+| 28.5 | Production/deployment and optimized bundle | Validate production topology, hardening and optimized artifact | [ ] NOT VERIFIED; synthetic loopback only, `wasm-opt=0`; PhotoCraft remains excluded from committed dispatch |
+| 28.6 | Local Rust build storage | Confirm Cargo targets and child temporary files stay off `/tmp` | [x] `scripts/check-build-storage.sh` confirms both paths under `/home/roddy/.cache` |
+
+Bounded synthetic evidence only; independent review was PROVISIONAL ACCEPT
+without blocker/major; final wording MINOR corrected afterward. See
+`docs/reviews/GR-037/`.
