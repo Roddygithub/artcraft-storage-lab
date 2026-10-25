@@ -98,9 +98,10 @@ OPEN GAPS:
   full workspace test suite did not complete; `xtask ci` stops at existing
   Clippy findings outside the changed files. See `docs/reviews/GR-020/README.md`.
 - GR-021 prototypes a one-document DesignCraft Web host-save adapter over the
-  shared transport at `91836a9`. Five focused Rust 1.95 tests, the locked WASM
-  check, formatting and diff checks pass. Luna high R3 found no code-level
-  blocker or major on the exact patch. A P3 resource limit remains: the 64 MiB
+  shared transport at `56c5e16`. Five focused Rust 1.95 tests, the locked WASM
+  check, formatting and diff checks pass. Luna high R3 and the independent
+  transport re-pin review found no code-level blocker or major on the exact
+  patch. A P3 resource limit remains: the 64 MiB
   outbound guard runs after serialization allocation, so it does not bound
   peak memory for larger documents. Browser messaging and Seafile
   version/reopen remain NOT VERIFIED; see `docs/reviews/GR-021/`.

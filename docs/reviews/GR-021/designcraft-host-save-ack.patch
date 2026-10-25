@@ -1,5 +1,5 @@
 diff --git c/Cargo.lock w/Cargo.lock
-index e75e8d5a..108aecd5 100644
+index e75e8d5a..bc5691b1 100644
 --- c/Cargo.lock
 +++ w/Cargo.lock
 @@ -851,6 +851,16 @@ dependencies = [
@@ -9,7 +9,7 @@ index e75e8d5a..108aecd5 100644
 +[[package]]
 +name = "craft-platform"
 +version = "0.1.0"
-+source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=91836a9ebad5ffcd8f1966fb4f36dc84387f2cdd#91836a9ebad5ffcd8f1966fb4f36dc84387f2cdd"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=56c5e16d79b77751106173c13111ef4fe0a2c0ec#56c5e16d79b77751106173c13111ef4fe0a2c0ec"
 +dependencies = [
 + "js-sys",
 + "wasm-bindgen",
@@ -28,14 +28,14 @@ index e75e8d5a..108aecd5 100644
   "designcraft-format",
   "designcraft-ui-egui",
 diff --git c/apps/designcraft-web/Cargo.toml w/apps/designcraft-web/Cargo.toml
-index 1667e69e..854a2254 100644
+index 1667e69e..70736a8f 100644
 --- c/apps/designcraft-web/Cargo.toml
 +++ w/apps/designcraft-web/Cargo.toml
 @@ -31,3 +31,4 @@ wasm-bindgen = "0.2"
  wasm-bindgen-futures = "0.4"
  js-sys = "0.3"
  web-sys = { version = "0.3", features = ["Event", "EventTarget", "Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "HtmlAnchorElement", "Blob", "BlobPropertyBag", "Url", "Location", "CssStyleDeclaration"] }
-+craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "91836a9ebad5ffcd8f1966fb4f36dc84387f2cdd", features = ["browser"] }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "56c5e16d79b77751106173c13111ef4fe0a2c0ec", features = ["browser"] }
 diff --git c/apps/designcraft-web/src/web.rs w/apps/designcraft-web/src/web.rs
 index 27d236a2..8ec6ffb5 100644
 --- c/apps/designcraft-web/src/web.rs

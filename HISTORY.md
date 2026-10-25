@@ -26,6 +26,9 @@
   serialization allocates its buffer.
 * No browser messaging or Seafile version/reopen test has run, and the patch is
   not in the dispatcher. See `docs/reviews/GR-021/`.
+* Re-pinned the stored exact patch to transport commit `56c5e16`; five focused
+  tests and the locked WASM check passed again. Independent review confirmed
+  only manifest/lock revisions changed from the previously reviewed app code.
 
 ## 2026-10-24 — GR-021 cumulative Open admission
 
