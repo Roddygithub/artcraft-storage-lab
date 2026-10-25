@@ -592,6 +592,31 @@ Publication: LOCKED; no upstream changes
 Evidence:    `docs/GR-029-SOUNDCRAFT-EGUI-WASM.md`, `docs/reviews/GR-029/`
 ```
 
+### GR-030 — SoundCraft browser host-save smoke
+
+```text
+Status:      browser protocol smoke reproduced; bounded evidence, GPT REVIEW PENDING
+Base:        SoundCraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588` with local GR-025/027/028/029 overlays
+Transport:   craft-platform `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
+Evidence:    Chromium Open → UI edit → ticketed save/ACK → clean → fresh iframe reopen; 66,203,163-byte payload SHA-256 recorded
+Open:        in-memory parent only; Seafile version/reopen NOT VERIFIED; payload exceeds gateway's default 50 MiB cap; wasm-opt=0 build is not optimized
+Dispatch:    SoundCraft remains excluded
+Evidence:    `docs/GR-030-SOUNDCRAFT-BROWSER-SMOKE.md`, `docs/reviews/GR-030/`
+```
+
+### GR-031 — SoundCraft Seafile save/version/reopen evidence
+
+```text
+Status:      reproduced on isolated synthetic Seafile; Luna High R1/R2 bounded PROVISIONAL PASS; project GPT review pending
+Base:        SoundCraft `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588` with local GR-025/027/028/029 overlays
+Transport:   craft-platform `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
+Evidence:    Seahub file-list click → add Audio 2 → host save ACK → new Seafile file ID/head → 6,877-byte user-bound readback → fresh Seahub reopen showing all three tracks
+Readback:    SHA-256 `895bce8fa565730ded872bbf1dd1746ddddc0345e72d9485279e3d987a5a3aff`; exact outgoing message bytes were not separately hashed
+Limits:      `wasm-opt=0`; loopback synthetic stack; ONLYOFFICE regression, deployment security and optimized bundle NOT VERIFIED
+Dispatch:    SoundCraft remains excluded until review and remaining readiness gaps are addressed
+Evidence:    `docs/GR-031-SOUNDCRAFT-SEAFILE-E2E.md`, `docs/reviews/GR-031/`
+```
+
 ### GR-026 — PhotoCraft host integration assessment
 
 ```text

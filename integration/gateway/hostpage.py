@@ -66,6 +66,11 @@ function toCraft(type, extra) {
   frame.contentWindow.postMessage(msg, ORIGIN);
 }
 
+function fileExtension(name) {
+  const dot = typeof name === "string" ? name.lastIndexOf(".") : -1;
+  return dot < 0 ? "" : name.slice(dot + 1).toLowerCase();
+}
+
 // ---------------------------------------------------------------------------
 // VectorCraft's transport.
 //
@@ -247,6 +252,25 @@ window.addEventListener("message", async (event) => {
       const bytes = data.bytes instanceof ArrayBuffer ? new Uint8Array(data.bytes) : data.bytes;
       // The ticket the app gave this save, if it uses one (WordCraft's async_saves).
       const ticket = data.ticket;
+      // This session is bound to exactly one Seafile document. Editors may
+      // serialize their internal project title, which is not the storage name;
+      // pin the write to the selected file and refuse Save As / exports.
+      const requestedName = typeof data.name === "string" ? data.name : FILE_NAME;
+      if (data.saveAs === true || fileExtension(requestedName) !== fileExtension(FILE_NAME)) {
+        window.__lastDirty = true;
+        window.__editorConfirmedSave = false;
+        window.__saveConfirmationPending = false;
+        fetch("/session/" + SID + "/dirty", {
+          method: "POST", credentials: "same-origin",
+          headers: { "Content-Type": "text/plain" }, body: "true",
+        }).catch(() => {});
+        if (ticket !== undefined && ticket !== null) {
+          toCraft("saveResult", { ticket: ticket, ok: false,
+            error: "Save As and exports are not supported in this session" });
+        }
+        say("Save rejected: this session can only overwrite the selected file", "err");
+        break;
+      }
       // The host's state is document-wide, while editor save tickets are
       // independent. Refuse overlapping writes so an older acknowledgement
       // cannot mark newer bytes clean or race Seafile's compare-and-swap.
@@ -277,7 +301,7 @@ window.addEventListener("message", async (event) => {
         const resp = await fetch("/session/" + SID + "/save", {
           method: "POST",
           credentials: "same-origin",
-          headers: { "Content-Type": "application/octet-stream", "X-ArtCraft-Filename": data.name || FILE_NAME },
+          headers: { "Content-Type": "application/octet-stream", "X-ArtCraft-Filename": FILE_NAME },
           body: bytes,
         });
         const result = await resp.json();

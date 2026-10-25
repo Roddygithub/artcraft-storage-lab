@@ -302,6 +302,17 @@ def main():
         sample_xlsx = f.read()
     check("ordinary XLSX MIME is accepted by the gateway",
           payload_matches_name("synthetic.xlsx", sample_xlsx))
+    soundcraft_bundle = io.BytesIO()
+    with zipfile.ZipFile(soundcraft_bundle, "w", zipfile.ZIP_STORED) as archive:
+        archive.writestr("Synthetic Session.scraft", "{}")
+        archive.writestr("Audio Files/clip.wav", b"synthetic audio")
+    check("SoundCraft bundle with one root session is accepted",
+          payload_matches_name("synthetic.scraftz", soundcraft_bundle.getvalue()))
+    invalid_soundcraft = io.BytesIO()
+    with zipfile.ZipFile(invalid_soundcraft, "w", zipfile.ZIP_STORED) as archive:
+        archive.writestr("Audio Files/clip.wav", b"no session document")
+    check("SoundCraft bundle without a root session is rejected",
+          not payload_matches_name("synthetic.scraftz", invalid_soundcraft.getvalue()))
 
     # ---- Seafile capability URLs do not escape through browser errors -----
     upstream = ThreadingHTTPServer(("127.0.0.1", 0), UpstreamErrorHandler)

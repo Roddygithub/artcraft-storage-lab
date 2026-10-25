@@ -50,6 +50,16 @@ def payload_matches_name(name, data):
     if ext == "svg":
         text = data[:4096].decode("utf-8", "ignore").lower()
         return "<svg" in text
+    if ext == "scraftz":
+        try:
+            with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                sessions = [item for item in archive.infolist()
+                            if item.filename.endswith(".scraft")
+                            and "/" not in item.filename
+                            and "\\" not in item.filename]
+            return len(sessions) == 1 and sessions[0].file_size > 0
+        except (OSError, RuntimeError, zipfile.BadZipFile):
+            return False
     if ext in {"docx", "xlsx", "pptx"}:
         try:
             with zipfile.ZipFile(io.BytesIO(data)) as archive:

@@ -376,7 +376,7 @@ saved. **The integration layer must never pretend a save succeeded.**
 | filmcraft | no | no `Services` found in `ui-egui/src/lib.rs` | locate the seam first |
 | lightcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
 | effectcraft | upstream private API; local GR-022 prototype under review | local pathless `.ecproj` ticketed snapshot ACK | browser/Seafile runtime remains unverified |
-| soundcraft | no | `Services` present, no `open_async`/`inbox`/`download` | locate the seam first |
+| soundcraft | no upstream | Upstream `Services` lacks file hooks; local GR-025 adds a ticketed host adapter. GR-030 proves an in-memory browser round trip; GR-031 proves a bounded synthetic Seafile version/readback/fresh-reopen flow. | Keep out of dispatch pending independent review and production-readiness evidence; outbound-byte provenance remains NOT VERIFIED. |
 
 ### 4.1 The upstream patch shape (GR-014 candidate)
 

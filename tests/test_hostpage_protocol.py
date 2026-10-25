@@ -25,6 +25,7 @@ class State:
     vector_save_started = threading.Event()
     vector_retry_started = threading.Event()
     save_count = 0
+    last_save_name = None
     vector_save_count = 0
     vector_saved_bytes = None
     document_bytes = b"original bytes"
@@ -42,10 +43,10 @@ window.addEventListener('message', (event) => {
     parent.postMessage({type: 'wordcraft:dirty', dirty: !msg.ok}, location.origin);
   }
 });
-window.requestSave = (ticket, text) => {
+window.requestSave = (ticket, text, name = 'synthetic.docx', saveAs = false) => {
   parent.postMessage({type: 'wordcraft:dirty', dirty: true}, location.origin);
-  parent.postMessage({type: 'wordcraft:save', name: 'synthetic.docx',
-    bytes: new TextEncoder().encode(text).buffer, ticket}, location.origin);
+  parent.postMessage({type: 'wordcraft:save', name,
+    bytes: new TextEncoder().encode(text).buffer, ticket, saveAs}, location.origin);
 };
 window.requestOpen = () => parent.postMessage(
   {type: 'wordcraft:openRequest', purpose: 'open'}, location.origin);
@@ -117,6 +118,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, b'{"ok":true,"version":"vector-version"}')
 
         State.save_count += 1
+        State.last_save_name = self.headers.get("X-ArtCraft-Filename")
         if State.save_count == 1:
             State.first_save_started.set()
             if not State.release_first_save.wait(5):
@@ -133,6 +135,7 @@ def main():
     State.vector_save_started.clear()
     State.vector_retry_started.clear()
     State.save_count = 0
+    State.last_save_name = None
     State.vector_save_count = 0
     State.vector_saved_bytes = None
     State.document_bytes = b"original bytes"
@@ -174,10 +177,19 @@ def main():
             assert "Saved" not in page.locator("#state").inner_text()
 
             # Once A has completed, retrying B is allowed and can be confirmed.
-            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-c', 'later edit')")
+            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-c', 'later edit', 'Renamed title.docx')")
             page.wait_for_function("() => document.getElementById('frame').contentWindow.saveResults?.some(x => x.ticket === 'ticket-c' && x.ok)")
             page.wait_for_function("() => window.__editorConfirmedSave === true")
             assert page.evaluate("() => window.__lastDirty === false")
+            assert State.last_save_name == "synthetic.docx", "host save must remain bound to the originally selected file"
+
+            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-save-as', 'copy', 'copy.docx', true)")
+            page.wait_for_function("() => document.getElementById('frame').contentWindow.saveResults?.some(x => x.ticket === 'ticket-save-as' && !x.ok)")
+            assert State.save_count == 2, "Save As must not reach storage"
+
+            page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-export', 'pdf', 'export.pdf', false)")
+            page.wait_for_function("() => document.getElementById('frame').contentWindow.saveResults?.some(x => x.ticket === 'ticket-export' && !x.ok)")
+            assert State.save_count == 2, "cross-format export must not reach storage"
 
             page.evaluate("() => document.getElementById('frame').contentWindow.requestSave('ticket-d', 'failed edit')")
             page.wait_for_function("() => window.__lastSave?.ok === false")
@@ -218,6 +230,7 @@ def main():
     print("PASS: earlier acknowledgement cannot clear a later dirty revision")
     print("PASS: retry after prior save completes is durably confirmed")
     print("PASS: failed save cannot be cleared by the synthetic editor's dirty=false")
+    print("PASS: host saves stay bound to the selected filename; Save As and cross-format exports are rejected")
     print("PASS: file-open request explains the single-file Seafile session boundary")
     print("PASS: distinct equal-length VectorCraft bytes with a 32-bit FNV-1a collision are persisted")
     print("PASS: VectorCraft retries after a rejected write, then skips unchanged persisted bytes")

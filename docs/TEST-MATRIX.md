@@ -260,7 +260,7 @@ not yet a PhotoCraft browser host adapter or project-level PASS. See
 | 17.1 | Host snapshot ACK ledger | exact success ACK clears only captured state; failure/retry/timeout remain safe | [x] 2 focused host-save ledger tests pass; independent source review found no new blocker/major |
 | 17.2 | Local picker/drop cannot replace host-bound session | dirty content and history remain unchanged | [x] Focused host-bound UI library regression passes 1/1 with GR-029 overlay |
 | 17.3 | SoundCraft Web WASM build | pinned host adapter builds for browser target | [x] Rust 1.95 locked check passes with GR-027/028 and local GR-029 egui overlays |
-| 17.4 | Browser host messaging and Seafile version/reopen | durable saved edit reopens from a fresh session | [ ] NOT VERIFIED; adapter is not in dispatch |
+| 17.4 | Browser host messaging and Seafile version/reopen | durable saved edit reopens from a fresh session | [x] GR-031 confirms this bounded flow; adapter remains outside dispatch |
 
 Patch, review, base-build blockers and limits: `docs/reviews/GR-025/`.
 
@@ -280,7 +280,7 @@ Patch, review, base-build blockers and limits: `docs/reviews/GR-025/`.
 | 19.1 | Playback native and WASM checks | Locked CPAL 0.18.2 APIs compile | [x] Reran in this session; both pass |
 | 19.2 | Playback native unit tests | Playback/recording behavior remains covered | [x] Reran in this session; 36 pass |
 | 19.3 | Full SoundCraft Web WASM | App and host adapter compile | [x] Rust 1.95 locked check passes with local GR-029 craft-ui and SoundCraft compatibility patches; no upstream edits |
-| 19.4 | Browser host save / Seafile version / fresh reopen | Durable version and edit survive reopen | [ ] NOT VERIFIED |
+| 19.4 | Browser host save / Seafile version / fresh reopen | Durable version and edit survive reopen | [x] GR-031 reproduced with SoundCraft Web/WASM in isolated synthetic Seafile; exact outbound payload hash and deployment behavior remain unverified |
 
 Independent CPAL patch review: `docs/reviews/GR-028/REVIEW-INDEPENDENT-R1.md`.
 
@@ -291,7 +291,39 @@ Independent CPAL patch review: `docs/reviews/GR-028/REVIEW-INDEPENDENT-R1.md`.
 | 20.1 | craft-ui egui 0.37 port | Pinned shared UI crate builds against SoundCraft's egui 0.37 | [x] Local compatibility patch passes as part of the full app WASM check |
 | 20.2 | SoundCraft egui API port | Screenshot, wheel, widget-role and gutter-scroll APIs compile | [x] Rust 1.95 locked full Web WASM check passes after exact GR-025→027→028→029 patch sequence |
 | 20.3 | GR-025 host-save guard regression | Host Save routes through the adapter; replacement and Save As remain refused | [x] Focused UI library test passes 1/1 |
-| 20.4 | Browser/Seafile save and reopen | Actual Web/WASM editor creates a Seafile version and reopens it | [ ] NOT VERIFIED |
+| 20.4 | Browser/Seafile save and reopen | Actual Web/WASM editor creates a Seafile version and reopens it | [x] GR-031 actual Seahub file-list open, save ACK, new version and fresh reopen; bounded synthetic stack only |
 | 20.5 | Independent GR-029 review | Exact patches, lock order and scoped code review | [x] Sol low R3 bounded PROVISIONAL PASS; project GPT review remains pending |
 
 Patch hashes, application order, commands and limits: `docs/reviews/GR-029/`.
+
+
+## 21. SoundCraft browser host-save smoke (GR-030)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 21.1 | Open through host `postMessage` | SoundCraft Web opens the supplied synthetic `.scraftz` | [x] Chromium/T3 preview: same-origin parent sent the bundle; actual WASM editor opened it clean |
+| 21.2 | Real UI edit and save handoff | Added track is serialized and sent to the parent | [x] Added `Audio 1`; Ctrl+S delivered 66,203,163 bytes, SHA-256 recorded in GR-030 evidence |
+| 21.3 | Host ACK state transition | Matching positive ACK clears the captured current state | [x] In-memory parent replied with the same ticket; editor reported `dirty: false` |
+| 21.4 | Fresh editor reopen | A new editor instance opens the acknowledged bytes and retains the edit | [x] Fresh iframe displayed ten tracks including `Audio 1`; screenshot retained |
+| 21.5 | Seafile new version and storage-backed reopen | Save creates a Seafile version and a fresh Seahub open retains the edit | [ ] NOT VERIFIED; parent kept bytes in memory only |
+| 21.6 | Default gateway size compatibility | Current host-save payload is accepted by the gateway default ceiling | [ ] NOT VERIFIED / known mismatch: 66,203,163-byte payload exceeds the 50 MiB `ARTCRAFT_MAX_BYTES` default |
+
+Build used the release profile with `data-wasm-opt="0"`; it is functional
+browser evidence, not optimized production bundle evidence. See
+`docs/reviews/GR-030/` and `docs/GR-030-SOUNDCRAFT-BROWSER-SMOKE.md`.
+
+## 22. SoundCraft isolated Seafile save and reopen (GR-031)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 22.1 | Seahub file-list open | Selected `.scraftz` opens in SoundCraft Web/WASM | [x] Reproduced through the synthetic Seahub file-list route |
+| 22.2 | Editor Save creates Seafile version | Edit is stored as a new Seafile head and receives host confirmation | [x] Added `Audio 2`; new file ID/head; editor showed “Saved — new version” |
+| 22.3 | User-bound readback | Seafile returns the saved project bytes | [x] 6,877 bytes, SHA-256 `895bce8fa565730ded872bbf1dd1746ddddc0345e72d9485279e3d987a5a3aff`; exact outbound message bytes were not independently hashed |
+| 22.4 | Fresh storage-backed reopen | New Seahub click renders the saved edit in a fresh editor session | [x] Three tracks visible and editor clean after reopen |
+| 22.5 | Gateway `.scraftz` archive-shape check | ZIP directory has one nonempty root `.scraft` entry; missing entry is rejected | [x] Gateway unit suite passes; this does not validate entry CRC or session semantics |
+| 22.6 | Independent bounded review | Evidence and implementation reviewed without blocker/major finding | [x] Luna High PROVISIONAL PASS with three minor qualifications; Playwright refusal cases and independent Seafile-byte verification remain open |
+
+The functional release bundle used `wasm-opt=0`; production optimization,
+security hardening, ONLYOFFICE regression and deployment behavior remain
+NOT VERIFIED. SoundCraft remains excluded from the committed dispatch. See
+`docs/GR-031-SOUNDCRAFT-SEAFILE-E2E.md` and `docs/reviews/GR-031/`.

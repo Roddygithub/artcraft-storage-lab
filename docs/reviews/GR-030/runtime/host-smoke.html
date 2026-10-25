@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>SoundCraft host protocol smoke</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;width:100%;height:100%;font:14px system-ui}#editor{width:100%;height:calc(100% - 92px);border:0}#bar{height:92px;display:flex;gap:12px;align-items:center;padding:8px 14px;box-sizing:border-box;flex-wrap:wrap}#status{flex:1;min-width:280px}.ok{color:#16803a}.error{color:#b42318}button{padding:8px}</style></head>
+<body><div id="bar"><b>SoundCraft host smoke</b><span id="status">Waiting for editor…</span><button id="reopen" disabled>Open saved bytes in a fresh editor</button><span id="meta"></span></div><iframe id="editor" src="index.html?host=parent"></iframe>
+<script>
+const statusEl=document.getElementById('status'), frameEl=document.getElementById('editor'), reopen=document.getElementById('reopen'), meta=document.getElementById('meta');
+let saved=null, opened=false;
+function say(text,cls=''){statusEl.textContent=text;statusEl.className=cls;}
+function sendOpen(bytes,name='host-smoke.scraftz'){const copy=bytes.slice(0);frameEl.contentWindow.postMessage({type:'soundcraft:open',name,bytes:copy.buffer},location.origin,[copy.buffer]);opened=true;say('Sent '+name+' ('+bytes.length+' bytes)');}
+window.addEventListener('message',async e=>{
+ if(e.origin!==location.origin||e.source!==frameEl.contentWindow)return;
+ const d=e.data;if(!d||typeof d.type!=='string')return;
+ if(d.type==='soundcraft:ready'){
+  say('Editor ready; loading synthetic project…');
+  if(saved)sendOpen(saved,'host-smoke.scraftz');
+  else {const r=await fetch('host-fixture.scraftz');if(!r.ok){say('Fixture load failed: '+r.status,'error');return;}sendOpen(new Uint8Array(await r.arrayBuffer()));}
+ } else if(d.type==='soundcraft:dirty')say('Editor dirty: '+d.dirty);
+ else if(d.type==='soundcraft:save'){
+  const b=d.bytes instanceof ArrayBuffer?new Uint8Array(d.bytes):new Uint8Array(d.bytes.buffer,d.bytes.byteOffset,d.bytes.byteLength);
+  saved=b.slice();const digest=await crypto.subtle.digest('SHA-256',saved);const hash=[...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  meta.textContent=`${d.name} · ${saved.length} bytes · SHA-256 ${hash.slice(0,16)}…`;
+  frameEl.contentWindow.postMessage({type:'soundcraft:saveResult',ticket:d.ticket,ok:true},location.origin);
+  say('Host accepted save; waiting for editor ACK/clean state');reopen.disabled=false;
+ } else if(d.type==='soundcraft:failed')say('Editor failed: '+d.error,'error');
+});
+reopen.addEventListener('click',()=>{frameEl.src='index.html?host=parent&reopen='+Date.now();say('Starting fresh editor instance…');});
+</script></body></html>

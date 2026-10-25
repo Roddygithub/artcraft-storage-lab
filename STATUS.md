@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; shared transport and app adapters conti
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has a provisional exact-review PASS; GR-028 CPAL patch checks/tests pass locally, independent semantic review remains incomplete; GR-029 local egui 0.37 compatibility patches and locked WASM check passed independent bounded review R3; browser/Seafile behavior remains unverified; PhotoCraft GR-026 core patch has a provisional independent PASS and engine 4/4, UI 1/1 tests plus locked Web WASM check pass; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has a provisional exact-review PASS; GR-028 CPAL patch checks/tests pass locally, independent semantic review remains incomplete; GR-029 local egui 0.37 overlays passed bounded review; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack and received Luna High bounded PROVISIONAL PASS with minor gaps; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-020/021/022/023/024 — DeckCraft, DesignCraft, EffectCraft and FilmCraft patches use 56c5e16; EffectCraft GR-022 has an exact bounded review PASS; SoundCraft GR-025 has a bounded source review; GR-027 passed bounded exact review after five rounds; GR-028 playback patch has an incomplete independent semantic review; GR-029 full Web WASM build passes with a local egui 0.37 overlay and bounded R3 review PASS. This is compile evidence only; browser/Seafile save/version/reopen is NOT VERIFIED. PhotoCraft GR-026 pathless-open/snapshot-ACK core has an incarnation guard and provisional independent PASS; no browser host adapter yet
+CURRENT GR: GR-020/021/022/023/024 — DeckCraft, DesignCraft, EffectCraft and FilmCraft patches use 56c5e16; EffectCraft GR-022 has an exact bounded review PASS; GR-027 passed bounded exact review after five rounds; GR-028 playback patch has an incomplete independent semantic review; GR-029 full Web WASM build passes with local egui 0.37 overlays and bounded R3 review PASS; GR-030 proves browser protocol round trip with an in-memory parent; GR-031 reproduces SoundCraft Seahub click → edit → Seafile version/ACK → API readback → fresh Seahub reopen on synthetic services and has a Luna High bounded PROVISIONAL PASS with minor evidence gaps. PhotoCraft GR-026 pathless-open/snapshot-ACK core has an incarnation guard and provisional independent PASS; no browser host adapter yet
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -125,9 +125,25 @@ OPEN GAPS:
   but could not verify exact applicability or reproduce reported commands.
   GR-029 local egui 0.37 overlays now let the full Web WASM build pass; exact
   review R3 is bounded PROVISIONAL PASS and GPT REVIEW PENDING. The focused
-  host-bound UI regression passes. Host browser messaging and Seafile
-  version/reopen remain NOT VERIFIED; do not add SoundCraft to dispatch. See
+  host-bound UI regression passes. GR-030 now verifies browser messaging and
+  memory-backed fresh-iframe reopen; Seafile version/reopen remain NOT VERIFIED.
+  Do not add SoundCraft to dispatch. See
   `docs/reviews/GR-025/`, `GR-027/`, `GR-028/`, `GR-029/`.
+- GR-030 now exercises that adapter in Chromium: host Open, a real UI track edit,
+  Ctrl+S, matching success ACK, clean-state report, and fresh iframe reopen all
+  passed against a same-origin in-memory parent. It is not Seafile evidence. The
+  66,203,163-byte save is below SoundCraft’s 64 MiB cap but above the gateway’s
+  50 MiB default; configure and verify the limit or use a smaller fixture before
+  the isolated Seafile run. See `docs/reviews/GR-030/`.
+- GR-031 then used a 4,041-byte synthetic `.scraftz` fixture and the existing
+  50 MiB gateway ceiling in an isolated rootless Podman Seafile stack. A real
+  Seahub file-list click opened SoundCraft Web/WASM; adding `Audio 2` and Ctrl+S
+  created a new file ID/head, received host confirmation, and read back 6,877
+  bytes. A fresh Seahub click reopened all three tracks with a clean editor.
+  Exact editor-to-gateway bytes, optimized WASM, deployment security and
+  ONLYOFFICE regression remain NOT VERIFIED. Luna High returned a bounded
+  PROVISIONAL PASS with minor evidence gaps; SoundCraft stays out of dispatch.
+  Evidence: `docs/reviews/GR-031/`.
 - GR-026 now has a bounded core patch for pathless open and revision ACK, with
   per-open incarnation identity to reject ACKs after close/reopen with a reused
   document ID. Independent R2 review is provisional PASS; engine 4/4 pass, UI
@@ -150,8 +166,8 @@ OPEN GAPS:
 NEXT:
 - FigCraft and CADCraft are repinned to `56c5e16`; exact bounded repin reviews
   are recorded
-- verify the GR-029 SoundCraft/craft-ui overlay in a browser and through the
-  isolated Seafile save/version/reopen flow before adding SoundCraft to
+- address GR-031's remaining exact-payload provenance, optimized-bundle,
+  security and ONLYOFFICE regression gaps before considering SoundCraft for
   dispatch. Extend PhotoCraft
   GR-026 from its provisional pathless-open/snapshot-ACK core to guarded async
   UI save routing and browser transport. Neither app enters dispatch without

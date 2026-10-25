@@ -1,3 +1,29 @@
+## 2026-10-25 — GR-031 SoundCraft Seafile save and reopen
+
+* In an isolated rootless Podman Seafile stack, a Seahub file-list click opened
+  SoundCraft Web/WASM; adding `Audio 2` and pressing Ctrl+S created a new Seafile
+  file ID and head. The host confirmed the save, API readback returned 6,877
+  bytes, and a fresh Seahub click reopened all three tracks cleanly.
+* The final content readback SHA-256, before/after IDs, and screenshots are in
+  `docs/reviews/GR-031/`. This is synthetic loopback evidence; exact outbound
+  message-byte identity, optimized bundle, deployment security and ONLYOFFICE
+  regression remain unverified. Luna High returned a bounded PROVISIONAL PASS
+  with minor evidence qualifications; SoundCraft stays out of dispatch. No
+  upstream or production change was made.
+
+## 2026-10-25 — GR-030 SoundCraft browser host-save smoke
+
+* Ran the GR-025 host-save adapter in a real Chromium browser with the exact
+  GR-025/027/028/029 local overlay sequence. A synthetic host opened a
+  `.scraftz`, a UI-created audio track was saved, a matching ACK returned the
+  editor to clean, and a fresh iframe reopened the retained bytes with the new
+  track. The outbound bytes were hashed and the browser capture/harness were
+  recorded in `docs/reviews/GR-030/`.
+* The host stored bytes only in JavaScript memory. GR-031 later verifies a
+  separate storage-backed flow with a smaller fixture. The 66.2 MB output from
+  this specific smoke exceeds the gateway’s 50 MiB default request cap. This
+  remains bounded browser protocol evidence, not an MVP or GPT PASS.
+
 ## 2026-10-25 — GR-029 SoundCraft egui 0.37 compatibility
 
 * Added local compatibility patches for the pinned `craft-ui` and SoundCraft
