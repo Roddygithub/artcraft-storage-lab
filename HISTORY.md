@@ -1,3 +1,21 @@
+## 2026-10-25 — GR-036 PhotoCraft Seafile version and reopen
+
+* Reproduced a real PhotoCraft Web/WASM host open from a Seahub file route,
+  added a layer, saved through the gateway, and observed the editor report
+  “Saved to host” after the write returned. Seafile history grew from one to
+  two versions; readback was 4,984 bytes and contained `Layer 1`.
+* A fresh Seahub route opened a new editor session and displayed the saved
+  layer. The incremental PhotoCraft fix requests an egui repaint after queuing
+  asynchronous host messages; its patch and the reopen screenshot are recorded
+  in `docs/reviews/GR-036/`.
+* The runtime used the isolated synthetic stack and temporary `.pcraft`
+  dispatch, not the committed dispatcher. Build used `wasm-opt=0`; optimized
+  production output, deployment security and ONLYOFFICE regression remain
+  NOT VERIFIED. Independent review returned PROVISIONAL ACCEPT without
+  blocker/major; a GET-only readback artifact and verifier were added to close
+  its evidence-substantiation qualification. No upstream changes were made.
+* Full evidence and limitations: `docs/GR-036-PHOTOCRAFT-SEAFILE-E2E.md`.
+
 ## 2026-10-25 — GR-035 PhotoCraft optimized Web smoke
 
 * Built the GR-032 PhotoCraft host adapter with `trunk build --release`;

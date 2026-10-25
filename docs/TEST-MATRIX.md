@@ -392,3 +392,18 @@ source reference: `docs/GR-034-PHOTOCRAFT-GATEWAY-VALIDATION.md`.
 This smoke establishes optimized-bundle browser execution only. It is not
 Seafile E2E or a project GPT PASS. Evidence: `docs/reviews/GR-035/` and
 `docs/GR-035-PHOTOCRAFT-OPTIMIZED-BROWSER-SMOKE.md`.
+
+## 27. PhotoCraft synthetic Seafile version and reopen (GR-036)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 27.1 | Seahub file route opens PhotoCraft | Actual Web/WASM receives the host Open and renders the document | [x] Synthetic Seahub route fetched the document; explicit repaint after queueing allowed the idle editor to process the host event |
+| 27.2 | Edit and save through host | UI edit is sent to gateway; editor reports success after host save response | [x] Added `Layer 1`; Ctrl+S returned 200 and editor displayed “Saved to host” |
+| 27.3 | Seafile history and readback | Save creates a new version whose content includes the edit | [x] History grew 1→2; readback 4,984 bytes; ZIP manifest contains `Layer 1` |
+| 27.4 | Fresh storage-backed reopen | A new Seahub route/session loads the saved edit from Seafile | [x] Fresh route created a new session; document GET returned 200 and reopened editor displayed `Layer 1` |
+| 27.5 | Independent exact evidence review | No blocker/major remains for this bounded evidence claim | [x] R2 PROVISIONAL ACCEPT; evidence substantiated with read-only readback artifact; duplicate README entry fixed |
+| 27.6 | Optimized bundle and deployment/security | Optimized output and production topology are validated | [ ] NOT VERIFIED; `wasm-opt=0`, synthetic loopback only |
+
+This is synthetic Seafile runtime evidence, not a production deployment or
+project-level GPT PASS. The temporary `.pcraft` route was outside the committed
+dispatcher. See `docs/GR-036-PHOTOCRAFT-SEAFILE-E2E.md` and `docs/reviews/GR-036/`.

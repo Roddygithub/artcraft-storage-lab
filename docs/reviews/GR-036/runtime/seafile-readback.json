@@ -1,0 +1,26 @@
+{
+  "captured_utc": "2026-10-25T10:46:53Z",
+  "source": "read-only Seafile API query against the isolated synthetic stack",
+  "repo_id": "a1a2768f-a6ea-4e18-858f-b09e3f64a11d",
+  "path": "/photocraft-gr035.pcraft",
+  "history": [
+    {
+      "commit_id": "a19b117254ed9c0382b6a55a2cd53ccd3c33068a",
+      "file_id": "555181a4a3fa85916107c4fc3af75eb13ab67373",
+      "size": 4984
+    },
+    {
+      "commit_id": "08001b2acdd2998fe0b31ae04da0d36d1b21ef6b",
+      "file_id": "2be21dab7ba8a2b5843bb965ad25616d59ba1415",
+      "size": 4000
+    }
+  ],
+  "current_readback": {
+    "http_status": 200,
+    "size": 4984,
+    "sha256": "92e93c2b993b7de073a2c870aba522d7f9112647d9d1181d2b8592df665936b3",
+    "zip_root_manifest": true,
+    "manifest_contains_layer_1": true
+  },
+  "secrets_included": false
+}

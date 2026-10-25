@@ -684,6 +684,19 @@ Review:      PROVISIONAL ACCEPT; screenshot does not identify loaded WASM resour
 Evidence:    `docs/GR-035-PHOTOCRAFT-OPTIMIZED-BROWSER-SMOKE.md` and `docs/reviews/GR-035/`
 ```
 
+### GR-036 — PhotoCraft synthetic Seafile save/version/reopen
+
+```text
+Status:      bounded synthetic Seafile E2E; independent R2 PROVISIONAL ACCEPT, no blocker/major; GPT REVIEW PENDING
+Base:        PhotoCraft a02f2ee41059d3312e7ff24a5af5edcac7b6435a + GR-032 adapter + GR-036 repaint fix
+Build:       `trunk build --release`, wasm-opt=0; loaded WASM 35,820,040 bytes, SHA-256 d4f339df6312429fa15de653a37b3ef156cee84a3c58eee1358caee34523324c
+Flow:        Seahub open → PhotoCraft host Open → add Layer 1 → Ctrl+S → host confirmation → Seafile history 1→2 → fresh Seahub route/session reopens Layer 1
+Readback:    4,984 bytes, SHA-256 92e93c2b993b7de073a2c870aba522d7f9112647d9d1181d2b8592df665936b3
+Limits:      synthetic loopback only; temporary `.pcraft` route not committed; exact browser-message bytes not independently hashed; security, ONLYOFFICE and optimized production bundle NOT VERIFIED; see independent R1/R2 evidence review
+Dispatch:    committed `integration/config/dispatch.json` unchanged; PhotoCraft remains excluded
+Evidence:    `docs/GR-036-PHOTOCRAFT-SEAFILE-E2E.md`, `docs/reviews/GR-036/`
+```
+
 ## GPT review instruction (for the future session)
 
 ```text
