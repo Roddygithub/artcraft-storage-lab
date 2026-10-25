@@ -1,17 +1,24 @@
 # STATUS
 
-## CURRENT GR: GR-054 — exact candidate inventory
+## CURRENT GR: GR-055 — reproducible WordCraft candidate
 
-Current source snapshot: `1c7914bf1e166ac4731a1c9b11dce649210eed70`.
-Documentation/evidence inventory independently reviewed (R1–R2 bounded
-PROVISIONAL PASS, no remaining findings). Project GPT verdict remains
-**INCOMPLETE**; GR-054 is queued for project-level GPT review.
-GR-054 work-item status: **GPT REVIEW PENDING**.
-The clean source has no `integration/static/`; the parent checkout has 82
-ignored/untracked local files inventoried read-only. All four dispatched app
-bundles lack matched exact source/patch/transport provenance: **NOT VERIFIED**,
-not candidate-ready. PhotoCraft is not dispatched and has a missing WASM index
-target. No build, promotion, service or production access.
+Implementation worktree base: `0d16be1ea37ace6ddd282c514a05df6b4906cbc0`.
+Exact WordCraft source `00bc6a4b`, GR-054 shared-transport patch
+`1c0bba26…b753842afc`, immutable transport `90c261de`, and Rust 1.95 release
+build are recorded in [GR-055](docs/GR-055-WORDCRAFT-REPRODUCIBLE-CANDIDATE.md).
+The actual staged WordCraft WASM passes the synthetic in-memory browser
+edit/save-ack/reopen smoke; four staged bundle files have a runnable hash and
+membership verifier. Candidate remains outside `integration/static/` and
+dispatch. Exact-candidate Seafile history/readback/reopen is **NOT RUN**.
+Independent R1–R2 reviews: bounded **PROVISIONAL PASS**, no remaining findings.
+GR-055 work-item status: **GPT REVIEW PENDING**. Project verdict remains
+**INCOMPLETE**; upstream publication remains locked.
+
+GR-054 remains prior reviewed inventory: bounded independent R1–R2
+PROVISIONAL PASS; it documented the mismatch between current default assets and
+historical source/runtime evidence. GR-055 supplies one separate reproducible
+WordCraft candidate, but does not revalidate the four default bundles, other
+apps, Seafile, production, or ONLYOFFICE.
 
 GR-040 proves ONLYOFFICE preservation on the isolated synthetic patched stack
 (two browser edits/versions and fresh file-list reopen). Production/deployment,
@@ -19,7 +26,8 @@ other types/versions and security remain **NOT VERIFIED**. Earlier unqualified
 ONLYOFFICE blockers below are historical per-run limitations, superseded only
 within GR-040's bounded scope. Historical test results do not constitute a
 replay of this exact current source-plus-assets combination.
-See `docs/GR-054-CURRENT-CANDIDATE-MANIFEST.md`, `docs/reviews/GR-054/`.
+See `docs/GR-055-WORDCRAFT-REPRODUCIBLE-CANDIDATE.md`, `docs/reviews/GR-055/`,
+and `docs/GR-054-CURRENT-CANDIDATE-MANIFEST.md`.
 
 ## PREVIOUS GR: GR-053 — credential redirects
 
@@ -32,9 +40,9 @@ Seafile redirects NOT VERIFIED. Evidence:
 
 ```text
 PHASE:      project GPT INCOMPLETE; historical GPT first pass on 95d8983
-SOURCE BASE: local main at 1c7914bf; implementation worktree t3/gr054-candidate-manifest
+SOURCE BASE: local main at 0d16be1ea37ace6ddd282c514a05df6b4906cbc0; implementation worktree t3/gr055-wordcraft-candidate
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
-CURRENT SOURCE CANDIDATE: 1c7914bf1e166ac4731a1c9b11dce649210eed70; GR-054 inventory; not project-level GPT-reviewed or deployment-ready
+CURRENT SOURCE CANDIDATE: worktree base 0d16be1ea37ace6ddd282c514a05df6b4906cbc0; GR-055 WordCraft source 00bc6a4b + patch, candidate staged outside dispatch; not Seafile-validated or deployment-ready
 HISTORICAL WORK: GR-048 FigCraft browser smoke completed from isolated worktree based on main `32069b9`; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; GR-044 through GR-048 cover DeckCraft, DesignCraft, EffectCraft, FilmCraft and FigCraft host-save browser runtime; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
@@ -52,8 +60,7 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-054 — documentation/evidence inventory, bounded R1–R2 reviews
-PROVISIONAL PASS; awaiting commit/push and project GPT review.
+CURRENT GR: GR-055 — reproducible WordCraft candidate; browser memory-host smoke PASS, independent review and project GPT PENDING.
 
 PREVIOUS GR: GR-053 — credential redirect isolation.
 Loopback tests prove urllib redirects credential-bearing requests and signed

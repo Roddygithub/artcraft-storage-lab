@@ -1,0 +1,30 @@
+$ sha256sum docs/reviews/GR-016/patches/wordcraft-shared-transport.patch
+1c0bba26de821d1d54c161c5954bc8a5b0f5d7df71be7c4488c473b753842afc
+
+$ git -C /home/roddy/.cache/artcraft-storage-lab/gr055-source/wordcraft rev-parse HEAD
+00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d
+
+$ git -C /home/roddy/.cache/artcraft-storage-lab/gr055-source/wordcraft apply --check /home/roddy/.t3/worktrees/artcraft-storage-lab/t3-c60d0371/docs/reviews/GR-016/patches/wordcraft-shared-transport.patch
+PASS (exit 0; no output)
+
+Cargo.toml and Cargo.lock both pin craft-platform to
+90c261de22ef75c4c7c5c5cd1c712d483be0bbc8.
+
+Build command from apps/wordcraft-web:
+RUSTUP_TOOLCHAIN=1.95.0 trunk build --release --locked --dist /home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static/wordcraft
+PASS: Finished release profile and Trunk reported success.
+
+Build note: an initial Trunk launch inherited machine-default Rust 1.97 and
+was interrupted before completion. Its partial output was not used. The
+successful release build above was rerun with RUSTUP_TOOLCHAIN=1.95.0 and
+verified to invoke Cargo 1.95.0.
+
+$ python3 docs/reviews/GR-055/verify_candidate.py
+PASS: 4 staged WordCraft files match recorded paths, sizes and SHA-256
+PASS: all recorded index references are present in the candidate manifest
+
+$ python3 -m py_compile tests/test_wordcraft_host_roundtrip.py docs/reviews/GR-055/verify_candidate.py
+PASS (exit 0)
+
+$ git diff --check
+PASS (exit 0)

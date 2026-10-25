@@ -7,6 +7,23 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-055 — exact WordCraft candidate
+
+GR-055 builds the exact WordCraft source/patch/transport combination with Rust
+1.95 and stages it outside dispatch. The actual WASM passes the synthetic
+in-memory browser edit/save-ack/reopen test. This does not replay Seafile or
+establish durable Seafile versions. Independent R1–R2 reviews are bounded
+PROVISIONAL PASS, no remaining findings. GR-055 is GPT REVIEW PENDING; project
+GPT remains **INCOMPLETE**.
+
+| Check | Result | Scope |
+|---|---|---|
+| Pinned source, patch and transport | [x] Source `00bc6a4b`, GR-054 patch SHA matches, normal `git apply --check` passes, Cargo manifest/lock both pin `90c261de` | Exact inputs documented in [GR-055](GR-055-WORDCRAFT-REPRODUCIBLE-CANDIDATE.md) |
+| Rust 1.95 release Web/WASM build | [x] Trunk `--release --locked` succeeds with build-local `data-wasm-opt=0` overlay | Functional release bundle; optimized wasm-opt output not verified |
+| Candidate asset manifest | [x] Four staged served files match recorded paths, sizes and SHA-256 | [`verify_candidate.py`](reviews/GR-055/verify_candidate.py); candidate stays outside dispatch |
+| Actual WordCraft synthetic browser roundtrip | [x] Edit/serialize, synthetic version acknowledgement, save confirmation and fresh reopen pass | In-memory host only; no Seafile persistence |
+| Exact-candidate Seafile history/readback/reopen | [ ] NOT RUN | No Seafile service or real files used |
+
 ## GR-054 — current inventory boundary
 
 Current source snapshot: `1c7914bf1e166ac4731a1c9b11dce649210eed70`;

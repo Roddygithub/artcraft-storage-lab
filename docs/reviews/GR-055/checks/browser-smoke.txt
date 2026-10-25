@@ -1,0 +1,11 @@
+$ uv run --with playwright --python 3.14 -- python -u tests/test_wordcraft_host_roundtrip.py --static-root /home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static
+PASS: real WordCraft Web edit changed and serialized the DOCX
+PASS: synthetic storage acknowledged one new version
+PASS: host observed WordCraft's post-save dirty=false acknowledgement
+PASS: WordCraft reopened the saved document
+NOTE: synthetic in-memory storage; real Seafile E2E remains unverified
+
+Exit status: 0.
+During teardown, the loopback HTTP server logged ConnectionResetError after
+the browser closed a request. The browser test exited successfully after all
+assertions; this does not change the synthetic-memory scope.

@@ -1,0 +1,41 @@
+{
+  "work_item": "GR-055",
+  "static_root": "/home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static",
+  "bundle_root": "/home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static/wordcraft",
+  "files": [
+    {
+      "path": "index.html",
+      "absolute_path": "/home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static/wordcraft/index.html",
+      "size_bytes": 1604,
+      "sha256": "6ad835854299babc8b95c55c9ec3802987b492ed8b5a39cf5cef8c4ab8451044"
+    },
+    {
+      "path": "wordcraft-fa59e09a3f921e03.ico",
+      "absolute_path": "/home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static/wordcraft/wordcraft-fa59e09a3f921e03.ico",
+      "size_bytes": 18378,
+      "sha256": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225"
+    },
+    {
+      "path": "wordcraft-web-560bd897561fb430_bg.wasm",
+      "absolute_path": "/home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static/wordcraft/wordcraft-web-560bd897561fb430_bg.wasm",
+      "size_bytes": 57071893,
+      "sha256": "c82750dcc596041f12ebcaa3f2f211b56312da0a1046609055fa6bfcf92a696c"
+    },
+    {
+      "path": "wordcraft-web-8e316b1a2b15f271.js",
+      "absolute_path": "/home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static/wordcraft/wordcraft-web-8e316b1a2b15f271.js",
+      "size_bytes": 167331,
+      "sha256": "c481f86fa6f8108abb0fc45dbf41c652d7fab9fe1d1e29229b7ee34ee2ed4f6f"
+    }
+  ],
+  "index_references": [
+    "wordcraft-fa59e09a3f921e03.ico",
+    "wordcraft-web-560bd897561fb430_bg.wasm",
+    "wordcraft-web-8e316b1a2b15f271.js"
+  ],
+  "excluded_transient": {
+    "path": "/home/roddy/.cache/artcraft-storage-lab/gr055-wordcraft-static/wordcraft/.trunk-lock",
+    "size_bytes": 0,
+    "reason": "Trunk build lock; not a served bundle asset"
+  }
+}

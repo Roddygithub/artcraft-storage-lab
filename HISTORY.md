@@ -1,3 +1,18 @@
+## 2026-10-25 — GR-055 reproducible WordCraft candidate
+
+- Built actual WordCraft Web/WASM from exact source `00bc6a4b`, the GR-054
+  patch SHA, and locked `craft-platform` `90c261de` using Rust 1.95. The
+  build-local `data-wasm-opt=0` overlay is recorded; candidate stays in cache
+  outside dispatch.
+- The synthetic in-memory browser edit/save-ack/fresh-reopen smoke passed.
+  Four served files have exact path/size/SHA inventory and a runnable verifier.
+  Seafile persistence/readback/reopen was not run; production and ONLYOFFICE
+  were untouched. Independent R1–R2 reviews are bounded PROVISIONAL PASS, no
+  remaining findings. GR-055 is GPT REVIEW PENDING; project remains INCOMPLETE
+  and upstream publication locked.
+- Evidence: `docs/GR-055-WORDCRAFT-REPRODUCIBLE-CANDIDATE.md`,
+  `docs/reviews/GR-055/`.
+
 ## 2026-10-25 — GR-054 current source and local asset inventory
 
 - Pinned clean source base `1c7914bf1e166ac4731a1c9b11dce649210eed70`;

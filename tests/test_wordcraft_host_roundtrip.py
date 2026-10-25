@@ -11,6 +11,7 @@ wordcraft and install Playwright with Chromium. Run:
     python3 tests/test_wordcraft_host_roundtrip.py
 """
 
+import argparse
 import hashlib
 import io
 import sys
@@ -77,7 +78,16 @@ def docx_text(data):
 
 
 def main():
-    web_root = ROOT / "integration/static/wordcraft"
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--static-root",
+        type=Path,
+        default=ROOT / "integration/static",
+        help="static root containing a wordcraft/ bundle (default: integration/static)",
+    )
+    args = parser.parse_args()
+    static_root = args.static_root.resolve()
+    web_root = static_root / "wordcraft"
     fixture = ROOT / "tests/fixtures/synthetic.docx"
     if not (web_root / "index.html").is_file() or not list(web_root.glob("*_bg.wasm")):
         raise SystemExit("WordCraft Web bundle missing; stage and verify a pinned build, then promote it per docs/ASSET-INGESTION.md")
@@ -90,7 +100,7 @@ def main():
         raise SystemExit("Playwright is required; install Playwright and Chromium") from exc
 
     backend = SyntheticSeafile(fixture.read_bytes())
-    gateway = Gateway(backend, load_dispatch(), static_root=str(ROOT / "integration/static"))
+    gateway = Gateway(backend, load_dispatch(), static_root=str(static_root))
     first, error = gateway.open_session(TOKEN)
     assert first is not None, error
 

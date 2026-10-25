@@ -1,5 +1,16 @@
 # GPT Review Queue
 
+## GR-055 — reproducible WordCraft candidate
+
+Implementation produced an exact source/patch/transport Rust 1.95 release
+WordCraft Web/WASM bundle in cache outside dispatch. The actual candidate passed
+the synthetic in-memory browser edit/save-ack/fresh-reopen flow; exact asset
+hashes and a runnable verifier are in [GR-055 evidence](reviews/GR-055/README.md).
+Seafile persistence/readback/reopen was **NOT RUN**. Independent R1–R2 bounded
+reviews are PROVISIONAL PASS, no remaining findings. GR-055 is GPT REVIEW
+PENDING; project remains **INCOMPLETE** and upstream publication remains locked. See
+[candidate report](GR-055-WORDCRAFT-REPRODUCIBLE-CANDIDATE.md).
+
 ## GR-054 — Current candidate manifest (bounded independent review passed)
 
 Exact current **source** snapshot: `1c7914bf1e166ac4731a1c9b11dce649210eed70`.
