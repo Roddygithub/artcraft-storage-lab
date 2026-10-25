@@ -1,3 +1,18 @@
+## 2026-10-25 — GR-059 real synthetic Seafile WordCraft deployment
+
+- Restored the Seafile 12.0.14 conditional-save route using the reviewed GR-015
+  Seahub and Seafile patches, with a verified private rollback archive.
+  ArtCraft dispatch is limited to one synthetic library and DOCX.
+- The exact GR-055 WordCraft candidate completed real file-list open, visible
+  edit, save confirmation, new Seafile history version, and fresh file-list
+  reopen with the edit intact. No direct/manual upload was used.
+- After deployment, ONLYOFFICE opened a synthetic DOCX outside the allowlist;
+  no edit/save was performed there. Its post-deploy save regression remains
+  unverified. No dispatch table change; project GPT remains INCOMPLETE and
+  upstream publication locked. Independent review pending.
+- Evidence: `docs/GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md`,
+  `docs/reviews/GR-059/`.
+
 ## 2026-10-25 — GR-055 reproducible WordCraft candidate
 
 - Built actual WordCraft Web/WASM from exact source `00bc6a4b`, the GR-054

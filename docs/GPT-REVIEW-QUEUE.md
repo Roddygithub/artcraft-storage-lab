@@ -1,12 +1,26 @@
 # GPT Review Queue
 
+## GR-059 — real synthetic Seafile WordCraft deployment
+
+**Review pending.** The exact GR-055 candidate now completed the real
+synthetic Seafile open → visible edit → save acknowledgement → new history
+version → fresh list reopen flow. Browser evidence includes a reopened screen
+with the added text, the host save response, and Seafile history growth. A
+post-deployment open-only ONLYOFFICE check loaded its assets from an
+out-of-allowlist synthetic folder; ONLYOFFICE save/version behavior after this
+deployment was not tested. Rollback archive SHA and deployment scope are
+recorded. The project remains **INCOMPLETE**; this does not unlock upstream
+publication. See [GR-059 report](GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md)
+and [evidence](reviews/GR-059/).
+
 ## GR-055 — reproducible WordCraft candidate
 
 Implementation produced an exact source/patch/transport Rust 1.95 release
 WordCraft Web/WASM bundle in cache outside dispatch. The actual candidate passed
 the synthetic in-memory browser edit/save-ack/fresh-reopen flow; exact asset
 hashes and a runnable verifier are in [GR-055 evidence](reviews/GR-055/README.md).
-Seafile persistence/readback/reopen was **NOT RUN**. Independent R1–R2 bounded
+At the time of GR-055, Seafile persistence/readback/reopen was **NOT RUN**;
+GR-059 later records the live synthetic result. Independent R1–R2 bounded
 reviews are PROVISIONAL PASS, no remaining findings. GR-055 is GPT REVIEW
 PENDING; project remains **INCOMPLETE** and upstream publication remains locked. See
 [candidate report](GR-055-WORDCRAFT-REPRODUCIBLE-CANDIDATE.md).

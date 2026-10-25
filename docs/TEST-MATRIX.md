@@ -7,7 +7,29 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-059 — deployed WordCraft route on real synthetic Seafile
+
+The exact GR-055 staged candidate ran through the owner-managed Seafile
+instance, restricted to one synthetic library and DOCX. Seafile created a
+new version and a fresh file-list reopen displayed the edit. ONLYOFFICE opened
+a synthetic document outside the allowlist after deployment, without edits.
+This is bounded runtime evidence, not production readiness or a project GPT
+PASS. See [GR-059](GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md).
+
+| Check | Result | Scope |
+|---|---|---|
+| Exact staged WordCraft bundle | [x] GR-055 four-file candidate verifier passed against the deployed staging root | Candidate remains outside tracked static assets and dispatch |
+| Seafile file-list open → edit → save → new version → fresh reopen | [x] Save confirmed; history advanced; reopened text intact | One explicitly synthetic DOCX and library; detailed boundary and limits in GR-059 |
+| ONLYOFFICE post-deploy open | [x] Synthetic non-allowlisted DOCX opened; representative ONLYOFFICE 9.4 assets returned 200 | Open-only check; edit/save/version regression after this deployment is **NOT VERIFIED** |
+| Security/deployment failure cases | [ ] Permission revocation, external writer, token expiry/replay, response loss and cross-origin deployment not exercised here | Keep as project gates |
+
 ## GR-055 — exact WordCraft candidate
+
+GR-059 deployed that exact staged candidate for one explicitly synthetic
+DOCX. The live Seafile run passed edit → save acknowledgement → history
+version → fresh file-list reopen with the edit visible. ONLYOFFICE was opened
+after deployment from a synthetic, non-allowlisted folder; its post-deploy
+save/version regression remains unverified. See [GR-059](GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md).
 
 GR-055 builds the exact WordCraft source/patch/transport combination with Rust
 1.95 and stages it outside dispatch. The actual WASM passes the synthetic
@@ -22,7 +44,7 @@ GPT remains **INCOMPLETE**.
 | Rust 1.95 release Web/WASM build | [x] Trunk `--release --locked` succeeds with build-local `data-wasm-opt=0` overlay | Functional release bundle; optimized wasm-opt output not verified |
 | Candidate asset manifest | [x] Four staged served files match recorded paths, sizes and SHA-256 | [`verify_candidate.py`](reviews/GR-055/verify_candidate.py); candidate stays outside dispatch |
 | Actual WordCraft synthetic browser roundtrip | [x] Edit/serialize, synthetic version acknowledgement, save confirmation and fresh reopen pass | In-memory host only; no Seafile persistence |
-| Exact-candidate Seafile history/readback/reopen | [ ] NOT RUN | No Seafile service or real files used |
+| Exact-candidate Seafile history/readback/reopen | [x] GR-059 real synthetic library; a new history entry and fresh editor reopen with the edit intact | One file/library only; permission revocation, external writers, response loss, and ONLYOFFICE save regression remain unverified |
 
 ## GR-054 — current inventory boundary
 

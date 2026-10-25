@@ -1,0 +1,16 @@
+GR-059 checks and observations (2026-10-25)
+
+PASS: GR-055 verifier against the actual deployment staging root:
+  4 staged WordCraft files match recorded paths, sizes, SHA-256 and index references.
+PASS: LXC 108 seafile.service and seahub.service active after deployment.
+PASS: installed seaf-server SHA-256 matches the GR-059 report.
+PASS: private rollback archive SHA-256 matches the GR-059 report on both host and hypervisor.
+PASS: private Seahub settings parse; the five ArtCraft allowlist/dispatch settings exist.
+PASS: ENABLE_ONLYOFFICE=True remains set.
+PASS: HTTP health check and WordCraft static index returned 200 on the deployed gateway.
+PASS: live Seafile browser save returned through the gateway with HTTP 200 and produced the new version shown in Seafile History.
+PASS: post-deployment ONLYOFFICE browser open loaded representative 9.4.0 assets with HTTP 200; no edit or save performed.
+PASS: screenshot SHA-256 values verify with `sha256sum -c SHA256SUMS`.
+
+The private gateway/service hostnames, library UUID, session identifier/capability,
+authentication material and user identity are deliberately excluded.

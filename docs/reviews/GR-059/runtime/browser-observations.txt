@@ -1,0 +1,22 @@
+GR-059 sanitized browser observations — 2026-10-25 (Europe/Paris)
+
+Target: synthetic.docx in the explicitly synthetic ArtCraft library only.
+No private hostname, library UUID, session id/capability, auth header, or user identity retained.
+
+WordCraft path
+- Clicked the file from Seafile’s authenticated library listing.
+- Host page POST: HTTP 200.
+- WordCraft index, JS and WASM assets: HTTP 200.
+- Gateway session document GET: HTTP 200; editor displayed “synthetic.docx opened”.
+- Added visible paragraph: “ArtCraft Seafile integration test — 25 Oct 2026”.
+- Before save: editor status “Unsaved changes”; status notification POST: HTTP 200.
+- Pressed Ctrl+S. Gateway session save POST: HTTP 200. WordCraft status: “Saved — new version …”; later dirty status POSTs: HTTP 200.
+- Seafile file-history UI: 3 versions. Current: 2026-10-25 20:38:18, 15.8 KB; prior: 25.3 KB; older: 1.6 KB.
+- Clicked the file again from the Seafile list, which opened a fresh iframe/session. Fresh host POST and document GET: HTTP 200. Reopened document visibly contains the added paragraph; editor word count: 15.
+
+ONLYOFFICE post-deployment open-only check
+- Opened synthetic.docx from the synthetic OnlyOffice/artcraft-lab folder, outside the ArtCraft repo allowlist.
+- Seafile opened the ONLYOFFICE editor. Multiple /onlyoffice/9.4.0… resources returned HTTP 200.
+- No edits or saves were made in this check. ENABLE_ONLYOFFICE remained enabled.
+
+No manual upload, direct upload API, production-library access, or ONLYOFFICE configuration change was used for the WordCraft save flow. Screenshots are listed and hashed in ../SHA256SUMS.

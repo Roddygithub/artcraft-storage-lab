@@ -1,6 +1,19 @@
 # STATUS
 
-## CURRENT GR: GR-055 — reproducible WordCraft candidate
+## CURRENT GR: GR-059 — real synthetic Seafile WordCraft deployment
+
+The GR-055 exact WordCraft candidate is now deployed only for the explicitly
+synthetic DOCX library. The live browser path completed Seafile list click →
+visible edit → WordCraft save confirmation → new Seafile history version →
+fresh list click and reopen with the edit intact. The saved version is 15.8 KB;
+history shows 3 versions. A post-deployment open-only check on a synthetic
+DOCX outside the allowlist loaded ONLYOFFICE assets successfully; no
+ONLYOFFICE edit/save was attempted. Evidence and rollback digest:
+`docs/GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` and
+`docs/reviews/GR-059/`. Independent review and project GPT review are pending.
+Project status remains **INCOMPLETE** and upstream publication **LOCKED**.
+
+## PREVIOUS GR: GR-055 — reproducible WordCraft candidate
 
 Implementation worktree base: `0d16be1ea37ace6ddd282c514a05df6b4906cbc0`.
 Exact WordCraft source `00bc6a4b`, GR-054 shared-transport patch
@@ -9,7 +22,8 @@ build are recorded in [GR-055](docs/GR-055-WORDCRAFT-REPRODUCIBLE-CANDIDATE.md).
 The actual staged WordCraft WASM passes the synthetic in-memory browser
 edit/save-ack/reopen smoke; four staged bundle files have a runnable hash and
 membership verifier. Candidate remains outside `integration/static/` and
-dispatch. Exact-candidate Seafile history/readback/reopen is **NOT RUN**.
+dispatch. The real-instance follow-up is recorded separately in GR-059; this
+GR-055 statement describes the state before that follow-up.
 Independent R1–R2 reviews: bounded **PROVISIONAL PASS**, no remaining findings.
 GR-055 work-item status: **GPT REVIEW PENDING**. Project verdict remains
 **INCOMPLETE**; upstream publication remains locked.
