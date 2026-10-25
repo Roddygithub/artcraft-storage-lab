@@ -165,7 +165,8 @@ coordinates.
 
 ```sh
 # 1. the Craft web builds
-./scripts/fetch-craft-web.sh gridcraft pdfcraft
+# Historical command (the fetcher now requires a release tag + asset SHA-256
+# and stages candidates without replacing active assets); see docs/ASSET-INGESTION.md.
 #    and, for WordCraft, the patched build (see docs/reviews/GR-014/)
 
 # 2. the fixtures

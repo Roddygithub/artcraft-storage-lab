@@ -422,3 +422,16 @@ dispatcher. See `docs/GR-036-PHOTOCRAFT-SEAFILE-E2E.md` and `docs/reviews/GR-036
 Bounded synthetic evidence only; independent review was PROVISIONAL ACCEPT
 without blocker/major; final wording MINOR corrected afterward. See
 `docs/reviews/GR-037/`.
+
+## 29. Craft Web asset ingestion safety (GR-038)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 29.1 | Release selection | A caller names an exact release tag and digest; no mutable `latest` lookup | [x] WordCraft v0.10.0 selected explicitly |
+| 29.2 | Pinned archive integrity and basic layout | Digest matches; one-root ZIP contains root `index.html` and WASM | [x] Exact WordCraft release passed digest and layout validation |
+| 29.3 | Unsafe ZIP rejection | Traversal, symlink, ambiguous root, missing index/WASM archives are rejected | [~] Guards are present by inspection; negative archive cases were not executed |
+| 29.4 | Active build safety | Fetching must not overwrite dispatcher-selected `integration/static/<app>/` | [x] Output staged under `integration/static/candidates/wordcraft/`; promotion is separate; final move uses no-clobber semantics |
+| 29.5 | Host protocol compatibility | Staged release passes Open/Save/ACK app smoke before promotion | [ ] NOT VERIFIED; candidate is not promoted |
+| 29.6 | Independent review | No blocker/major remains in the asset-ingestion change | [x] Luna High bounded re-review: provisional ACCEPT; negative ZIP cases remain unexecuted |
+
+See `docs/GR-038-CRAFT-ASSET-INGESTION.md` and `docs/ASSET-INGESTION.md`.

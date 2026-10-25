@@ -63,16 +63,24 @@ it; it must not use a broad service-account write credential.
 
 ## The Craft web builds
 
-They are not in the repository: they are upstream release artifacts.
+They are not in the repository: they are upstream release artifacts. The
+fetcher stages an exact, SHA-256-checked release candidate; it never writes to
+the active `integration/static/<app>/` directory.
 
 ```sh
-./scripts/fetch-craft-web.sh            # every application in dispatch.json
-./scripts/fetch-craft-web.sh gridcraft  # just one
+# Use the exact release tag and the SHA-256 of its `<app>-web-*.zip` asset.
+./scripts/fetch-craft-web.sh wordcraft vX.Y.Z <asset-sha256>
 ```
 
-The script fetches `<app>-web-<version>.zip` from the application's GitHub
-release and unpacks it into `integration/static/<app>/`. No Rust toolchain is
-needed — the release build is what the applications publish.
+The candidate is unpacked under
+`integration/static/candidates/<app>/<tag>-<sha256>/` with a provenance file.
+That path is not selected by the dispatcher. Before manually promoting a
+candidate into `integration/static/<app>/`, verify it contains the required
+host protocol and passes the app's save/version/reopen smoke. The fetcher does
+not claim host compatibility. See [`docs/ASSET-INGESTION.md`](../docs/ASSET-INGESTION.md).
+
+Older reproduction commands in review reports document the fetcher as it
+existed at the time; use the pinned staging flow above for new work.
 
 The **WordCraft** build with the host bridge is built from source instead (the
 patch in `docs/reviews/GR-014/`); see that bundle for the commands.

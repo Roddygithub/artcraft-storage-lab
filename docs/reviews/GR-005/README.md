@@ -73,7 +73,7 @@ integration/gateway/sessions.py   the editing sessions
 integration/gateway/hostpage.py   the host page (the parent side of the bridge)
 integration/gateway/server.py     the HTTP server
 integration/config/dispatch.json  extension -> Craft app
-scripts/fetch-craft-web.sh        fetch the prebuilt Craft web builds
+scripts/fetch-craft-web.sh        stage pinned prebuilt Craft web assets; protocol-check before promotion
 tests/fixtures/make_fixtures.py   synthetic docx / xlsx / pdf / svg
 tests/upload_fixtures.py          put the fixtures in a test library
 tests/test_integration.py         the end-to-end test

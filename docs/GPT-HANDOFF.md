@@ -255,8 +255,9 @@ patch is installed on the live instance.
 ## 7. The commands
 
 ```sh
-# the Craft web builds (upstream release artifacts)
-./scripts/fetch-craft-web.sh
+# stage one exact Craft web release asset (does not install it)
+./scripts/fetch-craft-web.sh wordcraft vX.Y.Z <asset-sha256>
+# Verify the host protocol before manually promoting it; see docs/ASSET-INGESTION.md.
 
 # the WordCraft build with the host bridge (needs a Rust toolchain)
 rustup target add wasm32-unknown-unknown

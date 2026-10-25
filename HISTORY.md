@@ -1,3 +1,16 @@
+## 2026-10-25 — GR-038 pinned Web asset staging
+
+* Reworked `scripts/fetch-craft-web.sh` to require an exact release tag and
+  SHA-256, validate the ZIP structure and paths, and stage under a candidate
+  directory instead of replacing the active app build.
+* Verified shell syntax and staged the exact WordCraft v0.10.0 release asset
+  (SHA-256 `46e32c024cac86d644874e7120ee9e42a6c0ccc76bd020ba9c741706b5b77b05`).
+  A repeated staging attempt refused the existing candidate without changing
+  its provenance record. Symlinked candidate directories are also refused.
+  Luna High returned bounded provisional ACCEPT with no material finding;
+  negative ZIP cases remain untested and host-protocol compatibility remains
+  NOT VERIFIED. Evidence: `docs/GR-038-CRAFT-ASSET-INGESTION.md`.
+
 ## 2026-10-25 — First GPT-6.1 review of current remediation
 
 * GPT-6.1 Sol reviewed exact HEAD `95d89835b2b1d06fd098c586469ed03b8fd0549e`

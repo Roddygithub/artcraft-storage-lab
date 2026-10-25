@@ -4,8 +4,8 @@
 PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local main
 BRANCH:     main
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
-CURRENT CANDIDATE: documentation now records the review of 95d8983; exact post-review tip not re-reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has a provisional exact-review PASS; GR-028 CPAL patch checks/tests pass locally, independent semantic review remains incomplete; GR-029 local egui 0.37 overlays passed bounded review; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; no upstream changes
+CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038 and are not project-level GPT-reviewed
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has a provisional exact-review PASS; GR-028 CPAL patch checks/tests pass locally, independent semantic review remains incomplete; GR-029 local egui 0.37 overlays passed bounded review; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 stages exact-hash Web assets without replacing active builds; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -22,7 +22,20 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-037 — PhotoCraft’s editor save message, gateway request body, and Seafile content readback matched byte-for-byte (8,555 bytes; SHA-256 `ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca`). Synthetic Seafile history grew 2→3; a fresh Seahub route loaded a new editor session clean. Independent bounded review returned PROVISIONAL ACCEPT without blocker/major; its final wording MINOR was corrected but not separately re-reviewed. Evidence is in `docs/reviews/GR-037/`. The local Cargo target/temp configuration now directs builds to the persistent home filesystem instead of `/tmp`. Production security, ONLYOFFICE regression, optimized production output, and project-level GPT PASS remain NOT VERIFIED. PhotoCraft stays out of the committed dispatch. Other app milestones remain listed below.
+CURRENT GR: GR-038 — The Web asset fetcher requires an exact release tag and SHA-256,
+validates archive paths, and stages under `integration/static/candidates/`
+without modifying active builds. A real release artifact passed the staging
+check; Luna High bounded re-review returned PROVISIONAL ACCEPT with no material
+finding. Host protocol compatibility is **NOT VERIFIED**; staged artifacts are
+not approved for promotion. See `docs/GR-038-CRAFT-ASSET-INGESTION.md`.
+
+LATEST E2E: GR-037 PhotoCraft’s editor message, gateway request body, and
+Seafile readback matched byte-for-byte (8,555 bytes; SHA-256
+`ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca`). History
+grew 2→3; a fresh Seahub route opened a new clean editor session. PhotoCraft
+remains excluded from dispatch. Cargo build/temp paths use the persistent home
+filesystem. Production security, ONLYOFFICE regression, optimized output and
+project-level GPT PASS remain NOT VERIFIED; details are in `docs/reviews/GR-037/`.
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -294,7 +307,7 @@ NEXT:
 | ONLYOFFICE | LXC 112, Document Server 24.04, **untouched** |
 | Test library | `c82cc792-389d-43e6-b963-0dab1a47a9a8` ("OnlyOffice"), folder `/artcraft-lab/` |
 | Gateway | `integration/gateway/`; running in the development workspace only, not installed on LXC 108 |
-| Craft web builds | fetched with `scripts/fetch-craft-web.sh` into `integration/static/` (gitignored) |
+| Craft web builds | pinned releases are staged under `integration/static/candidates/`; protocol-check before manual promotion |
 | Rust toolchain | 1.97.0 + `wasm32-unknown-unknown`; `trunk` 0.22.0 in `~/.local/bin` |
 | Browser test | Playwright chromium in `~/.cache/ms-playwright`; a Python venv with `playwright` |
 | Live Seafile config | global third-party `.xlsx` route removed; ONLYOFFICE settings untouched; backup at `/root/seahub_settings.py.artcraft-rollback-20261022` on LXC 108 |

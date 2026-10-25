@@ -80,7 +80,7 @@ def main():
     web_root = ROOT / "integration/static/wordcraft"
     fixture = ROOT / "tests/fixtures/synthetic.docx"
     if not (web_root / "index.html").is_file() or not list(web_root.glob("*_bg.wasm")):
-        raise SystemExit("WordCraft Web bundle missing; run scripts/fetch-craft-web.sh wordcraft first")
+        raise SystemExit("WordCraft Web bundle missing; stage and verify a pinned build, then promote it per docs/ASSET-INGESTION.md")
     if not fixture.is_file():
         raise SystemExit("synthetic DOCX fixture is missing")
 

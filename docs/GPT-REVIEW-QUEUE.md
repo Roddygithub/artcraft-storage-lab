@@ -103,6 +103,16 @@ and the GR-015 isolated runtime evidence.
 
 ## Queue
 
+### GR-038 — Safe Craft Web asset ingestion
+
+```text
+Status:      Luna High bounded re-review: provisional ACCEPT; no material finding remains
+Change:      exact tag + SHA-256 required; ZIP paths validated; candidate staged without replacing active build
+Evidence:    docs/GR-038-CRAFT-ASSET-INGESTION.md
+Limit:       host-protocol compatibility check and deployment promotion are not implemented
+Upstream:    no upstream artifact or production state changed
+```
+
 ### GR-001 — Seafile online-editor integration contract
 
 ```text
