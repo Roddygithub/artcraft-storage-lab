@@ -473,3 +473,19 @@ Run `python3 tests/test_gr049_save_retry.py`; evidence in `docs/reviews/GR-049/`
 | Independent review | Exact test/evidence review | [x] PROVISIONAL PASS R1, no blocker/major |
 
 Evidence: `docs/reviews/GR-050/`. GPT REVIEW PENDING; no project-level verdict.
+
+## GR-051. Browser retry after lost gateway response
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Real open/render/document routes | Browser loads synthetic editor/document, HTTP 200 | [x] Cached Playwright Chromium, loopback only |
+| First save commits then gateway response socket drops | Browser fetch fails; ticket-1 negative, editor/host dirty and unconfirmed | [x] Exact `net::ERR_EMPTY_RESPONSE`, internal 200, no browser response |
+| User retry, same bytes, fresh ticket-2 | Receipt HTTP 200, one fake upstream write/version | [x] Exact result, bytes, CAS expectation and write count |
+| Editor sends dirty=false after success | Host clean/confirmed, gateway unsaved=false | [x] State and dirty route ACK asserted |
+| Exact route status observations and cleanup | No extra routes/writes; browser and servers stop | [x] Browser/server route multisets, failed request, joins asserted |
+| Actual WordCraft WASM / real Seafile / reopen | Complete MVP | [ ] NOT VERIFIED; synthetic editor and FakeSeafile only |
+| Upstream response loss before gateway receipt | Safe end-to-end retry | [ ] NOT VERIFIED; only gateway-to-browser response loss covered |
+| Independent review | Separate bounded reviewer | [x] R1 PROVISIONAL PASS, no blocker/major; two P3 wording corrections closed |
+
+Evidence: `docs/reviews/GR-051/`; `tests/test_gr051_browser_save_retry.py`.
+GR-049/050 and gateway checks pass. GPT REVIEW PENDING; no project verdict.

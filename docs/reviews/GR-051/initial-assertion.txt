@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/roddy/.t3/worktrees/artcraft-storage-lab/t3-0c20d0c0/tests/test_gr051_browser_save_retry.py", line 217, in <module>
+    main()
+    ~~~~^^
+  File "/home/roddy/.t3/worktrees/artcraft-storage-lab/t3-0c20d0c0/tests/test_gr051_browser_save_retry.py", line 157, in main
+    assert session.unsaved is True
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

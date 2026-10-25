@@ -1,5 +1,18 @@
 # GPT Review Queue
 
+## GR-051 — Browser committed-save response-loss retry
+
+**BOUNDED INDEPENDENT REVIEW: PROVISIONAL PASS, no blocker/major; GPT REVIEW
+PENDING.** Based on `5a1ceb66`; cached Playwright Chromium, actual Handler/Gateway/rendered
+host, synthetic editor (not actual WASM), FakeSeafile (not real). First save
+commits then browser response drops; ticket-1 fails/dirty; fresh user save
+with identical bytes/ticket-2 succeeds, one fake write, clean/confirmed host.
+Exact route statuses, connection failure, ticket results and cleanup asserted.
+GR-049/050 and gateway regressions pass. Independent R1 P3 wording corrections
+are closed. No production code edits or project PASS. Upstream response loss
+before gateway receipt and real Seafile MVP remain NOT VERIFIED.
+Evidence: `docs/GR-051-BROWSER-SAVE-RETRY.md`, `docs/reviews/GR-051/`.
+
 ## GR-050 — Loopback HTTP committed-save response-loss regression
 
 **BOUNDED INDEPENDENT REVIEW: PROVISIONAL PASS, no blocker/major; GPT REVIEW

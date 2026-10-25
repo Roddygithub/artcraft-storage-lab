@@ -22,12 +22,18 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-050 — deterministic loopback HTTP post-commit response-loss
-regression implemented on fd6ae99; 1 HTTP test, 6 receipt tests and existing
-gateway checks pass. Independent R1 bounded review: PROVISIONAL PASS, no
-blocker/major. Browser/real Seafile runtime NOT VERIFIED. GPT REVIEW PENDING;
-no project GPT PASS.
-See `docs/GR-050-HTTP-SAVE-RETRY.md` and `docs/reviews/GR-050/`.
+CURRENT GR: GR-051 — loopback Chromium post-commit response-loss/retry proof
+based on 5a1ceb66; synthetic editor (not actual WASM), FakeSeafile (not
+real). First fetch fails/ticket-1 negative/dirty; user retry ticket-2 returns
+receipt HTTP 200 with one fake write; editor and host confirm clean. GR-049/050
+and gateway checks pass. Independent R1 bounded review: PROVISIONAL PASS, no
+blocker/major; two P3 wording corrections closed. GPT REVIEW PENDING.
+Upstream response loss before gateway receipt and real Seafile MVP NOT VERIFIED.
+No production code changes or project-level GPT PASS.
+See `docs/GR-051-BROWSER-SAVE-RETRY.md` and `docs/reviews/GR-051/`.
+
+PREVIOUS GR: GR-050 — loopback HTTP post-commit response-loss proof;
+independent R1 bounded review PROVISIONAL PASS. See `docs/reviews/GR-050/`.
 
 PREVIOUS GR: GR-049 — gateway last-successful-save receipt implemented;
 6 focused retry tests and existing gateway checks pass. Independent R1 bounded

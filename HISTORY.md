@@ -1,3 +1,18 @@
+## 2026-10-25 — GR-051 browser committed-save retry
+
+- Added loopback Chromium proof using actual Handler/Gateway/hostpage.render,
+  a synthetic editor (not WASM) and FakeSeafile (not real Seafile). First save
+  commits before its socket response is dropped; ticket-1 fails and stays dirty.
+  User retry with identical bytes/ticket-2 succeeds via receipt, one fake write;
+  editor dirty=false confirms the host clean. Exact routes and cleanup asserted.
+- Documented GR-043 Playwright workflow, GR-049/050 and gateway checks pass.
+  Production code unchanged. Upstream response loss before gateway receipt,
+  real Seafile and actual WordCraft/reopen remain NOT VERIFIED.
+- Independent R1 bounded review: PROVISIONAL PASS, no blocker/major; two P3
+  wording corrections closed. GPT REVIEW PENDING; no project-level PASS.
+  Evidence: `docs/GR-051-BROWSER-SAVE-RETRY.md`,
+  `docs/reviews/GR-051/`.
+
 ## 2026-10-25 — GR-050 loopback HTTP committed-save retry
 
 - Added a real Handler save-route regression: fake commit completes, test handler

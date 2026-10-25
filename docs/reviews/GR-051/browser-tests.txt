@@ -1,0 +1,10 @@
+PASS: real Handler /open/ + hostpage.render + /document HTTP 200; synthetic editor opened
+PASS: first save committed HTTP 200 internally, socket dropped; Chromium net::ERR_EMPTY_RESPONSE
+PASS: ticket-1 negative result; editor and host dirty, unconfirmed; no clean signal
+PASS: user retry ticket-2, identical bytes, HTTP 200 receipt; upstream writes=1, head=head-b
+PASS: editor dirty=false; host clean/confirmed; two dirty routes HTTP 200, gateway unsaved=false
+PASS: exact browser/server route statuses and both ticket results asserted
+OBSERVED server routes: [('GET', '/artcraft/test-editor', 200), ('GET', '/session/<sid>/document', 200), ('POST', '/open/', 200), ('POST', '/session/<sid>/dirty', 200), ('POST', '/session/<sid>/dirty', 200), ('POST', '/session/<sid>/save', 'DROP'), ('POST', '/session/<sid>/save', 200)]
+OBSERVED browser save: DROP/net::ERR_EMPTY_RESPONSE, then HTTP 200; tickets: ticket-1=false, ticket-2=true
+PASS: browser closed, servers closed, serve threads joined, origin environment restored
+LIMIT: synthetic editor (not WASM), synthetic Seafile (not real); upstream response loss before gateway receipt NOT VERIFIED
