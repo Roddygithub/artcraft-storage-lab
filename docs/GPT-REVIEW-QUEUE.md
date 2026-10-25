@@ -1,11 +1,23 @@
 # GPT Review Queue
 
+## GR-050 — Loopback HTTP committed-save response-loss regression
+
+**BOUNDED INDEPENDENT REVIEW: PROVISIONAL PASS, no blocker/major; GPT REVIEW
+PENDING.** Slice based on `fd6ae99`; 1 real-route loopback HTTP test, 6 GR-049
+receipt tests and existing gateway unit checks pass. Test-only response hook
+closes the socket after fake commit, before sending any response; identical
+HTTP retry returns success with one fake write/version. No production code
+changes. Browser/real Seafile and upstream-response loss NOT VERIFIED. No
+project GPT verdict claimed.
+Evidence: `docs/GR-050-HTTP-SAVE-RETRY.md`, `docs/reviews/GR-050/`.
+
 ## GR-049 — Gateway committed-save retry
 
 **BOUNDED INDEPENDENT REVIEW: PROVISIONAL PASS, no findings; GPT REVIEW
 PENDING.** The receipt/locking change is based on `7238bc85`; 6 focused tests
-and existing gateway unit checks pass. Direct-call discarded-result simulation,
-not actual network-loss runtime. Real Seafile/browser behavior NOT VERIFIED.
+and existing gateway unit checks pass. Direct-call discarded-result behavior is
+now complemented by GR-050's independently reviewed loopback socket response-
+loss proof. Browser and real Seafile behavior remain NOT VERIFIED.
 No project GPT PASS or upstream publication authorization.
 Evidence: `docs/GR-049-IDEMPOTENT-SAVE-RETRY.md`, `docs/reviews/GR-049/`.
 

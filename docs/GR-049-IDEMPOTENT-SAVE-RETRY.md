@@ -10,7 +10,7 @@ local main `7238bc85b3816a6acfc1230c3cb1fb3172e1b696`. No project GPT PASS.
 | Retain only the last successful SHA-256 digest (32 bytes), length and result, never document bytes | `integration/gateway/sessions.py:25-26`; `integration/gateway/server.py:248-259` |
 | Identical retry rechecks token-bound user/document identity, edit permission and current file/head IDs; returns a copy of the original result without a save call | `integration/gateway/server.py:213-226`; `integration/gateway/seafile.py:127-140`; retry tests |
 | Changed payload uses the existing atomic upstream CAS with updated session IDs; errors never create a successful receipt | `integration/gateway/server.py:227-259`; changed-payload and failed-save tests |
-| Response is sent after `Gateway.save` returns, so a failed gateway-to-browser response can leave a successful receipt | `integration/gateway/server.py:335-349`; discarded-response test calls save twice |
+| Response is sent after `Gateway.save` returns, so a failed gateway-to-browser response can leave a successful receipt | `integration/gateway/server.py:335-349`; direct-call discarded-response test; GR-050 adds a real loopback HTTP route/socket regression |
 
 ## Concurrency and boundaries
 
@@ -51,7 +51,8 @@ server-side atomic API is unchanged; unavailable upstream operations fail closed
 | `python3 -m py_compile integration/gateway/server.py integration/gateway/sessions.py tests/test_gr049_save_retry.py` | Exit 0; `docs/reviews/GR-049/checks.txt` |
 | `git diff --check` | Exit 0; `docs/reviews/GR-049/checks.txt` |
 | Independent review | PROVISIONAL PASS; no blocker/major/minor/actionable P3. Review did not run tests or services; see `docs/reviews/GR-049/INDEPENDENT-REVIEW-R1.md` |
-| Actual socket response loss, browser retry, real Seafile versions/readback/reopen | **NOT VERIFIED**; direct-call discarded-result simulation and synthetic CAS only |
+| Actual socket response loss | Verified in synthetic loopback HTTP by GR-050: real save route commits through FakeSeafile, response socket closes before any status/headers/body, identical HTTP retry returns the original success with one fake write/version; see `docs/GR-050-HTTP-SAVE-RETRY.md` |
+| Browser retry, real Seafile versions/readback/reopen | **NOT VERIFIED**; GR-050 uses a stdlib HTTP client and synthetic upstream only |
 | Production / ONLYOFFICE | Untouched; no deployment or regression-runtime claim |
 | Independent review / GPT review | Pending; no independent or project GPT verdict claimed |
 

@@ -1,0 +1,6 @@
+test_response_lost_after_commit_retry_writes_once (__main__.HttpSaveRetryTests.test_response_lost_after_commit_retry_writes_once) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.057s
+
+OK

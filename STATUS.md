@@ -22,7 +22,14 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-049 — gateway last-successful-save receipt implemented;
+CURRENT GR: GR-050 — deterministic loopback HTTP post-commit response-loss
+regression implemented on fd6ae99; 1 HTTP test, 6 receipt tests and existing
+gateway checks pass. Independent R1 bounded review: PROVISIONAL PASS, no
+blocker/major. Browser/real Seafile runtime NOT VERIFIED. GPT REVIEW PENDING;
+no project GPT PASS.
+See `docs/GR-050-HTTP-SAVE-RETRY.md` and `docs/reviews/GR-050/`.
+
+PREVIOUS GR: GR-049 — gateway last-successful-save receipt implemented;
 6 focused retry tests and existing gateway checks pass. Independent R1 bounded
 review is PROVISIONAL PASS, no findings. Actual network-loss/browser/Seafile
 runtime NOT VERIFIED. GPT REVIEW PENDING; no project GPT PASS.

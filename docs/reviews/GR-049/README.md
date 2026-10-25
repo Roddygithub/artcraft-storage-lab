@@ -11,7 +11,12 @@ Artifact: `docs/GR-049-IDEMPOTENT-SAVE-RETRY.md`.
 
 Independent R1 review returned **PROVISIONAL PASS**, with no blocker, major,
 minor, or actionable P3 finding; see `INDEPENDENT-REVIEW-R1.md`. The reviewer
-did not run tests or services. Actual HTTP response loss, browser retry, and
-real Seafile version/readback/reopen remain **NOT VERIFIED**. The work item is
+did not run tests or services. GR-050 adds an independently reviewed loopback
+HTTP response-loss regression. Browser retry and real Seafile
+version/readback/reopen remain **NOT VERIFIED**. The work item is
 GPT REVIEW PENDING; this does not change the project verdict or authorize
 upstream publication.
+
+Follow-up: GR-050 adds deterministic real-route loopback socket response-loss
+coverage; see `../GR-050/README.md`. Original GR-049 runs remain direct-call
+evidence; this follow-up does not extend the scope of its independent review.

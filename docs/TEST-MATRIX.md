@@ -457,7 +457,19 @@ See `docs/GR-038-CRAFT-ASSET-INGESTION.md` and `docs/ASSET-INGESTION.md`.
 | Replay validation / permission / identity / freshness | Invalid payload/name/size and unauthorized or stale replay refused | [x] Synthetic regression |
 | Upstream error | No false receipt; reauthorization errors fail closed | [x] Synthetic regression |
 | Existing gateway security and two-session CAS race | Existing checks pass | [x] `python3 tests/test_gateway_unit.py` |
-| Actual response loss / browser / Seafile new version and reopen | Reproduce full runtime | [ ] NOT VERIFIED |
+| Gateway socket response loss after commit | Real save route then identical HTTP retry, without duplicate write | [x] GR-050 loopback TCP regression |
+| Browser / real Seafile new version and reopen | Durable end-to-end retry | [ ] NOT VERIFIED |
 | Independent review | Separate bounded reviewer | [x] PROVISIONAL PASS R1, no findings; network/runtime gaps remain |
 
 Run `python3 tests/test_gr049_save_retry.py`; evidence in `docs/reviews/GR-049/`.
+
+## GR-050. HTTP response loss after committed save
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Real save route commits, server closes socket before any HTTP response, identical bytes retried over HTTP | Client sees RemoteDisconnected; retry returns original success, exactly one fake upstream write/version | [x] Synthetic loopback TCP regression; `tests/test_gr050_http_save_retry.py` |
+| Browser / real Seafile versions | Durable end-to-end retry | [ ] NOT VERIFIED by this slice |
+
+| Independent review | Exact test/evidence review | [x] PROVISIONAL PASS R1, no blocker/major |
+
+Evidence: `docs/reviews/GR-050/`. GPT REVIEW PENDING; no project-level verdict.

@@ -1,3 +1,14 @@
+## 2026-10-25 — GR-050 loopback HTTP committed-save retry
+
+- Added a real Handler save-route regression: fake commit completes, test handler
+  closes the response socket before status/headers/body, client observes EOF,
+  identical HTTP retry succeeds with one synthetic upstream write/version.
+- Focused HTTP and GR-049 receipt tests, existing gateway suite and syntax/diff
+  checks pass. Production code unchanged; real Seafile/browser NOT VERIFIED.
+- Independent R1 bounded review: PROVISIONAL PASS, no blocker/major. Project GPT
+  review remains pending; no project-level PASS.
+- Evidence: `docs/GR-050-HTTP-SAVE-RETRY.md`, `docs/reviews/GR-050/`.
+
 ## 2026-10-25 — GR-049 gateway committed-save retry
 
 - Added a bounded per-session digest/length/result receipt and session locking.
