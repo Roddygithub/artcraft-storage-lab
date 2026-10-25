@@ -1,10 +1,10 @@
 # STATUS
 
 ```text
-PHASE:      GPT-6.1 Sol FAIL on 0edbe52; shared transport and app adapters continue on local main
+PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local main
 BRANCH:     main
-LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
-CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
+LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
+CURRENT CANDIDATE: documentation now records the review of 95d8983; exact post-review tip not re-reviewed
 WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has a provisional exact-review PASS; GR-028 CPAL patch checks/tests pass locally, independent semantic review remains incomplete; GR-029 local egui 0.37 overlays passed bounded review; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
@@ -15,10 +15,12 @@ IMPLEMENTER:artcraft-worker           (nvidia/z-ai/glm-5.3-flash#thinking)
 REVIEWER:   artcraft-reviewer         (nvidia/nvidia/nemotron-3-ultra-550b-a55b#high)
 
 FREE REVIEW: PASS (2 rounds, both remediated) — see docs/reviews/REVIEW-0*.md
-GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a97863,
+GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
+             c76a7594cc43ba2a6cf56de2232836f008a97863,
              d9ef476e6fbcb04c9a9e23cfe235812167d1f27c, and
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
+FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
 CURRENT GR: GR-037 — PhotoCraft’s editor save message, gateway request body, and Seafile content readback matched byte-for-byte (8,555 bytes; SHA-256 `ea0121c1e465c753947005e1ff4452cc031f734baed3345400bcd3a96218c4ca`). Synthetic Seafile history grew 2→3; a fresh Seahub route loaded a new editor session clean. Independent bounded review returned PROVISIONAL ACCEPT without blocker/major; its final wording MINOR was corrected but not separately re-reviewed. Evidence is in `docs/reviews/GR-037/`. The local Cargo target/temp configuration now directs builds to the persistent home filesystem instead of `/tmp`. Production security, ONLYOFFICE regression, optimized production output, and project-level GPT PASS remain NOT VERIFIED. PhotoCraft stays out of the committed dispatch. Other app milestones remain listed below.
 

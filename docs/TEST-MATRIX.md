@@ -54,10 +54,10 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | --- | --- | --- | --- |
 | 3.1 | Open a synthetic XLSX from Seafile Web | GridCraft Web opens inline | [x] real Seahub file-list click in isolated synthetic Seafile opened GridCraft Web/WASM; see `docs/reviews/GR-010/GRIDCRAFT-SEAFILE-E2E-20261023.md` |
 | 3.2 | Edit a cell value | value changes | [x] real GridCraft edit; saved value appeared in a fresh GridCraft session after a Seahub click |
-| 3.3 | Edit a formula | formula recomputes | [ ] not yet exercised |
+| 3.3 | Edit a formula | formula recomputes | [x] Synthetic Seafile E2E changed B2 from 42 to 1337; `SUM(B2:B2)` recalculated to 1337 and survived save/readback/fresh reopen. One formula path only; broader compatibility is not claimed. See `docs/reviews/GR-016/SEAFILE-GRIDCRAFT-SHARED-TRANSPORT-E2E-20261024.md`. |
 | 3.4 | Minimal formatting | applied | [ ] not yet exercised |
 | 3.5 | Save | new Seafile version | [~] patched bridge received a committed head/file ID from isolated Seafile; host showed `Stored — new version`; readback bytes/hash recorded, but history-list count was not independently queried (browser API returned 403) |
-| 3.6 | Reopen | values and formulas preserved | [~] fresh GridCraft session displayed the saved A3 edit; valid XLSX retained the B3 formula and cached value, but recalculation after changing an input is NOT VERIFIED |
+| 3.6 | Reopen | values and formulas preserved | [x] Fresh GridCraft session displayed B2=1337 and B3=1337 after the saved `SUM(B2:B2)` recalculation; formula and cached result were present in Seafile readback. Broader formula compatibility is not claimed. See `docs/reviews/GR-016/SEAFILE-GRIDCRAFT-SHARED-TRANSPORT-E2E-20261024.md`. |
 | 3.7 | Concurrent edit | conflict, no silent overwrite | [~] fake-CAS unit test only; Seafile fileserver behavior is NOT VERIFIED |
 
 ## 4. PPTX — DeckCraft (GR-011)

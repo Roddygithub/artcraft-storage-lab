@@ -1,3 +1,16 @@
+## 2026-10-25 — First GPT-6.1 review of current remediation
+
+* GPT-6.1 Sol reviewed exact HEAD `95d89835b2b1d06fd098c586469ed03b8fd0549e`
+  and returned **INCOMPLETE**; GPT REVIEW PASS was not granted and upstream
+  publication remains locked.
+* The review accepts the synthetic DOCX click/edit/version/confirmation/reopen
+  evidence as demonstrated. It leaves ONLYOFFICE regression, authorization and
+  failure cases, patched-server compatibility, production security, pinned
+  editor assets/protocol compatibility, and distribution/licensing treatment
+  open. Full findings are recorded in `docs/reviews/GPT-FIRST-PASS-95D8983.md`.
+* Reconciled the GridCraft formula rows in `docs/TEST-MATRIX.md` with the later
+  GR-016 runtime evidence; this verifies one tested `SUM(B2:B2)` path only.
+
 ## 2026-10-25 — GR-037 PhotoCraft save-byte provenance
 
 * Re-ran a real PhotoCraft Web/WASM edit and host save through isolated synthetic

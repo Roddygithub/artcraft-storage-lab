@@ -6,6 +6,24 @@ and does not trust the free-model verdicts.
 Nothing may be published upstream (issue, PR, RFC in `storytold/*`, Seafile or
 Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 
+## Latest first-pass result — 2026-10-25
+
+```text
+Candidate: 95d89835b2b1d06fd098c586469ed03b8fd0549e
+Reviewer: GPT-6.1 Sol (low)
+Verdict: INCOMPLETE — GPT REVIEW PASS not granted
+Report: docs/reviews/GPT-FIRST-PASS-95D8983.md
+Synthetic DOCX MVP: demonstrated on isolated patched Seafile C-fileserver stack
+Open gates: ONLYOFFICE regression, security/authorization cases, server compatibility,
+            pinned editor assets/protocol check, distribution/licensing decision
+Upstream publication: LOCKED
+```
+
+This result supersedes the old “no Seafile E2E” objection for the candidate's
+remediation evidence; it does not erase the historical FAIL on `0edbe52` or
+establish production readiness. The current test matrix corrects the stale
+GridCraft formula-recalculation entries based on the later GR-016 runtime report.
+
 ## Latest candidate result — 2026-10-23
 
 ```text
