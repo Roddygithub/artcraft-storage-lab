@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; shared transport and app adapters conti
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has a provisional exact-review PASS; GR-028 CPAL patch checks/tests pass locally, independent semantic review remains incomplete; GR-029 local egui 0.37 overlays passed bounded review; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack and received Luna High bounded PROVISIONAL PASS with minor gaps; GR-033 reproduced PhotoCraft browser Open/edit/save/ACK/fresh iframe reopen against an in-memory parent; GR-034 adds gateway-only structural `.pcraft` validation; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027 Symphonia audio crate has a provisional exact-review PASS; GR-028 CPAL patch checks/tests pass locally, independent semantic review remains incomplete; GR-029 local egui 0.37 overlays passed bounded review; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack and received Luna High bounded PROVISIONAL PASS with minor gaps; GR-033 reproduced PhotoCraft browser Open/edit/save/ACK/fresh iframe reopen against an in-memory parent; GR-034 adds gateway-only structural `.pcraft` validation; GR-035 reran PhotoCraft host open/edit/save/ACK/reopen with optimized WASM; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-032/034 — PhotoCraft GR-032 adapter has bounded R2/R3 PROVISIONAL PASS, GR-033 reproduces browser Open/edit/save/ACK/fresh iframe reopen against an in-memory parent, and GR-034 validates `.pcraft` ZIP root-manifest shape before save. Seafile runtime is unavailable; PhotoCraft stays out of dispatch. Other active app milestones remain listed below.
+CURRENT GR: GR-032/035 — PhotoCraft GR-032 adapter has bounded R2/R3 PROVISIONAL PASS; GR-033 proves the browser host flow; GR-034 validates `.pcraft` ZIP shape at the gateway; GR-035 repeats the browser flow on an optimized release bundle. The parent remains in-memory, Seafile version/reopen is NOT VERIFIED, and PhotoCraft stays out of dispatch. Other active app milestones remain listed below.
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -172,6 +172,12 @@ OPEN GAPS:
   returned bounded PROVISIONAL PASS. Seafile runtime was unavailable and not
   accessed; the PhotoCraft dispatch table remains unchanged. See
   `docs/GR-034-PHOTOCRAFT-GATEWAY-VALIDATION.md`.
+- GR-035 builds GR-032 with optimized release WASM and reproduces open, edit,
+  ticketed save, in-memory ACK, and fresh iframe reopen in Chromium. The saved
+  bytes never left the parent page; Seafile persistence/version/reopen remains
+  NOT VERIFIED. Nemotron returned bounded PROVISIONAL ACCEPT; screenshot-to-
+  WASM-hash binding remains NOT VERIFIED. See
+  `docs/GR-035-PHOTOCRAFT-OPTIMIZED-BROWSER-SMOKE.md`.
 - The isolated synthetic Seafile runtime flows currently documented are for
   WordCraft, GridCraft, VectorCraft, PdfCraft and CADCraft. VectorCraft uses its
   page API, not the common `?host=parent` contract. DeckCraft now has a local

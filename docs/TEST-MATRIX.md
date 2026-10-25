@@ -377,3 +377,18 @@ and `docs/reviews/GR-033/`.
 The validator inspects ZIP central-directory metadata only; it does not
 decompress/parse `manifest.json` or verify member CRC/data. Full limits and
 source reference: `docs/GR-034-PHOTOCRAFT-GATEWAY-VALIDATION.md`.
+
+## 26. PhotoCraft optimized Web host smoke (GR-035)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 26.1 | Optimized release Web bundle | Release build completes with `wasm-opt -Oz` | [x] `trunk build --release` completed; WASM 26,342,447 bytes |
+| 26.2 | Host Open and editor startup | Same-origin parent receives ready and opens synthetic `.pcraft` | [x] PhotoCraft 0.15.1 opened the 4,000-byte fixture |
+| 26.3 | UI edit and ticketed Save | Editor emits a save ticket and serialized bytes while dirty | [x] UI-created `Layer 1`; 4,984 bytes; SHA-256 recorded in GR-035 |
+| 26.4 | Matching positive ACK and fresh iframe reopen | Matching in-memory ACK clears dirty; fresh app instance renders saved edit | [x] In-memory parent ACK and fresh iframe reopen showed `Layer 1`, `dirty=false` |
+| 26.5 | Seafile version and fresh storage-backed reopen | Seafile creates a new version and a fresh Seahub click reads the saved edit | [ ] NOT VERIFIED; parent retained bytes in memory only; PhotoCraft remains out of dispatch |
+| 26.6 | Independent bounded evidence review | Reviewer confirms artifact and scope without blocker/major finding | [x] PROVISIONAL ACCEPT; no blocker/major; minor note: browser capture does not bind loaded WASM resource to recorded artifact hash |
+
+This smoke establishes optimized-bundle browser execution only. It is not
+Seafile E2E or a project GPT PASS. Evidence: `docs/reviews/GR-035/` and
+`docs/GR-035-PHOTOCRAFT-OPTIMIZED-BROWSER-SMOKE.md`.

@@ -1,3 +1,18 @@
+## 2026-10-25 — GR-035 PhotoCraft optimized Web smoke
+
+* Built the GR-032 PhotoCraft host adapter with `trunk build --release`;
+  release `wasm-opt -Oz` completed. The 26,342,447-byte WASM loaded in a
+  same-origin T3 Chromium parent harness.
+* Reproduced fixture open, UI edit, ticketed save, matching in-memory success
+  ACK, and fresh iframe reopen with the added layer intact. The save payload
+  was 4,984 bytes with recorded SHA-256.
+* The parent retained bytes in memory. Seafile version creation and
+  storage-backed reopen remain NOT VERIFIED. Nemotron returned PROVISIONAL
+  ACCEPT for this bounded smoke; its minor browser-to-WASM-hash binding
+  qualification is recorded in the evidence bundle. No project GPT PASS is
+  claimed.
+* Scope and limits: `docs/GR-035-PHOTOCRAFT-OPTIMIZED-BROWSER-SMOKE.md`.
+
 ## 2026-10-25 — GR-034 PhotoCraft gateway payload validation
 
 * Added gateway `.pcraft` type validation that requires exactly one nonempty

@@ -671,6 +671,19 @@ Publication: no upstream action, service/config change or Seafile access
 Evidence:    `docs/GR-034-PHOTOCRAFT-GATEWAY-VALIDATION.md`
 ```
 
+### GR-035 — PhotoCraft optimized Web host smoke
+
+```text
+Status:      bounded optimized-bundle browser smoke; Nemotron PROVISIONAL ACCEPT, no blocker/major
+Base:        PhotoCraft a02f2ee41059d3312e7ff24a5af5edcac7b6435a + GR-032 host adapter patch
+Build:       Trunk 0.22.0 `trunk build --release`; `wasm-opt -Oz` completed; WASM 26,342,447 bytes
+Flow:        real PhotoCraft WASM opens a 4,000-byte synthetic fixture in the GR-033 same-origin harness; UI edit; 4,984-byte ticketed save; exact ticket ACK; fresh iframe reopen shows Layer 1 and dirty=false
+Save hash:   `92e93c2b993b7de073a2c870aba522d7f9112647d9d1181d2b8592df665936b3`
+Limits:      parent retains bytes in JS memory; no gateway/Seafile call, version, or storage-backed reopen; `.pcraft` remains out of dispatch
+Review:      PROVISIONAL ACCEPT; screenshot does not identify loaded WASM resource hash
+Evidence:    `docs/GR-035-PHOTOCRAFT-OPTIMIZED-BROWSER-SMOKE.md` and `docs/reviews/GR-035/`
+```
+
 ## GPT review instruction (for the future session)
 
 ```text
