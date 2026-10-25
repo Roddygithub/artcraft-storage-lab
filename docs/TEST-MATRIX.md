@@ -199,6 +199,7 @@ Patch, exact source pin, checks and evidence limits: `docs/reviews/GR-020/README
 | 13.7 | DesignCraft exact-patch review | no blocker/major in adapter after transport repin | [x] Luna high R3 plus independent repin review; P3 peak serialization-memory limit remains; see `DESIGNCRAFT-REVIEW-REPIN.md` |
 | 13.8 | DesignCraft Seafile browser version/reopen | saved document is persisted as a Seafile version and reopened from Seafile | [ ] NOT VERIFIED; patch not in dispatcher |
 | 13.9 | Malformed host save acknowledgements | missing/non-boolean `ok` does not consume a ticket as a false ACK; valid true/false retain behavior | [x] Parser tests cover malformed values and valid booleans; WASM test target compiled but was not browser-executed; 7 native tests and 19 checksums pass; see `docs/reviews/GR-024/` |
+| 13.10 | DesignCraft actual WASM host runtime | synthetic native file opens, visible edit emits save bytes, matching ACK clears dirty, fresh iframe reopens captured bytes | [x] GR-045: built the patched WASM from source pin `80d13911`; Chromium opened the 6,585-byte synthetic document, saved 3,184 bytes, accepted matching ticket `designcraft:1:1`, became clean and reopened the edit in a fresh iframe. Synthetic parent only; no Seafile write. See `docs/GR-045-DESIGNCRAFT-WASM-SMOKE.md` |
 
 GR-024 does not establish browser runtime, Seafile persistence, or
 application-level open/edit/save/reopen behavior. Active app patches must pin

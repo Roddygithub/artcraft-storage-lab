@@ -1,5 +1,19 @@
 # GPT Review Queue
 
+## GR-045 — DesignCraft host-save browser runtime smoke
+
+The actual GR-021 patched DesignCraft WASM opened a synthetic native document
+in Chromium; an in-editor visible text change became dirty, Ctrl+S emitted
+3,184 serialized bytes, the same-origin synthetic parent ACKed matching ticket
+`designcraft:1:1`, and the editor became clean. A fresh iframe reopened the
+captured bytes with `GR045 runtime edit passed` visible. Evidence and exact
+build pins/commands: `docs/GR-045-DESIGNCRAFT-WASM-SMOKE.md` and
+`docs/reviews/GR-045/`. This does not prove Seafile persistence, dispatch,
+production or ONLYOFFICE behavior; those remain **NOT VERIFIED**. Independent
+reviews R1 and R2 returned bounded **PROVISIONAL PASS** with no remaining
+findings; see `docs/reviews/GR-045/INDEPENDENT-REVIEW-R1.md` and `R2.md`.
+Work-item state: **GPT REVIEW PENDING**; upstream publication remains locked.
+
 Every work item in this project ends here. GPT performs an **independent** review
 and does not trust the free-model verdicts.
 
@@ -578,14 +592,14 @@ Publication: LOCKED; no upstream issue, PR, RFC, or patch was published
 ### GR-021 — DesignCraft host-save acknowledgement prototype
 
 ```text
-Status:      bounded local prototype; project GPT verdict remains FAIL on 0edbe524
+Status:      bounded local prototype; GR-045 verifies actual-WASM browser host flow; project GPT verdict remains FAIL on 0edbe524
 Base:        storytold/designcraft 80d13911b2d20fbb5cd9398696627bb3a715417b
-Transport:   craft-platform `91836a9ebad5ffcd8f1966fb4f36dc84387f2cdd`
-Patch:       `1333c9d24f19cbc458a436fac77a94f15924f5c9d1ec428c630fbadd0b2cbb30`
+Transport:   craft-platform `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
+Patch:       `519c03180b17f035ef8fbfcd08a85bda312f6f0721bfbdf9dc1d9d5992fdf972`
 Scope:       one pathless native .designcraft document; serialized snapshot save with durable ticket ACK; no Save As
 Tests:       five focused Rust 1.95 tests, locked WASM check, formatting and diff checks PASS
 Independent: Luna high R1 found pre-copy transport gap; package fixed/reviewed. Luna high R3 PROVISIONAL: no code blocker/major; R2 P3 peak-serialization-memory qualification is documented
-Open:        browser messaging, Seafile version/reopen, and production security NOT VERIFIED; 64 MiB serialized payload cap is after allocation
+Open:        Seafile version/reopen and production security NOT VERIFIED; GR-045 actual-WASM synthetic open/edit/save/ACK/fresh-reopen evidence does not establish durable persistence; 64 MiB serialized payload cap is after allocation
 GPT review:  not a project candidate; project remains GPT REVIEW FAIL on 0edbe524
 Publication: LOCKED; no upstream issue, PR, RFC, or patch published
 ```

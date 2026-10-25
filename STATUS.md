@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local ma
 BRANCH:     main
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
 CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038/039 and are not project-level GPT-reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; GR-044 covers DeckCraft host-save browser runtime; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; GR-044 covers DeckCraft and GR-045 covers DesignCraft host-save browser runtime; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -22,11 +22,13 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-044 — Chromium loaded the actual patched DeckCraft WASM, edited
-a synthetic slide, captured and acknowledged exact save bytes, observed clean
-state, and reopened those bytes in a fresh iframe. Seafile version creation,
-Seafile-backed reopen, and dispatcher behavior remain **NOT VERIFIED**. See
-`docs/GR-044-DECKCRAFT-WASM-SMOKE.md` and `docs/reviews/GR-044/`.
+CURRENT GR: GR-045 — Chromium loaded actual patched DesignCraft WASM, opened a
+synthetic native document, edited visible text, captured and acknowledged exact
+save bytes, observed clean state, and reopened those bytes in a fresh iframe.
+Independent R1/R2 evidence reviews returned bounded **PROVISIONAL PASS** with
+no remaining findings. Seafile version creation, Seafile-backed reopen, and
+dispatcher behavior remain **NOT VERIFIED**. See
+`docs/GR-045-DESIGNCRAFT-WASM-SMOKE.md` and `docs/reviews/GR-045/`.
 
 GR-043 — Chromium verifies an expired in-memory gateway session is
 refused during save: actual 404 with reopen guidance, dirty preserved,
@@ -159,14 +161,15 @@ OPEN GAPS:
   Seafile dispatch/version/reopen remains NOT VERIFIED. The
   full workspace test suite did not complete; `xtask ci` stops at existing
   Clippy findings outside the changed files. See `docs/reviews/GR-020/README.md`.
-- GR-021 prototypes a one-document DesignCraft Web host-save adapter over the
+- GR-021 provides a one-document DesignCraft Web host-save adapter over the
   shared transport at `56c5e16`. Five focused Rust 1.95 tests, the locked WASM
   check, formatting and diff checks pass. Luna high R3 and the independent
   transport re-pin review found no code-level blocker or major on the exact
-  patch. A P3 resource limit remains: the 64 MiB
-  outbound guard runs after serialization allocation, so it does not bound
-  peak memory for larger documents. Browser messaging and Seafile
-  version/reopen remain NOT VERIFIED; see `docs/reviews/GR-021/`.
+  patch. A P3 resource limit remains: the 64 MiB outbound guard runs after
+  serialization allocation, so it does not bound peak memory for larger
+  documents. GR-045 verifies actual-WASM browser open/edit/save/ACK/reopen with
+  an in-memory parent; Seafile version/reopen remains NOT VERIFIED. See
+  `docs/reviews/GR-021/` and `docs/reviews/GR-045/`.
 - GR-024 changes the shared transport parser to ignore malformed save ACKs,
   preserving pending/unknown outcome semantics. The bounded review and package
   checks pass; browser execution was not run. The immutable transport commit is

@@ -1,3 +1,15 @@
+## 2026-10-25 — GR-045 DesignCraft browser host-save smoke
+
+* Built the actual GR-021 patched DesignCraft WASM from pinned source and
+  exercised it in Chromium with a same-origin synthetic parent. A visible
+  native-document text edit emitted 3,184 bytes; the matching positive ACK
+  cleared dirty state, and a fresh iframe reopened the edit from those bytes.
+* Added the reproducible harness, native fixture, captured payload and browser
+  screenshot under `docs/reviews/GR-045/`; updated the DesignCraft test matrix
+  and review queue. Independent R1/R2 reviews returned bounded PROVISIONAL PASS
+  with no remaining findings. Seafile version/reopen, dispatcher, production and
+  ONLYOFFICE remain **NOT VERIFIED**; no upstream changes were made.
+
 ## 2026-10-25 — GR-044 DeckCraft browser host-save smoke
 
 * Built the actual DeckCraft WASM from the GR-020 patched source and exercised

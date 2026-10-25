@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GR-045 DesignCraft synthetic host</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; font: 14px system-ui, sans-serif; }
+    #bar { min-height: 72px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; flex-wrap: wrap; }
+    #status { flex: 1; }
+    #meta { flex-basis: 100%; font: 11px ui-monospace, monospace; }
+    #editor { width: 100%; height: calc(100% - 72px); border: 0; }
+    button { padding: 7px 10px; }
+  </style>
+</head>
+<body>
+  <div id="bar">
+    <strong>GR-045 synthetic host</strong>
+    <span id="status">Waiting for DesignCraft…</span>
+    <span>Edit the sample text, then use File › Save or Ctrl+S in the editor.</span>
+    <button id="reopen" disabled>Reopen captured bytes</button>
+    <span id="meta">No save captured yet</span>
+  </div>
+  <iframe id="editor" title="DesignCraft editor"></iframe>
+  <script>
+    const frame = document.querySelector('#editor');
+    const status = document.querySelector('#status');
+    const meta = document.querySelector('#meta');
+    const reopen = document.querySelector('#reopen');
+    let savedBytes = null;
+    let savedTicket = null;
+    let saveHash = null;
+    let reopening = false;
+    const appPath = new URLSearchParams(location.search).get('app') || './designcraft/index.html';
+
+    async function open(name, bytes) {
+      const copy = bytes.slice();
+      frame.contentWindow.postMessage({ type: 'designcraft:open', name, bytes: copy.buffer }, location.origin, [copy.buffer]);
+    }
+    window.addEventListener('message', async event => {
+      if (event.origin !== location.origin || event.source !== frame.contentWindow) return;
+      const message = event.data;
+      if (!message || typeof message.type !== 'string') return;
+      if (message.type === 'designcraft:ready') {
+        const bytes = reopening ? savedBytes : new Uint8Array(await (await fetch('./synthetic.designcraft')).arrayBuffer());
+        await open('GR-045-synthetic.designcraft', bytes);
+        status.textContent = `${reopening ? 'Reopened captured' : 'Opened synthetic'} native document (${bytes.byteLength} bytes)`;
+      } else if (message.type === 'designcraft:dirty') {
+        if (reopening && !message.dirty) {
+          status.textContent = `Fresh iframe reopened saved bytes; clean (ticket ${savedTicket}, SHA-256 ${saveHash})`;
+          reopen.disabled = false;
+        } else {
+          status.textContent = `Editor dirty=${message.dirty}`;
+        }
+      } else if (message.type === 'designcraft:save') {
+        const data = message.bytes instanceof ArrayBuffer
+          ? new Uint8Array(message.bytes)
+          : new Uint8Array(message.bytes.buffer, message.bytes.byteOffset, message.bytes.byteLength);
+        savedBytes = data.slice();
+        savedTicket = message.ticket;
+        saveHash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', savedBytes))]
+          .map(byte => byte.toString(16).padStart(2, '0')).join('');
+        meta.textContent = `Captured ${savedBytes.byteLength} bytes · SHA-256 ${saveHash} · ACK ${savedTicket}`;
+        frame.contentWindow.postMessage({ type: 'designcraft:saveResult', ticket: message.ticket, ok: true }, location.origin);
+        status.textContent = `Captured save bytes and sent matching positive ACK ${savedTicket}`;
+        reopen.disabled = false;
+      } else if (message.type === 'designcraft:failed') {
+        status.textContent = `DesignCraft failed: ${message.error}`;
+      }
+    });
+    reopen.addEventListener('click', () => {
+      if (!savedBytes) return;
+      reopening = true;
+      frame.src = `${appPath}?host=parent&webgl&blank&reopen=${Date.now()}`;
+      status.textContent = 'Starting fresh DesignCraft instance…';
+    });
+    frame.src = `${appPath}?host=parent&webgl&blank`;
+  </script>
+</body>
+</html>
