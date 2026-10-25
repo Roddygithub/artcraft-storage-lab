@@ -508,3 +508,14 @@ GR-049/050 and gateway checks pass. GPT REVIEW PENDING; no project verdict.
 
 Evidence: `docs/reviews/GR-052/`; `tests/test_gr052_upstream_save_loss.py`.
 PROVISIONAL implementation; GPT REVIEW PENDING; no project GPT PASS.
+
+## GR-053. Credential redirect isolation
+
+| Scenario | Result |
+|---|---|
+| 301/302/303/307/308 with Authorization or credential query | PASS; target receives no request |
+| Signed download/update/upload path-only bearer | PASS; redirect refused |
+| Public no-credential request with ordinary query | PASS; 302 followed intentionally |
+| Gateway suite / pycompile / diff check | PASS; docs/reviews/GR-053/ |
+| Real Seafile redirects / browser MVP | NOT VERIFIED; no external access |
+| Independent review | [x] R1–R2 PROVISIONAL PASS, no blocker/major; GPT REVIEW PENDING |

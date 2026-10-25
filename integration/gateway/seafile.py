@@ -26,6 +26,12 @@ class SeafileError(Exception):
         self.body = body
 
 
+class _RejectRedirects(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        fp.close()
+        raise SeafileError("Seafile credential-bearing redirect refused", status=code)
+
+
 class Seafile:
     _credential_query_keys = {"access_token", "token", "jwt", "signature", "password"}
 
@@ -37,19 +43,28 @@ class Seafile:
     # -- plumbing ---------------------------------------------------------
 
     def _request(self, url, method="GET", headers=None, data=None, raw=False, auth=True,
-                 response_limit=None):
+                 response_limit=None, allow_redirects=True):
         """Perform a request.
 
-        `auth=False` sends no credential. The file server's own URLs already carry
-        a short-lived token in the query string, so the account token must not be
+        `auth=False` omits the account Authorization header. File-server URLs
+        carry a short-lived token in their path or query, so the account token must not be
         sent to them: it would widen the blast radius of a leak for no gain.
         """
         headers = dict(headers or {})
         if auth and self.token and "Authorization" not in headers:
             headers["Authorization"] = "Token " + self.token
         req = urllib.request.Request(url, method=method, data=data, headers=headers)
+        # Signed file-server links can carry bearer tokens in their path too.
+        # Query keys are decoded and case-folded before the shared API guard.
+        credential_query = any(
+            key.casefold() in self._credential_query_keys
+            for key, _ in urllib.parse.parse_qsl(
+                urllib.parse.urlsplit(url).query, keep_blank_values=True))
+        reject_redirects = not allow_redirects or req.has_header("Authorization") or credential_query
+        handlers = [_RejectRedirects()] if reject_redirects else []
+        opener = urllib.request.build_opener(*handlers)
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            with opener.open(req, timeout=self.timeout) as resp:
                 body = resp.read(response_limit + 1) if response_limit is not None else resp.read()
                 if response_limit is not None and len(body) > response_limit:
                     raise SeafileError("Seafile response exceeds the document limit", 413)
@@ -192,7 +207,7 @@ class Seafile:
         if not isinstance(link, str) or not link:
             raise SeafileError(f"no download link for {repo_id} {path}: {link!r}")
         # The link carries its own file-server token; the account token stays home.
-        status, body = self._request(link, raw=True, auth=False)
+        status, body = self._request(link, raw=True, auth=False, allow_redirects=False)
         return body
 
     def update_link(self, repo_id, parent_dir):
@@ -229,7 +244,7 @@ class Seafile:
             "Content-Length": str(len(body)),
         }
         status, resp = self._request(link, method="POST", headers=headers, data=body, raw=True,
-                                     auth=False)
+                                     auth=False, allow_redirects=False)
         return self._file_id(resp)
 
     def upload_file(self, repo_id, parent_dir, name, data, replace=True):
@@ -264,7 +279,7 @@ class Seafile:
             "Content-Length": str(len(body)),
         }
         status, resp = self._request(link, method="POST", headers=headers, data=body, raw=True,
-                                     auth=False)
+                                     auth=False, allow_redirects=False)
         return self._file_id(resp)
 
     @staticmethod

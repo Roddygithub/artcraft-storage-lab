@@ -1,3 +1,13 @@
+## 2026-10-25 — GR-053 credential redirect guard
+
+- Added stdlib redirect rejection for Authorization, recognized credential query
+  keys and all three signed-link callers, including path-only capabilities.
+- Two-loopback-server regression and gateway checks pass; pycompile/diff checked.
+- R1 found a MINOR `lower()`/casefold wording mismatch; code changed to `casefold()`
+  with a percent-encoded Unicode regression. R2 PROVISIONAL PASS, no
+  blocker/major. GPT REVIEW PENDING; real Seafile redirects NOT VERIFIED.
+  Evidence: `docs/reviews/GR-053/`.
+
 ## 2026-10-25 — GR-052 ambiguous upstream save response reconciliation
 
 - Only status=None from the upstream save triggers user-bound detail/content/detail

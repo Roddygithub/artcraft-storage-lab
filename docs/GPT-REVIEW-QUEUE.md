@@ -1,5 +1,14 @@
 # GPT Review Queue
 
+## GR-053 — Credential redirect guard
+
+**BOUNDED INDEPENDENT R1–R2: PROVISIONAL PASS, no blocker/major; GPT REVIEW
+PENDING.** Local redirect/gateway checks pass. Real Seafile redirect behavior
+NOT VERIFIED; canonical base/file-server URLs required. This is not a project
+GPT PASS. Evidence:
+`docs/GR-053-CREDENTIAL-REDIRECTS.md`, `docs/reviews/GR-053/`.
+
+
 ## GR-052 — Ambiguous upstream save response reconciliation
 
 **BOUNDED INDEPENDENT R1–R3: PROVISIONAL PASS, no blocker/major; GPT REVIEW

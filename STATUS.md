@@ -1,5 +1,14 @@
 # STATUS
 
+## CURRENT GR: GR-053 — credential redirects
+
+Credential-bearing API and signed-link redirects fail closed; public redirects
+remain enabled. Local regression and gateway checks pass. Independent R1–R2
+bounded reviews: PROVISIONAL PASS, no blocker/major. GPT REVIEW PENDING. Real
+Seafile redirects NOT VERIFIED. Evidence:
+`docs/GR-053-CREDENTIAL-REDIRECTS.md`, `docs/reviews/GR-053/`.
+
+
 ```text
 PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local main
 BRANCH:     main
@@ -22,15 +31,19 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-052 — ambiguous upstream save response reconciliation.
-Synthetic native tests confirm exact bounded user-bound reread after status=None;
+CURRENT GR: GR-053 — credential redirect isolation.
+Loopback tests prove urllib redirects credential-bearing requests and signed
+file-server links are refused before a second host receives the request; public
+credential-free redirects still work. Independent review PENDING; real Seafile
+redirect behavior is NOT VERIFIED. No project GPT PASS.
+See `docs/GR-053-CREDENTIAL-REDIRECTS.md`, `docs/reviews/GR-053/`.
+
+PREVIOUS GR: GR-052 — ambiguous upstream save response reconciliation.
+Ten synthetic tests confirm exact bounded user-bound reread after status=None;
 permission/identity/head/read failures fail closed, no second write. GR-049/050
 and gateway checks pass. Independent R1–R3 bounded reviews: PROVISIONAL PASS,
-no blocker/major; minor test/docs notes were remediated. GPT REVIEW PENDING.
-Implementation is locally validated; real Seafile/browser behavior remains
-NOT VERIFIED, and no project GPT PASS is claimed.
-Real Seafile/browser MVP remains NOT VERIFIED.
-See `docs/GR-052-UPSTREAM-SAVE-RECONCILIATION.md`, `docs/reviews/GR-052/`.
+no blocker/major; test/docs notes remediated. Real Seafile/browser behavior and
+project GPT PASS remain NOT VERIFIED. See `docs/GR-052-UPSTREAM-SAVE-RECONCILIATION.md`.
 
 PREVIOUS GR: GR-051 — loopback Chromium post-commit response-loss/retry proof
 based on 5a1ceb66; synthetic editor (not actual WASM), FakeSeafile (not

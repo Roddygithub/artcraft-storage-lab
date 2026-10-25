@@ -1,0 +1,65 @@
+[PASS] the extension is the one after the last dot  -- report.final.docx -> docx
+[PASS] the extension is lowercased  -- REPORT.XLSX -> xlsx
+[PASS] a file with no dot has no editor
+[PASS] a read-only file opens in view mode  -- can_edit=False
+[PASS] a read-only session cannot write  -- {'ok': False, 'error': 'you do not have permission to edit this file'}
+[PASS] a refused write writes nothing  -- 0 write(s)
+[PASS] a user-bound token opens  -- None
+[PASS] an editable file may write
+[PASS] a revoked permission stops the write  -- HTTP 403
+[PASS] the revoked write wrote nothing
+[PASS] a user-bound token opens  -- None
+[PASS] a stale save is refused  -- HTTP 409
+[PASS] the refused stale save wrote nothing
+[PASS] a user-bound token opens  -- None
+[PASS] a current save is accepted  -- {'ok': True, 'file_id': 'bbbb', 'version': 'head-b', 'message': 'saved'}
+[PASS] the write happened
+[PASS] the session now holds the new content id  -- file_id=bbbb
+[PASS] a user-bound token opens  -- None
+[PASS] a document over the limit is refused  -- HTTP 413
+[PASS] the oversized save wrote nothing
+[PASS] an extension with no editor is refused
+[PASS] direct repo/path opening is disabled
+[PASS] HTTP direct /open cannot mint a session  -- HTTP 401: {"ok": false, "error": "a Seafile access_token is required"}
+[PASS] cross-origin POST cannot open or save a document  -- HTTP 403
+[PASS] the capability host page uses a nonce-bound strict CSP  -- HTTP 200; CSP nonce-bound=True
+[PASS] the host-page CSP nonce is fresh per response  -- distinct nonce=True
+[PASS] malformed configured Seafile origins fail closed without header injection  -- 6/6 rejected safely
+[PASS] configured default HTTPS port matches the browser's normalized Origin  -- HTTP 200
+[PASS] configured Seafile origin may only use the open handoff  -- open HTTP 200; dirty HTTP 403
+[PASS] a user-bound token opens  -- None
+[PASS] Save As cannot replace the original
+[PASS] PDF export cannot replace a DOCX
+[PASS] oversized OOXML type metadata is rejected before full decompression
+[PASS] ordinary XLSX MIME is accepted by the gateway
+[PASS] SoundCraft bundle with one root session is accepted
+[PASS] SoundCraft bundle without a root session is rejected
+[PASS] the project-native PhotoCraft fixture has the expected ZIP manifest
+[PASS] malformed .pcraft ZIP is rejected
+[PASS] .pcraft ZIP without a root manifest is rejected
+[PASS] nested manifest is not accepted as the .pcraft root manifest
+[PASS] duplicate exact-root manifests are rejected
+[PASS] empty exact-root manifest is rejected
+[PASS] invalid .pcraft save is refused before calling Seafile  -- HTTP 400; save calls=0
+[PASS] upstream failure does not leak a capability URL to the browser  -- HTTP 403: {"ok": false, "error": "HTTP 403 from http://127.0.0.1:33151/thirdparty-editor/file-content/", "conflict": false}
+[PASS] malformed save response cannot leak capability through browser JSON  -- HTTP 502: {'ok': False, 'error': 'Seafile could not confirm the save'}
+[PASS] Seafile document response is bounded before full buffering
+[PASS] a user-bound token opens  -- None
+[PASS] a user-bound token opens  -- None
+[PASS] concurrent saves have one winner  -- [200, 409]
+[PASS] the losing concurrent save is explicitly a conflict
+[PASS] the fake upstream CAS stored one version
+[PASS] a session is created with an unguessable id  -- 32 chars
+[PASS] a session is found
+[PASS] an unknown session is not found
+[PASS] the session store is capped  -- 3 sessions
+[PASS] an expired session is not found
+[PASS] the dispatch table is read from the file
+[PASS] every dispatch entry names an app and a url  -- {'pdf': {'app': 'pdfcraft', 'url': '/artcraft/pdfcraft/?host=parent'}, 'svg': {'app': 'vectorcraft', 'url': '/artcraft/v
+[PASS] the dispatch keys carry no dot  -- ['pdf', 'svg', 'xlsx', 'docx']
+[PASS] the pdf url asks for the host mode  -- /artcraft/pdfcraft/?host=parent
+[PASS] the svg url does not claim the host mode  -- /artcraft/vectorcraft/
+[PASS] the xlsx url asks for the host mode  -- /artcraft/gridcraft/?host=parent
+[PASS] the docx url asks for the host mode  -- /artcraft/wordcraft/?host=parent
+
+ALL CHECKS PASSED
