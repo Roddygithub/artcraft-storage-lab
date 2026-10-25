@@ -1,3 +1,16 @@
+## 2026-10-25 — GR-033 PhotoCraft browser host-protocol smoke
+
+* Reproduced the actual PhotoCraft Web/WASM host protocol in a same-origin
+  Chromium preview: synthetic Open, UI layer edit, exact save-message bytes and
+  ticket capture, matching in-memory success ACK, clean-state report, and fresh
+  iframe reopen showing the saved layer.
+* The parent retained bytes only in JavaScript memory. This proves browser
+  adapter interoperability, not Seafile persistence or a new server version.
+  The functional release build used wasm-opt=0; optimized bundle, deployment
+  security and ONLYOFFICE regression remain NOT VERIFIED.
+* Harness, screenshot, fixture hashes, and limitations are in
+  `docs/reviews/GR-033/`; summary: `docs/GR-033-PHOTOCRAFT-BROWSER-SMOKE.md`.
+
 ## 2026-10-25 — GR-032 PhotoCraft host-save adapter
 
 * Added a local one-document Rust Web adapter to the exact PhotoCraft `a02f2ee`

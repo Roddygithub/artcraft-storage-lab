@@ -1,0 +1,117 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhotoCraft GR-033 host smoke</title>
+<style>
+  body { margin: 0; font: 14px system-ui, sans-serif; color: #172033; background: #eef2f7; }
+  header { padding: 12px 16px; background: #fff; border-bottom: 1px solid #ccd5e1; }
+  button { margin: 4px 8px 4px 0; padding: 7px 12px; }
+  #state { font-weight: 600; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(100vh - 120px); }
+  iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+  aside { overflow: auto; padding: 12px; background: #fff; border-left: 1px solid #ccd5e1; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+</style>
+<header>
+  <button id="open">Open synthetic .pcraft</button>
+  <button id="ack" disabled>Send matching success ACK</button>
+  <button id="reopen" disabled>Open saved bytes in fresh editor</button>
+  <span id="state">Waiting</span>
+  <div>Inside PhotoCraft, make an edit (for example Layer → New → Layer), then use File → Save. This parent captures the exact bytes and ticket.</div>
+</header>
+<main>
+  <iframe id="editor" title="PhotoCraft"></iframe>
+  <aside><strong>Protocol log</strong><pre id="log"></pre></aside>
+</main>
+<script>
+(() => {
+  const editor = document.getElementById("editor");
+  const state = document.getElementById("state");
+  const log = document.getElementById("log");
+  const ack = document.getElementById("ack");
+  const reopen = document.getElementById("reopen");
+  let fixture = null;
+  let savedBytes = null;
+  let pendingTicket = null;
+  let nextOpen = null;
+  let ready = false;
+
+  function note(value) {
+    log.textContent = `${new Date().toISOString()} ${value}\n` + log.textContent;
+  }
+
+  function postOpen(bytes, name) {
+    const buffer = bytes.slice(0);
+    const length = buffer.byteLength;
+    editor.contentWindow.postMessage({ type: "photocraft:open", name, bytes: buffer }, location.origin, [buffer]);
+    state.textContent = `Opening ${name}`;
+    note(`sent photocraft:open (${length} bytes)`);
+  }
+
+  function createEditor(bytes, name) {
+    ready = false;
+    nextOpen = { bytes, name };
+    editor.src = `/dist/web/?host=parent`;
+  }
+
+  document.getElementById("open").onclick = async () => {
+    state.textContent = "Loading fixture…";
+    const response = await fetch("./photocraft-smoke.pcraft", { cache: "no-store" });
+    if (!response.ok) throw new Error(`fixture HTTP ${response.status}`);
+    fixture = await response.arrayBuffer();
+    createEditor(fixture, "GR-033-smoke.pcraft");
+  };
+
+  ack.onclick = () => {
+    if (!pendingTicket) return;
+    editor.contentWindow.postMessage({ type: "photocraft:saveResult", ticket: pendingTicket, ok: true }, location.origin);
+    note(`sent success ACK for ${pendingTicket}`);
+    ack.disabled = true;
+    state.textContent = "Success ACK sent (in-memory only)";
+  };
+
+  reopen.onclick = () => {
+    if (!savedBytes) return;
+    pendingTicket = null;
+    ack.disabled = true;
+    createEditor(savedBytes, "GR-033-smoke-saved.pcraft");
+  };
+
+  editor.addEventListener("load", () => {
+    ready = false;
+    state.textContent = "Editor page loaded; waiting for photocraft:ready";
+  });
+
+  window.addEventListener("message", async event => {
+    if (event.origin !== location.origin || event.source !== editor.contentWindow) return;
+    const message = event.data;
+    if (!message || typeof message.type !== "string") return;
+    if (message.type === "photocraft:ready") {
+      ready = true;
+      state.textContent = `Ready (${message.version ?? "unknown version"})`;
+      note(`received photocraft:ready version=${message.version ?? "?"}`);
+      if (nextOpen) {
+        const open = nextOpen;
+        nextOpen = null;
+        postOpen(open.bytes, open.name);
+      }
+    } else if (message.type === "photocraft:dirty") {
+      state.textContent = `Editor dirty=${Boolean(message.dirty)}`;
+      note(`received photocraft:dirty ${Boolean(message.dirty)}`);
+    } else if (message.type === "photocraft:save") {
+      const source = message.bytes instanceof ArrayBuffer ? new Uint8Array(message.bytes) : new Uint8Array(message.bytes.buffer);
+      savedBytes = source.slice().buffer;
+      pendingTicket = message.ticket;
+      const hash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", source)))
+        .map(byte => byte.toString(16).padStart(2, "0")).join("");
+      ack.disabled = false;
+      reopen.disabled = false;
+      state.textContent = `Captured ${source.byteLength} bytes; ACK pending`;
+      note(`captured photocraft:save ticket=${message.ticket} name=${message.name} saveAs=${message.saveAs} bytes=${source.byteLength} sha256=${hash}`);
+    } else if (message.type === "photocraft:failed") {
+      state.textContent = `Editor failure: ${message.error ?? "unknown"}`;
+      note(`received photocraft:failed ${message.error ?? ""}`);
+    }
+  });
+})();
+</script>

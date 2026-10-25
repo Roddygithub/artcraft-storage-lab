@@ -645,6 +645,18 @@ Publication: LOCKED; no upstream issue/PR/RFC, commit or push
 Evidence:    `docs/GR-032-PHOTOCRAFT-HOST-SAVE.md`, `docs/reviews/GR-032/`
 ```
 
+### GR-033 — PhotoCraft browser host-protocol smoke
+
+```text
+Status:      browser Open/edit/save/ACK/fresh iframe reopen reproduced; bounded independent evidence review PROVISIONAL ACCEPT
+Scope:       same-origin Chromium; parent retains bytes in JavaScript memory
+Save bytes:  4,995; SHA-256 cbaa7b458588780210d1da7a267d2d5223d6808e0b15ea9e80e84d23ea980f34
+Evidence:    screenshot, static host harness and synthetic fixture in docs/reviews/GR-033/runtime/
+Limits:      no Seafile write/version/readback, optimized bundle, deployment security or ONLYOFFICE regression
+Dispatch:    PhotoCraft remains excluded; no project GPT PASS or upstream publication approval
+Review:      Nemotron 3 Ultra PROVISIONAL ACCEPT; no blocker/major; reviewer did not rerun browser or builds
+```
+
 ## GPT review instruction (for the future session)
 
 ```text

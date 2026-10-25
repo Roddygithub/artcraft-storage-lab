@@ -346,3 +346,19 @@ NOT VERIFIED. SoundCraft remains excluded from the committed dispatch. See
 
 Patch hash, exact base, review request and limits: `docs/reviews/GR-032/` and
 `docs/GR-032-PHOTOCRAFT-HOST-SAVE.md`.
+
+## 24. PhotoCraft browser host-protocol smoke (GR-033)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 24.1 | Browser host Open | Same-origin parent opens the synthetic file in PhotoCraft Web/WASM | [x] Chromium preview received ready and sent the 4,000-byte fixture |
+| 24.2 | UI edit and save handoff | Real editor edit emits serialized bytes and a correlated ticket | [x] Added GR-033 saved layer; captured 4,995 bytes, SHA-256 cbaa7b458588780210d1da7a267d2d5223d6808e0b15ea9e80e84d23ea980f34 |
+| 24.3 | Matching ACK | Only matching parent success ACK makes the editor clean | [x] Matching ticket returned; editor reported dirty=false |
+| 24.4 | Fresh iframe reopen | Reopened bytes render the edit in a new editor instance | [x] New iframe showed GR-033 saved layer; screenshot and harness log retained |
+| 24.5 | Durable host write / Seafile version | ACK follows a committed Seafile version and readback | [ ] NOT VERIFIED; harness retains bytes only in page memory |
+| 24.6 | Optimized bundle and deployment controls | Production-optimized WASM works under TLS, proxy, CSP and adversarial-frame checks | [ ] NOT VERIFIED; build used wasm-opt=0, local same-origin loopback only |
+| 24.7 | Independent bounded evidence review | Browser claims and limits agree with retained artifacts | [x] Nemotron 3 Ultra PROVISIONAL ACCEPT; read-only artifact review, runtime not rerun |
+
+This smoke does not add PhotoCraft to the Seafile dispatch and is not a Seafile
+MVP or project GPT PASS. Evidence and limits: `docs/GR-033-PHOTOCRAFT-BROWSER-SMOKE.md`
+and `docs/reviews/GR-033/`.
