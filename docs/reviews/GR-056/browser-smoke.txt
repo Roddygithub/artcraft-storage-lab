@@ -1,0 +1,19 @@
+GR-056 actual-WASM Chromium synthetic memory-parent smoke
+Date: 2026-10-25
+Browser: T3 collaborative Chromium, 1280x800, SwiftShader/WebGL2
+Host page: supplied docs/reviews/GR-016/runtime/gridcraft-host.html
+Candidate served from: /home/roddy/.cache/artcraft-storage-lab/gr056-gridcraft-static/gridcraft
+Browser URL: http://127.0.0.1:8976/gridcraft-host.html
+Host transport: copied host page and fixture plus symlinks to the exact candidate files in a disposable cache directory; local python3 -m http.server
+Fixture: tests/fixtures/synthetic.xlsx (2,154 bytes)
+
+Result: PASS
+- Chromium loaded the candidate JS and WASM over HTTP 200.
+- Visible edit: B2 changed from 42 to 1337.
+- Visible recalculation: B3 formula bar displayed =SUM(B2:B2), result displayed 1337.
+- Events: gridcraft:dirty true; gridcraft:save ticket=gridcraft:1; matching gridcraft:saveResult ticket=gridcraft:1 ok=true; gridcraft:dirty false.
+- Fresh iframe reopen loaded memory-stored bytes. Visible B2=1337, B3=1337, and dirty=false.
+- Serialized XLSX: docs/reviews/GR-056/runtime/gridcraft-memory-saved.xlsx; 4,149 bytes; SHA-256 cf240bb1f1f67b7ddefd38939aebe6f7d6c13167063a5983d02aba91ce97ea2c.
+- Screenshot: docs/reviews/GR-056/runtime/gridcraft-fresh-reopen.png; 63,436 bytes; SHA-256 54f4dab2c6bc5a7db1581bffd859d5d3b948dfd49cb553a8b89b2c9d69f6542c.
+
+Boundary: the parent used browser sessionStorage only. No Seafile write, version/history result, API readback, production service or ONLYOFFICE path was exercised. This is not the Seafile MVP.

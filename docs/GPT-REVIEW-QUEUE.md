@@ -13,6 +13,36 @@ recorded. The project remains **INCOMPLETE**; this does not unlock upstream
 publication. See [GR-059 report](GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md)
 and [evidence](reviews/GR-059/).
 
+## GR-058 — reproducible VectorCraft candidate
+
+The exact `v0.14.0` source candidate, built with the release-pinned font input,
+passed the synthetic browser page-API edit/save/reopen flow against loopback
+storage. Independent R1 review: bounded PROVISIONAL PASS, no findings. Seafile
+version/reopen, release-binary reproducibility, and missing optional font
+rendering remain **NOT VERIFIED**. Candidate remains outside dispatch; project
+is **INCOMPLETE**, upstream publication **LOCKED**. See [report](GR-058-VECTORCRAFT-REPRODUCIBLE-CANDIDATE.md)
+and [review evidence](reviews/GR-058/).
+
+## GR-057 — reproducible PdfCraft candidate
+
+The exact source/patch/transport candidate passed actual-WASM synthetic browser
+form edit/save/ACK/fresh-reopen. R1–R2 bounded reviews are PROVISIONAL PASS;
+R1's optimizer wording MINOR was corrected. Seafile persistence/version/reopen
+remains **NOT RUN**; this build disabled `wasm-opt`. Candidate stays outside
+dispatch; project remains **INCOMPLETE** and upstream publication **LOCKED**.
+See [report](GR-057-PDFCRAFT-REPRODUCIBLE-CANDIDATE.md) and
+[review evidence](reviews/GR-057/).
+
+## GR-056 — reproducible GridCraft candidate
+
+The exact source/patch/transport candidate passed actual-WASM synthetic browser
+edit/save/ACK/reopen with B2/B3 recalculation. Independent R1–R5 bounded
+reviews are PROVISIONAL PASS with no remaining findings. A read-only Seafile GET
+preflight returned 404; no write was attempted and version/readback/reopen is
+**NOT RUN**. Candidate remains outside dispatch; project **INCOMPLETE**,
+upstream publication **LOCKED**. See [report](GR-056-GRIDCRAFT-REPRODUCIBLE-CANDIDATE.md)
+and [review evidence](reviews/GR-056/).
+
 ## GR-055 — reproducible WordCraft candidate
 
 Implementation produced an exact source/patch/transport Rust 1.95 release

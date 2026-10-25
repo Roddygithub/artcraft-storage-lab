@@ -1,0 +1,33 @@
+GR-056 focused validation record (2026-10-25)
+
+Source / patch / transport
+- Worktree branch: t3/gr056-gridcraft-candidate
+- Worktree base: 247ae75753d4d22c7567b53271b3bf0c0d119f99
+- Source HEAD: 06920de8da609c19de7446945cfc62b844691efd
+- Source remote: https://github.com/storytold/gridcraft.git
+- Stored patch SHA-256: 20b219e7f53d7fd0e2fa1c84033cef3d72b22e6f69fe4c4cbcab5ffff077945f
+- Normal git apply --check: exit 0; normal git apply: exit 0; no fuzz option
+- Reverse apply check after applying: PASS
+- Cargo.toml craft-platform rev: 90c261de22ef75c4c7c5c5cd1c712d483be0bbc8
+- Cargo.lock craft-platform source rev and resolved commit: 90c261de22ef75c4c7c5c5cd1c712d483be0bbc8
+
+Toolchain / build
+- rustc 1.95.0 (59807616e 2026-04-14)
+- cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+- trunk 0.22.0
+- Build command: RUSTUP_TOOLCHAIN=1.95.0 trunk build --release --locked --dist /home/roddy/.cache/artcraft-storage-lab/gr056-gridcraft-static/gridcraft
+- Build cwd: /home/roddy/.cache/artcraft-storage-lab/gr056-source/gridcraft/apps/gridcraft-web
+- Build result: exit 0; release profile finished in 2m43s; Trunk reported success
+- Build-only index overlay SHA-256: b86f07792b2c600a4d5f3ff275e4dffc4adbb70fc6b23edd713cf4e7fd919fd1
+- /home/roddy/.cargo/config.toml sets target-dir=/home/roddy/.cache/cargo-target and TMPDIR=/home/roddy/.cache/cargo-tmp; CARGO_TARGET_DIR remained unset. The active rustc build command used /home/roddy/.cache/cargo-target. No Cargo target or TMPDIR under /tmp.
+
+Post-build checks
+- python3 docs/reviews/GR-056/verify_candidate.py: PASS (4 assets, 25,378,206 bytes; path/size/hash, index, source, patch, transport and overlay)
+- sh -n docs/reviews/GR-056/commands.sh: PASS
+- python3 -m py_compile docs/reviews/GR-056/verify_candidate.py: PASS
+- Synthetic saved XLSX assertions: PASS (B2=1337; B3 formula SUM(B2:B2); cached B3=1337)
+- git diff --check: PASS
+- No integration/static or dispatch asset changed.
+
+The candidate file list, individual byte sizes and SHA-256 digests are in
+hash-inventory.json. The browser roundtrip result is in browser-smoke.txt.

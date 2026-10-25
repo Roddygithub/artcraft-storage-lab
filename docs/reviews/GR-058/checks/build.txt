@@ -1,0 +1,85 @@
+GR-058 build and provenance checks
+==================================
+
+Repository base: 247ae75753d4d22c7567b53271b3bf0c0d119f99
+Candidate path: /home/roddy/.cache/artcraft-storage-lab/gr058-vectorcraft-static/vectorcraft
+Source checkout: /home/roddy/.cache/artcraft-storage-lab/gr058-source/vectorcraft
+Source repository: https://github.com/storytold/vectorcraft.git
+Source tag: v0.14.0
+Source commit: ad0566943ab9741e6356bbc9b53c3cc09895068d
+Tag resolution: git ls-remote returned this commit for refs/tags/v0.14.0; lightweight tag.
+Source checkout after build: clean, detached at the pin.
+Cargo.lock SHA-256: 96b84621ca0b72f73a3e9d5dbdd830e616f42a4342a00130dc0ebaed298abf6b
+Source apps/vectorcraft-web/index.html SHA-256: b910a86a101c9aa4807dd67956f92a8e0e0ad60b3fa94fc84bb70cbf3761115e
+
+Source and release evidence commands:
+  git ls-remote --tags https://github.com/storytold/vectorcraft.git 'v0.14.0' 'refs/tags/v0.14.0^{}'
+  git clone https://github.com/storytold/vectorcraft.git /home/roddy/.cache/artcraft-storage-lab/gr058-source/vectorcraft
+  git -C /home/roddy/.cache/artcraft-storage-lab/gr058-source/vectorcraft checkout --detach ad0566943ab9741e6356bbc9b53c3cc09895068d
+  git clone https://github.com/storytold/craft-fonts.git /home/roddy/.cache/artcraft-storage-lab/gr058-source/craft-fonts
+  git -C /home/roddy/.cache/artcraft-storage-lab/gr058-source/craft-fonts checkout --detach a71c20e30af613287c504f7e685ca8fad77752bc
+  curl -fsSL https://github.com/storytold/vectorcraft/releases/download/v0.14.0/SHA256SUMS.txt -o SHA256SUMS.txt
+  curl -fsSL https://github.com/storytold/vectorcraft/releases/download/v0.14.0/vectorcraft-web-0.14.0.zip -o vectorcraft-web-0.14.0.zip
+  sha256sum -c SHA256SUMS.txt --ignore-missing
+
+Clean-machine toolchain provisioning (not needed for this run; installed tools were reused):
+  rustup toolchain install 1.95.0 --profile minimal
+  rustup target add wasm32-unknown-unknown --toolchain 1.95.0
+  cargo install trunk --version 0.22.0 --locked
+
+Pinned release font input:
+  Repository: https://github.com/storytold/craft-fonts.git
+  Commit: a71c20e30af613287c504f7e685ca8fad77752bc
+  fonts/manifest.txt SHA-256: ba26303ae75c4469104ea9dc54f828e7769e0e0259303e15f532c80ca4ed577e
+  The source release.yml specifies this `craft-fonts-ref` and `web-craft-fonts: true`.
+
+Release evidence:
+  ZIP: https://github.com/storytold/vectorcraft/releases/download/v0.14.0/vectorcraft-web-0.14.0.zip
+  SHA256SUMS: https://github.com/storytold/vectorcraft/releases/download/v0.14.0/SHA256SUMS.txt
+  ZIP SHA-256: 6f28a8bcee1c5ad6c37c6a0c44058793a40ea4443085866d5f78afb16aba075e
+  SHA256SUMS.txt SHA-256: 2a2fa7a6d12260aa2d7f097e819b90232cbdee00717ba2a1d9bf0941ac042f95
+  Check: sha256sum -c SHA256SUMS.txt --ignore-missing -> vectorcraft-web-0.14.0.zip: OK
+  Release index: 55f3e447e46af2d38be31efb4d9fe6a53944d11b3a90db82efbeae55faf7800f
+  Release JS:     6fefae1599ba61e318df66e0e63defa829fe176995bde7aa796d50b5edd5f01b
+  Release WASM:   6ff3616ff6cf11723d5b453ec2a64f5410cdd3830503017d761a775c3b24254d
+  These three hashes match GR-054's parent-local VectorCraft hashes exactly.
+
+Build toolchain:
+  rustc 1.95.0 (59807616e 2026-04-14)
+  cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+  trunk 0.22.0
+  target wasm32-unknown-unknown
+  Trunk-managed wasm-opt v131, -Oz
+  Cargo target /home/roddy/.cache/cargo-target; no TMPDIR override or /tmp build output.
+
+Final build command (exit 0):
+  cd /home/roddy/.cache/artcraft-storage-lab/gr058-source/vectorcraft/apps/vectorcraft-web
+  CRAFT_FONTS_DIR=/home/roddy/.cache/artcraft-storage-lab/gr058-source/craft-fonts CRAFT_FONTS_REQUIRED=1 RUSTUP_TOOLCHAIN=1.95.0 trunk build --release --locked --dist /home/roddy/.cache/artcraft-storage-lab/gr058-vectorcraft-static/vectorcraft
+
+Trunk built the optimized release successfully and ran the repository's
+post-build `cargo xtask web-fonts` hook. The hook copied Noto Sans Arabic, Thai,
+and Georgian plus the adjacent OFL files. The exact missing-face warning names
+Cairo Regular; Tajawal ExtraLight, Light, Regular, Medium, Bold, ExtraBold and
+Black; Almarai Light, Regular, Bold and ExtraBold; IBM Plex Sans Arabic Thin,
+ExtraLight, Light, Regular, Medium, SemiBold and Bold; Noto Kufi Arabic
+Regular; Amiri Regular, Italic, Bold and Bold Italic; Alexandria Regular;
+Fustat Regular; Reem Kufi Regular; Aref Ruqaa Regular and Bold; and Gulzar
+Regular. These are optional faces; their omission and script coverage are not
+hidden. The copied
+six font/license files match the release ZIP byte-for-byte.
+
+Comparison result:
+  Candidate index SHA-256: a067540826d3cc4fe03b8a9184cc0af41f0f8e704b9c42ef1b87bd8743c9e8ab
+  Candidate JS SHA-256:    d818c412f7e4a7aaa5d800edc43584556b3d1d3245654a0122101882836c8c2e
+  Candidate WASM SHA-256:  8b52bf8aa89f430c11fc1104edbe837296aaea2978c655226bc36adc478c9469
+  Candidate index/JS/WASM differ from release assets; see artifact_comparison in inventory.json.
+  Release workflow delegates to craft-common-actions release.yml@main; that floating workflow and
+  its full build environment were not frozen in this task. Release-binary reproducibility is NOT VERIFIED.
+
+Candidate check:
+  python3 docs/reviews/GR-058/verify_candidate.py --static-root /home/roddy/.cache/artcraft-storage-lab/gr058-vectorcraft-static
+  PASS: 9 staged VectorCraft files match recorded paths, sizes and SHA-256
+  PASS: all 2 index references resolve to manifested files
+
+No files were copied into integration/static or dispatch. No Seafile, production,
+ONLYOFFICE, credentials, or upstream write was used.

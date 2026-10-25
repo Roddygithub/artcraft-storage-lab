@@ -23,6 +23,51 @@ PASS. See [GR-059](GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md).
 | ONLYOFFICE post-deploy open | [x] Synthetic non-allowlisted DOCX opened; representative ONLYOFFICE 9.4 assets returned 200 | Open-only check; edit/save/version regression after this deployment is **NOT VERIFIED** |
 | Security/deployment failure cases | [ ] Permission revocation, external writer, token expiry/replay, response loss and cross-origin deployment not exercised here | Keep as project gates |
 
+## GR-058 — exact VectorCraft source candidate
+
+Source build from pinned `v0.14.0` and `craft-fonts` passed the current page-API
+host smoke in Chromium with loopback synthetic storage. Independent R1 review:
+PROVISIONAL PASS, no findings. The output differs from the official release
+bundle; Seafile persistence and optional missing-font rendering remain
+**NOT VERIFIED**. Candidate remains outside dispatch.
+
+| Check | Result | Scope |
+|---|---|---|
+| Source/font pins and release comparison | [x] Tag/commit and checksum-verified release archive match recorded inputs | Source build output is distinct from release bundle |
+| Candidate inventory | [x] Nine files, index links and integrity hashes verified | [`verify_candidate.py`](reviews/GR-058/verify_candidate.py); outside dispatch |
+| Actual candidate browser save/reopen | [x] Visible SVG edit, exact editor bytes stored by synthetic loopback parent, fresh session parses path | Not a Seafile test or common `?host=parent` protocol |
+| Independent review | [x] R1 bounded PROVISIONAL PASS, no findings | Project GPT remains INCOMPLETE |
+| Seafile storage/version/reopen | [ ] NOT RUN | No Seafile write; see GR-058 report |
+
+## GR-057 — exact PdfCraft candidate
+
+Actual built WASM passed synthetic AcroForm edit/save/ACK/fresh iframe reopen.
+Independent R1–R2 bounded reviews are PROVISIONAL PASS; the corrected report
+records that `wasm-opt` was disabled. Seafile persistence remains NOT RUN.
+
+| Check | Result | Scope |
+|---|---|---|
+| Exact source/patch/transport and build | [x] Pinned inputs, Rust 1.95/Trunk 0.22 release build recorded | `data-wasm-opt=0`; optimized output not compared |
+| Candidate inventory | [x] Three served files and index references verified | [`verify_candidate.py`](reviews/GR-057/verify_candidate.py); outside dispatch |
+| Actual browser edit/save/reopen | [x] Visible form edit, 2,403-byte save, matching memory ACK, clean state and fresh iframe reopen | Synthetic parent only |
+| Independent review | [x] R1–R2 bounded PROVISIONAL PASS; R1 wording MINOR corrected | Project GPT remains INCOMPLETE |
+| Seafile storage/version/reopen | [ ] NOT RUN | No Seafile endpoint accessed in GR-057 |
+
+## GR-056 — exact GridCraft candidate
+
+The actual release WASM passed a synthetic memory-parent edit/save-ACK/reopen
+flow, including B2/B3 formula recalculation. Independent R1–R5 bounded reviews
+are PROVISIONAL PASS with no remaining findings. Seafile persistence remains
+NOT RUN after a read-only 404 preflight; no write was attempted.
+
+| Check | Result | Scope |
+|---|---|---|
+| Exact source/patch/transport and build | [x] Pinned GridCraft source, GR-016 patch and transport `90c261de`; Rust 1.95 build | Build-local `data-wasm-opt=0`; optimized output not verified |
+| Candidate inventory | [x] Four served files, hashes, index links and provenance verifier pass | [`verify_candidate.py`](reviews/GR-056/verify_candidate.py); outside dispatch |
+| Actual browser edit/save/reopen | [x] B2→1337, formula B3→1337, matching ACK and fresh iframe reopen | Synthetic memory parent only |
+| Independent review | [x] R1–R5 bounded PROVISIONAL PASS, no remaining findings | Project GPT remains INCOMPLETE |
+| Seafile storage/version/reopen | [ ] NOT RUN | Read-only GET preflight 404; no write attempted |
+
 ## GR-055 — exact WordCraft candidate
 
 GR-059 deployed that exact staged candidate for one explicitly synthetic

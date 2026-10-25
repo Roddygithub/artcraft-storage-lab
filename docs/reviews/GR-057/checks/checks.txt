@@ -1,0 +1,24 @@
+GR-057 bounded build and candidate checks
+Date: 2026-10-25
+Base worktree: 247ae75753d4d22c7567b53271b3bf0c0d119f99
+PdfCraft source: 57e531ccca0047597809748b5cb4276336d6051a
+Stored patch SHA-256: 6d50eb1f45e81f2037948cd6160878feb2d87eb0881d167f0fc1d290e4450562
+Transport revision: craft-platform 90c261de22ef75c4c7c5c5cd1c712d483be0bbc8
+Rust: rustc 1.95.0 (59807616e 2026-04-14)
+Cargo: 1.95.0 (f2d3ce0bd 2026-03-21)
+Trunk: 0.22.0
+Patch application: git apply --check PASS; exact stored patch applied once
+Patched Cargo.lock SHA-256: 190c8a287c2010654192ecce2eb28b38aecb160a95fb5da62f9a6da774a88066
+Build: trunk build --release --locked --dist <cache candidate> --verbose; exit 0
+Build output: /home/roddy/.cache/artcraft-storage-lab/gr057-pdfcraft-static/pdfcraft
+Cargo target: /home/roddy/.cache/cargo-target
+TMPDIR: /home/roddy/.cache/cargo-tmp
+Build overlay: data-wasm-opt="0"; resulting apps/pdfcraft-web/index.html SHA-256 e1a34a29221432c5612c0b953f6c4cc7f5d5c6176c046b98ef728c78f0a58539
+Optimizer observation: Trunk's verbose log says "wasm-opt is turned off". Staged output is unoptimized by Binaryen.
+Candidate verifier: python3 docs/reviews/GR-057/verify_candidate.py PASS (3 served assets; exact membership, sizes, hashes and index references)
+Browser: uv run --with playwright --python 3.14 -- python -u docs/reviews/GR-057/runtime/test_pdfcraft_host_roundtrip.py ... PASS (actual generated WASM)
+Python syntax: python3 -m py_compile docs/reviews/GR-057/verify_candidate.py docs/reviews/GR-057/runtime/test_pdfcraft_host_roundtrip.py PASS
+Whitespace: git diff --check PASS
+Dispatch: integration/static/pdfcraft absent; integration/config/dispatch.json unchanged
+Seafile: no access in GR-057; persistence/version/readback/reopen NOT RUN
+Review: R1–R2 independent bounded PROVISIONAL PASS; GPT REVIEW PENDING

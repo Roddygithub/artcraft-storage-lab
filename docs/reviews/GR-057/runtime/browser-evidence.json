@@ -1,0 +1,26 @@
+{
+  "result": "PASS",
+  "fixture_bytes": 1744,
+  "fixture_sha256": "c6f8b656e225101129aa36bd5467adc8dba16730915f19caca17f6a546d0b040",
+  "saved_bytes": 2403,
+  "saved_sha256": "d99a53e45b423d664f97cf3f7f7873643a6dd4c73b6feca4b5f60db9e4faf2c2",
+  "ready_count": 2,
+  "dirty_sequence": [
+    false,
+    true,
+    false,
+    false
+  ],
+  "saves": [
+    {
+      "ticket": "pdfcraft:1",
+      "name": "synthetic.pdf",
+      "length": 2403,
+      "sha256": "d99a53e45b423d664f97cf3f7f7873643a6dd4c73b6feca4b5f60db9e4faf2c2"
+    }
+  ],
+  "visible_edit": "GR-057 visible PDF form edit",
+  "fresh_iframe_reopen": true,
+  "console_page_errors": [],
+  "scope": "actual built PdfCraft WASM; synthetic in-memory parent ACK; no Seafile persistence"
+}

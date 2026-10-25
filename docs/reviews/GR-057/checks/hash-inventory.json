@@ -1,0 +1,25 @@
+{
+  "static_root": "/home/roddy/.cache/artcraft-storage-lab/gr057-pdfcraft-static",
+  "app": "pdfcraft",
+  "files": [
+    {
+      "path": "index.html",
+      "size_bytes": 1210,
+      "sha256": "3a6e2ec1bad7f1f495256502bcfb525646267681c7b66577d689475ace33264c"
+    },
+    {
+      "path": "pdfcraft-web-a30dc4dd8a148def_bg.wasm",
+      "size_bytes": 49909107,
+      "sha256": "fcf3e3721c399fd695d3e431689f35b83e81b94960bd5d1eb57e1614ba5dcec4"
+    },
+    {
+      "path": "pdfcraft-web-d3ba543cb17a7f63.js",
+      "size_bytes": 165584,
+      "sha256": "84eea07a552e7c98b12c837f086c4da2364a285a5d468ad8ffc0f082fda0e042"
+    }
+  ],
+  "index_references": [
+    "pdfcraft-web-a30dc4dd8a148def_bg.wasm",
+    "pdfcraft-web-d3ba543cb17a7f63.js"
+  ]
+}

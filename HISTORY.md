@@ -13,6 +13,22 @@
 - Evidence: `docs/GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md`,
   `docs/reviews/GR-059/`.
 
+## 2026-10-26 — independent reviews of staged GR-056–058 candidates
+
+- GR-056 GridCraft R5 returned bounded PROVISIONAL PASS with no remaining
+  findings. The candidate verifier and whitespace checks passed; read-only
+  Seafile GET preflight documentation is distinguished from persistence tests.
+- GR-057 PdfCraft R1 returned PROVISIONAL PASS with one documentation MINOR;
+  R2 confirmed the corrected `wasm-opt` statement. No build or browser replay
+  was run during review.
+- GR-058 VectorCraft R1 returned bounded PROVISIONAL PASS with no findings.
+  Source/font pins, candidate inventory and synthetic browser evidence were
+  consistent.
+- These candidates remain outside dispatch. Durable Seafile persistence for
+  GR-056–058 remains NOT RUN; project verdict is INCOMPLETE and upstream
+  publication remains locked. Evidence is under `docs/reviews/GR-056/` through
+  `docs/reviews/GR-058/`.
+
 ## 2026-10-25 — GR-055 reproducible WordCraft candidate
 
 - Built actual WordCraft Web/WASM from exact source `00bc6a4b`, the GR-054

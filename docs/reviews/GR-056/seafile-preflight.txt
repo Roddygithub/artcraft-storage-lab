@@ -1,0 +1,14 @@
+Read-only Seafile integration preflight — 2026-10-25
+
+A dedicated synthetic library was identified on the user-authorized Seafile
+instance. Library name, UUID, hostname, credentials, and file contents are
+intentionally omitted from this public evidence bundle.
+
+From inside the Seafile container, without credentials and using GET only:
+
+  GET /api2/server-info/ -> HTTP 200; Seafile 12.0.14
+  GET /thirdparty-editor/file-save/ -> HTTP 404
+
+The ArtCraft gateway calls the second route for conditional writes. No POST,
+file write, service restart, configuration change, or ONLYOFFICE action was
+performed. Exact-candidate Seafile save/version/readback/reopen remains NOT RUN.

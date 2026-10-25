@@ -1,0 +1,17 @@
+{
+  "candidate_root": "/home/roddy/.cache/artcraft-storage-lab/gr056-gridcraft-static/gridcraft",
+  "source_root": "/home/roddy/.cache/artcraft-storage-lab/gr056-source/gridcraft",
+  "source_commit": "06920de8da609c19de7446945cfc62b844691efd",
+  "patch_path": "docs/reviews/GR-016/patches/gridcraft-shared-transport.patch",
+  "patch_sha256": "20b219e7f53d7fd0e2fa1c84033cef3d72b22e6f69fe4c4cbcab5ffff077945f",
+  "transport_revision": "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8",
+  "overlay_path": "apps/gridcraft-web/index.html",
+  "overlay_sha256": "b86f07792b2c600a4d5f3ff275e4dffc4adbb70fc6b23edd713cf4e7fd919fd1",
+  "index_references": ["gridcraft-45f84b7721cb79a9.ico", "gridcraft-web-3f5e5bd239be29ab_bg.wasm", "gridcraft-web-7252118cd6cd1011.js"],
+  "files": [
+    {"path": "gridcraft-45f84b7721cb79a9.ico", "size_bytes": 26895, "sha256": "f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07"},
+    {"path": "gridcraft-web-3f5e5bd239be29ab_bg.wasm", "size_bytes": 25189512, "sha256": "3d80731976bed742c1510907da19a4bcbf813faba96c25cd88e0b798a0f7f52f"},
+    {"path": "gridcraft-web-7252118cd6cd1011.js", "size_bytes": 160195, "sha256": "e7661ed559545436751ab2e6d1afd523357586cfc08151d87bf5a5fb53b562b3"},
+    {"path": "index.html", "size_bytes": 1604, "sha256": "6a30e84092705a7cc22164b9adb3d1cd569db41fbc5c9e8700178c82659602f7"}
+  ]
+}

@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+"""Exercise a staged VectorCraft bundle through the real host page and fake storage."""
+
+import argparse
+from functools import partial
+from http.server import BaseHTTPRequestHandler, SimpleHTTPRequestHandler, ThreadingHTTPServer
+import hashlib
+from pathlib import Path
+import sys
+import threading
+
+from playwright.sync_api import sync_playwright
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path[:0] = [str(ROOT), str(Path(__file__).resolve().parent)]
+from integration.gateway.hostpage import render
+from test_gr012_svg import has_expected_stroke, has_serialized_stroke
+
+FIXTURE = ROOT / "tests/fixtures/synthetic.svg"
+SAVED = None
+SAVE_COUNT = 0
+
+
+class Handler(SimpleHTTPRequestHandler):
+    def log_message(self, *_args):
+        pass
+
+    def _send(self, status, body, content_type="application/json"):
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        global SAVED
+        if self.path == "/":
+            return self._send(200, render("candidate", "vectorcraft", "/editor/", "synthetic.svg", True).encode(),
+                              "text/html; charset=utf-8")
+        if self.path == "/session/candidate/document":
+            return self._send(200, SAVED, "application/octet-stream")
+        if self.path.startswith("/editor/"):
+            self.path = self.path[len("/editor"):]
+        return super().do_GET()
+
+    def do_POST(self):
+        global SAVED, SAVE_COUNT
+        if self.path != "/session/candidate/save" or self.headers.get("X-ArtCraft-Filename") != "synthetic.svg":
+            return self._send(404, b'{"ok":false}')
+        SAVED = self.rfile.read(int(self.headers.get("Content-Length", "0")))
+        SAVE_COUNT += 1
+        return self._send(200, b'{"ok":true,"version":"synthetic-v1"}')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--static-root", type=Path, required=True,
+                        help="directory containing the staged vectorcraft/ bundle")
+    parser.add_argument("--screenshot", type=Path,
+                        help="optional path for a browser screenshot after the edit")
+    args = parser.parse_args()
+    root = (args.static_root / "vectorcraft").resolve()
+    if not (root / "index.html").is_file():
+        raise SystemExit(f"candidate index not found: {root / 'index.html'}")
+
+    global SAVED, SAVE_COUNT
+    SAVED = FIXTURE.read_bytes()
+    SAVE_COUNT = 0
+    server = ThreadingHTTPServer(("127.0.0.1", 0), partial(Handler, directory=str(root)))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True, args=[
+                "--enable-unsafe-swiftshader", "--use-gl=angle", "--use-angle=swiftshader"])
+            page = browser.new_page()
+            url = f"http://127.0.0.1:{server.server_port}/"
+            page.goto(url)
+            page.wait_for_function("() => document.querySelector('#frame')?.contentWindow?.vectorcraft?.openFile",
+                                   timeout=60000)
+            page.wait_for_function("() => document.querySelector('#state')?.textContent.includes('opened')")
+            page.evaluate("() => document.querySelector('#frame').contentWindow.vectorcraft.request('ui.tool.select', {tool:'pencil'})")
+            events = [
+                {"kind": "down", "x": 60, "y": 60, "space": "doc"},
+                {"kind": "drag", "x": 120, "y": 90, "space": "doc"},
+                {"kind": "drag", "x": 180, "y": 120, "space": "doc"},
+                {"kind": "up", "x": 180, "y": 120, "space": "doc"},
+            ]
+            page.evaluate("events => document.querySelector('#frame').contentWindow.vectorcraft.request('ui.pointer', {events})", events)
+            page.evaluate("() => document.querySelector('#frame').contentWindow.vectorcraft.request('app.save', {path:'synthetic.svg',svg:{}})")
+            page.wait_for_function("() => window.__lastSave?.ok === true", timeout=30000)
+            assert page.evaluate("() => document.querySelector('#state').textContent.includes('Saved — new version synthetic-v1')")
+            assert has_serialized_stroke(SAVED)
+            editor_bytes = bytes(page.evaluate("() => Array.from(new Uint8Array(document.querySelector('#frame').contentWindow.vectorcraft.readFile('synthetic.svg')))"))
+            assert SAVED == editor_bytes, "synthetic host storage must retain the exact editor bytes"
+            saved = SAVED
+            if args.screenshot:
+                args.screenshot.parent.mkdir(parents=True, exist_ok=True)
+                page.screenshot(path=str(args.screenshot), full_page=True)
+            browser.close()
+
+            reopened_browser = playwright.chromium.launch(headless=True, args=[
+                "--enable-unsafe-swiftshader", "--use-gl=angle", "--use-angle=swiftshader"])
+            reopened = reopened_browser.new_page()
+            reopened.goto(url)
+            reopened.wait_for_function("() => document.querySelector('#frame')?.contentWindow?.vectorcraft?.openFile",
+                                       timeout=60000)
+            reopened.wait_for_function("() => document.querySelector('#state')?.textContent.includes('opened')")
+            snapshot = reopened.evaluate("() => document.querySelector('#frame').contentWindow.vectorcraft.request('document.inspect', {})")
+            assert has_expected_stroke(snapshot)
+            assert SAVE_COUNT == 1
+            reopened_browser.close()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=3)
+
+    print(f"PASS: actual staged VectorCraft host page saved {len(saved)} SVG bytes as synthetic-v1 (SHA-256 {hashlib.sha256(saved).hexdigest()})")
+    print("PASS: stored bytes contain the pencil path and a fresh host/editor session reopens its expected geometry")
+    print("NOTE: isolated synthetic storage harness; no Seafile persistence or common host protocol claim")
+
+
+if __name__ == "__main__":
+    main()

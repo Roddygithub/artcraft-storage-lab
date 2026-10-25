@@ -28,6 +28,26 @@ Independent R1–R2 reviews: bounded **PROVISIONAL PASS**, no remaining findings
 GR-055 work-item status: **GPT REVIEW PENDING**. Project verdict remains
 **INCOMPLETE**; upstream publication remains locked.
 
+## REVIEWED STAGED CANDIDATES — GR-056–058
+
+- **GR-058 VectorCraft:** exact `v0.14.0` source plus pinned fonts; the staged
+  browser candidate passed the synthetic page-API edit/save/reopen flow. R1
+  bounded review: PROVISIONAL PASS, no findings. Release-binary reproducibility,
+  missing optional font rendering, and Seafile persistence remain unverified.
+- **GR-057 PdfCraft:** exact source/patch/transport candidate passed the actual-
+  WASM synthetic form-edit/ACK/reopen smoke. R1–R2 bounded reviews: PROVISIONAL
+  PASS; the optimizer-wording MINOR is corrected. Seafile persistence remains
+  NOT RUN; the build disabled `wasm-opt`.
+- **GR-056 GridCraft:** actual-WASM synthetic workbook edit/save/reopen passed,
+  including B2/B3 formula recalculation. R1–R5 bounded reviews: PROVISIONAL
+  PASS, no remaining findings. A read-only Seafile GET preflight returned 404;
+  no write was attempted and persistence remains NOT RUN.
+
+All three candidates remain outside dispatch. Their reports and review bundles
+are in `docs/GR-056-*`, `docs/GR-057-*`, `docs/GR-058-*` and the corresponding
+`docs/reviews/` directories. None changes the project GPT verdict or unlocks
+upstream publication.
+
 GR-054 remains prior reviewed inventory: bounded independent R1–R2
 PROVISIONAL PASS; it documented the mismatch between current default assets and
 historical source/runtime evidence. GR-055 supplies one separate reproducible

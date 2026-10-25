@@ -1,0 +1,3 @@
+PASS: actual staged VectorCraft host page saved 609 SVG bytes as synthetic-v1 (SHA-256 fad9b3e60c2e76e29214dccdd6edfeb00b5edc9be605aaefddaed8372d3497f2)
+PASS: stored bytes contain the pencil path and a fresh host/editor session reopens its expected geometry
+NOTE: isolated synthetic storage harness; no Seafile persistence or common host protocol claim
