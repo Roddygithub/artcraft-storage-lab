@@ -202,6 +202,19 @@ GR-024 does not establish browser runtime, Seafile persistence, or
 application-level open/edit/save/reopen behavior. Active app patches must pin
 immutable transport revision `56c5e16d79b77751106173c13111ef4fe0a2c0ec`.
 
+## 14. FilmCraft durable host-save acknowledgement prototype (GR-023)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 14.1 | Engine host-save snapshot/ACK | only the matching serialized `.fcproj` snapshot becomes saved; later edits stay dirty | [x] 4 focused engine tests pass after final host-close guard |
+| 14.2 | UI Save/Save All/ACK lifecycle | matching host ACK clears only captured state; failure, stale and unknown ACKs stay dirty | [x] 3 focused UI tests pass after final host-close guard |
+| 14.3 | Host mode lifecycle guards | create-from-template, close-all, save-as-template and direct project close cannot bypass binding | [x] engine/UI regression assertions present; independent source review confirms |
+| 14.4 | Rust/WASM compile and formatting | pinned app builds with transport revision `56c5e16` | [x] Rust 1.95 locked WASM check, fmt and diff checks pass per implementer |
+| 14.5 | Browser host messaging | real iframe Open/Save/ACK works in browser | [ ] NOT VERIFIED |
+| 14.6 | Seafile version and fresh reopen | saved edit survives durable Seafile write and new editor instance | [ ] NOT VERIFIED; app not in dispatcher |
+
+Patch, review and limitations: `docs/reviews/GR-023/README.md`.
+
 ## 9. How results are recorded
 
 Each test result is recorded in the corresponding evidence bundle under

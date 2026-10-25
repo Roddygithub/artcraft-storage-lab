@@ -1,0 +1,820 @@
+diff --git c/Cargo.lock w/Cargo.lock
+index 9ff01577..7788f700 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
+@@ -1024,6 +1024,16 @@ dependencies = [
+  "thiserror 2.0.21",
+ ]
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab?rev=56c5e16d79b77751106173c13111ef4fe0a2c0ec#56c5e16d79b77751106173c13111ef4fe0a2c0ec"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-ui"
+ version = "0.1.0"
+@@ -2351,6 +2361,7 @@ dependencies = [
+  "filmcraft-edit",
+  "filmcraft-engine",
+  "filmcraft-export",
++ "filmcraft-format",
+  "filmcraft-frame",
+  "filmcraft-geom",
+  "filmcraft-gpu",
+@@ -2398,6 +2409,7 @@ dependencies = [
+ name = "filmcraft-web"
+ version = "0.12.0"
+ dependencies = [
++ "craft-platform",
+  "eframe",
+  "egui",
+  "filmcraft-codecs",
+diff --git c/Cargo.toml w/Cargo.toml
+index 2801176d..df39f006 100644
+--- c/Cargo.toml
++++ w/Cargo.toml
+@@ -74,6 +74,7 @@ proptest = "1"
+ roxmltree = "0.21"
+ craft-docpath = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "82a24b006eefa036b43c09a67fb9a3fbd17ffe63" }
+ craft-media = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "f0ad6c1e1d297908915f4be315b0fcfc9be7b5d4", default-features = false }
++craft-platform = { version = "0.1.0", git = "https://github.com/Roddygithub/artcraft-storage-lab", rev = "56c5e16d79b77751106173c13111ef4fe0a2c0ec", default-features = false }
+ 
+ # ui
+ # Shared frontend components; keep this dependency above the engine boundary.
+diff --git c/apps/filmcraft-web/Cargo.toml w/apps/filmcraft-web/Cargo.toml
+index 6b1cb9ed..30803e19 100644
+--- c/apps/filmcraft-web/Cargo.toml
++++ w/apps/filmcraft-web/Cargo.toml
+@@ -24,6 +24,7 @@ filmcraft-color = { workspace = true }
+ filmcraft-isobmff = { workspace = true }
+ filmcraft-format = { workspace = true }
+ filmcraft-time = { workspace = true }
++craft-platform = { workspace = true, features = ["browser"] }
+ egui = { workspace = true }
+ eframe = { workspace = true, features = ["default_fonts", "wgpu"] }
+ serde_json = { workspace = true }
+diff --git c/apps/filmcraft-web/src/host.rs w/apps/filmcraft-web/src/host.rs
+new file mode 100644
+index 00000000..ba79b334
+--- /dev/null
++++ w/apps/filmcraft-web/src/host.rs
+@@ -0,0 +1,134 @@
++//! Opt-in, same-origin host save bridge for one FilmCraft project per iframe.
++use std::{cell::RefCell, rc::Rc, time::Duration};
++
++use craft_platform::{
++    browser::host::{HostListener, HostMessage, HostTransport},
++    host_protocol::SaveTicket,
++};
++use filmcraft_ui_egui::FilmcraftApp;
++use web_time::Instant;
++
++#[derive(Default)]
++struct Events {
++    opened: bool,
++    open: Option<(String, Vec<u8>)>,
++    ack: Option<(SaveTicket, bool, Option<String>)>,
++}
++
++#[derive(Default)]
++struct Pending {
++    ticket: Option<SaveTicket>,
++    sent_at: Option<Instant>,
++    timeout_reported: bool,
++}
++
++pub struct HostBridge {
++    transport: HostTransport,
++    _listener: HostListener,
++    events: Rc<RefCell<Events>>,
++    pending: Rc<RefCell<Pending>>,
++    last_dirty: Option<bool>,
++}
++
++impl HostBridge {
++    pub fn new() -> Result<Option<Self>, String> {
++        let Some(transport) = HostTransport::current("filmcraft").map_err(|e| format!("host transport: {e:?}"))? else {
++            return Ok(None);
++        };
++        let events = Rc::new(RefCell::new(Events::default()));
++        let pending = Rc::new(RefCell::new(Pending::default()));
++        let event_state = events.clone();
++        let pending_state = pending.clone();
++        let listener = transport
++            .listen(move |message| {
++                let mut events = event_state.borrow_mut();
++                match message {
++                    HostMessage::Open { name, bytes } if !events.opened && events.open.is_none() => {
++                        events.opened = true;
++                        events.open = Some((name, bytes));
++                        crate::repaint();
++                    }
++                    HostMessage::SaveResult { ticket, ok, error } => {
++                        let pending = pending_state.borrow();
++                        if pending.ticket.as_ref() == Some(&ticket) && events.ack.is_none() {
++                            events.ack = Some((ticket, ok, error));
++                            crate::repaint();
++                        }
++                    }
++                    _ => {}
++                }
++            })
++            .map_err(|e| format!("host listener: {e:?}"))?;
++        Ok(Some(Self { transport, _listener: listener, events, pending, last_dirty: None }))
++    }
++
++    pub fn ready(&self) -> Result<(), String> {
++        self.transport.post_ready(env!("CARGO_PKG_VERSION")).map_err(|e| format!("host ready: {e:?}"))
++    }
++
++    pub fn save_hook(&self) -> Box<dyn FnMut(&str, &str, &[u8]) -> Result<(), String>> {
++        let transport = self.transport.clone();
++        let pending = self.pending.clone();
++        Box::new(move |ticket, name, bytes| {
++            let ticket = SaveTicket::new(ticket.to_owned()).ok_or("invalid save ticket")?;
++            {
++                let mut state = pending.borrow_mut();
++                if state.ticket.is_some() {
++                    return Err("a host save is already pending".into());
++                }
++                state.ticket = Some(ticket.clone());
++                state.sent_at = Some(Instant::now());
++                state.timeout_reported = false;
++            }
++            if let Err(error) = transport.post_save(&ticket, name, bytes, false) {
++                *pending.borrow_mut() = Pending::default();
++                return Err(format!("host save post failed: {error:?}"));
++            }
++            Ok(())
++        })
++    }
++
++    pub fn tick(&mut self, app: &mut FilmcraftApp, ctx: &egui::Context) {
++        if let Some((name, bytes)) = self.events.borrow_mut().open.take() {
++            if !name.to_ascii_lowercase().ends_with(".fcproj") {
++                let error = "host only supports native .fcproj projects";
++                app.status(error);
++                let _ = self.transport.post_failed(error);
++            } else if let Err(error) = app.session.open_host_project(&name, &bytes) {
++                let error = error.to_string();
++                app.status(error.clone());
++                let _ = self.transport.post_failed(&error);
++            } else {
++                app.status(format!("Opened {name}"));
++            }
++        }
++        if let Some((ticket, ok, error)) = self.events.borrow_mut().ack.take() {
++            let _ = self.pending.borrow_mut().ticket.take();
++            self.pending.borrow_mut().sent_at = None;
++            self.pending.borrow_mut().timeout_reported = false;
++            match app.session.finish_host_save(ticket.as_str(), ok) {
++                Some(true) => app.status("Saved to host"),
++                Some(false) if !ok => app.status(error.unwrap_or_else(|| "Host save failed; the project remains unsaved".into())),
++                Some(false) if app.session.is_dirty() => app.status("Earlier changes saved; newer project changes remain unsaved"),
++                Some(false) => app.status("Host save result could not be applied; reopen from the file host"),
++                None => {}
++            }
++        }
++        let mut pending = self.pending.borrow_mut();
++        if let Some(sent_at) = pending.sent_at {
++            let timeout = Duration::from_secs(120);
++            let elapsed = sent_at.elapsed();
++            if elapsed >= timeout && !pending.timeout_reported {
++                pending.timeout_reported = true;
++                app.status("Save outcome unknown; the host may have committed it. Reopen or reconcile before retrying.");
++            } else if !pending.timeout_reported {
++                ctx.request_repaint_after(timeout.saturating_sub(elapsed));
++            }
++        }
++        drop(pending);
++        let dirty = app.session.is_dirty() || app.session.has_pending_host_save();
++        if self.last_dirty != Some(dirty) && self.transport.post_dirty(dirty).is_ok() {
++            self.last_dirty = Some(dirty);
++        }
++    }
++}
+diff --git c/apps/filmcraft-web/src/import.rs w/apps/filmcraft-web/src/import.rs
+index a075f9a9..cdfaeb78 100644
+--- c/apps/filmcraft-web/src/import.rs
++++ w/apps/filmcraft-web/src/import.rs
+@@ -134,6 +134,9 @@ pub async fn import_files(files: Vec<web_sys::File>) -> Value {
+ 
+ /// Open a `.fcproj` file picked or dropped by the user.
+ pub async fn open_project_file(file: web_sys::File) -> Result<Value, String> {
++    if on_ui(|w, _| w.app.host_mode).await {
++        return Err("opening another project is disabled in this host-bound editor; reopen it from the file host".into());
++    }
+     let buf = JsFuture::from(file.array_buffer()).await.map_err(|e| format!("{e:?}"))?;
+     let path = format!("/projects/{}", file.name());
+     fs::put(&path, js_sys::Uint8Array::new(&buf).to_vec());
+diff --git c/apps/filmcraft-web/src/lib.rs w/apps/filmcraft-web/src/lib.rs
+index 21512ccc..31481537 100644
+--- c/apps/filmcraft-web/src/lib.rs
++++ w/apps/filmcraft-web/src/lib.rs
+@@ -22,6 +22,7 @@ pub mod api;
+ pub mod audio;
+ pub mod download_pacing;
+ pub mod fs;
++pub mod host;
+ pub mod import;
+ pub mod opfs;
+ pub mod recovery;
+@@ -87,6 +88,7 @@ pub struct WebApp {
+     pub app: FilmcraftApp,
+     pub audio: Option<audio::Handle>,
+     pub autosave: recovery::Autosave,
++    pub host: Option<host::HostBridge>,
+ }
+ 
+ impl eframe::App for WebApp {
+@@ -99,6 +101,9 @@ impl eframe::App for WebApp {
+         for f in actions {
+             f(self, ctx);
+         }
++        if let Some(host) = &mut self.host {
++            host.tick(&mut self.app, ctx);
++        }
+         self.app.logic(ctx, frame);
+         api::poll_replies();
+         // exports advance between frames (no threads)
+@@ -108,7 +113,9 @@ impl eframe::App for WebApp {
+         if let Some(a) = &self.audio {
+             a.pump();
+         }
+-        self.autosave.tick(&self.app.session, ctx);
++        if self.host.is_none() {
++            self.autosave.tick(&self.app.session, ctx);
++        }
+     }
+ 
+     fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
+@@ -120,6 +127,15 @@ fn query_flag(name: &str) -> bool {
+     web_sys::window().and_then(|w| w.location().search().ok()).and_then(|s| web_sys::UrlSearchParams::new_with_str(&s).ok()).is_some_and(|p| p.has(name))
+ }
+ 
++fn host_requested() -> bool {
++    web_sys::window()
++        .and_then(|w| w.location().search().ok())
++        .and_then(|s| web_sys::UrlSearchParams::new_with_str(&s).ok())
++        .and_then(|p| p.get("host"))
++        .as_deref()
++        == Some("parent")
++}
++
+ /// Entry point (called by the page's bootstrap script once the wasm module is instantiated).
+ #[wasm_bindgen]
+ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
+@@ -136,15 +152,20 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
+     set_info("frameWorkers", json!("cooperative"));
+     set_info("opfs", json!(opfs::available()));
+ 
+-    // Media kept in OPFS by earlier sessions come back under their paths (recovery).
+-    let restored = if opfs::available() && !query_flag("fresh") { recovery::restore_media().await } else { 0 };
+-    let recovered = if query_flag("fresh") || query_flag("norecover") { None } else { recovery::load_snapshot().await };
++    let host_mode = host_requested();
++    let restored = if !host_mode && opfs::available() && !query_flag("fresh") { recovery::restore_media().await } else { 0 };
++    let recovered = if host_mode || query_flag("fresh") || query_flag("norecover") { None } else { recovery::load_snapshot().await };
+     webcodecs::probe().await;
+ 
+     api::install()?;
+     import::install_drop_handlers()?;
+ 
+-    let demo = !query_flag("empty");
++    let demo = !host_mode && !query_flag("empty");
++    let mut host = if host_mode {
++        Some(host::HostBridge::new().map_err(|e| JsValue::from_str(&e))?.ok_or_else(|| JsValue::from_str("?host=parent requires a same-origin parent frame"))?)
++    } else {
++        None
++    };
+     let mut web_options = eframe::WebOptions::default();
+     // `?webgl`: WebGL2 only. The page reloads with it when starting on WebGPU fails (an adapter
+     // whose device can't be created, a driver the browser rejects…); see `index.html`.
+@@ -185,6 +206,12 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
+                     let _ = session.execute("file.openDemoProject", json!({}));
+                 }
+                 let mut app = FilmcraftApp::new(session);
++                if host_mode {
++                    app.host_mode = true;
++                    if let Some(bridge) = &host {
++                        app.hooks.host_save = Some(bridge.save_hook());
++                    }
++                }
+                 import::install_hooks(&mut app);
+                 // Settings ▸ General ▸ Interface Language ▸ System Language (#218): the browser's languages.
+                 app.hooks.system_languages =
+@@ -214,7 +241,10 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
+                 }
+                 set_info("audio", json!(audio.is_some()));
+                 set_info("restoredMedia", json!(restored));
+-                Ok(Box::new(WebApp { app, audio, autosave: recovery::Autosave::default() }))
++                if let Some(bridge) = &host {
++                    bridge.ready().map_err(std::io::Error::other)?;
++                }
++                Ok(Box::new(WebApp { app, audio, autosave: recovery::Autosave::default(), host: host.take() }))
+             }),
+         )
+         .await?;
+diff --git c/crates/engine/src/commands.rs w/crates/engine/src/commands.rs
+index 5c564e69..9836966d 100644
+--- c/crates/engine/src/commands.rs
++++ w/crates/engine/src/commands.rs
+@@ -4378,6 +4378,8 @@ fn schema_backup_path(path: &str, schema: u32) -> String {
+ 
+ /// Make `proj` the session's project (fresh history, media pool and editor state).
+ fn install_project(s: &mut Session, proj: filmcraft_project::Project, path: Option<String>, clean: bool) {
++    s.project_generation = s.project_generation.saturating_add(1);
++    s.pending_host_save = None;
+     let proxies = s.media.use_proxies();
+     s.media = std::sync::Arc::new(crate::MediaPool::default());
+     s.media.set_use_proxies(proxies);
+@@ -4404,6 +4406,26 @@ fn install_project(s: &mut Session, proj: filmcraft_project::Project, path: Opti
+     crate::project_tools::warn_untrusted_scratch(s);
+ }
+ 
++/// Install a project supplied by an embedding host. Unlike `file.open`, this has no filesystem
++/// path and does not register a local recent-file entry.
++pub(crate) fn open_project_bytes(s: &mut Session, bytes: &[u8]) -> Result<Value> {
++    let loaded = filmcraft_format::decode(bytes).map_err(|e| EngineError::Other(e.to_string()))?;
++    let (from, migrated) = (loaded.schema_version, loaded.migrated());
++    install_project(s, loaded.project, None, true);
++    if let Some(view) = loaded.view.filter(|_| s.prefs.timeline.restore_open_sequences) {
++        s.restore_project_view(view);
++    }
++    if let Some(seq) = s.state.active_sequence {
++        s.events.push(crate::Event::OpenSequence(seq));
++    }
++    s.loaded_schema = from;
++    if migrated {
++        s.toast(format!("Upgraded project from schema v{from} to v{}; saving will create the current format", filmcraft_format::SCHEMA_VERSION));
++    }
++    let missing = crate::relink::on_open(s);
++    Ok(json!({"schemaVersion": from, "migrated": migrated, "missingMedia": missing}))
++}
++
+ fn open_project(s: &mut Session, path: &str) -> Result<Value> {
+     let bytes = s.services.read_file(path).map_err(|e| EngineError::Other(format!("{path}: {e}")))?;
+     let loaded = filmcraft_format::decode(&bytes).map_err(|e| EngineError::Other(format!("{path}: {e}")))?;
+diff --git c/crates/engine/src/host_save_tests.rs w/crates/engine/src/host_save_tests.rs
+new file mode 100644
+index 00000000..a20ac7e0
+--- /dev/null
++++ w/crates/engine/src/host_save_tests.rs
+@@ -0,0 +1,79 @@
++use serde_json::json;
++
++use crate::Session;
++
++fn fixture() -> Vec<u8> {
++    filmcraft_format::encode(&filmcraft_project::Project::new("Host fixture"), false)
++}
++
++#[test]
++fn host_save_ack_commits_only_the_serialized_revision_and_reopens() {
++    let mut session = Session::default();
++    session.open_host_project("Timeline.fcproj", &fixture()).expect("host project opens");
++    assert!(session.path.is_none());
++    session.execute("project.setNotes", json!({"text":"saved snapshot"})).expect("edit");
++
++    let request = session.begin_host_save().expect("serialize snapshot");
++    assert!(session.is_dirty(), "handoff alone cannot mark clean");
++    assert!(session.begin_host_save().is_err(), "only one ticket per bound session");
++    let saved_project = filmcraft_format::decode(&request.bytes).expect("request bytes decode").project;
++    assert_eq!(saved_project.notes, "saved snapshot");
++
++    session.execute("project.setNotes", json!({"text":"newer edit"})).expect("later edit");
++    assert_eq!(session.finish_host_save(&request.ticket, true), Some(false));
++    assert!(session.is_dirty(), "ACK for earlier snapshot preserves later edit");
++    assert!(session.finish_host_save(&request.ticket, true).is_none(), "ticket consumed once");
++
++    let latest = session.begin_host_save().expect("retry after known ACK");
++    assert_eq!(session.finish_host_save(&latest.ticket, true), Some(true));
++    assert!(!session.is_dirty());
++    let mut reopened = Session::default();
++    reopened.open_host_project("Timeline.fcproj", &latest.bytes).expect("fresh session reopen");
++    assert_eq!(reopened.project.notes, "newer edit");
++}
++
++#[test]
++fn failed_ack_keeps_project_dirty_and_rejects_replacement_routes() {
++    let mut session = Session::default();
++    session.open_host_project("Timeline.fcproj", &fixture()).expect("host project opens");
++    session.execute("project.setNotes", json!({"text":"edit"})).expect("edit");
++    let request = session.begin_host_save().expect("serialize");
++    assert_eq!(session.finish_host_save(&request.ticket, false), Some(false));
++    assert!(session.is_dirty());
++    for command in [
++        "file.open",
++        "file.newProject",
++        "file.newProjectFromTemplate",
++        "file.closeProject",
++        "file.closeAllProjects",
++        "file.saveAs",
++        "file.saveCopy",
++        "file.saveAsTemplate",
++        "file.recover",
++    ] {
++        assert!(session.execute(command, json!({})).is_err(), "{command} must fail closed");
++    }
++}
++
++#[test]
++fn unknown_timeout_does_not_release_ticket_for_unsafe_retry() {
++    let mut session = Session::default();
++    session.open_host_project("Timeline.fcproj", &fixture()).expect("host project opens");
++    session.execute("project.setNotes", json!({"text":"edit"})).expect("edit");
++    let request = session.begin_host_save().expect("serialize");
++    assert!(session.has_pending_host_save());
++    assert!(session.begin_host_save().is_err());
++    assert!(session.is_dirty());
++    assert!(session.finish_host_save("other-ticket", true).is_none());
++    assert!(session.has_pending_host_save());
++    assert!(session.finish_host_save(&request.ticket, false).is_some());
++}
++
++#[test]
++fn host_open_refuses_to_replace_pre_open_edits() {
++    let mut session = Session::default();
++    session.execute("project.setNotes", json!({"text":"typed before parent open"})).expect("pre-open edit");
++    assert!(session.open_host_project("Timeline.fcproj", &fixture()).is_err());
++    assert_eq!(session.project.notes, "typed before parent open");
++    assert!(session.host_project_name().is_none());
++}
+diff --git c/crates/engine/src/lib.rs w/crates/engine/src/lib.rs
+index 47a9cfd6..28116c0a 100644
+--- c/crates/engine/src/lib.rs
++++ w/crates/engine/src/lib.rs
+@@ -407,6 +407,10 @@ pub struct Session {
+     pub history: History,
+     pub revision: u64,
+     pub saved_revision: u64,
++    pub(crate) host_project_name: Option<String>,
++    host_save_counter: u64,
++    pub(crate) pending_host_save: Option<PendingHostSave>,
++    pub(crate) project_generation: u64,
+     pub path: Option<String>,
+     pub state: EditorState,
+     pub media: Arc<MediaPool>,
+@@ -475,6 +479,24 @@ pub struct Session {
+     pub media_scan: Option<media_watch::MediaScan>,
+ }
+ 
++/// Immutable serialized save request produced by the engine for a remote file host.
++#[derive(Clone, Debug)]
++pub struct HostSaveRequest {
++    pub ticket: String,
++    pub revision: u64,
++    pub bytes: Arc<[u8]>,
++}
++
++#[derive(Debug)]
++pub(crate) struct PendingHostSave {
++    ticket: String,
++    revision: u64,
++    project_generation: u64,
++    project: Arc<Project>,
++    view: filmcraft_project::ProjectView,
++    bytes: Arc<[u8]>,
++}
++
+ /// An export advanced a batch at a time on the host's thread ([`Session::pump_jobs`]).
+ pub struct SteppedJob {
+     pub job: u64,
+@@ -525,6 +547,10 @@ impl Session {
+             history: History { limit: 200, ..Default::default() },
+             revision: 1,
+             saved_revision: 1,
++            host_project_name: None,
++            host_save_counter: 0,
++            pending_host_save: None,
++            project_generation: 0,
+             path: None,
+             state: EditorState {
+                 snapping: true,
+@@ -714,8 +740,116 @@ impl Session {
+         self.revision != self.saved_revision
+     }
+ 
++    /// Open a native FilmCraft project supplied by an external host, without inventing a path.
++    /// This session can be host-bound only once; replacement requires a fresh editor instance.
++    pub fn open_host_project(&mut self, name: &str, bytes: &[u8]) -> Result<Value> {
++        if self.host_project_name.is_some() {
++            return Err(EngineError::Other("this editor session is already bound to a host document".into()));
++        }
++        if self.path.is_some()
++            || self.is_dirty()
++            || self.project.name != "Untitled"
++            || !self.project.items.is_empty()
++            || self.project.sequences().next().is_some()
++            || !self.history.undo.is_empty()
++            || !self.history.redo.is_empty()
++        {
++            return Err(EngineError::Other("host open is refused because this editor session already contains a project".into()));
++        }
++        if name.trim().is_empty() || name.len() > 4096 {
++            return Err(EngineError::Other("host document name is empty or too long".into()));
++        }
++        if !name.to_ascii_lowercase().ends_with(".fcproj") {
++            return Err(EngineError::Other("host mode accepts only native .fcproj projects".into()));
++        }
++        if bytes.len() > 256 * 1024 * 1024 {
++            return Err(EngineError::Other("host project exceeds the 256 MiB limit".into()));
++        }
++        let result = commands::open_project_bytes(self, bytes)?;
++        self.path = None;
++        self.host_project_name = Some(name.to_owned());
++        Ok(result)
++    }
++
++    pub fn host_project_name(&self) -> Option<&str> {
++        self.host_project_name.as_deref()
++    }
++
++    /// Serialize the current host-bound project and retain the exact snapshot until its ACK.
++    /// A timeout does not clear this record: the host may have committed but lost the response.
++    pub fn begin_host_save(&mut self) -> Result<HostSaveRequest> {
++        if self.host_project_name.is_none() || self.path.is_some() {
++            return Err(EngineError::Other("no pathless host project is open".into()));
++        }
++        if self.pending_host_save.is_some() {
++            return Err(EngineError::Other("a host save is already awaiting a result".into()));
++        }
++        self.host_save_counter = self.host_save_counter.checked_add(1).ok_or_else(|| EngineError::Other("host save ticket counter exhausted".into()))?;
++        let ticket = format!("filmcraft:{}", self.host_save_counter);
++        let project = self.project.clone();
++        let view = self.project_view();
++        let bytes: Arc<[u8]> = filmcraft_format::encode_with_view(&project, Some(&view), false).into();
++        if bytes.len() > 256 * 1024 * 1024 {
++            return Err(EngineError::Other("serialized host project exceeds the 256 MiB limit".into()));
++        }
++        let revision = self.revision;
++        let request = HostSaveRequest { ticket: ticket.clone(), revision, bytes: bytes.clone() };
++        self.pending_host_save = Some(PendingHostSave { ticket, revision, project_generation: self.project_generation, project, view, bytes });
++        Ok(request)
++    }
++
++    /// Consume one matching result. `Some(true)` means the exact snapshot is still current;
++    /// `Some(false)` means a failure or later edit; `None` is unknown/duplicate.
++    pub fn finish_host_save(&mut self, ticket: &str, ok: bool) -> Option<bool> {
++        if self.pending_host_save.as_ref().is_none_or(|pending| pending.ticket != ticket) {
++            return None;
++        }
++        let pending = self.pending_host_save.take()?;
++        if !ok || self.project_generation != pending.project_generation {
++            return Some(false);
++        }
++        let exact_snapshot = self.revision == pending.revision && Arc::ptr_eq(&self.project, &pending.project) && self.project_view() == pending.view;
++        // Advance only to the revision whose bytes the host committed. Later edits stay dirty.
++        self.saved_revision = pending.revision;
++        let _committed_bytes = pending.bytes;
++        Some(exact_snapshot)
++    }
++
++    /// Cancel only when sending the request itself failed. Do not call this on an unknown timeout.
++    pub fn cancel_host_save(&mut self, ticket: &str) -> bool {
++        if self.pending_host_save.as_ref().is_some_and(|pending| pending.ticket == ticket) {
++            self.pending_host_save = None;
++            true
++        } else {
++            false
++        }
++    }
++
++    pub fn has_pending_host_save(&self) -> bool {
++        self.pending_host_save.is_some()
++    }
++
+     /// Run a command by id.
+     pub fn execute(&mut self, id: &str, params: Value) -> Result<Value> {
++        if self.host_project_name.is_some()
++            && matches!(
++                id,
++                "file.newProject"
++                    | "file.newProjectFromTemplate"
++                    | "file.openDemoProject"
++                    | "file.open"
++                    | "file.revert"
++                    | "file.recover"
++                    | "file.closeProject"
++                    | "file.closeAllProjects"
++                    | "file.save"
++                    | "file.saveAs"
++                    | "file.saveCopy"
++                    | "file.saveAsTemplate"
++            )
++        {
++            return Err(EngineError::Other(format!("`{id}` is unavailable for a host-bound project")));
++        }
+         let spec = commands::find(id).ok_or_else(|| EngineError::UnknownCommand(id.to_string()))?;
+         if self.exec_depth == 0 && spec.journal && self.trim_play.active() {
+             self.settle_trim_playback(id);
+@@ -1356,4 +1490,6 @@ mod source_placement_tests;
+ #[cfg(test)]
+ mod frame_export_tests;
+ #[cfg(test)]
++mod host_save_tests;
++#[cfg(test)]
+ mod wasm_clock_tests;
+diff --git c/crates/ui-egui/Cargo.toml w/crates/ui-egui/Cargo.toml
+index f1d7b899..9c039ed5 100644
+--- c/crates/ui-egui/Cargo.toml
++++ w/crates/ui-egui/Cargo.toml
+@@ -47,6 +47,7 @@ cpu-time = "1"
+ 
+ [dev-dependencies]
+ pollster = "0.4"
++filmcraft-format = { workspace = true }
+ filmcraft-codecs = { workspace = true }
+ # the bench registers OS hardware decoders as the desktop app does (dev-dependency only: ui-egui
+ # itself stays OS-independent and web-portable)
+diff --git c/crates/ui-egui/src/lib.rs w/crates/ui-egui/src/lib.rs
+index 14d66da4..bfaa2ba9 100644
+--- c/crates/ui-egui/src/lib.rs
++++ w/crates/ui-egui/src/lib.rs
+@@ -125,6 +125,9 @@ pub struct AudioDevices {
+ /// Host hooks for native file dialogs etc.
+ #[derive(Default)]
+ pub struct HostHooks {
++    /// Durable host save delivery. Returning `Ok` means only that the request was posted; the
++    /// engine keeps the exact snapshot pending until `Session::finish_host_save` receives its ACK.
++    pub host_save: Option<Box<dyn FnMut(&str, &str, &[u8]) -> Result<(), String>>>,
+     pub pick_files: Option<Box<dyn FnMut(&[&str]) -> Vec<String>>>,
+     /// The cursor in physical screen pixels. Where the windowing layer reports no pointer while files are dragged in from the OS (Windows), a drop is placed where this says it landed.
+     pub cursor_screen_position: Option<Box<dyn Fn() -> Option<(i32, i32)>>>,
+@@ -294,6 +297,8 @@ pub struct FilmcraftApp {
+     /// Audio during scrubbing (#211).
+     pub scrub: scrub::ScrubAudio,
+     pub hooks: HostHooks,
++    /// A browser frame bound to one external project. Host save is the only project-save route.
++    pub host_mode: bool,
+     pub dialog: Option<Dialog>,
+     pub file_dialogs: panels::file_dialogs::FileDialogState,
+     /// The native file dialog the host is showing ([`Self::pick`]).
+@@ -562,6 +567,7 @@ impl FilmcraftApp {
+             audio: None,
+             scrub: Default::default(),
+             hooks: HostHooks::default(),
++            host_mode: false,
+             // Unsaved changes left by a session that died are offered first thing.
+             dialog: recovery.then_some(Dialog::Recovery),
+             file_dialogs: Default::default(),
+@@ -1358,6 +1364,14 @@ impl FilmcraftApp {
+     }
+ 
+     pub fn file_dialog(&mut self, id: &str, params: &Value) -> Result<Value, String> {
++        if self.host_mode
++            && matches!(
++                id,
++                "file.save" | "file.saveAs" | "file.saveCopy" | "file.saveAsTemplate" | "file.open" | "file.newProjectFromTemplate" | "file.closeAllProjects"
++            )
++        {
++            return Err(format!("{id} must use the host-bound file workflow"));
++        }
+         match id {
+             "file.import" => {
+                 let exts: Vec<&str> = filmcraft_media::VIDEO_EXTENSIONS
+diff --git c/crates/ui-egui/src/menus.rs w/crates/ui-egui/src/menus.rs
+index d4742ff5..1dd4daee 100644
+--- c/crates/ui-egui/src/menus.rs
++++ w/crates/ui-egui/src/menus.rs
+@@ -179,6 +179,48 @@ pub fn targets_source(app: &FilmcraftApp, params: &Value) -> bool {
+ 
+ /// Execute a UI or engine command by id.
+ pub fn invoke(app: &mut FilmcraftApp, ctx: &egui::Context, id: &str, mut params: Value) -> Result<Value, String> {
++    if app.host_mode {
++        if id == "file.saveAll" {
++            return invoke(app, ctx, "file.save", json!({}));
++        }
++        if id == "file.save" {
++            if !app.session.is_dirty() {
++                return Ok(json!({"saved": false, "dirty": false}));
++            }
++            let request = app.session.begin_host_save().map_err(|e| e.to_string())?;
++            let name = app.session.host_project_name().unwrap_or_default().to_owned();
++            let Some(send) = app.hooks.host_save.as_mut() else {
++                app.session.cancel_host_save(&request.ticket);
++                return Err("host save transport is unavailable".into());
++            };
++            if let Err(error) = send(&request.ticket, &name, &request.bytes) {
++                app.session.cancel_host_save(&request.ticket);
++                app.ui.status = format!("Save request failed: {error}");
++                return Err(error);
++            }
++            app.ui.status = "Saving to host…".into();
++            ctx.request_repaint();
++            return Ok(json!({"ticket": request.ticket, "revision": request.revision, "pending": true}));
++        }
++        if matches!(
++            id,
++            "file.saveAs"
++                | "file.saveCopy"
++                | "file.saveAsTemplate"
++                | "file.newProject"
++                | "file.newProjectFromTemplate"
++                | "file.openDemoProject"
++                | "file.open"
++                | "file.revert"
++                | "file.recover"
++                | "file.closeProject"
++                | "file.closeAllProjects"
++        ) {
++            let error = format!("{id} is unavailable in a host-bound project; reopen it from the file host");
++            app.ui.status = error.clone();
++            return Err(error);
++        }
++    }
+     if id == "edit.selectAll" && (crate::panels::graphics::select_all_edited_text(app) || crate::panels::effect_controls::select_all_keyframes(app)) {
+         return Ok(Value::Null);
+     }
+@@ -1080,6 +1122,71 @@ mod parse_shortcut_tests {
+     }
+ }
+ 
++#[cfg(test)]
++mod host_save_tests {
++    use std::{cell::RefCell, rc::Rc};
++
++    use serde_json::json;
++
++    use super::invoke;
++
++    #[test]
++    fn control_save_posts_snapshot_and_waits_for_engine_ack() {
++        let bytes = filmcraft_format::encode(&filmcraft_project::Project::new("Host"), false);
++        let mut session = filmcraft_engine::Session::default();
++        session.open_host_project("Host.fcproj", &bytes).expect("open host document");
++        session.execute("project.setNotes", json!({"text":"edited"})).expect("edit");
++        let mut app = crate::FilmcraftApp::new(session);
++        app.host_mode = true;
++        let captured: Rc<RefCell<Vec<(String, String, Vec<u8>)>>> = Rc::default();
++        let sink = captured.clone();
++        app.hooks.host_save = Some(Box::new(move |ticket, name, bytes| {
++            sink.borrow_mut().push((ticket.into(), name.into(), bytes.into()));
++            Ok(())
++        }));
++        let ctx = egui::Context::default();
++        let (request, _reply) = crate::ControlRequest::new("engine.execute", json!({"command":"file.save", "params":{}}));
++        let outcome = crate::control::handle(&mut app, &ctx, &request);
++        assert!(matches!(outcome, crate::control::Outcome::Done(ref value) if value["ok"] == true && value["result"]["pending"] == true));
++        let saved = captured.borrow();
++        assert_eq!(saved.len(), 1);
++        assert_eq!(saved[0].1, "Host.fcproj");
++        assert_eq!(filmcraft_format::decode(&saved[0].2).expect("captured project").project.notes, "edited");
++        assert!(app.session.is_dirty(), "postMessage handoff is not a durable ACK");
++        assert!(app.session.has_pending_host_save());
++    }
++
++    #[test]
++    fn host_save_as_and_replacement_fail_visibly() {
++        let bytes = filmcraft_format::encode(&filmcraft_project::Project::new("Host"), false);
++        let mut session = filmcraft_engine::Session::default();
++        session.open_host_project("Host.fcproj", &bytes).expect("open host document");
++        let mut app = crate::FilmcraftApp::new(session);
++        app.host_mode = true;
++        let ctx = egui::Context::default();
++        for command in
++            ["file.saveAs", "file.saveCopy", "file.saveAsTemplate", "file.open", "file.newProject", "file.newProjectFromTemplate", "file.closeAllProjects"]
++        {
++            assert!(invoke(&mut app, &ctx, command, json!({})).is_err(), "{command}");
++        }
++        assert!(!app.session.has_pending_host_save());
++    }
++
++    #[test]
++    fn failed_host_handoff_cancels_ticket_but_keeps_dirty_state() {
++        let bytes = filmcraft_format::encode(&filmcraft_project::Project::new("Host"), false);
++        let mut session = filmcraft_engine::Session::default();
++        session.open_host_project("Host.fcproj", &bytes).expect("open host document");
++        session.execute("project.setNotes", json!({"text":"edited"})).expect("edit");
++        let mut app = crate::FilmcraftApp::new(session);
++        app.host_mode = true;
++        app.hooks.host_save = Some(Box::new(|_, _, _| Err("post failed".into())));
++        assert!(invoke(&mut app, &egui::Context::default(), "file.save", json!({})).is_err());
++        assert!(!app.session.has_pending_host_save());
++        assert!(app.session.is_dirty());
++    }
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+diff --git c/crates/ui-egui/src/panels/clip_dialogs.rs w/crates/ui-egui/src/panels/clip_dialogs.rs
+index 5d64f425..b6d5b4ef 100644
+--- c/crates/ui-egui/src/panels/clip_dialogs.rs
++++ w/crates/ui-egui/src/panels/clip_dialogs.rs
+@@ -606,7 +606,9 @@ pub fn show(app: &mut FilmcraftApp, ctx: &egui::Context) {
+         }
+         Some("dontSave") | Some("save") => {
+             if action == Some("save") {
+-                let saved = if app.session.path.is_some() {
++                let saved = if app.host_mode {
++                    crate::menus::invoke(app, ctx, "file.save", json!({})).map(|_| ())
++                } else if app.session.path.is_some() {
+                     app.session.execute("file.save", json!({})).map(|_| ()).map_err(|e| e.to_string())
+                 } else {
+                     app.file_dialog("file.save", &json!({})).map(|_| ())

@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol FAIL on 0edbe52; shared transport and app adapters conti
 BRANCH:     main
 LAST REVIEWED SHA: 0edbe524b4fa321b0f73f8601afef390e7f785e6
 CURRENT CANDIDATE: local remediation after 0edbe52; current tip is not frozen or reviewed
-WORKTREE:   main-only workflow; DesignCraft evidence is pushed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft/FilmCraft patches are in remediation and must repin before exact review; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft and FilmCraft evidence are pushed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft final pin/build/review is in progress; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-021/022/023/024 — DesignCraft evidence is committed; GR-024 transport fix is pushed at 56c5e16; EffectCraft/FilmCraft have actionable guard/history findings being remediated; browser/Seafile runtime remains NOT VERIFIED
+CURRENT GR: GR-021/022/023/024 — DesignCraft and FilmCraft local prototypes are documented; GR-024 transport fix is pushed at 56c5e16; EffectCraft is repinning and rebuilding after branch-history remediation; browser/Seafile runtime remains NOT VERIFIED
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -111,6 +111,12 @@ OPEN GAPS:
   `56c5e16d79b77751106173c13111ef4fe0a2c0ec`; active app patches must pin it
   before their final exact-patch review. Evidence:
   `docs/reviews/GR-024/`.
+- GR-023 adds a one-document FilmCraft host-save adapter over the pinned
+  transport. Engine tests 4/4, UI tests 3/3, locked Rust 1.95 WASM check,
+  formatting and diff checks pass after the final host-only `file.closeProject`
+  guard. Independent round 2 exact review found no blocker/major. Browser,
+  durable Seafile version and fresh reopen remain NOT VERIFIED; see
+  `docs/reviews/GR-023/`.
 - The isolated synthetic Seafile runtime flows currently documented are for
   WordCraft, GridCraft, VectorCraft, PdfCraft and CADCraft. VectorCraft uses its
   page API, not the common `?host=parent` contract. DeckCraft now has a local

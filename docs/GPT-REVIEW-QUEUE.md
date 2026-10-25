@@ -522,6 +522,21 @@ Open:        repin to next transport commit and re-review; browser messaging and
 Publication: no upstream change
 ```
 
+### GR-023 — FilmCraft host-save acknowledgement prototype
+
+```text
+Status:      bounded local prototype; project GPT verdict remains FAIL on 0edbe524
+Base:        storytold/filmcraft `fa550ce2d07bdfee6b1d7b6835e8abc8c6913d00`
+Transport:   craft-platform `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
+Patch SHA:   `16158f500b2ec12f93c8fcb14867e0b452030dbb338b2d4d7fa8612850a694d4`
+Review:      independent bounded R2 source review found no blocker/major; tests/builds were not rerun by reviewer
+Tests:       engine 4/4; UI 3/3; Rust 1.95 locked WASM; fmt/diff checks pass per implementer
+Open:        browser messaging, authorization, Seafile version creation and fresh reopen NOT VERIFIED; not in dispatch
+GPT review:  not a project candidate; project remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC or patch published
+Evidence:    `docs/reviews/GR-023/`
+```
+
 ## GPT review instruction (for the future session)
 
 ```text

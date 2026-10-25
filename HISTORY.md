@@ -1,5 +1,18 @@
 # HISTORY
 
+## 2026-10-25 — GR-023 FilmCraft host-save prototype
+
+* Added a one-document FilmCraft Web host-save adapter over the shared
+  `craft-platform` transport pinned to `56c5e16`. Save/Save All route a captured
+  `.fcproj` snapshot through a ticketed host ACK; ordinary downloads and native
+  saves remain separate.
+* Added host-mode refusals for project-from-template, close-all, save-as-template
+  and direct project-close routes. Engine tests 4/4, UI tests 3/3, locked Rust
+  1.95 WASM, fmt and diff checks pass. Independent exact review verified the
+  final hash and found no blocker/major.
+* Browser host messaging, authorization, durable Seafile version creation and
+  fresh-storage reopen remain NOT VERIFIED. See `docs/reviews/GR-023/`.
+
 ## 2026-10-25 — GR-024 malformed host save acknowledgement handling
 
 * Changed the shared browser transport to ignore `saveResult` messages whose

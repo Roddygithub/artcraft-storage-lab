@@ -217,7 +217,7 @@ From `packaging/web/README.md` (present in all 13):
 
 | # | Question |
 | --- | --- |
-| Q-1 | What host-save seam remains in apps whose browser `Services` are picker/download-only? FigCraft's upstream `Services` seam is now prototyped locally in GR-019; FilmCraft/EffectCraft still need verification. |
+| Q-1 | What host-save seam remains in apps whose browser `Services` are picker/download-only? FigCraft has a local GR-019 adapter; FilmCraft and EffectCraft also have bounded local host-save prototypes (GR-022/023). Their browser/Seafile persistence remains unverified. |
 | Q-2 | Do the `?host=parent` bridges in GridCraft, PdfCraft and CADCraft differ in any way beyond the save semantics? (A line-by-line diff of the three is the natural next step.) |
 | Q-3 | What is `photocraft-web-boot` and `figcraft-server`? `figcraft-server` is a hosted-server precedent worth understanding. |
 | Q-4 | Are any of the web builds deployed publicly (a profile comment mentions Cloudflare Pages)? If so, their origin matters for the embedding model. |
