@@ -1,0 +1,720 @@
+diff --git c/Cargo.lock w/Cargo.lock
+index 9bed551d..a2437e81 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
+@@ -991,6 +991,16 @@ dependencies = [
+  "thiserror 2.0.21",
+ ]
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab?rev=56c5e16d79b77751106173c13111ef4fe0a2c0ec#56c5e16d79b77751106173c13111ef4fe0a2c0ec"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-ui"
+ version = "0.1.0"
+@@ -1699,6 +1709,7 @@ version = "0.16.0"
+ name = "effectcraft-web"
+ version = "0.16.0"
+ dependencies = [
++ "craft-platform",
+  "effectcraft-engine",
+  "effectcraft-export",
+  "effectcraft-expr",
+diff --git c/apps/effectcraft-web/Cargo.toml w/apps/effectcraft-web/Cargo.toml
+index 28ea2f36..c430f474 100644
+--- c/apps/effectcraft-web/Cargo.toml
++++ w/apps/effectcraft-web/Cargo.toml
+@@ -26,6 +26,7 @@ effectcraft-media = { workspace = true }
+ effectcraft-export = { workspace = true }
+ effectcraft-expr = { workspace = true }
+ effectcraft-ui-egui = { workspace = true }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab", rev = "56c5e16d79b77751106173c13111ef4fe0a2c0ec", version = "=0.1.0", default-features = false, features = ["browser"] }
+ egui = { workspace = true }
+ eframe = { workspace = true, features = ["default_fonts", "wgpu"] }
+ log = { workspace = true }
+diff --git c/apps/effectcraft-web/src/app.rs w/apps/effectcraft-web/src/app.rs
+index 3f462bd2..6160ba89 100644
+--- c/apps/effectcraft-web/src/app.rs
++++ w/apps/effectcraft-web/src/app.rs
+@@ -83,6 +83,7 @@ pub struct WebApp {
+     pub app: EffectcraftApp,
+     /// Keep the session snapshot (off with `?empty`).
+     pub persist: bool,
++    host: Option<super::host::HostController>,
+ }
+ 
+ impl eframe::App for WebApp {
+@@ -101,6 +102,9 @@ impl eframe::App for WebApp {
+             files::read_files(dropped, |paths| post(move |app| open_or_import(app, paths)));
+         }
+         self.app.logic(ctx, frame);
++        if let Some(host) = &mut self.host {
++            host.tick(&mut self.app, ctx.input(|i| i.time), ctx);
++        }
+         api::poll_replies();
+         // Render Queue outputs written this frame (here or by a worker) → downloads.
+         files::flush_downloads();
+@@ -191,7 +195,9 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
+     effectcraft_ui_egui::i18n::set_system_locales(query_value("lang"), browser.collect());
+     let doc = web_sys::window().and_then(|w| w.document()).ok_or("no document")?;
+     let canvas: web_sys::HtmlCanvasElement = doc.get_element_by_id(&canvas_id).ok_or("no canvas")?.dyn_into()?;
+-    let empty = query_flag("empty");
++    let host_mode = query_value("host").as_deref() == Some("parent");
++    let host = if host_mode { Some(super::host::HostController::new()?) } else { None };
++    let empty = query_flag("empty") || host_mode;
+     let home = query_flag("home");
+     // Browser storage: settings, recent projects, imported media, saved projects, auto-saves and
+     // the last session come back.
+@@ -238,7 +244,7 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
+                 }
+                 let mut session = session();
+                 session.load_settings();
+-                let recovery = session.begin_recovery();
++                let recovery = if host_mode { None } else { session.begin_recovery() };
+                 // `?empty`: a blank project; `?demo`: the demo project; otherwise the last visit's
+                 // project (the demo on a first visit).
+                 let restored = !empty && !query_flag("demo") && persist::restore(&mut session);
+@@ -249,6 +255,15 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
+                 // The ScriptUI panels open on the last visit open again.
+                 let _ = session.execute("window.restoreScriptPanels", json!({}));
+                 let mut app = EffectcraftApp::new(session);
++                if host_mode {
++                    app.enable_host_mode();
++                    if let Some(host) = &host {
++                        if let Err(error) = host.ready() {
++                            log::error!("could not announce EffectCraft host readiness: {error:?}");
++                            host.failed(&format!("could not announce readiness: {error:?}"));
++                        }
++                    }
++                }
+                 app.set_gpu_failure_bridge(gpu_failures);
+                 app.ui.start_screen = home;
+                 if let Some(r) = recovery.filter(|r| !restored && r.autosave.is_some()) {
+@@ -268,7 +283,7 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
+                 app = app.with_control(rx);
+                 let backend = cc.wgpu_render_state.as_ref().map(|rs| format!("{:?}", rs.adapter.get_info().backend));
+                 api::set_info("backend", json!(backend));
+-                Ok(Box::new(WebApp { app, persist: !empty }))
++                Ok(Box::new(WebApp { app, persist: !empty, host }))
+             }),
+         )
+         .await?;
+diff --git c/apps/effectcraft-web/src/host.rs w/apps/effectcraft-web/src/host.rs
+new file mode 100644
+index 00000000..2f41a5dc
+--- /dev/null
++++ w/apps/effectcraft-web/src/host.rs
+@@ -0,0 +1,107 @@
++//! Opt-in parent transport for one pathless EffectCraft project.
++use std::cell::RefCell;
++use std::rc::Rc;
++
++use craft_platform::browser::host::{HostListener, HostMessage, HostTransport};
++use craft_platform::host_protocol::SaveTicket;
++use effectcraft_ui_egui::EffectcraftApp;
++use wasm_bindgen::JsValue;
++
++pub struct HostController {
++    transport: HostTransport,
++    _listener: HostListener,
++    events: Rc<RefCell<HostQueue>>,
++    dirty: Option<bool>,
++}
++
++struct HostQueue {
++    events: Vec<HostMessage>,
++    queued_bytes: usize,
++    open_seen: bool,
++    pending_ticket: Option<String>,
++}
++
++const MAX_EVENTS: usize = 2;
++const MAX_OPEN_BYTES: usize = 256 * 1024 * 1024;
++
++impl HostController {
++    pub fn new() -> Result<Self, JsValue> {
++        let transport = HostTransport::current("effectcraft")?.ok_or_else(|| JsValue::from_str("host=parent requires a same-origin parent frame"))?;
++        let events = Rc::new(RefCell::new(HostQueue { events: Vec::new(), queued_bytes: 0, open_seen: false, pending_ticket: None }));
++        let queued = events.clone();
++        let listener = transport.listen(move |message| {
++            let mut queue = queued.borrow_mut();
++            match message {
++                HostMessage::Open { name, bytes }
++                    if !queue.open_seen
++                        && bytes.len() <= MAX_OPEN_BYTES
++                        && queue.queued_bytes + bytes.len() <= MAX_OPEN_BYTES
++                        && queue.events.len() < MAX_EVENTS =>
++                {
++                    queue.queued_bytes += bytes.len();
++                    queue.open_seen = true;
++                    queue.events.push(HostMessage::Open { name, bytes });
++                    crate::repaint();
++                }
++                HostMessage::SaveResult { ticket, ok, error }
++                    if queue.pending_ticket.as_deref() == Some(ticket.as_str()) && queue.events.len() < MAX_EVENTS =>
++                {
++                    queue.pending_ticket = None;
++                    queue.events.push(HostMessage::SaveResult { ticket, ok, error });
++                    crate::repaint();
++                }
++                _ => {}
++            }
++        })?;
++        Ok(Self { transport, _listener: listener, events, dirty: None })
++    }
++
++    pub fn ready(&self) -> Result<(), JsValue> {
++        self.transport.post_ready(env!("CARGO_PKG_VERSION"))
++    }
++
++    pub fn failed(&self, error: &str) {
++        let _ = self.transport.post_failed(error);
++    }
++
++    pub fn tick(&mut self, app: &mut EffectcraftApp, now: f64, ctx: &egui::Context) {
++        let events = {
++            let mut queue = self.events.borrow_mut();
++            queue.queued_bytes = 0;
++            std::mem::take(&mut queue.events)
++        };
++        for event in events {
++            match event {
++                HostMessage::Open { name, bytes } => {
++                    if let Err(error) = app.host_open(name, &bytes) {
++                        log::warn!("host open rejected: {error}");
++                        let _ = self.transport.post_failed(&error);
++                        // HostTransport's copied-byte budget is cumulative. Keep this iframe's
++                        // one initial Open consumed; retry requires reloading the iframe.
++                    }
++                }
++                HostMessage::SaveResult { ticket, ok, error } => app.host_save_result(ticket.as_str(), ok, error.as_deref()),
++            }
++        }
++        if let Some(save) = app.take_host_save() {
++            self.events.borrow_mut().pending_ticket = Some(save.ticket.clone());
++            match SaveTicket::new(save.ticket.clone())
++                .ok_or_else(|| JsValue::from_str("invalid save ticket"))
++                .and_then(|ticket| self.transport.post_save(&ticket, &save.name, &save.bytes, false).map(|_| ticket))
++            {
++                Ok(_) => {}
++                Err(error) => {
++                    if self.events.borrow().pending_ticket.as_deref() == Some(save.ticket.as_str()) {
++                        self.events.borrow_mut().pending_ticket = None;
++                    }
++                    app.host_save_send_failed(&save.ticket, &format!("{error:?}"));
++                }
++            }
++        }
++        app.tick_host_save_timeout(now, ctx);
++        let dirty = app.host_dirty();
++        if self.dirty != Some(dirty) && self.transport.post_dirty(dirty).is_ok() {
++            self.dirty = Some(dirty);
++        }
++    }
++}
+diff --git c/apps/effectcraft-web/src/lib.rs w/apps/effectcraft-web/src/lib.rs
+index 0d59906f..f0399ab0 100644
+--- c/apps/effectcraft-web/src/lib.rs
++++ w/apps/effectcraft-web/src/lib.rs
+@@ -39,6 +39,8 @@ pub mod files;
+ #[cfg(target_arch = "wasm32")]
+ pub mod frames;
+ #[cfg(target_arch = "wasm32")]
++mod host;
++#[cfg(target_arch = "wasm32")]
+ pub mod persist;
+ #[cfg(target_arch = "wasm32")]
+ pub mod storage;
+diff --git c/crates/engine/src/lib.rs w/crates/engine/src/lib.rs
+index 96b3bf67..be70d284 100644
+--- c/crates/engine/src/lib.rs
++++ w/crates/engine/src/lib.rs
+@@ -399,6 +399,8 @@ pub struct Session {
+     /// snapshot, so undoing back to the saved state clears the modified mark.
+     pub saved_project: Arc<Project>,
+     pub path: Option<String>,
++    /// The frontend owns the only open project and routes saves through its durable host bridge.
++    pub host_mode: bool,
+     pub state: EditorState,
+     pub services: Arc<dyn Services>,
+     pub footage: Arc<dyn FootageSource>,
+@@ -527,6 +529,14 @@ pub struct Session {
+     pub script_calls: ScriptCalls,
+ }
+ 
++/// A serialized project snapshot awaiting durable storage confirmation from an embedding host.
++pub struct HostSaveSnapshot {
++    project: Arc<Project>,
++    saved_project: Arc<Project>,
++    revision: u64,
++    pub bytes: Arc<[u8]>,
++}
++
+ /// The count behind [`Session::running_for_script`]; only the engine changes it.
+ #[derive(Clone, Copy, Debug, Default)]
+ pub struct ScriptCalls(u32);
+@@ -562,6 +572,7 @@ impl Default for Session {
+             revision: 0,
+             saved_revision: 0,
+             path: None,
++            host_mode: false,
+             state: EditorState { snapping: true, view_layout: 1, ..Default::default() },
+             services: Arc::new(FsServices),
+             footage: Arc::new(NoFootage),
+@@ -629,8 +640,71 @@ impl Session {
+         Session::default()
+     }
+ 
++    /// Opt this session into the single-document browser host contract.
++    pub fn set_host_mode(&mut self, enabled: bool) {
++        self.host_mode = enabled;
++    }
++
++    /// Open a host-provided native `.ecproj` without assigning it a local filesystem path.
++    pub fn open_host_project(&mut self, bytes: &[u8]) -> Result<()> {
++        if self.host_mode && self.is_dirty() {
++            return Err(EngineError::Other("refusing to replace unsaved edits made before the host document arrived".into()));
++        }
++        let text = std::str::from_utf8(bytes).map_err(|_| EngineError::Other("not a text project file".into()))?;
++        let (project, _) = Project::from_json_repaired(text).map_err(|e| EngineError::Other(format!("not a project EffectCraft can open: {e}")))?;
++        self.replace_project(project, None);
++        self.restore_view(&effectcraft_project::saved_view(text));
++        Ok(())
++    }
++
++    /// Serialize the exact current project snapshot for an asynchronous host write.
++    pub fn host_save_snapshot(&self) -> Result<HostSaveSnapshot> {
++        if !self.host_mode || self.path.is_some() {
++            return Err(EngineError::Other("no host-bound document is open".into()));
++        }
++        let json = self.project.to_file_json_with_view(&self.saved_view())?;
++        Ok(HostSaveSnapshot {
++            project: self.project.clone(),
++            saved_project: self.saved_project.clone(),
++            revision: self.revision,
++            bytes: json.into_bytes().into(),
++        })
++    }
++
++    /// Record a durable host acknowledgement against its captured snapshot. Later edits stay dirty.
++    pub fn ack_host_save(&mut self, snapshot: HostSaveSnapshot) -> bool {
++        if !self.host_mode || self.path.is_some() || !Arc::ptr_eq(&self.saved_project, &snapshot.saved_project) || snapshot.revision > self.revision {
++            return false;
++        }
++        self.saved_project = snapshot.project.clone();
++        self.saved_revision = if Arc::ptr_eq(&self.project, &snapshot.project) { self.revision } else { snapshot.revision };
++        true
++    }
++
+     /// Run a command by id.
+     pub fn execute(&mut self, id: &str, params: Value) -> Result<Value> {
++        if self.host_mode
++            && matches!(
++                id,
++                "templates.create"
++                    | "file.newProject"
++                    | "file.newFromTemplate"
++                    | "file.open"
++                    | "file.openRecent"
++                    | "file.openDemoProject"
++                    | "file.revert"
++                    | "file.recovery.open"
++                    | "file.closeProject"
++                    | "file.saveAs"
++                    | "file.saveCopy"
++                    | "file.saveCopyAsXml"
++                    | "file.incrementAndSave"
++                    | "file.importProject"
++                    | "file.save"
++            )
++        {
++            return Err(EngineError::Disabled(id.to_string(), "the document is controlled by its host".into()));
++        }
+         let spec = commands::find(id).ok_or_else(|| EngineError::UnknownCommand(id.to_string()))?;
+         if let Err(why) = (spec.enabled)(self) {
+             // Explicit targets (agents, scripts) don't need a UI selection.
+diff --git c/crates/engine/src/tests.rs w/crates/engine/src/tests.rs
+index b3f0602b..ded7c8d7 100644
+--- c/crates/engine/src/tests.rs
++++ w/crates/engine/src/tests.rs
+@@ -8,6 +8,84 @@ fn demo() -> Session {
+     s
+ }
+ 
++#[test]
++fn host_save_ack_commits_only_the_captured_project_snapshot() {
++    let source = demo();
++    let bytes = source.project.to_file_json_with_view(&source.saved_view()).unwrap().into_bytes();
++    let mut host = Session::default();
++    host.set_host_mode(true);
++    host.open_host_project(&bytes).unwrap();
++    assert_eq!(host.path, None);
++    host.execute("comp.new", json!({"name":"Captured"})).unwrap();
++    let snapshot = host.host_save_snapshot().unwrap();
++    assert!(!snapshot.bytes.is_empty());
++    let committed_bytes = snapshot.bytes.clone();
++    host.execute("comp.new", json!({"name":"Later"})).unwrap();
++    assert!(host.ack_host_save(snapshot));
++    assert!(host.is_dirty(), "the ACK cannot clean edits made after serialization");
++
++    let committed: serde_json::Value = serde_json::from_slice(&committed_bytes).unwrap();
++    assert!(committed["items"].as_object().unwrap().values().any(|item| item["name"] == "Captured"));
++    assert!(!committed["items"].as_object().unwrap().values().any(|item| item["name"] == "Later"));
++}
++
++#[test]
++fn host_save_serializes_current_snapshot_without_discarding_undo_branch() {
++    let source = demo();
++    let bytes = source.project.to_file_json_with_view(&source.saved_view()).unwrap().into_bytes();
++    let mut host = Session::default();
++    host.set_host_mode(true);
++    host.open_host_project(&bytes).unwrap();
++
++    host.execute("comp.new", json!({"name":"A"})).unwrap();
++    host.execute("edit.undo", json!({})).unwrap();
++    host.execute("comp.new", json!({"name":"B"})).unwrap();
++    let branches_before_save = host.history.branches.len();
++    assert!(branches_before_save > 0, "undo then new edit creates a history branch");
++
++    let snapshot = host.host_save_snapshot().unwrap();
++    let serialized: serde_json::Value = serde_json::from_slice(&snapshot.bytes).unwrap();
++    let item_names = serialized["items"].as_object().unwrap().values().filter_map(|item| item["name"].as_str()).collect::<Vec<_>>();
++    assert!(item_names.contains(&"B"), "host snapshot serializes the current edit: {item_names:?}");
++    assert!(!item_names.contains(&"A"), "undone edit is not serialized: {item_names:?}");
++    assert_eq!(host.history.branches.len(), branches_before_save, "snapshot serialization preserves undo history");
++
++    assert!(host.ack_host_save(snapshot));
++    assert!(!host.is_dirty(), "the exact current snapshot becomes the saved baseline");
++    assert_eq!(host.history.branches.len(), branches_before_save, "ack preserves history in memory");
++}
++
++#[test]
++fn host_mode_rejects_document_replacement_and_synchronous_saves() {
++    let mut s = Session::default();
++    s.set_host_mode(true);
++    for (id, params) in [
++        ("file.newProject", json!({})),
++        ("file.open", json!({"path":"/other.ecproj"})),
++        ("file.recovery.open", json!({})),
++        ("file.closeProject", json!({})),
++        ("file.saveAs", json!({"path":"/other.ecproj"})),
++        ("file.save", json!({})),
++    ] {
++        assert!(s.execute(id, params).is_err(), "{id} must not bypass the host adapter");
++    }
++}
++
++#[test]
++fn host_mode_rejects_template_create_but_standalone_templates_still_work() {
++    let mut standalone = Session::default();
++    let result = standalone.execute("templates.create", json!({"id": "title-card"}));
++    assert!(result.is_ok(), "templates.create remains available outside host mode: {result:?}");
++    assert!(standalone.project.comps().next().is_some());
++
++    let mut host = Session::default();
++    host.set_host_mode(true);
++    let before = host.project.clone();
++    let result = host.execute("templates.create", json!({"id": "title-card"}));
++    assert!(result.is_err(), "direct templates.create must not replace a host-bound project");
++    assert!(std::sync::Arc::ptr_eq(&host.project, &before), "refused command must leave project unchanged");
++}
++
+ #[test]
+ fn demo_opens_and_renders() {
+     let s = demo();
+diff --git c/crates/ui-egui/src/lib.rs w/crates/ui-egui/src/lib.rs
+index 2762188a..cb3fb104 100644
+--- c/crates/ui-egui/src/lib.rs
++++ w/crates/ui-egui/src/lib.rs
+@@ -261,6 +261,11 @@ impl Playback {
+ 
+ pub struct EffectcraftApp {
+     pub session: Session,
++    host_mode: bool,
++    host_name: Option<String>,
++    host_next_ticket: u64,
++    host_pending: Option<PendingHostSave>,
++    host_outbox: Option<HostSaveRequest>,
+     pub ui: UiState,
+     workspace_store: workspace_state::WorkspaceStore,
+     pub tokens: Tokens,
+@@ -354,6 +359,20 @@ pub struct EffectcraftApp {
+     pub(crate) template_list: Option<(Vec<String>, Vec<effectcraft_engine::templates::TemplateInfo>)>,
+ }
+ 
++/// One serialized save awaiting the browser adapter's durable host write.
++pub struct HostSaveRequest {
++    pub ticket: String,
++    pub name: String,
++    pub bytes: std::sync::Arc<[u8]>,
++}
++
++struct PendingHostSave {
++    ticket: String,
++    snapshot: effectcraft_engine::HostSaveSnapshot,
++    started_at: f64,
++    outcome_unknown: bool,
++}
++
+ /// The saved workspaces in the settings store ([`effectcraft_engine::config::ConfigStore`]).
+ pub const WORKSPACES_FILE: &str = "workspaces.json";
+ 
+@@ -371,6 +390,11 @@ impl EffectcraftApp {
+         let workspace_store = workspace_state::WorkspaceStore::load(session.config.as_deref(), &mut ui);
+         EffectcraftApp {
+             session,
++            host_mode: false,
++            host_name: None,
++            host_next_ticket: 1,
++            host_pending: None,
++            host_outbox: None,
+             ui,
+             workspace_store,
+             tokens: Tokens::for_kind(Default::default()),
+@@ -1776,6 +1800,106 @@ impl EffectcraftApp {
+ }
+ 
+ impl EffectcraftApp {
++    /// Enable the opt-in, single-document host mode.
++    pub fn enable_host_mode(&mut self) {
++        self.host_mode = true;
++        self.session.set_host_mode(true);
++    }
++
++    pub fn is_host_mode(&self) -> bool {
++        self.host_mode
++    }
++
++    /// Accept the initial host document only; it never receives a local filesystem path.
++    pub fn host_open(&mut self, name: String, bytes: &[u8]) -> Result<(), String> {
++        if !self.host_mode {
++            return Err("EffectCraft host mode accepts one initial project only".into());
++        }
++        if self.host_name.is_some() || self.host_pending.is_some() {
++            return Err(self.host_open_failure("EffectCraft host mode accepts one initial project only"));
++        }
++        if bytes.len() > 256 * 1024 * 1024 || !name.to_ascii_lowercase().ends_with(".ecproj") || name.contains('/') || name.contains('\\') {
++            return Err(self.host_open_failure("host open requires a supported .ecproj file under 256 MiB"));
++        }
++        self.session.open_host_project(bytes).map_err(|e| self.host_open_failure(&e.to_string()))?;
++        self.host_name = Some(name);
++        Ok(())
++    }
++
++    fn host_open_failure(&mut self, reason: &str) -> String {
++        let error = format!(
++            "{reason}. This editor cannot save pre-open edits or retry its initial host Open in place. Undo those edits (or copy them elsewhere), then reload this iframe to retry."
++        );
++        self.ui.status = error.clone();
++        error
++    }
++
++    pub fn begin_host_save(&mut self) -> Result<serde_json::Value, String> {
++        if !self.host_mode || self.host_name.is_none() {
++            return Err("no host project is open".into());
++        }
++        if self.host_pending.is_some() {
++            return Err("a host save is already awaiting confirmation".into());
++        }
++        let snapshot = self.session.host_save_snapshot().map_err(|e| e.to_string())?;
++        if snapshot.bytes.len() > 256 * 1024 * 1024 {
++            return Err("host save exceeds the 256 MiB limit".into());
++        }
++        let ticket = format!("effectcraft:{}", self.host_next_ticket);
++        self.host_next_ticket = self.host_next_ticket.saturating_add(1);
++        let name = self.host_name.clone().ok_or_else(|| "no host project is open".to_string())?;
++        self.host_outbox = Some(HostSaveRequest { ticket: ticket.clone(), name, bytes: snapshot.bytes.clone() });
++        self.host_pending = Some(PendingHostSave { ticket: ticket.clone(), snapshot, started_at: self.last_ui_time, outcome_unknown: false });
++        self.ui.status = "Saving to host…".into();
++        Ok(serde_json::json!({"pending": true, "ticket": ticket}))
++    }
++
++    pub fn take_host_save(&mut self) -> Option<HostSaveRequest> {
++        self.host_outbox.take()
++    }
++
++    pub fn host_save_send_failed(&mut self, ticket: &str, error: &str) {
++        if self.host_pending.as_ref().is_some_and(|pending| pending.ticket == ticket) {
++            self.host_pending = None;
++            self.host_outbox = None;
++            self.ui.status = format!("Host save was not sent: {error}");
++        }
++    }
++
++    pub fn host_save_result(&mut self, ticket: &str, ok: bool, error: Option<&str>) {
++        if !self.host_pending.as_ref().is_some_and(|pending| pending.ticket == ticket) {
++            return;
++        }
++        let Some(pending) = self.host_pending.take() else { return };
++        if !ok {
++            self.ui.status = format!("Host save failed: {}", error.unwrap_or("storage rejected the write"));
++        } else if !self.session.ack_host_save(pending.snapshot) {
++            self.ui.status = "Host save completed for an older document; current changes remain unsaved".into();
++        } else if self.session.is_dirty() {
++            self.ui.status = "Earlier changes saved; newer edits remain unsaved".into();
++        } else {
++            self.ui.status = "Saved to host".into();
++        }
++    }
++
++    pub fn host_dirty(&self) -> bool {
++        self.session.is_dirty() || self.host_pending.is_some()
++    }
++
++    pub fn tick_host_save_timeout(&mut self, now: f64, ctx: &egui::Context) {
++        let Some(pending) = &mut self.host_pending else { return };
++        if pending.outcome_unknown {
++            return;
++        }
++        let remaining = 120.0 - (now - pending.started_at).max(0.0);
++        if remaining <= 0.0 {
++            pending.outcome_unknown = true;
++            self.ui.status = "Save outcome unknown; check the host before trying again".into();
++        } else {
++            ctx.request_repaint_after(std::time::Duration::from_secs_f64(remaining));
++        }
++    }
++
+     /// Scripts' `app.scheduleTask` tasks that are due (repeating ones keep a ScriptUI panel
+     /// fresh): errors as a toast, the last line printed in the status bar, and a repaint when
+     /// the next one is due.
+@@ -2180,3 +2304,101 @@ mod appearance_tests {
+         assert_eq!(app.ui.theme, ThemeKind::Darker);
+     }
+ }
++
++#[cfg(test)]
++mod host_save_tests {
++    use super::*;
++    use serde_json::json;
++
++    fn host_app() -> EffectcraftApp {
++        let mut source = effectcraft_engine::Session::default();
++        source.execute("file.openDemoProject", json!({})).unwrap();
++        let bytes = source.project.to_file_json_with_view(&source.saved_view()).unwrap().into_bytes();
++        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
++        app.enable_host_mode();
++        app.host_open("Demo.ecproj".into(), &bytes).unwrap();
++        app
++    }
++
++    #[test]
++    fn initial_host_open_refuses_to_overwrite_edits_made_while_waiting() {
++        let mut source = effectcraft_engine::Session::default();
++        source.execute("file.openDemoProject", json!({})).unwrap();
++        let bytes = source.project.to_file_json_with_view(&source.saved_view()).unwrap().into_bytes();
++
++        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
++        app.enable_host_mode();
++        app.session.execute("comp.new", json!({"name":"BeforeHost"})).unwrap();
++        let before = app.session.project.clone();
++
++        let result = app.host_open("Demo.ecproj".into(), &bytes);
++        let error = result.expect_err("initial host Open must not discard an edit made while waiting");
++        assert!(error.contains("refusing to replace unsaved edits"), "the refusal is surfaced to the host: {error}");
++        assert!(error.contains("reload this iframe to retry"), "the user is told how to retry: {error}");
++        assert!(error.contains("cannot save pre-open edits"), "the user is warned that reload loses unsaved pre-open edits: {error}");
++        assert!(app.ui.status.contains("refusing to replace unsaved edits"), "the refusal is visible in the editor");
++        assert!(std::sync::Arc::ptr_eq(&app.session.project, &before));
++        assert!(app.session.is_dirty());
++        assert!(app.host_name.is_none(), "rejected Open must not bind the host filename");
++    }
++
++    #[test]
++    fn host_save_stays_dirty_until_matching_ack_and_preserves_later_edits() {
++        let mut app = host_app();
++        app.session.execute("comp.new", json!({"name":"Saved"})).unwrap();
++        let request = app.begin_host_save().unwrap();
++        let outbound = app.take_host_save().unwrap();
++        assert_eq!(request["ticket"], outbound.ticket);
++        assert!(app.session.is_dirty());
++        app.host_save_result("unknown", true, None);
++        assert!(app.session.is_dirty(), "unknown acknowledgements do not settle a save");
++        app.session.execute("comp.new", json!({"name":"Later"})).unwrap();
++        app.host_save_result(&outbound.ticket, true, None);
++        assert!(app.session.is_dirty(), "a matching ACK cannot clean edits newer than its snapshot");
++        assert!(app.ui.status.contains("newer edits"));
++        app.host_save_result(&outbound.ticket, true, None);
++        assert!(app.session.is_dirty(), "duplicate acknowledgements are ignored");
++    }
++
++    #[test]
++    fn host_save_ack_cleans_only_the_current_snapshot_and_timeout_keeps_ticket_pending() {
++        let mut app = host_app();
++        app.session.execute("comp.new", json!({"name":"Saved"})).unwrap();
++        let ctx = egui::Context::default();
++        app.begin_host_save().unwrap();
++        let outbound = app.take_host_save().unwrap();
++        app.host_save_result(&outbound.ticket, true, None);
++        assert!(!app.session.is_dirty());
++        app.host_save_result(&outbound.ticket, true, None);
++        assert!(!app.session.is_dirty(), "duplicate ACK cannot mutate the clean state");
++
++        app.session.execute("comp.new", json!({"name":"Pending"})).unwrap();
++        let unknown = app.begin_host_save().unwrap();
++        let pending_ticket = app.take_host_save().unwrap().ticket;
++        assert_eq!(unknown["ticket"], pending_ticket);
++        app.tick_host_save_timeout(121.0, &ctx);
++        assert!(app.host_dirty(), "timeout leaves the outcome unresolved and the document dirty");
++        assert!(app.ui.status.contains("outcome unknown"));
++        assert!(app.begin_host_save().is_err(), "no automatic retry can race a possibly committed write");
++    }
++
++    #[test]
++    fn rejected_host_save_remains_dirty_and_host_mode_blocks_replacement_and_save_as() {
++        let mut app = host_app();
++        app.session.execute("comp.new", json!({"name":"Unsaved"})).unwrap();
++        let ctx = egui::Context::default();
++        assert!(menus::invoke(&mut app, &ctx, "file.saveAs", json!({"path":"/other.ecproj"})).is_err());
++        assert!(menus::invoke(&mut app, &ctx, "file.saveCopyAsXml", json!({"path":"/other.ecprojx"})).is_err());
++        assert!(menus::invoke(&mut app, &ctx, "file.newProject", json!({})).is_err());
++        assert!(menus::invoke(&mut app, &ctx, "file.open", json!({"path":"/other.ecproj"})).is_err());
++        assert!(menus::invoke(&mut app, &ctx, "file.closeProject", json!({})).is_err());
++        let outbound = app.begin_host_save().unwrap();
++        let request = app.take_host_save().unwrap();
++        assert_eq!(outbound["ticket"], request.ticket);
++        app.host_save_result(&request.ticket, false, Some("conflict"));
++        assert!(app.session.is_dirty());
++        assert!(app.ui.status.contains("conflict"));
++        app.host_save_result(&request.ticket, true, None);
++        assert!(app.session.is_dirty(), "late success after a rejected ticket is ignored");
++    }
++}
+diff --git c/crates/ui-egui/src/menus.rs w/crates/ui-egui/src/menus.rs
+index 36a85aef..2568b3e0 100644
+--- c/crates/ui-egui/src/menus.rs
++++ w/crates/ui-egui/src/menus.rs
+@@ -310,6 +310,26 @@ fn only_comp(p: &Value) -> Option<effectcraft_engine::project::ItemId> {
+ 
+ /// Execute a UI or engine command by id.
+ pub fn invoke(app: &mut EffectcraftApp, ctx: &egui::Context, id: &str, params: Value) -> Result<Value, String> {
++    if app.is_host_mode() {
++        match id {
++            "file.save" => return app.begin_host_save(),
++            "file.saveAs" | "file.saveCopy" | "file.saveCopyAsXml" | "file.incrementAndSave" => {
++                return Err("Save As and local copies are unavailable in host mode".into());
++            }
++            "file.newProject"
++            | "file.newFromTemplate"
++            | "file.open"
++            | "file.openRecent"
++            | "file.openDemoProject"
++            | "file.revert"
++            | "file.recovery.open"
++            | "file.closeProject"
++            | "file.importProject" => {
++                return Err("the host controls which project is open".into());
++            }
++            _ => {}
++        }
++    }
+     if matches!(id, "effects.copyPresetsFolderPath" | "mediaBrowser.copySourcePath") {
+         return frontend(app, ctx, id, params);
+     }

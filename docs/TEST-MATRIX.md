@@ -225,3 +225,15 @@ Each test result is recorded in the corresponding evidence bundle under
 ```
 
 A test that has not been run is `[ ]`, never `[x]`. A mock is not a result.
+
+## 15. EffectCraft host-save acknowledgement prototype (GR-022)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 15.1 | Host-mode project replacement and unsupported save routes | host-bound project cannot be replaced or locally saved as if durable | [x] engine/UI guards and focused tests pass per implementer |
+| 15.2 | Save acknowledgement matches captured project snapshot | dirty clears only after matching success; later edits remain dirty | [x] focused engine/UI host-save tests pass; independent source review found no blocker/major |
+| 15.3 | Initial Open after pre-open edits | no silent replacement; user receives truthful reload guidance | [x] source/test reviewed; browser presentation not exercised |
+| 15.4 | Browser host protocol and Seafile version/reopen | durable version and edit visible after fresh storage reopen | [ ] NOT VERIFIED; adapter is not in dispatch |
+| 15.5 | Production host authorization and security topology | permissions/origins/proxy controls verified | [ ] NOT VERIFIED |
+
+Patch, commands, and limits: `docs/reviews/GR-022/`.

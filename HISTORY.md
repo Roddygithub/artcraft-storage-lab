@@ -1,3 +1,14 @@
+## 2026-10-25 — GR-022 EffectCraft host-save prototype
+
+* Added a one-document host-save adapter using `craft-platform` `56c5e16`.
+  Snapshot saves use ticketed durable acknowledgements; host-mode replacement
+  and unsupported save routes are refused, and pre-open edits are not silently
+  discarded.
+* Engine 2/2 and UI 4/4 focused tests, locked Rust 1.95 WASM check, formatting
+  and diff checks pass per implementer. Independent exact review found no
+  blocker/major, but did not rerun build/tests. Browser/Seafile version and
+  fresh-reopen behavior remain NOT VERIFIED; see `docs/reviews/GR-022/`.
+
 # HISTORY
 
 ## 2026-10-25 — GR-023 FilmCraft host-save prototype

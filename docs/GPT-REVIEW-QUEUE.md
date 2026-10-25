@@ -514,12 +514,16 @@ Evidence:    `docs/reviews/GR-024/`
 ### GR-022 — EffectCraft host-save acknowledgement prototype
 
 ```text
-Status:      bounded local prototype; independent exact-patch review pending
+Status:      bounded local prototype; project GPT verdict remains FAIL on 0edbe524
 Base:        storytold/effectcraft `049070d65c66a73f322b496b22521816e0018f14`
-Finding:     Luna high identified a `templates.create` replacement bypass; engine guard now rejects it in host mode and regression test preserves standalone behavior
-Checks:      host-mode template guard and host-save tests pass; Rust 1.95 locked WASM check, formatting and diff checks pass, per author
-Open:        repin to next transport commit and re-review; browser messaging and Seafile save/version/reopen NOT VERIFIED
-Publication: no upstream change
+Transport:   craft-platform `56c5e16d79b77751106173c13111ef4fe0a2c0ec`
+Patch SHA:   `4e0a1799e36209e1234a1b3ff504ab5ed647cf3bd066af6dec90dacd46ab7407`
+Review:      independent exact review found no blocker/major; tests/builds not rerun by reviewer
+Tests:       engine 2/2; UI 4/4; Rust 1.95 locked WASM, fmt and diff checks pass per implementer
+Open:        browser messaging, host authorization, Seafile version creation and fresh reopen NOT VERIFIED; not in dispatch
+GPT review:  not a project candidate; project remains GPT REVIEW FAIL on 0edbe524
+Publication: LOCKED; no upstream issue, PR, RFC or patch published
+Evidence:    `docs/reviews/GR-022/`
 ```
 
 ### GR-023 — FilmCraft host-save acknowledgement prototype
