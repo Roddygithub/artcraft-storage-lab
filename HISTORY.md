@@ -1,3 +1,15 @@
+## 2026-10-25 — GR-044 DeckCraft browser host-save smoke
+
+* Built the actual DeckCraft WASM from the GR-020 patched source and exercised
+  it in Chromium with a same-origin synthetic parent. A visible slide-text edit
+  produced 7,297 save bytes; the matching positive ACK cleared dirty state, and
+  a fresh iframe reopened the edit from the captured bytes.
+* Added the bounded runtime harness, synthetic PPTX fixture and captured save
+  payload under `docs/reviews/GR-044/`; updated the DeckCraft test matrix and
+  review queue. Independent reviews R1 and R2 recorded PROVISIONAL PASS; R2
+  rechecked the corrected page-memory host. Seafile version/reopen, dispatcher,
+  production and ONLYOFFICE remain **NOT VERIFIED**. No upstream changes were made.
+
 ## 2026-10-25 — GR-043 expired-session save refusal
 
 * Added a Chromium regression that expires the actual gateway session between

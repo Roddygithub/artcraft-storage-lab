@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GR-044 DeckCraft synthetic host</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; font: 14px system-ui, sans-serif; }
+    #bar { min-height: 72px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; box-sizing: border-box; flex-wrap: wrap; }
+    #status { flex: 1; }
+    #meta { flex-basis: 100%; font: 11px ui-monospace, monospace; }
+    #editor { width: 100%; height: calc(100% - 72px); border: 0; }
+    button { padding: 7px 10px; }
+  </style>
+</head>
+<body>
+  <div id="bar">
+    <strong>GR-044 synthetic host</strong>
+    <span id="status">Waiting for DeckCraft…</span>
+    <button id="reopen" disabled>Reopen saved bytes</button>
+    <span id="meta">No save captured yet</span>
+  </div>
+  <iframe id="editor" title="DeckCraft editor"></iframe>
+  <script>
+    const frame = document.querySelector('#editor');
+    const status = document.querySelector('#status');
+    const reopen = document.querySelector('#reopen');
+    const meta = document.querySelector('#meta');
+    const params = new URLSearchParams(location.search);
+    const appPath = params.get('app') || './deckcraft/index.html';
+    let opened = false;
+    let reopenRequested = false;
+    let savedBytes = null;
+    let saveHash = null;
+    let savedTicket = null;
+
+    function say(message) { status.textContent = message; }
+    async function sendOpen() {
+      let bytes;
+      if (reopenRequested) {
+        bytes = savedBytes;
+      } else {
+        const response = await fetch('./synthetic.pptx');
+        if (!response.ok) throw new Error(`fixture HTTP ${response.status}`);
+        bytes = new Uint8Array(await response.arrayBuffer());
+      }
+      const copy = bytes.slice();
+      frame.contentWindow.postMessage({
+        type: 'deckcraft:open',
+        name: 'GR-044-synthetic.pptx',
+        bytes: copy.buffer,
+      }, location.origin, [copy.buffer]);
+      opened = true;
+      say(`${reopenRequested ? 'Reopened saved' : 'Opened synthetic'} PPTX (${bytes.byteLength} bytes)`);
+    }
+
+    window.addEventListener('message', async event => {
+      if (event.origin !== location.origin || event.source !== frame.contentWindow) return;
+      const message = event.data;
+      if (!message || typeof message.type !== 'string') return;
+      if (message.type === 'deckcraft:ready') {
+        say('DeckCraft ready; loading synthetic presentation…');
+        try { await sendOpen(); } catch (error) { say(`Fixture open failed: ${error}`); }
+      } else if (message.type === 'deckcraft:dirty') {
+        if (opened && reopenRequested && !message.dirty) {
+          say(`Fresh editor reopened saved bytes (${savedBytes.byteLength} bytes, SHA-256 ${saveHash.slice(0, 16)}…)`);
+          reopen.disabled = false;
+        } else {
+          say(`Editor dirty=${message.dirty}`);
+        }
+      } else if (message.type === 'deckcraft:save') {
+        const data = message.bytes instanceof ArrayBuffer
+          ? new Uint8Array(message.bytes)
+          : new Uint8Array(message.bytes.buffer, message.bytes.byteOffset, message.bytes.byteLength);
+        savedBytes = data.slice();
+        saveHash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', savedBytes))]
+          .map(byte => byte.toString(16).padStart(2, '0')).join('');
+        savedTicket = message.ticket;
+        meta.textContent = `Captured ${savedBytes.byteLength} bytes · SHA-256 ${saveHash} · ACK ${savedTicket}`;
+        frame.contentWindow.postMessage({
+          type: 'deckcraft:saveResult', ticket: message.ticket, ok: true,
+        }, location.origin);
+        reopen.disabled = false;
+        say(`Captured ${savedBytes.byteLength} save bytes; SHA-256 ${saveHash}; ACK ${message.ticket}`);
+      } else if (message.type === 'deckcraft:failed') {
+        say(`DeckCraft failed: ${message.error}`);
+      }
+    });
+
+    reopen.addEventListener('click', () => {
+      if (!savedBytes) return;
+      reopenRequested = true;
+      opened = false;
+      frame.src = `${appPath}?host=parent&webgl&blank&reopen=${Date.now()}`;
+      say('Starting fresh DeckCraft instance…');
+    });
+    frame.src = `${appPath}?host=parent&webgl&blank`;
+  </script>
+</body>
+</html>

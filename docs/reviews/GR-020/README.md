@@ -38,4 +38,4 @@ The workspace test suite did not complete, so only the focused engine/UI tests a
 
 ## Evidence boundary
 
-The native adapter test exercises host open → edit → serialized bytes → positive acknowledgement → reopen, plus stale-edit and rejected-save behavior. The WASM target compiles the actual browser transport. **A browser message run, Seafile version creation, a fresh Seafile-backed reopen, and production or ONLYOFFICE behavior are NOT VERIFIED.** This does not change the project-level GPT FAIL or upstream lock.
+The native adapter tests exercise host open → edit → serialized bytes → positive acknowledgement → reopen, plus stale-edit and rejected-save behavior. GR-044 now records an actual-WASM browser message run with a synthetic in-memory parent and fresh iframe reopen from captured bytes. **Seafile version creation, a fresh Seafile-backed reopen, dispatcher integration, and production or ONLYOFFICE behavior are NOT VERIFIED.** This does not change the project-level GPT FAIL or upstream lock.

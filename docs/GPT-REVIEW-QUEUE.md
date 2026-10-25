@@ -6,6 +6,19 @@ and does not trust the free-model verdicts.
 Nothing may be published upstream (issue, PR, RFC in `storytold/*`, Seafile or
 Seafile docs) before an entry reaches `GPT REVIEW PASS`.
 
+## GR-044 — DeckCraft host-save browser runtime smoke
+
+The actual GR-020 patched DeckCraft WASM opened a synthetic PPTX in Chromium;
+a visible edit became dirty, Ctrl+S emitted 7,297 serialized bytes, the
+synthetic same-origin parent echoed `deckcraft:1` in a positive ACK, and the
+editor became clean. A fresh iframe reopened the captured bytes with the edit
+intact. Evidence: `docs/GR-044-DECKCRAFT-WASM-SMOKE.md` and
+`docs/reviews/GR-044/`. This is **NOT** Seafile persistence: version creation,
+Seafile-backed reopen, dispatcher and production remain NOT VERIFIED. Independent reviews R1 and R2 recorded **PROVISIONAL PASS** with no blockers or
+major findings: `docs/reviews/GR-044/REVIEW-NEMOTRON.md` and
+`docs/reviews/GR-044/REVIEW-NEMOTRON-R2.md`. Final disposition remains GPT
+REVIEW PENDING; upstream publication remains locked.
+
 ## GR-043 — expired editing session during browser save
 
 The real gateway `/open/` and `/session/<sid>/save` routes are exercised in

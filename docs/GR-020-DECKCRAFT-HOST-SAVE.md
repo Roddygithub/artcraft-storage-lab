@@ -11,8 +11,8 @@ Host mode rejects a second document, host Save As, path opens, and recovery/dupl
 ## Pinned evidence
 
 - Source: DeckCraft `0f4fffcf6c71ffa16029d07ac23752fedd783547`.
-- Shared transport: `craft-platform` pinned to lab commit `90c261de22ef75c4c7c5c5cd1c712d483be0bbc8`.
+- Shared transport: `craft-platform` pinned to lab commit `56c5e16d79b77751106173c13111ef4fe0a2c0ec`.
 - Patch and exact hash: `docs/reviews/GR-020/README.md`.
 - Independent bounded review: `docs/reviews/GR-020/REVIEW-LUNA-HIGH-R1.md`.
 
-The native tests cover positive and negative acknowledgements, a later edit during an outstanding save, and reopening serialized bytes. The pinned WASM target compiles. A browser transport run, Seafile version creation/reopen, public deployment controls, and project-level GPT review remain **NOT VERIFIED**. Upstream publication remains locked.
+The native tests cover positive and negative acknowledgements, a later edit during an outstanding save, and reopening serialized bytes. GR-044 now verifies the pinned adapter's actual WASM host messaging in Chromium with a same-origin synthetic parent and fresh iframe reopen from captured bytes. Seafile version creation/reopen, dispatcher integration, public deployment controls, and project-level GPT review remain **NOT VERIFIED**. Upstream publication remains locked.

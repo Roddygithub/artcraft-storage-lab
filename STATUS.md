@@ -5,7 +5,7 @@ PHASE:      GPT-6.1 Sol INCOMPLETE on 95d8983; remediation continues on local ma
 BRANCH:     main
 LAST REVIEWED SHA: 95d89835b2b1d06fd098c586469ed03b8fd0549e
 CURRENT CANDIDATE: remediation after reviewed 95d8983; later changes include GR-038/039 and are not project-level GPT-reviewed
-WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; no upstream changes
+WORKTREE:   main-only workflow; DesignCraft, DeckCraft and FilmCraft patches are repinned/reviewed; GR-024 malformed-ACK transport fix is pushed at 56c5e16; EffectCraft exact patch is pinned, built and independently reviewed; SoundCraft GR-025 replacement guard is source-reviewed; GR-027/028/029 compatibility slices passed bounded reviews; GR-030 browser smoke passed with an in-memory parent; GR-031 reproduced SoundCraft Seafile save/version/readback/fresh reopen on an isolated synthetic stack; GR-033/035 reproduced PhotoCraft browser host flow; GR-036 reproduced PhotoCraft Seafile version/readback/fresh reopen on the isolated synthetic stack; GR-038 safely stages hash-pinned Web assets; GR-039 CSP enforcement has GR-042 browser coverage; GR-041 bounds staged Craft Web ZIP download/extraction; GR-043 covers expired-session save refusal; GR-044 covers DeckCraft host-save browser runtime; no upstream changes
 LUNA AUDIT: docs/reviews/GPT-LUNA-AUDIT.md (implementation/docs through 71a7d82)
 
 OWNER:      artcraft-owner            (nvidia/z-ai/glm-5.3-flash#thinking)
@@ -22,7 +22,13 @@ GPT REVIEW:  INCOMPLETE (GPT-6.1 Sol on 95d8983; earlier frozen candidates FAIL:
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 
-CURRENT GR: GR-043 — Chromium verifies an expired in-memory gateway session is
+CURRENT GR: GR-044 — Chromium loaded the actual patched DeckCraft WASM, edited
+a synthetic slide, captured and acknowledged exact save bytes, observed clean
+state, and reopened those bytes in a fresh iframe. Seafile version creation,
+Seafile-backed reopen, and dispatcher behavior remain **NOT VERIFIED**. See
+`docs/GR-044-DECKCRAFT-WASM-SMOKE.md` and `docs/reviews/GR-044/`.
+
+GR-043 — Chromium verifies an expired in-memory gateway session is
 refused during save: actual 404 with reopen guidance, dirty preserved,
 `saveResult ok:false`, and no fake Seafile write. Real token expiry and Seafile
 behavior remain **NOT VERIFIED**. See `docs/GR-043-SESSION-EXPIRY.md`.
@@ -148,8 +154,9 @@ OPEN GAPS:
   pinned to `56c5e16`. Two engine tests and four UI lifecycle tests pass, as do the Rust
   1.95 app WASM check, `xtask wasm`, `assets`, and `layers`; two independent Luna
   high rounds returned bounded PASS on the current exact patch. Host mode is
-  restricted to one document and waits for a ticket-matched durable ACK. No
-  DeckCraft browser runtime or Seafile dispatch/version/reopen is verified. The
+  restricted to one document and waits for a ticket-matched durable ACK. GR-044
+  verifies actual WASM host messaging in Chromium with an in-memory parent;
+  Seafile dispatch/version/reopen remains NOT VERIFIED. The
   full workspace test suite did not complete; `xtask ci` stops at existing
   Clippy findings outside the changed files. See `docs/reviews/GR-020/README.md`.
 - GR-021 prototypes a one-document DesignCraft Web host-save adapter over the

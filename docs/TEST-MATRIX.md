@@ -64,10 +64,11 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 
 | # | Test | Expected | Result |
 | --- | --- | --- | --- |
-| 4.1 | Open a synthetic PPTX | DeckCraft Web opens inline | [ ] |
-| 4.2 | Edit a slide | the change is visible | [ ] |
+| 4.1 | Open a synthetic PPTX | DeckCraft Web opens inline | [x] GR-044: actual patched DeckCraft WASM loaded and displayed the synthetic one-slide PPTX from a same-origin parent in Chromium (`docs/GR-044-DECKCRAFT-WASM-SMOKE.md`) |
+| 4.2 | Edit a slide | the change is visible | [x] GR-044: actual patched DeckCraft WASM opened a synthetic PPTX in Chromium; edited the slide text and saw the changed text with `dirty=true` (`docs/GR-044-DECKCRAFT-WASM-SMOKE.md`) |
 | 4.3 | Save | new Seafile version | [ ] |
-| 4.4 | Reopen | the slide change is preserved | [ ] |
+| 4.4 | Reopen from Seafile | the slide change is preserved | [ ] Seafile-backed reopen and version creation remain NOT VERIFIED |
+| 4.5 | Synthetic host save acknowledgement | exact serialized bytes are captured; matching `saveResult` clears dirty; a fresh editor reopens the bytes | [x] GR-044 Chromium smoke captured 7,297 bytes (SHA-256 `ce01fb7cd7819f5ee6e67c67d77aeda19829e431a2cf92bdfe396b7d76b09376`), acknowledged `deckcraft:1`, observed clean state, and reopened the same edit in a fresh iframe; no Seafile write was performed |
 
 ## 5. PDF and SVG — proving non-Office formats (GR-012)
 
@@ -178,7 +179,7 @@ Patch and limits: `docs/reviews/GR-019/README.md`.
 | 12.2 | Synthetic host open/edit/save/ACK/reopen | no clean state before ACK; serialized bytes reopen with the saved edit | [x] 4 focused `deckcraft-ui-egui` tests pass, including failure ACK and edit-after-submit |
 | 12.3 | DeckCraft Web shared transport compilation | pinned adapter compiles for `wasm32-unknown-unknown` | [x] Rust 1.95 locked WASM check passes on pin `56c5e16` |
 | 12.4 | Host-mode single-document and Save As guards | no second document, path-open, or Save As can bypass the host binding | [x] UI dispatch and direct helpers guard the local adapter; bounded independent review PASS |
-| 12.5 | Browser messaging with real DeckCraft WASM | parent open/save/ACK exchange works in browser | [ ] NOT VERIFIED |
+| 12.5 | Browser messaging with real DeckCraft WASM | parent open/save/ACK exchange works in browser | [x] GR-044: actual patched WASM opened, edited, saved and received matching ACK in Chromium; fresh iframe reopened captured bytes. Synthetic parent only; see `docs/GR-044-DECKCRAFT-WASM-SMOKE.md` |
 | 12.6 | Seafile new version and fresh-storage reopen | saved presentation survives Seafile version creation and fresh editor load | [ ] NOT VERIFIED; DeckCraft is not in the Seafile dispatcher |
 | 12.7 | Independent bounded review | no blocker/major/minor in exact local patch | [x] GPT-6 Luna high R2 reviewed app source; independent re-pin review verifies exact pin/artifact; see `REVIEW-TRANSPORT-REPIN.md` |
 | 12.8 | Full DeckCraft workspace CI | all xtask steps pass | [~] `assets`, `layers`, and `wasm` pass; `xtask ci` stops at existing workspace Clippy errors; full workspace tests did not complete (long-running UI tests stopped) |
