@@ -327,3 +327,22 @@ The functional release bundle used `wasm-opt=0`; production optimization,
 security hardening, ONLYOFFICE regression and deployment behavior remain
 NOT VERIFIED. SoundCraft remains excluded from the committed dispatch. See
 `docs/GR-031-SOUNDCRAFT-SEAFILE-E2E.md` and `docs/reviews/GR-031/`.
+
+## 23. PhotoCraft host-save source prototype (GR-032)
+
+| # | Test | Expected | Result |
+|---|---|---|---|
+| 23.1 | Pathless host open | One `.pcraft` opens without local path/recent entry; second open is refused | [x] GR-026 pathless-open regression and GR-032 one-open assertion pass |
+| 23.2 | File Save dispatch and serialization | File Save sends one serialized `.pcraft` snapshot with one ticket | [x] Focused UI lifecycle test passes 1/1 |
+| 23.3 | ACK identity and dirty state | Unknown ticket ignored; only matching positive ACK acknowledges captured snapshot; negative leaves baseline unchanged | [x] Test covers negative ACK, dirty preservation, unique retry ticket, stale ACK rejection and matching success |
+| 23.4 | Unknown timeout and unsafe close/retry | Missing result locks retry; dirty or unresolved close cannot discard snapshot | [x] Focused UI test exercises timeout, retry refusal and close refusal |
+| 23.5 | Open/replace/Save As bypasses | Local picker/drop, new/open, action playback, Save As/Copy cannot replace host-bound document | [ ] New/Save As guards and one-open are tested; remaining picker/drop/action routes are source-inspected only |
+| 23.6 | Rust 1.95 Web WASM check | Pinned transport and PhotoCraft app compile for WASM | [x] `cargo +1.95.0 check --locked -p photocraft-web --target wasm32-unknown-unknown` passes |
+| 23.7 | Browser host and Seafile version/reopen | Edit creates durable Seafile version and survives fresh editor reopen | [ ] NOT VERIFIED; no browser or Seafile accessed |
+| 23.8 | R1 bounded ACK inbox | Unknown/duplicate replies cannot grow the queue or block a matching ACK | [x] `cargo +1.95.0 test --locked -p photocraft-web host_inbox::tests::`; 1 queue flood regression passes |
+| 23.9 | Listener registration failure | Host startup reports listener error and never posts ready | [x] Listener error propagation helper test passes; browser startup rendering is NOT VERIFIED |
+| 23.10 | Gateway size limit / pre-serialization memory | Saves within default ceiling reach gateway; oversized document fails without excessive allocation | [ ] NOT VERIFIED; gateway defaults to 50 MiB (`integration/gateway/server.py:98`); PhotoCraft serializes first and rejection only preserves dirty state |
+| 23.11 | Independent exact-patch review | Corrected patch includes inbox module and bounded ticket filtering | [x] R2/R3 bounded PROVISIONAL PASS; builds/tests are implementer-reported, not independently rerun |
+
+Patch hash, exact base, review request and limits: `docs/reviews/GR-032/` and
+`docs/GR-032-PHOTOCRAFT-HOST-SAVE.md`.

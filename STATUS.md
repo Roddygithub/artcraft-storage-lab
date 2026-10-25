@@ -20,7 +20,7 @@ GPT REVIEW:  FAIL (GPT-6.1 Sol; original c76a7594cc43ba2a6cf56de2232836f008a9786
              afec19e63a6a4faec8a94f93651363dbe007e526, and
              0edbe524b4fa321b0f73f8601afef390e7f785e6)
 
-CURRENT GR: GR-020/021/022/023/024 — DeckCraft, DesignCraft, EffectCraft and FilmCraft patches use 56c5e16; EffectCraft GR-022 has an exact bounded review PASS; GR-027 passed bounded exact review after five rounds; GR-028 playback patch has an incomplete independent semantic review; GR-029 full Web WASM build passes with local egui 0.37 overlays and bounded R3 review PASS; GR-030 proves browser protocol round trip with an in-memory parent; GR-031 reproduces SoundCraft Seahub click → edit → Seafile version/ACK → API readback → fresh Seahub reopen on synthetic services and has a Luna High bounded PROVISIONAL PASS with minor evidence gaps. PhotoCraft GR-026 pathless-open/snapshot-ACK core has an incarnation guard and provisional independent PASS; no browser host adapter yet
+CURRENT GR: GR-020/021/022/023/024 — DeckCraft, DesignCraft, EffectCraft and FilmCraft patches use 56c5e16; EffectCraft GR-022 has an exact bounded review PASS; GR-027 passed bounded exact review after five rounds; GR-028 playback patch has an incomplete independent semantic review; GR-029 full Web WASM build passes with local egui 0.37 overlays and bounded R3 review PASS; GR-030 proves browser protocol round trip with an in-memory parent; GR-031 reproduces SoundCraft Seahub click → edit → Seafile version/ACK → API readback → fresh Seahub reopen on synthetic services and has a Luna High bounded PROVISIONAL PASS with minor evidence gaps. PhotoCraft GR-032 has a local Rust-only `?host=parent` adapter patch on top of GR-026; R2/R3 bounded independent reviews are PROVISIONAL PASS; browser and Seafile runtime evidence remain NOT VERIFIED
 
 FREE REVIEW: PASS (3 rounds: 01 FAIL->remediated, 02 FAIL->remediated, 03 PASS)
 INDEPENDENT REVIEW: Nemotron FAIL on `a4ecc8e` candidate readiness; follow-up
@@ -147,9 +147,17 @@ OPEN GAPS:
 - GR-026 now has a bounded core patch for pathless open and revision ACK, with
   per-open incarnation identity to reject ACKs after close/reopen with a reused
   document ID. Independent R2 review is provisional PASS; engine 4/4 pass, UI
-  and post-change WASM checks are pending. It is not a host adapter: browser
+  and post-change WASM checks pass. It is not a host adapter: browser
   behavior and Seafile version/reopen remain NOT VERIFIED. See
   `docs/reviews/GR-026/`.
+- GR-032 adds a local Rust-only PhotoCraft `?host=parent` adapter on top of that
+  core: one pathless `.pcraft`, ticketed File Save, snapshot-specific positive
+  ACK, negative/unknown outcome preservation, and host-mode route guards. Final
+  locked WASM/UI checks pass. R1’s unbounded ACK inbox and swallowed listener
+  failure findings are remediated; R2/R3 independent bounded reviews are
+  PROVISIONAL PASS; browser and Seafile version/reopen are NOT VERIFIED. R2 also recorded the 50 MiB gateway
+  default versus post-serialization rejection as an unverified size/memory limit.
+  See `docs/reviews/GR-032/`.
 - The isolated synthetic Seafile runtime flows currently documented are for
   WordCraft, GridCraft, VectorCraft, PdfCraft and CADCraft. VectorCraft uses its
   page API, not the common `?host=parent` contract. DeckCraft now has a local

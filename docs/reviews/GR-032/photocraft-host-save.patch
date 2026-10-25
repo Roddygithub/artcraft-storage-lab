@@ -1,0 +1,730 @@
+diff --git c/Cargo.lock w/Cargo.lock
+index df709e58..85652f92 100644
+--- c/Cargo.lock
++++ w/Cargo.lock
+@@ -1227,6 +1227,16 @@ name = "craft-docpath"
+ version = "0.1.0"
+ source = "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
+ 
++[[package]]
++name = "craft-platform"
++version = "0.1.0"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab?rev=56c5e16d79b77751106173c13111ef4fe0a2c0ec#56c5e16d79b77751106173c13111ef4fe0a2c0ec"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++ "web-sys",
++]
++
+ [[package]]
+ name = "craft-print"
+ version = "0.1.0"
+@@ -5104,6 +5114,7 @@ dependencies = [
+ name = "photocraft-web"
+ version = "0.15.1"
+ dependencies = [
++ "craft-platform",
+  "eframe",
+  "egui",
+  "js-sys",
+diff --git c/apps/photocraft-web/Cargo.toml w/apps/photocraft-web/Cargo.toml
+index 279d13b4..cd20e00d 100644
+--- c/apps/photocraft-web/Cargo.toml
++++ w/apps/photocraft-web/Cargo.toml
+@@ -34,7 +34,8 @@ rfd = { workspace = true }
+ wasm-bindgen = "0.2"
+ wasm-bindgen-futures = "0.4"
+ js-sys = "0.3"
+-web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "DomRect", "HtmlAnchorElement", "Blob", "BlobPropertyBag", "Url", "Location", "CssStyleDeclaration", "Storage", "Event", "EventTarget", "MouseEvent", "PointerEvent", "BeforeUnloadEvent", "AbortController", "AbortSignal", "DomException", "Response", "IdbFactory", "IdbOpenDbRequest", "IdbDatabase", "IdbRequest", "IdbTransaction", "IdbTransactionMode", "IdbObjectStore", "IdbCursor", "IdbCursorWithValue", "RequestInit", "RequestMode", "Navigator"] }
++web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "DomRect", "HtmlAnchorElement", "Blob", "BlobPropertyBag", "Url", "Location", "CssStyleDeclaration", "Storage", "Event", "EventTarget", "MouseEvent", "PointerEvent", "BeforeUnloadEvent", "AbortController", "AbortSignal", "DomException", "Response", "IdbFactory", "IdbOpenDbRequest", "IdbDatabase", "IdbRequest", "IdbTransaction", "IdbTransactionMode", "IdbObjectStore", "IdbCursor", "IdbCursorWithValue", "RequestInit", "RequestMode", "Navigator", "Crypto"] }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab", rev = "56c5e16d79b77751106173c13111ef4fe0a2c0ec", default-features = false, features = ["browser"] }
+ 
+ [dev-dependencies]
+ serde_json = { workspace = true }
+diff --git c/apps/photocraft-web/src/host_inbox.rs w/apps/photocraft-web/src/host_inbox.rs
+new file mode 100644
+index 00000000..cd68cebf
+--- /dev/null
++++ w/apps/photocraft-web/src/host_inbox.rs
+@@ -0,0 +1,63 @@
++use std::mem;
++
++#[derive(Debug, PartialEq, Eq)]
++pub enum HostEvent {
++    Open { name: String, bytes: Vec<u8> },
++    SaveResult { ticket: String, ok: bool, error: Option<String> },
++}
++
++#[derive(Default)]
++pub struct HostInbox {
++    open: Option<(String, Vec<u8>)>,
++    save_result: Option<(String, bool, Option<String>)>,
++}
++
++impl HostInbox {
++    /// Keep only the first Open and the one ACK for the currently outstanding save.
++    pub fn push(&mut self, event: HostEvent, expected_ticket: Option<&str>) {
++        match event {
++            HostEvent::Open { name, bytes } if self.open.is_none() => self.open = Some((name, bytes)),
++            HostEvent::SaveResult { ticket, ok, error } if expected_ticket == Some(ticket.as_str()) && self.save_result.is_none() => {
++                self.save_result = Some((ticket, ok, error));
++            }
++            HostEvent::Open { .. } | HostEvent::SaveResult { .. } => {}
++        }
++    }
++
++    pub fn take(&mut self) -> (Option<(String, Vec<u8>)>, Option<(String, bool, Option<String>)>) {
++        (mem::take(&mut self.open), mem::take(&mut self.save_result))
++    }
++}
++
++pub fn require_listener<T, E>(host_mode: bool, listener: Result<Option<T>, E>) -> Result<Option<T>, E> {
++    if host_mode { listener } else { Ok(None) }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn unknown_and_duplicate_results_cannot_grow_or_fill_queue_ahead_of_valid_ack() {
++        let mut inbox = HostInbox::default();
++        inbox.push(HostEvent::Open { name: "one.pcraft".into(), bytes: vec![1] }, None);
++        for _ in 0..10_000 {
++            inbox.push(HostEvent::SaveResult { ticket: "unknown".into(), ok: true, error: None }, Some("live-ticket"));
++        }
++        inbox.push(HostEvent::SaveResult { ticket: "live-ticket".into(), ok: true, error: None }, Some("live-ticket"));
++        for _ in 0..10_000 {
++            inbox.push(HostEvent::SaveResult { ticket: "live-ticket".into(), ok: false, error: None }, Some("live-ticket"));
++        }
++
++        let (open, result) = inbox.take();
++        assert_eq!(open, Some(("one.pcraft".into(), vec![1])));
++        assert_eq!(result, Some(("live-ticket".into(), true, None)));
++        assert_eq!(inbox.take(), (None, None));
++    }
++
++    #[test]
++    fn host_listener_failure_propagates_instead_of_allowing_ready() {
++        let result: Result<Option<()>, &str> = require_listener(true, Err("listener failed"));
++        assert_eq!(result, Err("listener failed"));
++    }
++}
+diff --git c/apps/photocraft-web/src/main.rs w/apps/photocraft-web/src/main.rs
+index 0802a02e..ca1ae235 100644
+--- c/apps/photocraft-web/src/main.rs
++++ w/apps/photocraft-web/src/main.rs
+@@ -25,6 +25,9 @@ mod indexed_presets;
+ #[cfg(target_arch = "wasm32")]
+ mod web;
+ 
++#[cfg(any(target_arch = "wasm32", test))]
++mod host_inbox;
++
+ #[cfg(target_arch = "wasm32")]
+ fn main() {
+     web::start();
+diff --git c/apps/photocraft-web/src/web.rs w/apps/photocraft-web/src/web.rs
+index 20e64fa0..56bb6511 100644
+--- c/apps/photocraft-web/src/web.rs
++++ w/apps/photocraft-web/src/web.rs
+@@ -1,6 +1,6 @@
+ //! The browser shell: web `Services`, drag-and-drop, and the eframe web runner.
+ 
+-use std::cell::Cell;
++use std::cell::{Cell, RefCell};
+ use std::collections::{HashMap, HashSet};
+ use std::rc::Rc;
+ use std::sync::atomic::{AtomicBool, Ordering};
+@@ -15,6 +15,7 @@ use photocraft_ui_egui::{FileDialogAnswer, FileDialogRequest, PhotocraftApp, Ser
+ use wasm_bindgen::JsCast as _;
+ 
+ type Inbox = Arc<Mutex<Vec<(String, Vec<u8>)>>>;
++type HostInbox = Arc<Mutex<crate::host_inbox::HostInbox>>;
+ 
+ /// Everything File › Open reads: PhotoCraft, Photoshop, OpenRaster, Krita and Affinity documents, flat images, and
+ /// Photoshop brushes (.abr), gradients (.grd), layer styles (.asl) and swatches (.aco, .act, .ase), which go to the preset libraries.
+@@ -56,6 +57,15 @@ pub fn start() {
+             return;
+         };
+         let q = query();
++        let host_instance = host_instance_id();
++        let host_requested = q.split(['?', '&']).any(|part| part == "host=parent");
++        let host_transport = if host_requested { craft_platform::browser::host::HostTransport::current("photocraft").ok().flatten() } else { None };
++        if host_requested && host_transport.is_none() {
++            if let Some(el) = document.get_element_by_id("photocraft_loading") {
++                el.set_inner_html("PhotoCraft host mode requires a same-origin parent frame.");
++            }
++            return;
++        }
+         let force_cpu = q.contains("cpu");
+         let mut options = eframe::WebOptions::default();
+         photocraft_ui_egui::gpu_canvas::use_adapter_limits(&mut options.wgpu_options.wgpu_setup);
+@@ -82,13 +92,54 @@ pub fn start() {
+                 Box::new(move |cc| {
+                     PhotocraftApp::setup_context(&cc.egui_ctx, ThemeKind::Pro);
+                     let inbox: Inbox = Arc::default();
++                    let host_inbox: HostInbox = Arc::default();
++                    let expected_host_ticket = Rc::new(RefCell::new(None));
++                    let host_save_started = Rc::new(Cell::new(None));
++                    let host_save_counter = Rc::new(Cell::new(0_u64));
++                    let listener = host_transport.as_ref().map(|host| {
++                        let messages = host_inbox.clone();
++                        let expected_ticket = expected_host_ticket.clone();
++                        host.listen(move |message| {
++                            let expected = expected_ticket.borrow().clone();
++                            let event = match message {
++                                craft_platform::browser::host::HostMessage::Open { name, bytes } => crate::host_inbox::HostEvent::Open { name, bytes },
++                                craft_platform::browser::host::HostMessage::SaveResult { ticket, ok, error } => {
++                                    crate::host_inbox::HostEvent::SaveResult { ticket: ticket.as_str().to_owned(), ok, error }
++                                }
++                            };
++                            messages.lock().unwrap_or_else(|e| e.into_inner()).push(event, expected.as_deref());
++                        })
++                        .map(Some)
++                        .map_err(|e| format!("{e:?}"))
++                    });
++                    let host_listener = match crate::host_inbox::require_listener(host_transport.is_some(), listener.unwrap_or(Ok(None))) {
++                        Ok(listener) => listener,
++                        Err(error) => return Err(std::io::Error::other(format!("PhotoCraft host listener failed: {error}")).into()),
++                    };
+                     let place_inbox: Inbox = Arc::default();
+                     let served: Served = Arc::default();
+                     load_font_manifest(served.clone(), cc.egui_ctx.clone());
+                     let (session, warnings) = crate::preset_bridge::session(presets.clone());
+                     preset_warnings.extend(warnings);
+                     let drag = listen_drag(&pen_target);
+-                    let mut app = PhotocraftApp::new(session, services(inbox.clone(), place_inbox.clone(), drag_pos_service(pen_target.clone(), drag)));
++                    let mut app = PhotocraftApp::new(
++                        session,
++                        services(
++                            inbox.clone(),
++                            place_inbox.clone(),
++                            drag_pos_service(pen_target.clone(), drag),
++                            host_transport.clone(),
++                            host_save_started.clone(),
++                            host_save_counter,
++                            host_instance.clone(),
++                            expected_host_ticket.clone(),
++                        ),
++                    );
++                    if host_transport.is_some() {
++                        if let Some(host) = host_transport.as_ref() {
++                            let _ = host.post_ready(env!("CARGO_PKG_VERSION"));
++                        }
++                    }
+                     if !preset_warnings.is_empty() {
+                         photocraft_ui_egui::notices::post(&mut app, i18n::t("Some brush presets could not be loaded"), preset_warnings, true, None);
+                     }
+@@ -102,7 +153,20 @@ pub fn start() {
+                     }
+                     let unsaved = Arc::new(AtomicBool::new(false));
+                     guard_unload(unsaved.clone());
+-                    Ok(Box::new(WebShell { app, inbox, place_inbox, unsaved, served, database, presets }))
++                    Ok(Box::new(WebShell {
++                        app,
++                        inbox,
++                        place_inbox,
++                        host_inbox,
++                        host_transport: host_transport.clone(),
++                        _host_listener: host_listener,
++                        host_save_started,
++                        expected_host_ticket,
++                        unsaved,
++                        served,
++                        database,
++                        presets,
++                    }))
+                 }),
+             )
+             .await;
+@@ -264,6 +328,11 @@ struct WebShell {
+     inbox: Inbox,
+     /// Dropped files to place on the active document's canvas.
+     place_inbox: Inbox,
++    host_inbox: HostInbox,
++    host_transport: Option<craft_platform::browser::host::HostTransport>,
++    _host_listener: Option<craft_platform::browser::host::HostListener>,
++    host_save_started: Rc<Cell<Option<f64>>>,
++    expected_host_ticket: Rc<RefCell<Option<String>>>,
+     /// Read by the `beforeunload` listener ([`guard_unload`]).
+     unsaved: Arc<AtomicBool>,
+     served: Served,
+@@ -331,6 +400,22 @@ impl eframe::App for WebShell {
+     }
+ 
+     fn logic(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
++        let (open, save_result) = self.host_inbox.lock().unwrap_or_else(|e| e.into_inner()).take();
++        if let Some((name, bytes)) = open
++            && let Err(e) = self.app.open_file_pathless(&name, &bytes)
++        {
++            self.app.open_failed(&name, &e);
++        }
++        if let Some((ticket, ok, error)) = save_result {
++            if self.app.host_save_result(&ticket, ok, error.as_deref()) {
++                *self.expected_host_ticket.borrow_mut() = None;
++                self.host_save_started.set(None);
++            }
++        }
++        if self.host_save_started.get().is_some_and(|started| js_sys::Date::now() - started > 30_000.0) {
++            self.app.host_save_timed_out();
++            self.host_save_started.set(None);
++        }
+         let dropped = ctx.input_mut(|i| std::mem::take(&mut i.raw.dropped_files));
+         if !dropped.is_empty() {
+             let names: Vec<String> =
+@@ -357,6 +442,9 @@ impl eframe::App for WebShell {
+         }
+         self.serve_fonts(ctx);
+         self.app.logic(ctx, frame);
++        if let Some(host) = &self.host_transport {
++            let _ = host.post_dirty(self.app.has_unsaved_work());
++        }
+         self.save_presets(ctx);
+     }
+ 
+@@ -389,8 +477,38 @@ impl eframe::App for WebShell {
+     }
+ }
+ 
+-fn services(inbox: Inbox, place_inbox: Inbox, cursor_pos: photocraft_ui_egui::CursorPosFn) -> Services {
++fn services(
++    inbox: Inbox,
++    place_inbox: Inbox,
++    cursor_pos: photocraft_ui_egui::CursorPosFn,
++    host: Option<craft_platform::browser::host::HostTransport>,
++    host_save_started: Rc<Cell<Option<f64>>>,
++    host_save_counter: Rc<Cell<u64>>,
++    host_instance: String,
++    expected_host_ticket: Rc<RefCell<Option<String>>>,
++) -> Services {
++    let host_save = host.clone().map(|transport| {
++        let started = host_save_started.clone();
++        let counter = host_save_counter.clone();
++        let host_instance = host_instance.clone();
++        let expected = expected_host_ticket.clone();
++        Box::new(move |name: &str, bytes: &[u8]| {
++            let next = counter.get().checked_add(1).ok_or("host save ticket counter exhausted")?;
++            counter.set(next);
++            let ticket = craft_platform::host_protocol::SaveTicket::new(format!("photocraft:{host_instance}:{next}")).ok_or("invalid save ticket")?;
++            let ticket_text = ticket.as_str().to_owned();
++            *expected.borrow_mut() = Some(ticket_text.clone());
++            if let Err(error) = transport.post_save(&ticket, name, bytes, false) {
++                *expected.borrow_mut() = None;
++                return Err(format!("{error:?}"));
++            }
++            started.set(Some(js_sys::Date::now()));
++            Ok(ticket_text)
++        }) as Box<dyn FnMut(&str, &[u8]) -> Result<String, String>>
++    });
+     Services {
++        host_mode: host.is_some(),
++        host_save,
+         screen_pick: screen_color_service(),
+         import: Some(Box::new(|name: &str, bytes: &[u8], opts: &photocraft_io::ImportOptions| {
+             photocraft_io::import_with_options(name, bytes, opts).map(|r| (r.document, r.warnings)).map_err(|e| e.to_string())
+@@ -451,6 +569,17 @@ fn services(inbox: Inbox, place_inbox: Inbox, cursor_pos: photocraft_ui_egui::Cu
+     }
+ }
+ 
++/// Per-page namespace plus a monotonic sequence prevents a delayed ACK from matching a later save.
++fn host_instance_id() -> String {
++    let mut bytes = [0_u8; 16];
++    if let Some(crypto) = web_sys::window().and_then(|window| window.crypto().ok())
++        && crypto.get_random_values_with_u8_array(&mut bytes).is_ok()
++    {
++        return bytes.iter().map(|byte| format!("{byte:02x}")).collect();
++    }
++    format!("{:x}-{:x}", js_sys::Date::now() as u64, (js_sys::Math::random() * u32::MAX as f64) as u32)
++}
++
+ const PREFS_KEY: &str = "photocraft.preferences";
+ 
+ fn local_storage() -> Option<web_sys::Storage> {
+diff --git c/crates/engine/src/lib.rs w/crates/engine/src/lib.rs
+index 4a352107..6dc49c79 100644
+--- c/crates/engine/src/lib.rs
++++ w/crates/engine/src/lib.rs
+@@ -201,6 +201,8 @@ pub(crate) fn active_layer_of(s: &Session) -> std::result::Result<&photocraft_do
+ #[derive(Clone, Debug)]
+ pub struct DocState {
+     pub doc: Arc<Document>,
++    /// Unique identity for this open incarnation of the document.
++    incarnation: Arc<()>,
+     pub history: History,
+     /// The primary ("key") layer: what single-layer commands act on. Always a member of
+     /// `selected_layers` when set.
+@@ -254,7 +256,34 @@ pub struct DocState {
+     pub(crate) source_snapshot: Option<u64>,
+ }
+ 
++/// An immutable document value and revision captured together for an external save.
++/// Create one with [`DocState::saved_snapshot`], serialize [`Self::document`], then pass
++/// the same value to [`Session::acknowledge_saved_snapshot`] only after that write is durable.
++#[derive(Clone, Debug)]
++pub struct SavedSnapshot {
++    document: Arc<Document>,
++    revision: u64,
++    incarnation: Arc<()>,
++}
++
++impl SavedSnapshot {
++    /// The exact immutable document value captured for serialization.
++    pub fn document(&self) -> &Document {
++        &self.document
++    }
++
++    /// The document revision represented by [`Self::document`].
++    pub fn revision(&self) -> u64 {
++        self.revision
++    }
++}
++
+ impl DocState {
++    /// Capture the current document and revision as one immutable save snapshot.
++    pub fn saved_snapshot(&self) -> SavedSnapshot {
++        SavedSnapshot { document: Arc::clone(&self.doc), revision: self.revision, incarnation: Arc::clone(&self.incarnation) }
++    }
++
+     /// Trim the history to its budget, counting the tiles only History panel snapshots hold
+     /// against it too (#4530). Returns how many states were dropped.
+     pub fn trim_history(&mut self) -> usize {
+@@ -275,6 +304,7 @@ impl DocState {
+         history.set_current_layers(LayerTarget { active: active_layer, selected: active_layer.into_iter().collect() });
+         Self {
+             doc: Arc::new(doc),
++            incarnation: Arc::new(()),
+             history,
+             active_layer,
+             selected_layers: active_layer.into_iter().collect(),
+@@ -581,6 +611,22 @@ impl Session {
+     pub fn active_mut(&mut self) -> Option<&mut DocState> {
+         self.active.and_then(|i| self.docs.get_mut(i))
+     }
++
++    /// Acknowledge that `snapshot` was durably saved outside PhotoCraft. The baseline advances
++    /// only to the captured revision, so edits made after capture remain dirty. Returns an error
++    /// if that document incarnation is no longer open or the snapshot is inconsistent with its revision.
++    pub fn acknowledge_saved_snapshot(&mut self, snapshot: SavedSnapshot) -> Result<()> {
++        let st = self
++            .docs
++            .iter_mut()
++            .find(|st| st.doc.id == snapshot.document.id && Arc::ptr_eq(&st.incarnation, &snapshot.incarnation))
++            .ok_or(EngineError::Other("saved document incarnation is no longer open".into()))?;
++        if snapshot.revision > st.revision {
++            return Err(EngineError::Other("saved snapshot revision is newer than the open document".into()));
++        }
++        st.saved_revision = st.saved_revision.max(snapshot.revision);
++        Ok(())
++    }
+     pub fn set_active(&mut self, index: usize) -> bool {
+         if index < self.docs.len() {
+             self.active = Some(index);
+@@ -1111,3 +1157,6 @@ mod tests;
+ 
+ #[cfg(test)]
+ mod fx_mode_tests;
++
++#[cfg(test)]
++mod saved_snapshot_tests;
+diff --git c/crates/ui-egui/src/discard_ui.rs w/crates/ui-egui/src/discard_ui.rs
+index a6a65f29..a473013b 100644
+--- c/crates/ui-egui/src/discard_ui.rs
++++ w/crates/ui-egui/src/discard_ui.rs
+@@ -67,6 +67,14 @@ fn discarded(app: &PhotocraftApp, id: &str, params: &Value) -> (Option<DocId>, V
+ 
+ /// Park `id` behind a prompt if it would discard unsaved work. Returns whether it did.
+ pub fn intercept(app: &mut PhotocraftApp, id: &str, params: &Value) -> bool {
++    if app.services.host_mode
++        && matches!(id, "file.close" | "file.closeOthers" | "file.closeAll" | "file.exit" | "file.revert")
++        && (app.host_save_pending.is_some() || app.host_save_unknown || app.session.documents().iter().any(|d| d.is_dirty()))
++    {
++        app.ui.status = "Save this host document successfully before closing it".into();
++        app.ui.status_error = true;
++        return true;
++    }
+     let (target, docs) = discarded(app, id, params);
+     if docs.is_empty() {
+         return false;
+@@ -114,7 +122,9 @@ impl PhotocraftApp {
+     /// Whether closing now would lose work: a document has unsaved changes and closing wasn't
+     /// confirmed. The web build has the browser ask before leaving the page while this holds (#1380).
+     pub fn has_unsaved_work(&self) -> bool {
+-        !self.allow_close && self.session.documents().iter().any(|d| d.is_dirty())
++        !self.allow_close
++            && (self.services.host_mode && (self.host_save_pending.is_some() || self.host_save_unknown)
++                || self.session.documents().iter().any(|d| d.is_dirty()))
+     }
+ }
+ 
+diff --git c/crates/ui-egui/src/file_dialog.rs w/crates/ui-egui/src/file_dialog.rs
+index bddc6796..52e9f0da 100644
+--- c/crates/ui-egui/src/file_dialog.rs
++++ w/crates/ui-egui/src/file_dialog.rs
+@@ -260,6 +260,9 @@ impl PhotocraftApp {
+     /// Opens each picked file's contents as its own document, in name order (like
+     /// [`Self::open_paths`]), reporting each failure.
+     fn open_contents(&mut self, mut files: Vec<(String, Vec<u8>)>) {
++        if self.services.host_mode {
++            return;
++        }
+         files.sort_by(|a, b| crate::file_open::natural_cmp(&a.0, &b.0));
+         for (name, bytes) in files {
+             if let Err(e) = self.open_bytes(&name, &bytes) {
+diff --git c/crates/ui-egui/src/file_open.rs w/crates/ui-egui/src/file_open.rs
+index 19d8819e..522f0ca9 100644
+--- c/crates/ui-egui/src/file_open.rs
++++ w/crates/ui-egui/src/file_open.rs
+@@ -89,10 +89,23 @@ pub fn display_name(path: &str) -> String {
+ }
+ 
+ impl PhotocraftApp {
++    /// Open host-supplied document bytes without treating the host name as a filesystem path.
++    /// The name is used for display only; this method does not bind a save path or add Open Recent.
++    /// This is a Rust API, not a browser transport entry point.
++    pub fn open_file_pathless(&mut self, host_name: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
++        if self.services.host_mode && (!self.session.documents().is_empty() || !host_name.to_ascii_lowercase().ends_with(".pcraft")) {
++            return Err("host mode accepts one .pcraft document".into());
++        }
++        self.open_bytes_from(&display_name(host_name), bytes, None)
++    }
++
+     /// Open `bytes` read from the file at `path`: the document is named after the file, keeps
+     /// `path` for File › Save unless it is a derivative preview, and `path` goes to the top of Open Recent. Returns the import
+     /// warnings (also shown to the user).
+     pub fn open_file(&mut self, path: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
++        if self.services.host_mode {
++            return Err("local file opens are unavailable in host mode".into());
++        }
+         // Brushes/gradients go to the preset libraries (no document, no Open Recent entry).
+         if let Some(r) = crate::preset_files_ui::open(self, path, bytes) {
+             return r.map(|()| Vec::new());
+@@ -155,6 +168,9 @@ impl PhotocraftApp {
+     /// open in name order ([`natural_cmp`]: `File_2` before `File_10`), and their tabs keep that
+     /// order however long each takes to open in the background (#3248). Returns how many opened.
+     pub fn open_paths(&mut self, paths: &[String]) -> usize {
++        if self.services.host_mode {
++            return 0;
++        }
+         let mut paths: Vec<String> = paths.iter().map(|p| absolute(p)).collect();
+         paths.sort_by(|a, b| natural_cmp(a, b));
+         let batch = crate::jobs_ui::begin_batch(self);
+diff --git c/crates/ui-egui/src/file_open/tests.rs w/crates/ui-egui/src/file_open/tests.rs
+index 099caf58..910e6777 100644
+--- c/crates/ui-egui/src/file_open/tests.rs
++++ w/crates/ui-egui/src/file_open/tests.rs
+@@ -5,7 +5,7 @@ use photocraft_color::{ColorMode, SampleType};
+ use photocraft_doc::Document;
+ use photocraft_geom::Size;
+ use serde_json::json;
+-use std::cell::RefCell;
++use std::cell::{Cell, RefCell};
+ use std::rc::Rc;
+ 
+ /// Writes recorded by the fake writer: (path, bytes).
+@@ -80,6 +80,65 @@ fn open_file_sets_name_path_and_recent() {
+     assert!(app.ui.notices.is_empty());
+ }
+ 
++#[test]
++fn pathless_host_open_uses_name_without_binding_or_recent_entry() {
++    let (mut app, _) = app_with(Vec::new());
++    let warnings = app.open_file_pathless("/host/library/cat.psd", b"x").unwrap();
++    assert!(warnings.is_empty());
++    let st = app.session.active().unwrap();
++    assert_eq!(st.doc.name, "cat.psd");
++    assert!(st.path.is_none());
++    assert!(app.ui.recent_files.is_empty());
++}
++
++#[test]
++fn host_save_dispatch_waits_for_matching_durable_ack_and_guards_bypass_routes() {
++    let sent: Rc<RefCell<Vec<(String, Vec<u8>)>>> = Rc::default();
++    let capture = sent.clone();
++    let sequence = Rc::new(Cell::new(0_u8));
++    let next_sequence = sequence.clone();
++    let services = Services {
++        host_mode: true,
++        import: Some(Box::new(|name: &str, _: &[u8], _: &photocraft_io::ImportOptions| {
++            Ok((Document::new(name, Size::new(4, 4), ColorMode::Rgb, SampleType::U8), Vec::new()))
++        })),
++        export: Some(Box::new(|_: &Document, _: &str, _: &crate::ExportSettings| Ok((b"serialized-pcraft".to_vec(), Vec::new())))),
++        host_save: Some(Box::new(move |name, bytes| {
++            capture.borrow_mut().push((name.into(), bytes.to_vec()));
++            let next = next_sequence.get() + 1;
++            next_sequence.set(next);
++            Ok(format!("photocraft:test-{next}"))
++        })),
++        ..Default::default()
++    };
++    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
++    app.open_file_pathless("bound.pcraft", b"input").unwrap();
++    assert!(app.open_file_pathless("second.pcraft", b"input").is_err());
++    app.session.execute("layer.new.layer", json!({})).unwrap();
++    let ticket = menus::invoke(&mut app, &egui::Context::default(), "file.save", json!({})).unwrap();
++    assert_eq!(ticket, "photocraft:test-1");
++    assert_eq!(sent.borrow().as_slice(), [("bound.pcraft".into(), b"serialized-pcraft".to_vec())]);
++    assert!(app.host_save_result("wrong-ticket", true, None) == false);
++    assert!(app.save_host_snapshot().is_err(), "second write while a ticket is pending must be refused");
++    assert!(app.host_save_result("photocraft:test-1", false, Some("write rejected")));
++    assert!(app.session.active().unwrap().is_dirty(), "negative ACK must retain dirty state");
++    let retry_ticket = menus::invoke(&mut app, &egui::Context::default(), "file.save", json!({})).unwrap();
++    assert_eq!(retry_ticket, "photocraft:test-2");
++    assert_ne!(retry_ticket, ticket, "retry ticket must be unique");
++    assert!(!app.host_save_result("photocraft:test-1", true, None), "late duplicate ACK must not acknowledge a newer save");
++    assert!(app.host_save_result("photocraft:test-2", true, None));
++    assert!(!app.session.active().unwrap().is_dirty());
++    app.session.execute("layer.new.layer", json!({})).unwrap();
++    let timeout_ticket = menus::invoke(&mut app, &egui::Context::default(), "file.save", json!({})).unwrap();
++    app.host_save_timed_out();
++    assert!(app.save_host_snapshot().is_err(), "unknown save outcome must block retry");
++    menus::invoke(&mut app, &egui::Context::default(), "file.close", json!({})).unwrap();
++    assert_eq!(app.session.documents().len(), 1, "unresolved dirty document must not close");
++    assert!(app.host_save_result(timeout_ticket.as_str().unwrap(), true, None));
++    assert!(app.run("file.new", json!({"width": 8, "height": 8})).is_err());
++    assert!(app.run("file.saveAs", json!({"path":"copy.pcraft"})).is_err());
++}
++
+ #[test]
+ fn affinity_preview_does_not_acquire_the_source_path_even_when_renamed() {
+     for automation in [false, true] {
+diff --git c/crates/ui-egui/src/lib.rs w/crates/ui-egui/src/lib.rs
+index cf2b5814..2b5be0f3 100644
+--- c/crates/ui-egui/src/lib.rs
++++ w/crates/ui-egui/src/lib.rs
+@@ -562,6 +562,10 @@ pub type RightButtonDownFn = Box<dyn Fn() -> bool + Send + Sync>;
+ /// I/O dependencies.
+ #[derive(Default)]
+ pub struct Services {
++    /// One pathless document opened and saved by an embedding browser host.
++    pub host_mode: bool,
++    /// Deliver one serialized `.pcraft` save to the embedding host and return its opaque ticket.
++    pub host_save: Option<Box<dyn FnMut(&str, &[u8]) -> Result<String, String>>>,
+     /// User-initiated desktop/browser pixel sampling.
+     pub screen_pick: Option<screen_picker::Service>,
+     /// Decode a file's bytes into a document (PSD, PNG, JPEG, …).
+@@ -693,6 +697,8 @@ pub struct PhotocraftApp {
+     pub session: Session,
+     pub ui: UiState,
+     pub services: Services,
++    pub(crate) host_save_pending: Option<(String, photocraft_engine::SavedSnapshot)>,
++    pub(crate) host_save_unknown: bool,
+     /// Canvas caches per (document, display): CPU textures hold monitor values; the GPU
+     /// canvas state is shared (`canvas::GPU_OUTPUT`).
+     canvases: HashMap<(DocId, u32), canvas::CanvasCache>,
+@@ -1016,12 +1022,73 @@ pub struct PhotocraftApp {
+ }
+ 
+ impl PhotocraftApp {
++    /// Serialize and dispatch the active pathless host document as one `.pcraft` snapshot.
++    pub fn save_host_snapshot(&mut self) -> Result<String, String> {
++        if !self.services.host_mode {
++            return Err("host save is unavailable".into());
++        }
++        if self.host_save_pending.is_some() || self.host_save_unknown {
++            return Err("a host save is already pending or unresolved".into());
++        }
++        let st = self.session.active().ok_or("no document")?;
++        let name = st.doc.name.clone();
++        if !name.to_ascii_lowercase().ends_with(".pcraft") {
++            return Err("host mode saves only .pcraft documents".into());
++        }
++        let snapshot = st.saved_snapshot();
++        let export = self.services.export.as_ref().ok_or("no exporter configured")?;
++        let (bytes, warnings) = export(snapshot.document(), &name, &ExportSettings::default())?;
++        let send = self.services.host_save.as_mut().ok_or("host transport unavailable")?;
++        let ticket = send(&name, &bytes)?;
++        self.host_save_pending = Some((ticket.clone(), snapshot));
++        self.ui.status = if warnings.is_empty() { "Saving to host…".into() } else { warnings.join("\n") };
++        self.ui.status_error = false;
++        Ok(ticket)
++    }
++
++    /// Consume only the current ticket. A timeout stays unresolved and cannot be retried safely.
++    pub fn host_save_result(&mut self, ticket: &str, ok: bool, error: Option<&str>) -> bool {
++        let Some((pending, snapshot)) = self.host_save_pending.take() else {
++            return false;
++        };
++        if pending != ticket {
++            self.host_save_pending = Some((pending, snapshot));
++            return false;
++        }
++        self.host_save_unknown = false;
++        if ok {
++            if let Err(e) = self.session.acknowledge_saved_snapshot(snapshot) {
++                self.host_save_unknown = true;
++                self.ui.status = format!("Host saved, but PhotoCraft could not confirm this snapshot: {e}");
++                self.ui.status_error = true;
++            } else {
++                self.ui.status = "Saved to host".into();
++                self.ui.status_error = false;
++            }
++        } else {
++            self.ui.status = error.unwrap_or("Host save failed").to_owned();
++            self.ui.status_error = true;
++        }
++        true
++    }
++
++    /// Mark a missing durable acknowledgement as unknown; never auto-retry it.
++    pub fn host_save_timed_out(&mut self) {
++        if self.host_save_pending.is_some() {
++            self.host_save_unknown = true;
++            self.ui.status = "Host save outcome is unknown; reconcile with the host before continuing".into();
++            self.ui.status_error = true;
++        }
++    }
++
+     pub fn new(mut session: Session, mut services: Services) -> Self {
+         session.updates.check = services.check_updates.take();
+         let mut app = Self {
+             session,
+             ui: UiState::default(),
+             services,
++            host_save_pending: None,
++            host_save_unknown: false,
+             canvases: HashMap::new(),
+             navigator_textures: HashMap::new(),
+             display_memo: HashMap::new(),
+@@ -1263,6 +1330,11 @@ impl PhotocraftApp {
+ 
+     /// Run an engine command, reporting errors in the status bar.
+     pub fn run(&mut self, id: &str, params: Value) -> Result<Value, String> {
++        if self.services.host_mode
++            && (id.starts_with("file.open") || id.starts_with("file.new") || matches!(id, "file.revert" | "file.saveAs" | "file.saveACopy" | "actions.play"))
++        {
++            return Err("This command is unavailable for a host-bound document".into());
++        }
+         if let Some(result) = delete_layer_prompt::intercept(self, id, &params) {
+             return result;
+         }
+@@ -1667,6 +1739,9 @@ impl PhotocraftApp {
+     /// Returns the import warnings (also shown to the user). Brush and gradient
+     /// files go to the preset libraries, as for interactive opens.
+     pub fn open_automation_bytes(&mut self, name: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
++        if self.services.host_mode {
++            return Err("automation opens are unavailable in host mode".into());
++        }
+         let events_enabled = self.session.prefs().script_events.enabled;
+         if events_enabled {
+             self.session.edit_prefs(|prefs| prefs.script_events.enabled = false);
+diff --git c/crates/ui-egui/src/menus.rs w/crates/ui-egui/src/menus.rs
+index 0663f43e..88c300fa 100644
+--- c/crates/ui-egui/src/menus.rs
++++ w/crates/ui-egui/src/menus.rs
+@@ -68,6 +68,15 @@ fn workspace_name(id: &str) -> Option<&'static str> {
+ 
+ /// Run a command id from any source (menu, shortcut, palette, automation).
+ pub fn invoke(app: &mut PhotocraftApp, ctx: &egui::Context, id: &str, params: Value) -> Result<Value, String> {
++    if app.services.host_mode {
++        if id.starts_with("file.open") || id.starts_with("file.new") || matches!(id, "actions.play" | "file.saveAs" | "file.saveACopy") {
++            return Err("This command is unavailable for a host-bound document".into());
++        }
++        match id {
++            "file.save" => return Ok(json!(app.save_host_snapshot()?)),
++            _ => {}
++        }
++    }
+     if app.automation_input
+         && let Some(authorize) = app.services.automation_command.as_ref()
+     {

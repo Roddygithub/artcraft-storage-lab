@@ -631,6 +631,20 @@ Publication: LOCKED; no upstream issue, PR, RFC or patch published
 Evidence:    `docs/GR-026-PHOTOCRAFT-HOST-SAVE.md`, `docs/reviews/GR-026/`
 ```
 
+### GR-032 — PhotoCraft host-save adapter
+
+```text
+Status:      GPT REVIEW PENDING — bounded source prototype; R1 findings remediated; R2/R3 independent PROVISIONAL PASS
+Base:        storytold/photocraft `a02f2ee41059d3312e7ff24a5af5edcac7b6435a` plus GR-026 core patch
+Patch:       `docs/reviews/GR-032/photocraft-host-save.patch`; SHA-256 `487935d8f6db33cf82c85f8d9c8aa0686016612510f15cf34f6b3f05a2c53fe7`
+Transport:   `craft-platform` exact rev `56c5e16d79b77751106173c13111ef4fe0a2c0ec`, locked in Cargo.lock
+Review:      R1 found unbounded SaveResult enqueue and a swallowed listener-registration error. R2 verified the included fixed-slot inbox and listener failure handling; R3 verified documentation of the 50 MiB/serialization limit. Both are bounded provisional reviews, not project GPT PASS.
+Tests:       UI lifecycle test 1/1, inbox/listener tests 2/2, Rust 1.95 locked Web WASM check, clean-base patch apply and diff checks pass
+Open:        browser message execution, Seafile durable version/readback/fresh reopen, ONLYOFFICE regression NOT VERIFIED; gateway default is 50 MiB and serialization occurs before rejection, so oversized payload peak memory/compatibility is NOT VERIFIED
+Publication: LOCKED; no upstream issue/PR/RFC, commit or push
+Evidence:    `docs/GR-032-PHOTOCRAFT-HOST-SAVE.md`, `docs/reviews/GR-032/`
+```
+
 ## GPT review instruction (for the future session)
 
 ```text

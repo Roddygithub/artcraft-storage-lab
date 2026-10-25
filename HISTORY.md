@@ -1,3 +1,39 @@
+## 2026-10-25 — GR-032 PhotoCraft host-save adapter
+
+* Added a local one-document Rust Web adapter to the exact PhotoCraft `a02f2ee`
+  base with the accepted GR-026 core patch applied. `?host=parent` opens one
+  pathless `.pcraft`; File › Save serializes and sends ticketed bytes through
+  pinned `craft-platform` `56c5e16`, and only the matching positive ACK advances
+  the captured snapshot baseline. Negative ACK stays unsaved; timeout retains
+  an unknown ticket and blocks retry/dirty close.
+* Added route guards for new/open/replace, local picker/drop, Save As/Copy,
+  action playback, automation open and unsafe close. Standalone browser download
+  and native write paths are unchanged outside host mode.
+* Rust 1.95 locked Web WASM check, focused lifecycle UI test 1/1, exact-base
+  patch apply and diff checks pass. Browser runtime, Seafile save/version/reopen
+  and independent review are NOT VERIFIED. No upstream or production actions
+  were taken.
+* Patch and evidence: `docs/reviews/GR-032/`; full scope and limits:
+  `docs/GR-032-PHOTOCRAFT-HOST-SAVE.md`.
+
+## 2026-10-25 — GR-032 R1 queue/listener remediation
+
+* Addressed the independent R1 finding that every parsed `SaveResult` entered
+  an unbounded inbox before ticket validation. The new inbox has separate fixed
+  slots for the first Open and one result matching the live ticket; unknown and
+  duplicate ACKs are discarded before storage.
+* Listener registration errors now fail the Web app creator before `post_ready`.
+  Two focused PhotoCraft Web tests pass (queue flood protection and listener
+  error propagation), as does the Rust 1.95 locked WASM check. Updated patch SHA
+  is recorded in `docs/reviews/GR-032/README.md`; independent re-review is
+  pending. Browser runtime and Seafile version/reopen remain NOT VERIFIED.
+* R2/R3 bounded independent reviews returned PROVISIONAL PASS after confirming
+  the exact patch includes the new inbox module and documenting this size limit:
+  the gateway defaults to 50 MiB, while PhotoCraft
+  serializes before handoff, so oversized payloads may allocate before rejection.
+  Negative ACK preserves dirty state; peak memory and large-payload compatibility
+  remain unverified.
+
 ## 2026-10-25 — GR-031 SoundCraft Seafile save and reopen
 
 * In an isolated rootless Podman Seafile stack, a Seahub file-list click opened
