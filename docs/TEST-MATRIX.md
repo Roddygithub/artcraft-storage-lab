@@ -238,6 +238,7 @@ A test that has not been run is `[ ]`, never `[x]`. A mock is not a result.
 | 15.3 | Initial Open after pre-open edits | no silent replacement; user receives truthful reload guidance | [x] source/test reviewed; browser presentation not exercised |
 | 15.4 | Browser host protocol and Seafile version/reopen | durable version and edit visible after fresh storage reopen | [ ] NOT VERIFIED; adapter is not in dispatch |
 | 15.5 | Production host authorization and security topology | permissions/origins/proxy controls verified | [ ] NOT VERIFIED |
+| 15.6 | EffectCraft actual WASM host open/edit/save/ACK/reopen | native synthetic project opens; visible edit serializes; matching positive ACK clears dirty; fresh iframe reopens captured bytes with edit intact | [x] GR-046 built the exact GR-022 patch and passed in Chromium; parent captured 62,136 bytes (SHA-256 `0828d978e619e0b3afdfd9a8bfba3578b3844aebb9e18f24f412d3eadba2b3d6`), ACKed `effectcraft:1`, observed clean state and reopened with the edit visible. Parent storage is in-memory only; no Seafile persistence. See `docs/GR-046-EFFECTCRAFT-WASM-SMOKE.md` and `docs/reviews/GR-046/` |
 
 Patch, commands, and limits: `docs/reviews/GR-022/`.
 

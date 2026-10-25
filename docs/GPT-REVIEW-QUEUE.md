@@ -1,5 +1,19 @@
 # GPT Review Queue
 
+## GR-046 — EffectCraft host-save browser runtime smoke
+
+The exact GR-022 patched EffectCraft WASM opened a native synthetic `.ecproj`
+in Chromium. An in-app visible text edit became dirty; Ctrl+S emitted 62,136
+serialized bytes, the same-origin synthetic parent captured them and ACKed
+matching ticket `effectcraft:1`, and the editor became clean. A fresh iframe
+reopened the captured bytes with the edit visible. Evidence, hashes, commands
+and limitations: `docs/GR-046-EFFECTCRAFT-WASM-SMOKE.md` and
+`docs/reviews/GR-046/`. This does not prove Seafile persistence, dispatch,
+deployment or ONLYOFFICE behavior; those remain **NOT VERIFIED**. Independent
+reviews R1 and R2 returned bounded **PROVISIONAL PASS** with no remaining
+findings; see `docs/reviews/GR-046/INDEPENDENT-REVIEW-R1.md` and `R2.md`.
+Work-item state: **GPT REVIEW PENDING**; upstream publication remains locked.
+
 ## GR-045 — DesignCraft host-save browser runtime smoke
 
 The actual GR-021 patched DesignCraft WASM opened a synthetic native document

@@ -1,3 +1,16 @@
+## 2026-10-25 — GR-046 EffectCraft browser host-save smoke
+
+* Built the exact GR-022 patched EffectCraft Web/WASM from pinned source and
+  exercised open/edit/save/positive ACK/clean/reopen in Chromium with a
+  same-origin synthetic parent. A visible text edit emitted 62,136 bytes; a
+  fresh iframe reopened the captured bytes with the edit intact.
+* Added the native synthetic project, parent harness and screenshot under
+  `docs/reviews/GR-046/`; updated matrix, status and GPT review queue. The
+  parent ACK was in-memory only. Seafile version/readback, dispatch, deployment,
+  production and ONLYOFFICE remain **NOT VERIFIED**. Independent R1/R2 reviews
+  returned bounded PROVISIONAL PASS with no remaining findings. No upstream
+  changes.
+
 ## 2026-10-25 — GR-045 DesignCraft browser host-save smoke
 
 * Built the actual GR-021 patched DesignCraft WASM from pinned source and
