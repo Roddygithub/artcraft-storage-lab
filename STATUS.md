@@ -34,8 +34,9 @@ FIRST-PASS:   docs/reviews/GPT-FIRST-PASS-95D8983.md
 CURRENT GR: GR-053 — credential redirect isolation.
 Loopback tests prove urllib redirects credential-bearing requests and signed
 file-server links are refused before a second host receives the request; public
-credential-free redirects still work. Independent review PENDING; real Seafile
-redirect behavior is NOT VERIFIED. No project GPT PASS.
+credential-free redirects still work. Independent R1–R2 bounded reviews are
+PROVISIONAL PASS, no blocker/major; GPT REVIEW PENDING. Real Seafile redirect
+behavior is NOT VERIFIED. No project GPT PASS.
 See `docs/GR-053-CREDENTIAL-REDIRECTS.md`, `docs/reviews/GR-053/`.
 
 PREVIOUS GR: GR-052 — ambiguous upstream save response reconciliation.
