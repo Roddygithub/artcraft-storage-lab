@@ -1,0 +1,41 @@
+{
+  "source_commit": "80d13911b2d20fbb5cd9398696627bb3a715417b",
+  "transport_revision": "56c5e16d79b77751106173c13111ef4fe0a2c0ec",
+  "patch": "docs/reviews/GR-021/designcraft-host-save-ack.patch",
+  "patch_sha256": "519c03180b17f035ef8fbfcd08a85bda312f6f0721bfbdf9dc1d9d5992fdf972",
+  "source_build_cache": "/home/roddy/.cache/artcraft-designcraft-gr045/dist/web",
+  "candidate_parent": "/home/roddy/.cache/artcraft-storage-lab/gr065-designcraft-static",
+  "active_static_root": "/home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static",
+  "prior_smoke": "GR-045 actual-WASM Chromium smoke",
+  "files": [
+    {
+      "path": "designcraft-web-1ae03c772b45bf17.js",
+      "size_bytes": 161078,
+      "sha256": "bc068abd27138afc2bdbb8e1a3c42b0cc45e1446ab251ad93fe5006e67b288df"
+    },
+    {
+      "path": "designcraft-web-7119e171bd6acad7_bg.wasm",
+      "size_bytes": 49467912,
+      "sha256": "e06f61ce6f004653ed2d9adfb1d3db1b363b2c6bab0c1b025b760b57aeec446c"
+    },
+    {
+      "path": "index.html",
+      "size_bytes": 1484,
+      "sha256": "c360de13da0982a51876f318c3c8b82b1c358f122d46c3b1d95c32b6c015c14d"
+    }
+  ],
+  "index_references": [
+    "designcraft-web-1ae03c772b45bf17.js",
+    "designcraft-web-7119e171bd6acad7_bg.wasm"
+  ],
+  "index_integrity": [
+    {
+      "path": "designcraft-web-1ae03c772b45bf17.js",
+      "value": "sha384-LtINzFlHa+hVNhdWs0pignTMwsYb20k4+9MMhgde18BDEJ/aFoEzTNW/DdlgYrus"
+    },
+    {
+      "path": "designcraft-web-7119e171bd6acad7_bg.wasm",
+      "value": "sha384-I2oczlL824px6zvwhlJdT81gsLpIFGXB3SmFkkwKQ6AbRClM/Br4m3AaHn6FNefE"
+    }
+  ]
+}

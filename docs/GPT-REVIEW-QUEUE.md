@@ -1,5 +1,21 @@
 # GPT Review Queue
 
+## GR-065 — DesignCraft real synthetic Seafile roundtrip
+
+R1 returned a bounded PROVISIONAL PASS with no findings requiring remediation.
+The reviewer verified candidate/source/artifact hashes and inspected the
+sanitized evidence, but did not access services or replay the browser. HTTP
+statuses, history events, fresh-session chronology, deployment changes,
+rollback retention, and unchanged ONLYOFFICE configuration remain
+implementer-reported. The T3 preview used a test-file-only `window.open`
+same-tab shim. The history panel screenshot was omitted because it exposed the
+account display name. The save payload was not hashed against Seafile
+readback, and ONLYOFFICE edit/save was not rerun. Project verdict must remain
+INCOMPLETE and upstream publication LOCKED.
+
+Evidence: `docs/GR-065-DESIGNCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+`docs/reviews/GR-065/`. GR-065 remains GPT REVIEW PENDING; no project GPT PASS.
+
 ## GR-064 — DeckCraft real synthetic Seafile roundtrip
 
 Review the exact GR-064 evidence, current local candidate inventory, and source

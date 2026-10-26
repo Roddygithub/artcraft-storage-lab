@@ -1,3 +1,25 @@
+## 2026-10-26 — GR-065 DesignCraft real synthetic Seafile roundtrip
+
+- Reused the exact GR-045 DesignCraft WASM candidate and verified its three
+  served assets, per-file hashes, index references, and SRI against both the
+  staged candidate and active static root. No rebuild was performed.
+- Uploaded the synthetic `.designcraft` fixture for setup, opened it from the
+  Seafile file list, replaced its visible text, and saved through the host
+  route. Seafile showed a new-version confirmation and two `Modified` history
+  events (the second save followed an observed editor dirty-state change).
+  After navigating away and returning through the file list, a fresh editor
+  session displayed the saved text. No edited output download/manual upload
+  occurred.
+- Only the existing synthetic library was used. A test-only popup shim routed
+  this file's `window.open` to the same tab. No ONLYOFFICE settings or routes
+  were edited; an ONLYOFFICE edit/save regression was not run. Save-message to
+  stored-byte identity, broader compatibility, and production security remain
+  unverified. Independent R1 returned a bounded PROVISIONAL PASS with no
+  findings requiring remediation; runtime assertions remain implementer-
+  reported. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+- Evidence: `docs/GR-065-DESIGNCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-065/`.
+
 ## 2026-10-26 — GR-064 DeckCraft real synthetic Seafile roundtrip
 
 - Reused the exact GR-044 DeckCraft browser candidate, verified its four-file

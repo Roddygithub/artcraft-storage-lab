@@ -1,0 +1,42 @@
+GR-065 sanitized browser observations — 2026-10-26
+
+Target: `synthetic.designcraft` in the existing synthetic Seafile library.
+Private origin, repository identifier, account identity, and session
+capabilities are omitted.
+
+Setup and first editor:
+- Uploaded the 6,585-byte synthetic fixture through Seafile's file UI. This
+  was setup, not upload of edited output.
+- Clicked the document in the Seafile file list. The test candidate's JS and
+  WASM loaded with HTTP 200. Gateway POST `/open/` and GET
+  `/session/<redacted>/document` returned 200.
+- Replaced the visible text with `GR-065 DesignCraft save verified`. The
+  editor displayed `Unsaved changes`.
+- Ctrl+S displayed `Saved — new version 02e0d5436e1a3797e31e035b5ab4a1ac56d1e3bc`
+  and `Saved to file host`. Gateway POST `/session/<redacted>/save` returned
+  HTTP 200.
+- A browser-back keyboard attempt left the visible text unchanged and the
+  editor showed `Unsaved changes`. Ctrl+S again displayed
+  `Saved — new version 9d5657199e3b2f7f2e9eb811fe154bcb221e21ed`; the save
+  POST returned HTTP 200.
+
+Storage history and fresh open:
+- Seafile's library History UI showed one `Added "synthetic.designcraft"`
+  entry from setup followed by two `Modified "synthetic.designcraft"` entries
+  from the two editor saves. The UI also displayed the account name, so no
+  screenshot of that panel is retained.
+- Navigated away from the first editor to Seafile home, returned to the
+  synthetic library, and clicked the file again. The new POST `/open/` and
+  GET `/session/<redacted>/document` returned HTTP 200.
+- The newly opened editor displayed `GR-065 DesignCraft save verified`.
+
+T3 preview did not surface the file-view popup as a controllable tab. A
+page-local `window.open` shim restricted to the exact test filename routed
+that popup into the same tab. The file-list click and Seafile/gateway routes
+were still exercised. The first editor was left by page navigation; an
+explicit in-editor close action was not recorded.
+
+No edited output download or manual upload occurred. No editor-message hash
+was retained for comparison with Seafile readback. Only the synthetic library
+was used. The browser flow was live; production, broad compatibility,
+post-change ONLYOFFICE edit/save, and deployment security were not tested.

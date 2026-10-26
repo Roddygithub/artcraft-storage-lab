@@ -7,6 +7,24 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-065 — DesignCraft on real synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Candidate inventory and active static-root assets | Exact pinned DesignCraft candidate served | [x] Three assets, sizes, SHA-256 and each index-to-file SRI association verified against staged and active roots |
+| Synthetic Seafile file-list open | Actual DesignCraft WASM loads the native document | [x] Private Seafile instance, existing synthetic library; JS/WASM and document GET returned 200 |
+| Visible edit and Ctrl+S | Host ACK and Seafile version are confirmed | [x] Text edit; host showed `Saved — new version …`; gateway save POST returned 200 |
+| Seafile history | Setup fixture is distinct from editor saves | [x] UI showed `Added` then two `Modified` entries for `synthetic.designcraft`; no history screenshot retained because the account name was visible |
+| Fresh-session reopen | New editor session renders saved text | [x] Navigated away, returned to the Seafile list, and reopened; new open/document requests returned 200 and text was intact |
+| Edited-output download/manual upload | Not used | [x] None occurred; the one fixture upload was setup only |
+| Exact save-message/readback byte identity | Matching hashes | [ ] NOT VERIFIED; save payload and Seafile readback were not separately hashed |
+| ONLYOFFICE edit/save/version after route change | Full regression | [ ] NOT VERIFIED; no ONLYOFFICE setting was changed in this GR |
+| Browser popup lifecycle without test shim | Standard popup path | [ ] NOT VERIFIED; T3 preview redirected this file's popup to the same tab |
+| Broader format compatibility and production security | General readiness | [ ] NOT VERIFIED |
+| Independent review | Separate exact evidence review | [x] R1 bounded PROVISIONAL PASS, no findings requiring remediation; runtime assertions not independently replayed |
+
+Evidence: `docs/reviews/GR-065/`; candidate reuses the GR-045 optimized WASM and was not rebuilt. Project GPT remains INCOMPLETE; upstream publication LOCKED.
+
 ## GR-064 — DeckCraft on real synthetic Seafile
 
 | Scenario | Expected | Result |

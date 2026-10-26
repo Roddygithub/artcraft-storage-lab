@@ -1,6 +1,23 @@
 # STATUS
 
-## CURRENT GR: GR-064 — DeckCraft real synthetic Seafile roundtrip
+## CURRENT GR: GR-065 — DesignCraft real synthetic Seafile roundtrip
+
+The GR-045 DesignCraft WASM candidate was verified against the staged and
+active static roots, then opened from the Seafile file list in the existing
+synthetic library. A visible text edit was saved twice through the host route;
+Seafile history showed the fixture `Added` event and two `Modified` events.
+After navigating away and reopening from the list, a fresh editor session
+displayed the saved text. The T3 popup-to-same-tab shim was restricted to this
+test file. No edited output was downloaded or manually uploaded. Byte-level
+save-message/readback identity and a post-change ONLYOFFICE edit/save
+regression remain unverified. Independent R1 returned a bounded PROVISIONAL
+PASS with no findings requiring remediation; the runtime sequence was not
+independently replayed. GR-065 is **GPT REVIEW PENDING**; project GPT remains
+**INCOMPLETE** and upstream publication
+**LOCKED**. See `docs/GR-065-DESIGNCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+`docs/reviews/GR-065/`.
+
+## PREVIOUS GR: GR-064 — DeckCraft real synthetic Seafile roundtrip
 
 The pinned DeckCraft Web candidate opened the synthetic `synthetic.pptx` from
 Seafile, saved the visible slide edit through the ticketed host bridge, created
