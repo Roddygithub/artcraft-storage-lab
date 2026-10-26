@@ -1,3 +1,14 @@
+## 2026-10-26 — Reconcile application Seafile rows in the test matrix
+
+- Updated DeckCraft, DesignCraft, FilmCraft, and EffectCraft Seafile rows from
+  NOT VERIFIED to bounded synthetic-library results, linking each to its
+  corresponding GR-064–067 report. The changes retain popup-shim, fresh-session,
+  and no-explicit-close qualifications and keep byte identity and ONLYOFFICE
+  edit/save limitations open.
+- An independent read-only review found no findings in the five changed rows;
+  it did not replay the browser or access services. Project GPT remains
+  INCOMPLETE and upstream publication remains LOCKED.
+
 ## 2026-10-26 — GR-069 FigCraft real synthetic Seafile roundtrip
 
 - Reused the optimized GR-048 FigCraft candidate after verifying source,

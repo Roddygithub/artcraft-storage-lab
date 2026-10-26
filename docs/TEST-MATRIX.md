@@ -338,8 +338,8 @@ candidate-readiness or provenance PASS.
 | --- | --- | --- | --- |
 | 4.1 | Open a synthetic PPTX | DeckCraft Web opens inline | [x] GR-044: actual patched DeckCraft WASM loaded and displayed the synthetic one-slide PPTX from a same-origin parent in Chromium (`docs/GR-044-DECKCRAFT-WASM-SMOKE.md`) |
 | 4.2 | Edit a slide | the change is visible | [x] GR-044: actual patched DeckCraft WASM opened a synthetic PPTX in Chromium; edited the slide text and saw the changed text with `dirty=true` (`docs/GR-044-DECKCRAFT-WASM-SMOKE.md`) |
-| 4.3 | Save | new Seafile version | [ ] |
-| 4.4 | Reopen from Seafile | the slide change is preserved | [ ] Seafile-backed reopen and version creation remain NOT VERIFIED |
+| 4.3 | Save | new Seafile version | [x] GR-064: host ACK and Seafile `Modified` history event after the visible slide edit; synthetic library only (`docs/GR-064-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md`) |
+| 4.4 | Reopen from Seafile | the slide change is preserved | [x] GR-064: fresh file-list/editor session reopened the saved slide edit; no explicit in-app close was claimed (`docs/GR-064-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md`) |
 | 4.5 | Synthetic host save acknowledgement | exact serialized bytes are captured; matching `saveResult` clears dirty; a fresh editor reopens the bytes | [x] GR-044 Chromium smoke captured 7,297 bytes (SHA-256 `ce01fb7cd7819f5ee6e67c67d77aeda19829e431a2cf92bdfe396b7d76b09376`), acknowledged `deckcraft:1`, observed clean state, and reopened the same edit in a fresh iframe; no Seafile write was performed |
 
 ## 5. PDF and SVG — proving non-Office formats (GR-012)
@@ -453,7 +453,7 @@ Patch and limits: `docs/reviews/GR-019/README.md`.
 | 12.3 | DeckCraft Web shared transport compilation | pinned adapter compiles for `wasm32-unknown-unknown` | [x] Rust 1.95 locked WASM check passes on pin `56c5e16` |
 | 12.4 | Host-mode single-document and Save As guards | no second document, path-open, or Save As can bypass the host binding | [x] UI dispatch and direct helpers guard the local adapter; bounded independent review PASS |
 | 12.5 | Browser messaging with real DeckCraft WASM | parent open/save/ACK exchange works in browser | [x] GR-044: actual patched WASM opened, edited, saved and received matching ACK in Chromium; fresh iframe reopened captured bytes. Synthetic parent only; see `docs/GR-044-DECKCRAFT-WASM-SMOKE.md` |
-| 12.6 | Seafile new version and fresh-storage reopen | saved presentation survives Seafile version creation and fresh editor load | [ ] NOT VERIFIED; DeckCraft is not in the Seafile dispatcher |
+| 12.6 | Seafile new version and fresh-storage reopen | saved presentation survives Seafile version creation and fresh editor load | [x] GR-064 synthetic-library test created a history modification and reopened the slide edit in a fresh editor session; popup shim disclosed, no explicit in-app close claimed |
 | 12.7 | Independent bounded review | no blocker/major/minor in exact local patch | [x] GPT-6 Luna high R2 reviewed app source; independent re-pin review verifies exact pin/artifact; see `REVIEW-TRANSPORT-REPIN.md` |
 | 12.8 | Full DeckCraft workspace CI | all xtask steps pass | [~] `assets`, `layers`, and `wasm` pass; `xtask ci` stops at existing workspace Clippy errors; full workspace tests did not complete (long-running UI tests stopped) |
 
@@ -470,7 +470,7 @@ Patch, exact source pin, checks and evidence limits: `docs/reviews/GR-020/README
 | 13.5 | Repeated Open compatibility and shared budget | same-session OpenRequest works; repeated buffers remain bounded across transport/listener instances | [~] Native cumulative byte/message test passes; WASM sharing test compiles; Luna high round 4 found no functional issue; browser tests not executed; see `TRANSPORT-OPEN-ADMISSION-REVIEW.md` |
 | 13.6 | DesignCraft application host-save checks | snapshot opens, matching durable ACK cleans only captured revision; failures/replacements stay dirty/refused | [x] Five focused Rust 1.95 tests and locked WASM check pass on pin `56c5e16`; see `docs/reviews/GR-021/DESIGNCRAFT-HOST-SAVE.md` |
 | 13.7 | DesignCraft exact-patch review | no blocker/major in adapter after transport repin | [x] Luna high R3 plus independent repin review; P3 peak serialization-memory limit remains; see `DESIGNCRAFT-REVIEW-REPIN.md` |
-| 13.8 | DesignCraft Seafile browser version/reopen | saved document is persisted as a Seafile version and reopened from Seafile | [ ] NOT VERIFIED; patch not in dispatcher |
+| 13.8 | DesignCraft Seafile browser version/reopen | saved document is persisted as a Seafile version and reopened from Seafile | [x] GR-065 synthetic-library run observed two `Modified` events and fresh file-list reopen; save/readback byte identity remains NOT VERIFIED |
 | 13.9 | Malformed host save acknowledgements | missing/non-boolean `ok` does not consume a ticket as a false ACK; valid true/false retain behavior | [x] Parser tests cover malformed values and valid booleans; WASM test target compiled but was not browser-executed; 7 native tests and 19 checksums pass; see `docs/reviews/GR-024/` |
 | 13.10 | DesignCraft actual WASM host runtime | synthetic native file opens, visible edit emits save bytes, matching ACK clears dirty, fresh iframe reopens captured bytes | [x] GR-045: built the patched WASM from source pin `80d13911`; Chromium opened the 6,585-byte synthetic document, saved 3,184 bytes, accepted matching ticket `designcraft:1:1`, became clean and reopened the edit in a fresh iframe. Synthetic parent only; no Seafile write. See `docs/GR-045-DESIGNCRAFT-WASM-SMOKE.md` |
 
@@ -487,7 +487,7 @@ immutable transport revision `56c5e16d79b77751106173c13111ef4fe0a2c0ec`.
 | 14.3 | Host mode lifecycle guards | create-from-template, close-all, save-as-template and direct project close cannot bypass binding | [x] engine/UI regression assertions present; independent source review confirms |
 | 14.4 | Rust/WASM compile and formatting | pinned app builds with transport revision `56c5e16` | [x] Rust 1.95 locked WASM check, fmt and diff checks pass per implementer |
 | 14.5 | Browser host messaging | real iframe Open/Save/ACK works in browser | [x] GR-047 original run and supplemental Chromium replay; three bounded independent reviews PROVISIONAL PASS, no findings remain. Replay retains response-body hashes and R3 independently checked the separate pre-packaging WASM cache hash; historical continuity remains NOT VERIFIED. See `docs/GR-047-FILMCRAFT-WASM-SMOKE.md` |
-| 14.6 | Seafile version and fresh reopen | saved edit survives durable Seafile write and new editor instance | [ ] NOT VERIFIED; GR-047 parent held bytes in memory only; app not in dispatcher |
+| 14.6 | Seafile version and fresh reopen | saved edit survives durable Seafile write and new editor instance | [x] GR-066 synthetic-library run observed new-version confirmation/history modification and fresh file-list reopen; exact byte identity and explicit in-app close remain NOT VERIFIED |
 | 14.7 | Fresh iframe host-only reopen | new editor instance opens captured bytes and renders the edit | [x] GR-047: fresh iframe opened the captured bytes and visibly rendered `GR-047 visible edit passed`; no Seafile write. See `docs/GR-047-FILMCRAFT-WASM-SMOKE.md` |
 
 Patch, review and limitations: `docs/reviews/GR-023/README.md`.
@@ -510,7 +510,7 @@ A test that has not been run is `[ ]`, never `[x]`. A mock is not a result.
 | 15.1 | Host-mode project replacement and unsupported save routes | host-bound project cannot be replaced or locally saved as if durable | [x] engine/UI guards and focused tests pass per implementer |
 | 15.2 | Save acknowledgement matches captured project snapshot | dirty clears only after matching success; later edits remain dirty | [x] focused engine/UI host-save tests pass; independent source review found no blocker/major |
 | 15.3 | Initial Open after pre-open edits | no silent replacement; user receives truthful reload guidance | [x] source/test reviewed; browser presentation not exercised |
-| 15.4 | Browser host protocol and Seafile version/reopen | durable version and edit visible after fresh storage reopen | [ ] NOT VERIFIED; adapter is not in dispatch |
+| 15.4 | Browser host protocol and Seafile version/reopen | durable version and edit visible after fresh storage reopen | [x] GR-067 synthetic-library run saved a visible edit and reopened it in a fresh Seafile editor session; exact byte identity and explicit in-app close remain NOT VERIFIED |
 | 15.5 | Production host authorization and security topology | permissions/origins/proxy controls verified | [ ] NOT VERIFIED |
 | 15.6 | EffectCraft actual WASM host open/edit/save/ACK/reopen | native synthetic project opens; visible edit serializes; matching positive ACK clears dirty; fresh iframe reopens captured bytes with edit intact | [x] GR-046 built the exact GR-022 patch and passed in Chromium; parent captured 62,136 bytes (SHA-256 `0828d978e619e0b3afdfd9a8bfba3578b3844aebb9e18f24f412d3eadba2b3d6`), ACKed `effectcraft:1`, observed clean state and reopened with the edit visible. Parent storage is in-memory only; no Seafile persistence. See `docs/GR-046-EFFECTCRAFT-WASM-SMOKE.md` and `docs/reviews/GR-046/` |
 
