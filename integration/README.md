@@ -85,6 +85,14 @@ existed at the time; use the pinned staging flow above for new work.
 The **WordCraft** build with the host bridge is built from source instead (the
 patch in `docs/reviews/GR-014/`); see that bundle for the commands.
 
+The **PhotoCraft** route is included after the bounded GR-076 host adapter
+completed a synthetic Seafile save/version/reopen flow. Its source pin, combined
+patch, low-optimization browser build settings, and bundle hashes are in
+`docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
+`docs/reviews/GR-076/runtime/`. Stage the three verified files under
+`integration/static/photocraft/`; that build output is ignored by Git like the
+other Craft assets. The dispatcher route is `pcraft` → `photocraft`.
+
 ## The tests
 
 ```sh

@@ -3,11 +3,13 @@
 Read [the report](../../GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md) for scope,
 guards and limits. All claims remain bounded by recorded checks. This evidence
 source evidence was committed as `5637bf2`; the synthetic Seafile runtime
-follow-up was committed and pushed on `main`. It changed the ArtCraft
-extension allowlist, gateway dispatch, and deployed PhotoCraft static assets for
-the synthetic library. ONLYOFFICE configuration/service and production data
-were not changed. Independent runtime/docs R1 findings were closed by R2;
-R2/R3 returned PROVISIONAL PASS. See
+follow-up is committed and pushed on `main`. It changed the ArtCraft extension
+allowlist and gateway dispatch for the synthetic library and deployed the
+verified PhotoCraft static assets. The tracked dispatcher now includes the same
+`pcraft` route. ONLYOFFICE configuration/service and production data were not
+changed. Independent runtime/docs R1 findings were closed by R2; R2/R3 returned
+PROVISIONAL PASS. The dispatcher route review also returned PROVISIONAL PASS.
+See
 `runtime/review-r1-and-response.md`. No upstream
 publication was made.
 

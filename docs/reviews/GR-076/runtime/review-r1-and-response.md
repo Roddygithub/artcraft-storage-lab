@@ -45,3 +45,13 @@ history/version claims, screenshot and bundle hashes, rollback baseline hash,
 ONLYOFFICE 404-vs-200 diagnostic, secret/PII redaction, and consistency across
 status, history, test matrix, queue and runtime evidence. GPT review remains
 pending.
+
+## Dispatcher route promotion review
+
+Independent review task `gr076-dispatch-route-review-20261026-r1` returned
+**PROVISIONAL PASS**, with no BLOCKER or MAJOR. It confirmed that the tracked
+`pcraft` → PhotoCraft mapping matches the deployed synthetic route, retains all
+four prior tracked mappings, and is supported by the GR-076 runtime evidence.
+It also confirmed the static bundle stays Git-ignored and that no test/build or
+production/ONLYOFFICE change is claimed by this dispatcher follow-up. GPT review
+remains pending.

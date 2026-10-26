@@ -14,8 +14,10 @@ fresh-iframe-reopen smoke and a synthetic Seafile
 open/edit/save/new-version/readback/close/reopen flow. Three Seafile versions
 are recorded and current readback matches the latest. WordCraft DOCX was also
 edited, saved as a new version and reopened after the allowlist change. Only the
-synthetic ArtCraft extension allowlist, gateway dispatch and PhotoCraft static bundle
-were changed. ONLYOFFICE settings/service were untouched; post-change UI
+synthetic ArtCraft extension allowlist, gateway dispatch and PhotoCraft static
+bundle were changed; the tracked dispatcher now contains the verified `pcraft`
+route. The independent dispatcher review returned PROVISIONAL PASS. ONLYOFFICE
+settings/service were untouched; post-change UI
 regression attempt is inconclusive. Serialization peak memory, optimized bundle
 and production remain NOT VERIFIED. Runtime/docs R1 findings were closed and
 R2 and R3 returned PROVISIONAL PASS; a post-allowlist WordCraft DOCX regression passed.

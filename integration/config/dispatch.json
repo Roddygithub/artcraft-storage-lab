@@ -3,6 +3,10 @@
     "app": "pdfcraft",
     "url": "/artcraft/pdfcraft/?host=parent"
   },
+  "pcraft": {
+    "app": "photocraft",
+    "url": "/artcraft/photocraft/?host=parent"
+  },
   "svg": {
     "app": "vectorcraft",
     "url": "/artcraft/vectorcraft/"

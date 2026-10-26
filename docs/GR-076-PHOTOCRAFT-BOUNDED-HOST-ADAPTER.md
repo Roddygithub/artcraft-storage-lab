@@ -48,8 +48,10 @@ not been silently reused as current evidence.
 
 Exact current file:line anchors for the source claims above are retained in
 [source-evidence.txt](reviews/GR-076/source-evidence.txt); the complete source
-is preserved by the hash-pinned patch. The lab commit retains the candidate and
-evidence; it does not promote PhotoCraft into Seafile dispatch.
+is preserved by the hash-pinned patch. The source candidate retains the app
+patch. The runtime follow-up adds the verified `pcraft` → PhotoCraft route to
+this repository's single dispatcher and records the synthetic Seafile
+deployment evidence.
 
 ## Bounds and limitations
 

@@ -14,12 +14,14 @@ R1/R2 source reviews returned PROVISIONAL PASS. **GPT REVIEW PENDING**; no GPT
 PASS. Exact GR-076 WASM completed a low-optimization browser Open/edit/save/ACK/
 fresh-iframe-reopen smoke. The exact bundle also completed synthetic Seafile
 open/edit/save/version/readback/close/reopen; current file hash matches the
-latest of three history versions. Only the extension allowlist, dispatch, and
-new PhotoCraft static bundle were changed for the synthetic library; ONLYOFFICE
+latest of three history versions. The tracked dispatcher now includes the
+verified `pcraft` route, and the synthetic library extension allowlist and
+PhotoCraft static bundle were updated for the runtime. ONLYOFFICE
 settings/service were untouched. Post-change ONLYOFFICE UI check remains
 INCONCLUSIVE/NOT VERIFIED. WordCraft DOCX was re-opened after the allowlist
 change, edited, saved as a new version and reopened with the marker intact.
 Independent runtime/docs R1 findings were closed; R2 and R3 returned
+PROVISIONAL PASS. The tracked dispatcher route received an independent
 PROVISIONAL PASS. GPT review remains pending.
 No production data or upstream publication.
 See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
