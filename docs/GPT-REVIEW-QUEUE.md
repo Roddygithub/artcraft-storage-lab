@@ -1,5 +1,15 @@
 # GPT Review Queue
 
+## GR-060 — dedicated tailnet gateway LXC (paused)
+
+The isolated non-privileged Debian LXC and loopback-only gateway were staged;
+local health/static checks and the GR-055 candidate verifier passed before the
+owner-requested shutdown. Tailscale reports `NeedsLogin`, HTTPS Serve and Seahub
+migration are not configured, and the GR-059 route remains active. Independent
+R1–R2 reviews returned bounded PROVISIONAL PASS after correcting STATUS wording.
+Project remains **INCOMPLETE**, upstream publication **LOCKED**. See [report](GR-060-DEDICATED-TAILNET-GATEWAY-LXC.md)
+and [evidence](reviews/GR-060/).
+
 ## GR-059 — real synthetic Seafile WordCraft deployment
 
 **Review pending.** The exact GR-055 candidate now completed the real

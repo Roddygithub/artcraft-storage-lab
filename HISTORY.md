@@ -1,3 +1,26 @@
+## 2026-10-25 — GR-060 dedicated tailnet gateway LXC (paused by owner)
+
+- Created an unprivileged Debian 13 LXC and staged the existing WordCraft
+  gateway, exact GR-055 candidate, and a loopback-only systemd service.
+- Local health/static checks and the candidate verifier passed before pause.
+  Tailscale is installed but the node awaits owner authentication; Serve and
+  the Seahub origin migration are not configured. The owner-requested pause
+  cleanly stopped the LXC and disabled Proxmox auto-start. GR-059 remains active.
+- Evidence: `docs/GR-060-DEDICATED-TAILNET-GATEWAY-LXC.md`,
+  `docs/reviews/GR-060/`. No secrets or private host identifiers recorded.
+
+## 2026-10-26 — GR-060 bounded documentation review
+
+- Independent R1 returned PROVISIONAL PASS with one MINOR: STATUS wording
+  implied the stopped gateway might be active. It now says health/static checks
+  passed before shutdown. Review found no hostname, private IP, credentials,
+  account identity, or session capability in the new material.
+- The reviewer did not inspect Proxmox/LXC or replay the prior runtime checks.
+  GR-060 remains paused pending Tailscale enrollment; the GR-059 route remains
+  active. Project status is INCOMPLETE and upstream publication locked.
+- R2 confirmed the STATUS wording fix and found no new issue; see
+  `docs/reviews/GR-060/INDEPENDENT-REVIEW-R2.md`.
+
 ## 2026-10-25 — GR-059 real synthetic Seafile WordCraft deployment
 
 - Restored the Seafile 12.0.14 conditional-save route using the reviewed GR-015

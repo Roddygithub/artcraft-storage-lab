@@ -7,6 +7,22 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-060 — dedicated tailnet gateway LXC (paused)
+
+A non-privileged Debian 13 LXC was provisioned and staged with the existing
+gateway and exact GR-055 candidate. Local checks passed before shutdown. Tailscale
+enrollment and Serve are not configured; the owner-requested pause leaves the
+LXC stopped and the GR-059 route active. Independent R1–R2 reviews are bounded
+PROVISIONAL PASS after a status-wording correction. This is not a route migration or project
+GPT PASS.
+
+| Check | Result | Scope |
+|---|---|---|
+| LXC service and static health | [x] Loopback health/static returned 200 before pause | LXC is now stopped; no current health claim |
+| Exact WordCraft candidate staging | [x] GR-055 candidate verifier passed in the LXC staging path before pause | Candidate remains outside dispatch |
+| Tailscale enrollment and HTTPS Serve | [ ] NOT VERIFIED | Node awaits owner-authenticated login; no Serve hostname |
+| Seahub route migration and fresh Seafile roundtrip | [ ] NOT RUN | GR-059 route remains active; no settings changed for GR-060 |
+
 ## GR-059 — deployed WordCraft route on real synthetic Seafile
 
 The exact GR-055 staged candidate ran through the owner-managed Seafile

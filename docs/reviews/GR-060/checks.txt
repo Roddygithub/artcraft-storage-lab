@@ -1,0 +1,12 @@
+GR-060 local checks before owner pause, 2026-10-25
+
+PASS: Debian 13 LXC created non-privileged; single DHCP interface; onboot enabled.
+PASS: Tailscale stable package installed; tailscaled enabled and active.
+PENDING: Tailscale node authentication; current backend state NeedsLogin.
+NOT CONFIGURED: Tailscale Serve; no LXC HTTPS origin yet.
+PASS before pause: artcraft-gateway.service active under system account artcraft.
+PASS before pause: gateway bound only to 127.0.0.1:8777.
+PASS before pause: local healthz=200 and WordCraft static index=200.
+PASS: GR-055 candidate verifier: four exact staged files, hashes and index references match.
+PASS: GR-059 live Seafile route remains on its existing gateway origin during this preparation.
+PAUSED: LXC cleanly shut down; Proxmox onboot flag is 0. No tailnet auth/Serve or Seahub changes were made for GR-060.

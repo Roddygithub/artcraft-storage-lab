@@ -1,17 +1,27 @@
 # STATUS
 
-## CURRENT GR: GR-059 — real synthetic Seafile WordCraft deployment
+## CURRENT GR: GR-060 — dedicated gateway LXC (paused by owner)
 
-The GR-055 exact WordCraft candidate is now deployed only for the explicitly
-synthetic DOCX library. The live browser path completed Seafile list click →
-visible edit → WordCraft save confirmation → new Seafile history version →
-fresh list click and reopen with the edit intact. The saved version is 15.8 KB;
-history shows 3 versions. A post-deployment open-only check on a synthetic
-DOCX outside the allowlist loaded ONLYOFFICE assets successfully; no
-ONLYOFFICE edit/save was attempted. Evidence and rollback digest:
-`docs/GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` and
-`docs/reviews/GR-059/`. Independent review and project GPT review are pending.
-Project status remains **INCOMPLETE** and upstream publication **LOCKED**.
+The authorized non-privileged Debian 13 LXC is provisioned. Before shutdown,
+its gateway passed local health/static checks as a restricted service account,
+and the exact staged WordCraft bundle verified. Tailscale is installed but the
+node reports `NeedsLogin`; Serve and Seahub migration are pending
+owner-authenticated enrollment. At the owner’s request the LXC is stopped with auto-start disabled;
+the verified GR-059 route remains in service. Details:
+`docs/GR-060-DEDICATED-TAILNET-GATEWAY-LXC.md` and `docs/reviews/GR-060/`.
+Independent R1–R2 documentation reviews: bounded PROVISIONAL PASS, no remaining
+findings. Project status remains **INCOMPLETE** and upstream publication
+**LOCKED**.
+
+## PREVIOUS GR: GR-059 — real synthetic Seafile WordCraft deployment
+
+The exact GR-055 candidate completed the real synthetic Seafile file-list open,
+visible edit, save confirmation, new history version, and fresh editor reopen
+with the edit intact. A post-deployment ONLYOFFICE open-only check on an
+out-of-allowlist synthetic DOCX loaded editor assets; its edit/save regression
+was not performed. Bounded independent review: PROVISIONAL PASS, no findings.
+Report/evidence: `docs/GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` and
+`docs/reviews/GR-059/`. Project GPT remains INCOMPLETE; upstream locked.
 
 ## PREVIOUS GR: GR-055 — reproducible WordCraft candidate
 
