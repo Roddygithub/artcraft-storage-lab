@@ -1,8 +1,8 @@
 # GR-076 — PhotoCraft bounded browser host adapter follow-up
 
-**Status: GPT REVIEW PENDING — uncommitted implementation candidate for parent review.** No commit,
-push, publication, deployment or dispatch. This is a bounded source slice, not a
-project verdict or Seafile MVP.
+**Status: GPT REVIEW PENDING — committed as `5637bf2` on `main`, matching its local `origin/main` tracking ref.**
+No deployment, dispatch or upstream publication. This is a bounded source slice,
+not a project verdict or Seafile MVP.
 
 ## Scope and immutable inputs
 
@@ -47,7 +47,8 @@ not been silently reused as current evidence.
 
 Exact current file:line anchors for the source claims above are retained in
 [source-evidence.txt](reviews/GR-076/source-evidence.txt); the complete source
-is preserved by the hash-pinned patch.
+is preserved by the hash-pinned patch. The lab commit retains the candidate and
+evidence; it does not promote PhotoCraft into Seafile dispatch.
 
 ## Bounds and limitations
 
@@ -82,5 +83,5 @@ whitespace checks passed; independent R1/R2 source reviews returned only
 
 The script runs Rust 1.95 locked snapshot/host/file-open/inbox tests, formatting,
 locked Web WASM check and whitespace checks. It neither starts a service nor
-changes Cargo target/temp locations. All edits remain uncommitted for parent
-review. Upstream and dispatch gates remain closed.
+changes Cargo target/temp locations. The candidate and evidence are committed
+in this repository. Upstream and dispatch gates remain closed.

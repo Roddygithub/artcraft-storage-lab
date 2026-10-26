@@ -1,8 +1,11 @@
 # GR-076 evidence — bounded PhotoCraft host adapter
 
 Read [the report](../../GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md) for scope,
-guards and limits. All claims remain bounded by recorded checks. No Seafile,
-Proxmox, ONLYOFFICE, production, deploy/dispatch, commit, push or publication.
+guards and limits. All claims remain bounded by recorded checks. This evidence
+was committed as `5637bf2` on `main`, matching its local `origin/main` tracking
+ref. No Seafile,
+Proxmox, ONLYOFFICE, production, deployment or dispatch was accessed or changed;
+no upstream publication was made.
 
 ## Reproduction
 
@@ -73,9 +76,8 @@ compilation, not evidence for the final candidate. `source-evidence.txt` and
 
 ## Final result and retained state
 
-**GPT REVIEW PENDING** — uncommitted parent-review candidate. No commit/push or
-publication was performed, per task instruction overriding the normal work-item
-commit/push step. R1/R2 are PROVISIONAL source reviews. Runtime and memory limits
+**GPT REVIEW PENDING** — committed lab candidate (`5637bf2`). R1/R2 are
+PROVISIONAL source reviews. Runtime and memory limits
 remain in the report; this is not a project PASS or deployment authorization.
 
 - Combined patch SHA-256: `b3375bc2e9f29a9624df0428df3916b2013ba9aa11be9b7e27825cd103c07d85`.
