@@ -1,0 +1,27 @@
+{
+  "candidate": "GR-048 optimized FigCraft Web bundle",
+  "source_repository": "storytold/figcraft",
+  "source_commit": "8d790607ff1ad40e32343ca2116d8fdcf3244c8d",
+  "host_save_patch_sha256": "954850ba5aff7362e776b2331a5a5ff54bf9d71374d7b29bc856c2b7a47c4798",
+  "craft_platform_revision": "56c5e16d79b77751106173c13111ef4fe0a2c0ec",
+  "source_root": "/home/roddy/.cache/artcraft-figcraft-gr048/dist/web",
+  "staged_root": "/home/roddy/.cache/artcraft-storage-lab/gr069-figcraft-static/figcraft",
+  "active_root": "/home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static/figcraft",
+  "files": [
+    {
+      "path": "index.html",
+      "size_bytes": 1586,
+      "sha256": "a68fe13168b32940e6b6eb40401b2e47edfafae3bb4cbb09bbcfaff124c59686"
+    },
+    {
+      "path": "figcraft-web-5ec5dab2f432876d.js",
+      "size_bytes": 168530,
+      "sha256": "66543f78ecdf1a3da5eb7251c01e7aa4fb2b3a974c6c28d2f267e564665b0418"
+    },
+    {
+      "path": "figcraft-web-d41c15af7fe3eaf3_bg.wasm",
+      "size_bytes": 23480217,
+      "sha256": "029d1e23bb231c307c4d51e3ffafc7cd92052edf35833e3e38bb95b9b0ebc757"
+    }
+  ]
+}

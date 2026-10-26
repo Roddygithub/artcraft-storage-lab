@@ -1,0 +1,53 @@
+GR-069 sanitized browser/service chronology (UTC, 2026-10-26)
+
+Scope: one native synthetic `.figcraft` fixture in the existing synthetic
+Seafile library. No personal/production file was opened.
+
+Candidate load
+- Seafile library file route: GET 200.
+- Normal host `/open/` handoff: POST 200.
+- FigCraft host entry point, JS and WASM: GET 200.
+- Initial host document read and dirty-state report: HTTP 200.
+- Two PDF thumbnail requests by Seafile: HTTP 500; not investigated.
+
+Attempt 1 (not a save)
+- The local gateway process exited before the save request.
+- Dirty-state POST and save POST returned HTTP 502; no positive ACK or Seafile
+  save confirmation was observed.
+- The unsaved rectangle from this attempt was discarded after navigation and
+  is excluded from the result.
+
+Attempt 2 (counted result)
+- Reopened the fixture from the Seafile library after restarting the local
+  gateway; a new editor session fetched the document successfully.
+- Used FigCraft’s rectangle tool and clicked the canvas; a visible 100×100
+  rectangle appeared and the editor reported unsaved changes.
+- Ctrl+S sent the host save. The session save POST returned HTTP 200. The UI
+  showed `Saved to Seafile` and `Saved — new version
+  492a142d2afc76458f2d68eb0d9710cdf72413b4`; the editor returned to clean.
+- Navigated back to the Seafile library and opened the same fixture again. A
+  distinct document-open request returned HTTP 200. The fresh editor showed
+  the rectangle and `GR-069-synthetic.figcraft opened`.
+- The successful editor was exited by navigation. An explicit in-app close
+  was not performed.
+
+Popup behavior
+- A test-only same-tab shim was armed only for the fixture filename because
+  the preview did not preserve Seahub’s popup. The actual file-list click,
+  Seafile file route and `/open/` handoff were exercised.
+
+Cleanup
+- Removed the temporary FigCraft extension from the Seahub allowlist and
+  restored the settings file bytes to the private pre-test backup hash.
+- Verified `ENABLE_ONLYOFFICE=True` and active Seahub. The settings file is
+  service-readable with owner `seafile:seafile` and mode `0600`.
+- Restored local dispatch bytes to the private pre-test hash; confirmed there
+  is no FigCraft dispatcher entry. Stopped the local test gateway.
+
+Evidence limits
+- No edited output download or manual upload occurred; the earlier fixture
+  upload was test setup only.
+- The browser message bytes and Seafile readback bytes were not separately
+  hashed. No separate history-page capture was retained.
+- Post-change ONLYOFFICE edit/save, explicit in-app close, other browsers,
+  deployment security and production behavior are NOT VERIFIED.

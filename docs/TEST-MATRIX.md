@@ -7,6 +7,66 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-069 — FigCraft on real synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Candidate inventory and active static-root assets | Exact pinned FigCraft candidate served | [x] 3 assets, 23,650,333 bytes; build, staged and active hashes match |
+| Synthetic Seafile file-list open | Actual FigCraft WASM loads native document | [x] File route, `/open/`, index, JS, WASM and document GET succeeded |
+| Visible edit and Ctrl+S | Host ACK and Seafile version confirmed | [x] Visible 100×100 rectangle; successful retry returned HTTP 200, new-version identifier, and clean editor state |
+| Failed first save | Not counted as persistence | [x] Gateway returned 502; no positive ACK; discarded edit excluded |
+| Fresh-session reopen | New Seafile-backed editor renders saved edit | [x] Navigated to library and opened file again; rectangle visible |
+| Edited-output download/manual upload | Not used | [x] Fixture upload was setup only; edited output was neither downloaded nor uploaded manually |
+| Exact save-message/readback byte identity | Matching hashes | [ ] NOT VERIFIED |
+| Seafile history-page evidence | Retained history observation/capture | [ ] NOT VERIFIED; version identifier came from successful save response; no history capture retained |
+| ONLYOFFICE edit/save/version | Post-change regression | [ ] NOT VERIFIED; setting remained enabled; no edit/save regression run |
+| Explicit in-app close before reopen | Document explicitly closed | [ ] NOT VERIFIED; successful editor exited by navigation |
+| Broader compatibility and production security | General readiness | [ ] NOT VERIFIED |
+| Independent review | Separate exact evidence review | [x] R1 bounded PROVISIONAL PASS, no findings; project GPT remains INCOMPLETE and upstream publication LOCKED |
+
+Evidence: `docs/reviews/GR-069/`; reused optimized GR-048 actual-WASM candidate
+without rebuilding. Temporary `.figcraft` allowlist and dispatch changes were
+restored after the run.
+
+## GR-068 — PdfCraft on real synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Candidate inventory and active static-root assets | Exact pinned PdfCraft candidate served | [x] Three files, 50,075,901 bytes; staged and active hashes match |
+| Synthetic Seafile file-list open | Actual PdfCraft WASM loads existing PDF | [x] `/open/`, index, JS, WASM and document GET returned 200 |
+| Visible edit and Ctrl+S | Host ACK and Seafile version confirmed | [x] AcroForm field changed; `Saved — new version …`; gateway save POST 200 |
+| Seafile history | Editor save persists a new version | [x] Versions UI lists current 3.0 KB plus two older versions; account-bearing screenshot omitted; canceled initial attempt makes its separate revision uncertain |
+| Fresh-session reopen | New editor session renders saved value | [x] Navigated away and opened the existing PDF again from Seafile list; value intact |
+| Edited-output download/manual upload | Not used | [x] None occurred; existing synthetic PDF used |
+| Exact save-message/readback byte identity | Matching hashes | [ ] NOT VERIFIED |
+| ONLYOFFICE edit/save/version | Full regression | [ ] NOT VERIFIED; no ONLYOFFICE setting/route changed, edit/save not rerun |
+| In-app close before reopen | Document explicitly closed | [ ] NOT VERIFIED; old editor view exited by navigation |
+| Broader format compatibility and production security | General readiness | [ ] NOT VERIFIED |
+| Independent review | Separate exact evidence review | [x] R1 bounded PROVISIONAL PASS, no findings; project GPT remains INCOMPLETE and upstream publication LOCKED |
+
+Evidence: `docs/reviews/GR-068/`; reused GR-057 actual-WASM candidate without
+rebuilding. Existing PDF dispatch and allowlist were unchanged.
+
+## GR-067 — EffectCraft on real synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Candidate inventory and active static-root assets | Exact pinned EffectCraft candidate served | [x] 11 files, 57,470,921 bytes; build, staged, and active-root hashes match |
+| Synthetic Seafile file-list open | Actual EffectCraft WASM loads native project | [x] `/open/`, index, JS, runtime snippet, WASM and document GET returned 200 after restoring one omitted snippet |
+| Visible edit and Ctrl+S | Host ACK and Seafile version confirmed | [x] Canvas text edit; `Saved to host`, new-version confirmation, gateway save POST 200 |
+| Seafile history | Editor save creates a version after setup upload | [x] Versions UI listed current and preceding versions; history screenshot omitted because account name was visible |
+| Fresh-session reopen | New editor session renders saved edit | [x] Navigated away to file list and opened again in a new tab/session; saved text displayed |
+| Edited-output download/manual upload | Not used | [x] None occurred; fixture upload was setup only |
+| Exact save-message/readback byte identity | Matching hashes | [ ] NOT VERIFIED |
+| ONLYOFFICE edit/save/version after route change | Full regression | [ ] NOT VERIFIED; no ONLYOFFICE setting/route changed, but edit/save was not rerun |
+| In-app close before reopen | Document explicitly closed | [ ] NOT VERIFIED; old editor view exited by navigation |
+| Broader format compatibility and production security | General readiness | [ ] NOT VERIFIED |
+| Independent review | Separate exact evidence review | [x] R1 bounded PROVISIONAL PASS, no findings; project GPT remains INCOMPLETE and upstream publication LOCKED |
+
+Evidence: `docs/reviews/GR-067/`; reused GR-046 actual-WASM candidate without
+rebuilding. The missing snippet found on the first attempt was copied from the
+build and its digest checked before the successful retry.
+
 ## GR-066 — FilmCraft on real synthetic Seafile
 
 | Scenario | Expected | Result |
@@ -376,7 +436,7 @@ Patch and bounded-review reports: `docs/reviews/GR-018/`.
 | 11.2 | Synthetic host open/edit/save/ACK flow | no clean state before ACK; unknown ticket ignored; exact snapshot bytes reopen; later edit remains dirty | [x] 1 focused `figcraft-ui-egui` test passes with a mock transport service and real FigCraft serialization |
 | 11.3 | FigCraft Web shared transport build | pinned shared transport compiles for `wasm32-unknown-unknown` | [x] Rust 1.95 locked check passes against immutable `56c5e16`; existing optional-font/dead-code warnings remain |
 | 11.4 | Apply stored patch to pinned upstream base | all hunks apply to clean FigCraft SHA `8d790607ff1ad40e32343ca2116d8fdcf3244c8d` | [x] `git apply --check` passes against a clean archive |
-| 11.5 | Browser transport + Seafile save/version/reopen | actual Seafile click, editor save ACK, version and fresh reopen | [ ] NOT VERIFIED durable Seafile; patch is not in dispatch. GR-048 verifies only actual-WASM browser transport with a synthetic memory-only parent |
+| 11.5 | Browser transport + Seafile save/version/reopen | actual Seafile click, editor save ACK, version and fresh reopen | [x] GR-069: actual Seafile open/edit/save/new-version response and fresh Seafile file-list reopen with rectangle intact; exact message/readback bytes and history-page capture NOT VERIFIED |
 | 11.6 | Host timeout, wrong-origin/source and production security | failure paths remain safe in a real browser topology | [ ] NOT VERIFIED; source implements 120-second unknown-outcome warning; runtime path not exercised |
 | 11.7 | Single-document scope guards | host mode refuses new/open/duplicate/version-duplicate, branches and collaboration; unexpected extra dirty tabs remain visible and cannot be saved as the bound file | [x] synthetic UI test covers these dispatch paths, extra-tab dirty reporting and fail-closed save; browser controls NOT VERIFIED |
 | 11.8 | Independent bounded patch review and transport re-pin | no blocker/major correctness finding on the exact patch | [x] Sol low round 3 PASS; repin R2 confirmed only transport pin changes beyond the accepted source hunks. One MINOR: dirty-state transport failure is not retried until state changes; project verdict unchanged |

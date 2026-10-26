@@ -1,0 +1,26 @@
+{
+  "candidate": "GR-057 PdfCraft actual-WASM release bundle",
+  "source_repository": "storytold/pdfcraft",
+  "source_commit": "57e531ccca0047597809748b5cb4276336d6051a",
+  "host_save_patch_sha256": "6d50eb1f45e81f2037948cd6160878feb2d87eb0881d167f0fc1d290e4450562",
+  "craft_platform_revision": "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8",
+  "candidate_root": "/home/roddy/.cache/artcraft-storage-lab/gr057-pdfcraft-static/pdfcraft",
+  "active_static_root": "/home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static/pdfcraft",
+  "files": [
+    {
+      "path": "index.html",
+      "size_bytes": 1210,
+      "sha256": "3a6e2ec1bad7f1f495256502bcfb525646267681c7b66577d689475ace33264c"
+    },
+    {
+      "path": "pdfcraft-web-d3ba543cb17a7f63.js",
+      "size_bytes": 165584,
+      "sha256": "84eea07a552e7c98b12c837f086c4da2364a285a5d468ad8ffc0f082fda0e042"
+    },
+    {
+      "path": "pdfcraft-web-a30dc4dd8a148def_bg.wasm",
+      "size_bytes": 49909107,
+      "sha256": "fcf3e3721c399fd695d3e431689f35b83e81b94960bd5d1eb57e1614ba5dcec4"
+    }
+  ]
+}

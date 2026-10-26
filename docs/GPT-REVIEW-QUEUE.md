@@ -1,5 +1,39 @@
 # GPT Review Queue
 
+## GR-069 — FigCraft real synthetic Seafile roundtrip
+
+Independent R1 returned a bounded PROVISIONAL PASS with no findings. The
+reviewer verified candidate hashes, pins, checksums, screenshots, and scope
+wording without replaying the browser or accessing services. Runtime chronology,
+service state, and cleanup remain implementer-reported. Exact save/readback byte
+identity, history-page evidence, explicit in-app close, and post-change
+ONLYOFFICE edit/save remain NOT VERIFIED. The work item remains **GPT REVIEW
+PENDING**; project verdict remains INCOMPLETE and upstream publication LOCKED.
+Evidence and verifier: `docs/GR-069-FIGCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+`docs/reviews/GR-069/`.
+
+## GR-068 — PdfCraft real synthetic Seafile roundtrip
+
+Independent R1 returned a bounded PROVISIONAL PASS with no findings. Candidate
+hashes, source/patch/transport pins, overlay, checksums, and screenshots were
+verified read-only. Runtime chronology, history entries, cleanup, and ONLYOFFICE
+state remain implementer-reported. Save/readback byte identity, explicit in-app
+close, post-change ONLYOFFICE edit/save, and production readiness remain NOT
+VERIFIED. The work item remains **GPT REVIEW PENDING**; project verdict remains
+INCOMPLETE and upstream publication LOCKED. Evidence:
+`docs/GR-068-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md`, `docs/reviews/GR-068/`.
+
+## GR-067 — EffectCraft real synthetic Seafile roundtrip
+
+Independent R1 returned a bounded PROVISIONAL PASS with no findings. The
+reviewer verified all 11 assets, source and patch identity, transport pin,
+screenshots, and retained checksums. Runtime chronology, fresh-session creation,
+history timestamps, cleanup, and service state remain implementer-reported.
+Save/readback byte identity, explicit in-app close, and post-change ONLYOFFICE
+edit/save remain NOT VERIFIED. The work item remains **GPT REVIEW PENDING**;
+project verdict remains INCOMPLETE and upstream publication LOCKED. Evidence:
+`docs/GR-067-EFFECTCRAFT-REAL-SEAFILE-ROUNDTRIP.md`, `docs/reviews/GR-067/`.
+
 ## GR-066 — FilmCraft real synthetic Seafile roundtrip
 
 Independently review the exact candidate inventory and recorded Seafile

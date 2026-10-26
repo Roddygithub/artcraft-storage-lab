@@ -1,0 +1,27 @@
+GR-067 sanitized browser observations (2026-10-26)
+
+- Candidate: GR-046 EffectCraft WASM; reused without a build.
+- Setup: Seafile UI upload of the synthetic fixture (32,280 bytes); setup upload only.
+- First editor load: `/open/` returned 200; the generated page, JS, WASM, and
+  runtime host snippet loaded. One earlier attempt returned 404 for the host
+  snippet because it was missing from the copied static root. The snippet was
+  copied from the existing build output; staged and active hashes matched.
+- Retry: static index, JS, host snippet, and WASM returned 200; document GET
+  returned 200; editor displayed the composition.
+- Edit: visible text changed to `EffectCraft GR-067 saved`; editor displayed
+  `Unsaved changes`.
+- Save: Ctrl+S; editor displayed `Saved to host` and Seafile displayed
+  `Saved — new version …`; one gateway save POST returned HTTP 200.
+- End first session: navigated its tab back to the Seafile library list. No
+  explicit in-app close was recorded.
+- Fresh open: clicked the same file in the Seafile list; a new browser tab and
+  editor session opened. The new session's document GET returned 200 and the
+  canvas showed the saved `GR-067` text.
+- History → Versions: current version listed at 2026-10-26 05:21:54; preceding
+  version listed at 2026-10-26 05:13:31. The account display name is omitted.
+- Cleanup: restored the saved Seahub configuration exactly; `ENABLE_ONLYOFFICE`
+  remained true; removed the temporary `.ecproj` dispatch entry; stopped the
+  gateway process. The staged assets remain local and undispatched.
+
+Limitations: no save-body/readback hash, no retained history screenshot,
+no ONLYOFFICE edit/save regression, and no production/deployment security test.

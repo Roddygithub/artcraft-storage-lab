@@ -1,0 +1,67 @@
+{
+  "candidate": "EffectCraft Web static runtime; host.html and test fixture excluded",
+  "source_repository": "storytold/effectcraft",
+  "source_commit": "049070d65c66a73f322b496b22521816e0018f14",
+  "gr022_patch_sha256": "4e0a1799e36209e1234a1b3ff504ab5ed647cf3bd066af6dec90dacd46ab7407",
+  "craft_platform_revision": "56c5e16d79b77751106173c13111ef4fe0a2c0ec",
+  "build_cache": "/home/roddy/.cache/artcraft-effectcraft-gr046/target/web/dist",
+  "staged_root": "/home/roddy/.cache/artcraft-storage-lab/gr067-effectcraft-static/effectcraft",
+  "active_root": "/home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static/effectcraft",
+  "files": [
+    {
+      "path": "audio-worklet.js",
+      "size_bytes": 1298,
+      "sha256": "cf18c5c3e927c5160ff336a40b58faa19cc656c6465c97511bc22eaeb3605466"
+    },
+    {
+      "path": "effectcraft_web.js",
+      "size_bytes": 181581,
+      "sha256": "a069d10555da55ddbd7e108a7580c76a65a85f36a5928101b8bd69a3c4c1b4c3"
+    },
+    {
+      "path": "effectcraft_web_bg.wasm",
+      "size_bytes": 56691300,
+      "sha256": "f7b608a8ce3f768f9f81c75df3431eb9fefd23cd38cd3447d029f7ec9cca1e39"
+    },
+    {
+      "path": "favicon.svg",
+      "size_bytes": 350998,
+      "sha256": "6c6cb887bc3b95e897e881ce62eab11cfad8d5f18c98782f3d90713a1c2fcaa5"
+    },
+    {
+      "path": "icon-256.png",
+      "size_bytes": 57151,
+      "sha256": "186a1d869a4602ec86cd03f6e5e288ebbd328e0c3d8a17c205329829392f9add"
+    },
+    {
+      "path": "icon-512.png",
+      "size_bytes": 150412,
+      "sha256": "1d03baf4f9091d84cd8a48310d6b47fd92dfe31c0a648ea966dbbce28d8fd111"
+    },
+    {
+      "path": "index.html",
+      "size_bytes": 5664,
+      "sha256": "3fb03ccd8d46c5839fb2a09b950004b187840867caae49816221ec76559dc0f3"
+    },
+    {
+      "path": "manifest.webmanifest",
+      "size_bytes": 568,
+      "sha256": "e6555207647714c0a449770e39790d11c72b822fbc3e844ef1a440a54a7afee7"
+    },
+    {
+      "path": "snippets/effectcraft-web-5b4a90707761de19/js/host.js",
+      "size_bytes": 27701,
+      "sha256": "c2144651a3d0422be4d17295c525388c97e2aa66342515646c9efeb063dd4961"
+    },
+    {
+      "path": "sw.js",
+      "size_bytes": 2104,
+      "sha256": "fcf4e219dd25b037206c88b08dc29df782691045f32120eab5e9c25b11f6a974"
+    },
+    {
+      "path": "worker.js",
+      "size_bytes": 2144,
+      "sha256": "6c59cfbcf420fb0e3f01e03cce34f0a582bafab80dc504456d43a18220a50e15"
+    }
+  ]
+}

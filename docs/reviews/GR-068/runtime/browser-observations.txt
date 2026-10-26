@@ -1,0 +1,24 @@
+GR-068 sanitized browser observations (2026-10-26)
+
+- Candidate: GR-057 PdfCraft WASM; reused without rebuilding.
+- Existing synthetic `form.pdf`: Seafile list showed 2.4 KB before editing; the
+  PDF UI reported five interactive fields.
+- File-list click: gateway `/open/`, PdfCraft index, generated JS, WASM, and
+  document GET returned HTTP 200.
+- Edit: changed the top AcroForm field to `GR-068 saved edit`; editor displayed
+  `Unsaved changes`.
+- Save: Ctrl+S displayed `Saved — new version …`; one gateway save POST returned
+  HTTP 200. Final save screenshot shows the value and version confirmation.
+- An earlier text edit was canceled with Escape and the field reverted to the
+  old value. A host version message appeared on that attempt; the separate
+  revision outcome is uncertain and is not claimed.
+- Fresh open: navigated the original editor tab back to the Seafile list, then
+  clicked `form.pdf` again. A new browser tab/editor session opened; document
+  GET returned 200 and the field displayed `GR-068 saved edit`.
+- History → Versions: current 3.0 KB at 2026-10-26 05:29:46; prior 2.4 KB at
+  01:30:57; older 1.7 KB at 01:30:16. The account display name is omitted.
+- Cleanup: no dispatch or Seahub allowlist changes were made; ONLYOFFICE stayed
+  enabled; the temporary gateway process was stopped.
+
+Limitations: no save-body/readback hash, no retained history screenshot,
+no ONLYOFFICE edit/save regression, and no production/security test.

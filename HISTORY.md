@@ -1,3 +1,69 @@
+## 2026-10-26 — GR-069 FigCraft real synthetic Seafile roundtrip
+
+- Reused the optimized GR-048 FigCraft candidate after verifying source,
+  staged, and active static-root asset hashes. Opened the native synthetic
+  `.figcraft` fixture from the existing Seafile library and created a visible
+  rectangle in the editor.
+- The first save attempt returned 502 because the local gateway had exited; it
+  received no positive ACK and is excluded. After restarting the gateway and
+  opening a new editor session, Ctrl+S returned HTTP 200, displayed a Seafile
+  new-version identifier, and cleared the editor's dirty state. A fresh
+  file-list open showed the rectangle intact. The initial fixture upload was
+  setup only; edited output was not downloaded or manually uploaded.
+- Restored the Seahub extension setting and local dispatch bytes, verified
+  `ENABLE_ONLYOFFICE=True` and active Seahub, and stopped the gateway. The
+  successful editor was exited by navigation, not explicit in-app close.
+  Save/readback byte identity, a history-page capture, and post-change
+  ONLYOFFICE edit/save remain unverified. Independent R1 returned a bounded
+  PROVISIONAL PASS with no findings; live service state and chronology remain
+  implementer-reported. Project GPT remains INCOMPLETE and upstream
+  publication LOCKED.
+- Evidence: `docs/GR-069-FIGCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-069/`.
+
+## 2026-10-26 — GR-068 PdfCraft real synthetic Seafile roundtrip
+
+- Reused the GR-057 PdfCraft WASM candidate and verified its three served
+  files against the active static root; no rebuild, dispatch change, allowlist
+  change, or Seahub configuration change was needed.
+- Opened the existing synthetic PDF from the Seafile list, edited an AcroForm
+  field, saved through the host route, observed the new-version confirmation
+  and Versions UI, then reopened from the file list in a fresh editor session
+  with the final value intact. No edited-output download/manual upload occurred.
+- A first edit was canceled with Escape and the field returned to its previous
+  value; a later field edit was committed by moving focus before saving. The
+  initial attempt showed a host version message, but its separate history
+  outcome is uncertain and is not claimed. The old editor was exited by
+  navigation. Save/readback byte identity and post-change ONLYOFFICE edit/save
+  remain unverified. The gateway was stopped; project GPT remains INCOMPLETE
+  and upstream publication LOCKED. Independent R1 returned bounded PROVISIONAL
+  PASS with no findings; live HTTP sequence and cleanup remain implementer-
+  reported.
+- Evidence: `docs/GR-068-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-068/`.
+
+## 2026-10-26 — GR-067 EffectCraft real synthetic Seafile roundtrip
+
+- Reused the exact GR-046 EffectCraft WASM candidate, verified all 11 staged
+  and active static assets against the build cache, and added `.ecproj` only to
+  the existing synthetic-library allowlist and local test-gateway dispatch.
+- Opened the native synthetic project from the Seafile list, edited visible
+  text, saved through the host route, observed the host/new-version
+  confirmation and the current/prior Seafile Versions entries, then opened the
+  file from the list in a fresh editor session with the edit displayed. No
+  edited-output download/manual upload occurred; fixture upload was setup only.
+- A missing runtime snippet caused one initial 404; copying the exact build
+  snippet fixed the candidate and the successful retry loaded all app assets.
+  The old editor was exited by navigation; an explicit in-app close was not
+  recorded. Save/readback byte identity and a post-change ONLYOFFICE edit/save
+  regression remain unverified. Restored the previous Seahub config exactly,
+  removed the temporary dispatch route, and stopped the gateway. Independent
+  R1 returned bounded PROVISIONAL PASS with no findings; live sequence and
+  cleanup remain implementer-reported. Project GPT remains INCOMPLETE and
+  upstream publication LOCKED.
+- Evidence: `docs/GR-067-EFFECTCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-067/`.
+
 ## 2026-10-26 — GR-066 FilmCraft real synthetic Seafile roundtrip
 
 - Reused and verified the exact GR-047 FilmCraft candidate in the active local

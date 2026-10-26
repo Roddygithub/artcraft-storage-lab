@@ -1,21 +1,63 @@
 # STATUS
 
-## CURRENT GR: GR-066 — FilmCraft real synthetic Seafile roundtrip
+## CURRENT GR: GR-069 — FigCraft real synthetic Seafile roundtrip
 
-The exact GR-047 FilmCraft WASM candidate was verified against the staged and
-active static roots and reused without rebuilding. The synthetic `.fcproj`
-fixture opened from the Seafile file list, accepted a visible text edit, saved
-through the host route with a new-version confirmation, and reopened from the
-list in a fresh editor session with the edit intact. History showed the setup
-`Added` event followed by `Modified`. No edited output was downloaded or
-manually uploaded. The popup was routed to the same tab by a test-only shim;
-the first editor was exited by navigation, not an observed in-app close. Exact
-save-message/readback identity and a post-change ONLYOFFICE edit/save regression
-remain unverified. A thumbnail request returned HTTP 500 and was not
-investigated. Independent R1–R2 returned bounded PROVISIONAL PASS with no
-blocker/major; R1's screenshot-caption MINOR is closed. Runtime was not
-independently replayed. GR-066 is **GPT REVIEW PENDING**; project GPT remains
-**INCOMPLETE** and upstream publication **LOCKED**. See
+The exact optimized GR-048 FigCraft candidate was verified across its build,
+staged, and active static roots. In the existing synthetic Seafile library,
+the native `.figcraft` fixture opened from the file list, a visible rectangle
+was created, and Ctrl+S returned HTTP 200 with a new-version identifier and a
+clean editor state. Navigating to the library and opening the file again in a
+fresh session showed the rectangle. The first attempt failed with gateway 502
+and is excluded from the result. The temporary allowlist and local dispatch
+were restored, Seahub is active with the original settings bytes and
+`ENABLE_ONLYOFFICE=True`, and the gateway was stopped. The successful editor
+was exited by navigation, not explicit in-app close. Save/readback byte
+identity, a history-page capture, and post-change ONLYOFFICE edit/save remain
+unverified. Independent R1 returned bounded PROVISIONAL PASS with no findings;
+live HTTP chronology, service state and cleanup remain implementer-reported.
+Project GPT remains **INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-069-FIGCRAFT-REAL-SEAFILE-ROUNDTRIP.md`
+and `docs/reviews/GR-069/`.
+
+## PREVIOUS GR: GR-068 — PdfCraft real synthetic Seafile roundtrip
+
+The GR-057 PdfCraft WASM candidate was verified against its staged and active
+static roots and reused without rebuilding. The existing synthetic PDF opened
+from the Seafile file list, an AcroForm edit was saved through the host route
+with a new-version confirmation, and a fresh file-list open rendered the value.
+An earlier edit was canceled; its separate history effect is uncertain. The
+old editor was exited by navigation, not an observed in-app close. Exact
+save-message/readback identity and post-change ONLYOFFICE edit/save remain
+unverified. Independent R1 returned bounded PROVISIONAL PASS with no findings.
+GR-068 is **GPT REVIEW PENDING**;
+project GPT remains **INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-068-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and `docs/reviews/GR-068/`.
+
+## PREVIOUS GR: GR-067 — EffectCraft real synthetic Seafile roundtrip
+
+The exact GR-046 EffectCraft candidate opened the synthetic project, accepted
+a visible text edit, saved through the host route, showed a new-version
+confirmation, and reopened the edit in a fresh Seafile editor session. The
+first attempt received a missing runtime-snippet 404; the exact asset was
+restored and verified before the successful retry. Fixture upload was setup
+only; no edited output was downloaded or manually uploaded. The first editor
+was exited by navigation, not explicit in-app close. Save/readback byte
+identity and a post-change ONLYOFFICE edit/save regression remain unverified.
+Temporary routing/configuration was restored and Seahub is active. Independent
+R1 returned bounded PROVISIONAL PASS with no findings; live runtime details
+remain implementer-reported. Project GPT remains **INCOMPLETE** and upstream
+publication **LOCKED**. See `docs/GR-067-EFFECTCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+`docs/reviews/GR-067/`.
+
+## PREVIOUS GR: GR-066 — FilmCraft real synthetic Seafile roundtrip
+
+The exact GR-047 FilmCraft WASM candidate opened the synthetic `.fcproj` from
+the Seafile file list, saved a visible text edit, and reopened it in a fresh
+editor session. History showed the fixture setup followed by a modification.
+The first editor was exited by navigation, and a test-only same-tab popup shim
+was used. Save/readback byte identity and post-change ONLYOFFICE edit/save
+remain unverified. Independent R1–R2 reviews were bounded PROVISIONAL PASS;
+project GPT remains **INCOMPLETE** and upstream publication **LOCKED**. See
 `docs/GR-066-FILMCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and `docs/reviews/GR-066/`.
 
 ## PREVIOUS GR: GR-065 — DesignCraft real synthetic Seafile roundtrip
