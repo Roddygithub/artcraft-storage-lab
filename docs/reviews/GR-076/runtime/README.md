@@ -30,6 +30,22 @@ The browser readback used the authenticated Seafile page context and kept bytes
 in memory; no download or manual upload was used. No cookie, credential, user
 name, server address, session identifier or capability URL is retained here.
 
+## WordCraft DOCX non-regression after the allowlist change
+
+After adding only `pcraft` to the ArtCraft extension allowlist, the synthetic
+`synthetic.docx` in that same synthetic library was opened again from Seafile.
+WordCraft's open request, JS/WASM assets and document fetch returned HTTP 200.
+The editor added `gr076regression20261026`, saved with the visible “Saved — new
+version” confirmation, and was closed. A fresh file-list click reopened
+WordCraft with the marker intact. The Seafile history API returned four
+versions sized 15,832 / 15,807 / 25,329 / 1,632 bytes. The reopened screenshot
+is [wordcraft-seafile-reopen.png](wordcraft-seafile-reopen.png), SHA-256
+`8e0e60e83f92a4a0d6e8700613b2b8b5377db4adfb7602df7931c1f43b01ce44`.
+
+This verifies the DOCX route remained functional after the `.pcraft` allowlist
+addition on this synthetic library; it does not cover external writers or
+production.
+
 ## Runtime changes and rollback
 
 | Item | Before / after |
@@ -49,11 +65,16 @@ change is reversible; no rollback was performed after the successful smoke.
 ## ONLYOFFICE regression status
 
 After the Seafile extension update, a synthetic DOCX was selected in Seafile.
-The route rendered a blank preview and no ONLYOFFICE editor or editor network
-assets appeared. This attempt is **INCONCLUSIVE / NOT VERIFIED**, not a pass.
-ONLYOFFICE settings were read before and after and remained enabled and
-unchanged. A separate GR-072 synthetic-document smoke had previously exercised
-ONLYOFFICE; it does not establish this post-change UI check.
+The Seafile ONLYOFFICE integration component loaded, but its configured API
+script URL returned HTTP 404. `docEditor` remained undefined and the page had no
+editor frame. A read-only probe of the Document Server service itself returned
+HTTP 200 for its API script and healthcheck. This isolates the observed failure
+to the URL/proxy path between Seahub and Document Server; the exact proxy rule
+responsible has not been verified. The attempt is **INCONCLUSIVE / NOT
+VERIFIED**, not a pass. ONLYOFFICE settings and service configuration were not
+changed and `ENABLE_ONLYOFFICE` remained enabled. A separate GR-072
+synthetic-document smoke had previously exercised ONLYOFFICE; it does not
+establish this post-change UI check.
 
 ## Bundle and prior in-memory smoke
 
@@ -73,6 +94,8 @@ evidence.
   SHA-256 `b60193ba19e61fdc935e75977cf004d58f386a122e41b36a280fda49e9c7ad0e`.
 - [Earlier in-memory fresh iframe smoke](photocraft-browser-reopen.png), SHA-256
   `c1953f36319a5a2c5d0a523d70a68a3e1f3cd2a37c044c453aa40dfcbab03fb6`.
+- [WordCraft DOCX fresh Seafile reopen](wordcraft-seafile-reopen.png), SHA-256
+  `8e0e60e83f92a4a0d6e8700613b2b8b5377db4adfb7602df7931c1f43b01ce44`.
 
 All claims are bounded by this synthetic run. They do not establish concurrency
 conflict handling, token expiry/revocation, maximum-size behavior, proxy

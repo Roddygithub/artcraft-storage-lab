@@ -34,3 +34,14 @@ gaps remain unverified, and the `gr077`-named baseline file is the real
 pre-change dispatch snapshot with a matching hash. R2 also reconfirmed the
 runtime screenshot/evidence hashes, cross-file consistency and absence of
 secrets or personal data. GPT review remains pending.
+
+## R3 post-allowlist regression evidence
+
+After the WordCraft DOCX re-save/reopen evidence and the more precise
+ONLYOFFICE API-path diagnostic were added, independent review task
+`gr076-runtime-review-20261026-r3` returned **PASS / PROVISIONAL**, with no
+BLOCKER/MAJOR/MINOR findings. It verified the PhotoCraft and WordCraft
+history/version claims, screenshot and bundle hashes, rollback baseline hash,
+ONLYOFFICE 404-vs-200 diagnostic, secret/PII redaction, and consistency across
+status, history, test matrix, queue and runtime evidence. GPT review remains
+pending.

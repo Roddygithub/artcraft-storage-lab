@@ -17,9 +17,11 @@ open/edit/save/version/readback/close/reopen; current file hash matches the
 latest of three history versions. Only the extension allowlist, dispatch, and
 new PhotoCraft static bundle were changed for the synthetic library; ONLYOFFICE
 settings/service were untouched. Post-change ONLYOFFICE UI check remains
-INCONCLUSIVE/NOT VERIFIED. Independent runtime/docs review R1 findings were
-closed; R2 returned PROVISIONAL PASS. Runtime evidence commit is pending. No
-production data or upstream publication.
+INCONCLUSIVE/NOT VERIFIED. WordCraft DOCX was re-opened after the allowlist
+change, edited, saved as a new version and reopened with the marker intact.
+Independent runtime/docs R1 findings were closed; R2 and R3 returned
+PROVISIONAL PASS. GPT review remains pending.
+No production data or upstream publication.
 See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
 `docs/reviews/GR-076/`.
 

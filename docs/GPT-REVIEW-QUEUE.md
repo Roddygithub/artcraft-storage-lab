@@ -40,9 +40,11 @@ Exact low-optimization GR-076 bundle completed the synthetic Seafile
 open/edit/save/version/readback/close/reopen workflow. Three versions exist;
 current bytes match the newest history version. Runtime evidence and screenshots
 are in `docs/reviews/GR-076/runtime/`. Independent source R1/R2 and runtime/docs
-R2 are PROVISIONAL PASS; runtime R1 findings are closed. GPT review is pending.
-ONLYOFFICE settings were unchanged, but its post-change browser UI check is
-inconclusive.
+R2/R3 are PROVISIONAL PASS; runtime R1 findings are closed. GPT review is pending.
+WordCraft DOCX was re-saved as a new version and reopened after the `.pcraft`
+allowlist addition. ONLYOFFICE settings were unchanged; its API script route
+returned 404 while the Document Server API itself returned 200, so the
+post-change browser UI check remains inconclusive.
 No production data or upstream publication.
 
 ## GR-073 — gateway `/open/` rate limit

@@ -12,12 +12,16 @@ R1/R2 source reviews returned PROVISIONAL PASS. **GPT REVIEW PENDING**; no GPT
 PASS. Exact GR-076 WASM completed a low-optimization browser Open/edit/save/ACK/
 fresh-iframe-reopen smoke and a synthetic Seafile
 open/edit/save/new-version/readback/close/reopen flow. Three Seafile versions
-are recorded and current readback matches the latest. Only the synthetic
-ArtCraft extension allowlist, gateway dispatch and PhotoCraft static bundle
+are recorded and current readback matches the latest. WordCraft DOCX was also
+edited, saved as a new version and reopened after the allowlist change. Only the
+synthetic ArtCraft extension allowlist, gateway dispatch and PhotoCraft static bundle
 were changed. ONLYOFFICE settings/service were untouched; post-change UI
 regression attempt is inconclusive. Serialization peak memory, optimized bundle
 and production remain NOT VERIFIED. Runtime/docs R1 findings were closed and
-R2 returned PROVISIONAL PASS; GPT review is pending.
+R2 and R3 returned PROVISIONAL PASS; a post-allowlist WordCraft DOCX regression passed.
+The ONLYOFFICE API script URL returned 404 through the Seafile host even though
+the Document Server API and healthcheck returned 200 on the service; ONLYOFFICE
+was not modified. GPT review is pending.
 See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
 `docs/reviews/GR-076/`.
 

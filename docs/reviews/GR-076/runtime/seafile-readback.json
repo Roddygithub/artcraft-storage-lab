@@ -1,5 +1,5 @@
 {
-  "scope": "synthetic Seafile library and synthetic PhotoCraft document only",
+  "scope": "synthetic Seafile library with synthetic PhotoCraft and WordCraft documents",
   "fixture": {
     "bytes": 4000,
     "sha256": "c5fe5c8fb2bd9b38b4a0de1ad4ebc9c6e97006100e2b25e147265e2666b5a3c2"
@@ -11,6 +11,16 @@
     "second_edit": "Layer 2",
     "second_save": "PASS; gateway save returned HTTP 200; editor confirmed Saved to host",
     "close_and_reopen_from_file_list": "PASS; new open/document requests returned HTTP 200; both layers visible; editor showed no changes"
+  },
+  "wordcraft_docx_regression_after_pcraft_allowlist_change": {
+    "document_scope": "same synthetic ArtCraft library, synthetic.docx",
+    "open": "PASS; gateway open returned HTTP 200; WordCraft JS/WASM and document fetch returned HTTP 200",
+    "edit_marker": "gr076regression20261026",
+    "save": "PASS; WordCraft displayed Saved — new version",
+    "history_count_after_save": 4,
+    "history_sizes_bytes_newest_first": [15832, 15807, 25329, 1632],
+    "close_and_reopen": "PASS; fresh file-list click reopened WordCraft and the marker remained visible",
+    "screenshot_sha256": "8e0e60e83f92a4a0d6e8700613b2b8b5377db4adfb7602df7931c1f43b01ce44"
   },
   "seafile_readback": {
     "history_count": 3,
@@ -33,6 +43,14 @@
     "onlyoffice_enabled_before_and_after": true,
     "onlyoffice_settings_or_service_changed": false
   },
+  "onlyoffice_regression_diagnostic": {
+    "api_script_via_seafile_host_http_status": 404,
+    "editor_instance_created": false,
+    "document_server_api_script_local_http_status": 200,
+    "document_server_healthcheck_local_http_status": 200,
+    "onlyoffice_config_or_service_changed": false,
+    "interpretation": "Seafile-to-Document-Server URL/proxy path failed; exact proxy rule not identified"
+  },
   "bundle_sha256": {
     "wasm": "71e6594e78d33fa75ceebec5d981e7efaa1ab8bbafd21f86fdf2412f8f14a23a",
     "javascript": "f5280d32f337882597b4118ea6d528d975374933c3cfd865a1be6c417dd76484",
@@ -40,7 +58,7 @@
   },
   "limitations": [
     "functional low-optimization build; optimized bundle not verified",
-    "ONLYOFFICE post-change browser UI regression inconclusive: blank preview and no editor assets",
+    "ONLYOFFICE post-change browser UI regression inconclusive: Seafile API script URL returned 404 and no editor was instantiated; Document Server API and healthcheck returned 200 on the service itself",
     "production behavior, proxy/CSP behavior, concurrency conflicts, token expiry and maximum-size behavior not verified"
   ],
   "secrets_or_personal_data_retained": false

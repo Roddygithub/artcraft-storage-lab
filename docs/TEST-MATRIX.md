@@ -903,7 +903,8 @@ PROVISIONAL implementation; GPT REVIEW PENDING; no project GPT PASS.
 | Rust 1.95 locked WASM, format, whitespace and clean-base patch application | PASS, final script exit 0 and `reviews/GR-076/patch-check.txt` |
 | Live iframe Open/save/ACK/fresh reopen | PASS, actual GR-076 patched WASM in T3 Chromium; in-memory smoke, low-optimization bundle; `reviews/GR-076/runtime/` |
 | Synthetic Seafile click/open/edit/save/version/close/reopen | PASS, history has 3 versions; current readback hash and reopened two-layer view recorded in `reviews/GR-076/runtime/README.md` and `seafile-readback.json` |
+| WordCraft synthetic DOCX after `.pcraft` allowlist addition | PASS, edit/save/new version/close/reopen; marker remained visible; history count is 4; `reviews/GR-076/runtime/README.md` |
 | Browser unload/clock and optimized bundle | NOT VERIFIED |
-| ONLYOFFICE UI regression after GR-076 runtime deployment | NOT VERIFIED; file route rendered blank preview and loaded no editor assets. ONLYOFFICE settings were checked unchanged/enabled; prior GR-072 evidence is separate |
-| Independent runtime/docs evidence review | PASS, R1 MINOR findings closed in R2; both free-model verdicts PROVISIONAL; `reviews/GR-076/runtime/review-r1-and-response.md` |
+| ONLYOFFICE UI regression after GR-076 runtime deployment | NOT VERIFIED; configured API script URL returned 404, `docEditor` undefined. Document Server API and healthcheck returned 200 when probed on the service. ONLYOFFICE settings remained unchanged/enabled; prior GR-072 evidence is separate |
+| Independent runtime/docs evidence review | PASS, R1 MINOR findings closed in R2; R2/R3 PROVISIONAL PASS; `reviews/GR-076/runtime/review-r1-and-response.md` |
 | Full desktop suite / visual QA / clippy / corpus | NOT VERIFIED |
