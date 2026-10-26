@@ -1,3 +1,21 @@
+## GR-075 — gateway request-body deadline
+
+Nonempty request bodies have a 120-second total deadline across bounded
+`read1` calls. A loopback slow-drip test confirms 408/close and preservation of
+`/dirty` state. R3 returned bounded PROVISIONAL PASS with one matrix minor,
+corrected in the matrix. R4 returned bounded PROVISIONAL PASS and found stale
+R3-pending text in this report and the GR-075 report; both are corrected.
+Independent R1–R5 bounded reviews are PROVISIONAL PASS with no remaining
+findings in scope. Header-read deadlines, proxy and
+large slow-link behavior, production, and live Seafile/ONLYOFFICE remain NOT
+VERIFIED. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+R1 found a timing race; R2 showed the first synchronization still preceded
+deadline creation and socket creation was outside cleanup. The test now signals
+at the first `read1` call after deadline creation and protects setup in
+`finally`. R3's matrix-status minor and R4's stale R3-pending text were fixed;
+R5 confirmed the current summaries agree. Evidence:
+`docs/GR-075-HTTP-BODY-DEADLINE.md`, `docs/reviews/GR-075/`.
+
 ## GR-074 — gateway request-body framing
 
 The shared POST body reader now rejects unsupported transfer encoding, duplicate

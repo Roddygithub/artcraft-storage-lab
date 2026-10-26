@@ -476,6 +476,78 @@ def main():
           f"HTTP {exact_dirty_response.status}")
     exact_dirty.close()
 
+    original_body_timeout = Handler.body_read_timeout_seconds
+    original_read_body = Handler._read_body
+    first_body_read = threading.Event()
+
+    class SignaledReader:
+        def __init__(self, reader):
+            self.reader = reader
+
+        def read1(self, size):
+            first_body_read.set()
+            return self.reader.read1(size)
+
+        def __getattr__(self, name):
+            return getattr(self.reader, name)
+
+    def signaled_read_body(handler, limit=None):
+        if handler.path == f"/session/{http_session.sid}/dirty":
+            reader = handler.rfile
+            handler.rfile = SignaledReader(reader)
+            try:
+                return original_read_body(handler, limit)
+            finally:
+                handler.rfile = reader
+        return original_read_body(handler, limit)
+
+    slow_body = None
+    drip_thread = None
+    slow_reply = b""
+    try:
+        Handler.body_read_timeout_seconds = 0.25
+        Handler._read_body = signaled_read_body
+        http_session.unsaved = True
+        slow_body = socket.create_connection(("127.0.0.1", httpd.server_port), timeout=3)
+        slow_body.sendall((
+            f"POST /session/{http_session.sid}/dirty HTTP/1.1\r\n"
+            f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n"
+            "Content-Length: 5\r\n\r\n"
+        ).encode())
+        reader_ready = first_body_read.wait(timeout=2)
+        check("slow-drip test synchronizes with the first body read", reader_ready)
+        if reader_ready:
+
+            def drip_body():
+                for index, byte in enumerate(b"false"):
+                    try:
+                        slow_body.sendall(bytes((byte,)))
+                    except OSError:
+                        return
+                    if index < 4:
+                        time.sleep(0.09)
+
+            drip_thread = threading.Thread(target=drip_body, daemon=True)
+            drip_thread.start()
+            while True:
+                chunk = slow_body.recv(4096)
+                if not chunk:
+                    break
+                slow_reply += chunk
+    finally:
+        Handler._read_body = original_read_body
+        Handler.body_read_timeout_seconds = original_body_timeout
+        if slow_body is not None:
+            slow_body.close()
+        if drip_thread is not None:
+            drip_thread.join(timeout=1)
+    check("slow-drip body exceeds its total read deadline and closes",
+          slow_reply.startswith(b"HTTP/1.1 408")
+          and slow_reply.count(b"HTTP/1.1 ") == 1
+          and b"Connection: close" in slow_reply,
+          slow_reply[:160].decode("latin-1", "replace"))
+    check("timed-out dirty report cannot clear unsaved state", http_session.unsaved is True)
+
     oversized_save = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
     oversized_save.request(
         "POST", f"/session/{http_session.sid}/save", b"x" * 11,

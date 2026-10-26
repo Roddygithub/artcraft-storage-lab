@@ -1,3 +1,22 @@
+## 2026-10-26 — GR-075 gateway request-body deadline
+
+- Added a 120-second total deadline for nonempty request-body reads, enforced
+  across 64 KiB reads with monotonic time. Slow-drip uploads now receive 408 and
+  close rather than retaining a handler indefinitely; failed `/dirty` reads
+  preserve the prior unsaved state.
+- A loopback slow-drip regression passes with the gateway suite. R1 found a
+  timing race; R2 showed the first synchronization still preceded deadline
+  creation and socket creation was outside cleanup. The test now signals at the
+  first `read1`, with setup protected by `finally`. R3 returned bounded
+  PROVISIONAL PASS with one stale matrix-status minor, now corrected. R4
+  returned bounded PROVISIONAL PASS and found R3-pending text in the report and
+  queue; both are corrected. R5 returned bounded PROVISIONAL PASS with no new
+  findings in the status remediation.
+  Header-read deadlines, proxy behavior, large uploads over slow links, production, and live
+  Seafile/ONLYOFFICE remain NOT VERIFIED. Project
+  GPT remains INCOMPLETE and upstream publication LOCKED.
+- Evidence: `docs/GR-075-HTTP-BODY-DEADLINE.md`, `docs/reviews/GR-075/`.
+
 ## 2026-10-26 — GR-074 gateway request-body framing
 
 - Rejected POST bodies with duplicate/non-decimal lengths, unsupported transfer

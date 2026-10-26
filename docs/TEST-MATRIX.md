@@ -23,6 +23,19 @@ Evidence: [GR-074 report](GR-074-HTTP-BODY-FRAMING.md),
 [review bundle](reviews/GR-074/). R1–R5 bounded reviews are PROVISIONAL PASS;
 no project GPT approval is implied.
 
+## GR-075 — gateway request-body deadline
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Slow-drip incomplete body | Enforce a total body-read deadline despite periodic bytes | [x] Loopback `/dirty` drip test receives one 408, closes, and preserves dirty state |
+| Large upload throughput / proxy buffering | A 50 MiB upload can meet the configured deadline through deployment proxies | [ ] NOT VERIFIED |
+| Header-read deadline | Slow request headers cannot retain a handler indefinitely | [ ] NOT VERIFIED |
+
+Evidence: [GR-075 report](GR-075-HTTP-BODY-DEADLINE.md),
+[review bundle](reviews/GR-075/). R1/R2 test findings are fixed; R3/R4 returned
+R3–R5 bounded PROVISIONAL PASS after correcting their matrix/status
+documentation findings; no project GPT approval is implied.
+
 ## GR-073 — gateway `/open/` rate limit
 
 | Scenario | Expected | Result |

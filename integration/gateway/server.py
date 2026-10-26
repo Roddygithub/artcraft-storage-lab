@@ -22,6 +22,7 @@ import posixpath
 import re
 import secrets
 import struct
+import socket
 import threading
 import time
 import urllib.parse
@@ -40,6 +41,8 @@ CONFIG_PATH = os.path.join(ROOT, "config", "dispatch.json")
 # Permissions that allow writing a file back.
 EDITABLE_PERMISSIONS = ("rw", "cloud-edit", "preview-edit")
 MAX_CONTENT_TYPES_XML_BYTES = 1024 * 1024
+BODY_READ_TIMEOUT_SECONDS = 120
+BODY_READ_CHUNK_BYTES = 64 * 1024
 
 # The Craft app names, as the protocol uses them: "wordcraft:open".
 APP_ALIASES = {
@@ -337,6 +340,7 @@ class Gateway:
 class Handler(BaseHTTPRequestHandler):
     server_version = "artcraft-gateway/0.1"
     protocol_version = "HTTP/1.1"
+    body_read_timeout_seconds = BODY_READ_TIMEOUT_SECONDS
 
     # -- helpers ----------------------------------------------------------
 
@@ -390,7 +394,30 @@ class Handler(BaseHTTPRequestHandler):
             self._body_read_error = (413, "request body exceeds the size limit")
             self.close_connection = True
             return None
-        body = self.rfile.read(length) if length else b""
+        body = b""
+        if length:
+            deadline = time.monotonic() + self.body_read_timeout_seconds
+            previous_timeout = self.connection.gettimeout()
+            chunks = []
+            remaining = length
+            try:
+                while remaining:
+                    timeout = deadline - time.monotonic()
+                    if timeout <= 0:
+                        raise socket.timeout
+                    self.connection.settimeout(timeout)
+                    chunk = self.rfile.read1(min(BODY_READ_CHUNK_BYTES, remaining))
+                    if not chunk:
+                        break
+                    chunks.append(chunk)
+                    remaining -= len(chunk)
+            except socket.timeout:
+                self._body_read_error = (408, "request body read timed out")
+                self.close_connection = True
+                return None
+            finally:
+                self.connection.settimeout(previous_timeout)
+            body = b"".join(chunks)
         if len(body) != length:
             self._body_read_error = (400, "incomplete request body")
             self.close_connection = True

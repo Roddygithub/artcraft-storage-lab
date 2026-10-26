@@ -104,7 +104,7 @@ The session id is:
 | 4 | the file still exists | local patch binds reads/saves to the opened file id | deletion/revocation runtime **NOT VERIFIED** |
 | 5 | the file has not changed since it was opened | local C patch checks the file id and uses branch compare-and-update even for same-content saves | exact source patch only; build/runtime **NOT VERIFIED**; Go route remains unpatched |
 | 6 | the document is not too large | `ARTCRAFT_MAX_BYTES` | 413 |
-| 7 | request-body framing and size | GET/POST handlers reject parser defects and leftover header payload, require supported framing, enforce route limits, and close on malformed/oversized bodies; HTTP/0.9 is rejected | 400 / 413; `/dirty` state is unchanged |
+| 7 | request-body framing, size, and read time | GET/POST handlers reject parser defects and leftover header payload, require supported framing, enforce route limits and a 120-second total body-read deadline, and close on malformed/oversized/timed-out bodies; HTTP/0.9 is rejected | 400 / 408 / 413; `/dirty` state is unchanged |
 
 **Check 2 deserves a note:** the path, the repository and the user are read from the
 **session**, never from the request. A request cannot name a different file. This

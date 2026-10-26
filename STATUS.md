@@ -1,21 +1,30 @@
 # STATUS
 
-## CURRENT GR: GR-074 — strict gateway request-body framing
+## CURRENT GR: GR-075 — gateway request-body deadline
 
-Gateway GET/POST body handling rejects parser-reported malformed headers,
-duplicate or non-decimal `Content-Length`, unsupported `Transfer-Encoding`,
-truncated bodies, and route-size excesses. Error responses close the connection;
-rejected `/dirty` reports preserve the unsaved flag. R1's Unicode-whitespace
-bypass and false-positive-prone test were fixed. R2 reproduced a malformed
-header bypass; it is fixed with raw tests, and R2's unknown-route coverage note
-is addressed. R3's HTTP/0.9 and matrix-wording P3s were corrected. R4 found
-malformed header bytes retained as parser payload; the reader now rejects them
-and raw regressions cover both reported sequences. Independent R5 returned a
-bounded PROVISIONAL PASS with no new findings, including 36 additional raw
-route probes. Proxy behavior and live Seafile/ONLYOFFICE remain
-**NOT VERIFIED**; project GPT
-remains **INCOMPLETE**, upstream publication **LOCKED**. See
-`docs/GR-074-HTTP-BODY-FRAMING.md` and `docs/reviews/GR-074/`.
+Nonempty request bodies have a 120-second total read deadline, enforced across
+64 KiB `read1` calls using a monotonic clock. Slow-drip bodies receive 408 and
+close; rejected `/dirty` requests preserve the unsaved flag. The gateway unit
+suite, Python compilation, and whitespace checks pass. R1 found a timing race;
+R2 showed synchronization still preceded deadline creation and socket creation
+was outside cleanup. The test now synchronizes at the first `read1` and
+protects setup with `finally`. R3 returned bounded PROVISIONAL PASS with one
+stale matrix-status minor, now fixed. R4 returned bounded PROVISIONAL PASS and
+found R3-pending text in the report/queue; both are corrected. Independent
+R1–R5 bounded reviews are PROVISIONAL PASS with no remaining findings in scope.
+Header-read deadlines,
+proxy behavior, slow-link upload suitability,
+and live Seafile/ONLYOFFICE remain **NOT VERIFIED**; project GPT remains
+**INCOMPLETE**, upstream publication **LOCKED**. See
+`docs/GR-075-HTTP-BODY-DEADLINE.md` and `docs/reviews/GR-075/`.
+
+## PREVIOUS GR: GR-074 — strict gateway request-body framing
+
+R1–R5 bounded reviews are PROVISIONAL PASS with no remaining findings. The
+gateway rejects malformed framing and oversized/truncated bodies, closes
+rejected connections, and preserves `/dirty` state. Proxy behavior and live
+Seafile/ONLYOFFICE remain **NOT VERIFIED**. See
+`docs/GR-074-HTTP-BODY-FRAMING.md`.
 
 ## PREVIOUS GR: GR-073 — gateway `/open/` rate limit
 
