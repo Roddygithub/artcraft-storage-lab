@@ -1,6 +1,19 @@
 # STATUS
 
-## CURRENT GR: GR-072 — post-change ONLYOFFICE preservation smoke
+## CURRENT GR: GR-073 — gateway `/open/` rate limit
+
+`POST /open/` now has a process-local fixed-window limiter: 60 requests per 60
+seconds per observed TCP peer, with at most 1,024 tracked peers. A blocked open
+returns 429/`Retry-After` before Seafile is called. The gateway ignores
+`X-Forwarded-For`; behind a reverse proxy, clients may share one peer bucket.
+This is not a distributed or public-deployment control. Gateway tests pass.
+Independent R1–R3 reviews are bounded PROVISIONAL PASS. R1 code findings were
+fixed; R2’s stale security-table entry was corrected and verified in R3. Proxy
+behavior, deployment security, and production readiness remain **NOT VERIFIED**.
+Project GPT remains **INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-073-OPEN-RATE-LIMIT.md` and `docs/reviews/GR-073/`.
+
+## PREVIOUS GR: GR-072 — post-change ONLYOFFICE preservation smoke
 
 The operator-recorded Seafile ONLYOFFICE run opened the existing synthetic DOCX
 outside the ArtCraft allowlist, edited and saved it, observed new history

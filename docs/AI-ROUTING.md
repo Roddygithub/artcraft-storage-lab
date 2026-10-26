@@ -53,6 +53,13 @@ was withdrawn. It is **not** replaced by a paid MiniMax model. The definitions i
 `config/opencode/agents/` no longer name it, and `scripts/install-agents.sh`
 installs the current ones.
 
+## 2026-10-26 — GR-073 bounded worker overrun
+
+The T3 `artcraft-worker` implementation task for GR-073 remained in analysis
+for over 20 minutes without producing a diff, including after two steering
+messages. The task was cancelled with a clean worktree; the owner resumed the
+small implementation directly. No repository state was lost.
+
 The owner now implements directly (it is the *default implementer*), and delegates
 only what is genuinely better delegated: hard architecture to the architect,
 independent review to the reviewer.

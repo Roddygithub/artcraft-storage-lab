@@ -7,6 +7,20 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-073 — gateway `/open/` rate limit
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Per-peer request threshold | Excess `/open/` requests are rejected before Seafile access | [x] 60 requests / 60-second fixed window; 429 and `Retry-After` tested |
+| Forwarded-header spoofing | Client-supplied XFF cannot select another bucket | [x] HTTP test changes XFF; same TCP peer remains rate limited |
+| Bounded state and expiry | Peer map stays capped and resets expired windows | [x] Injected-clock checks pass; max 1,024 peers in production configuration |
+| Reverse-proxy identity / multi-process behavior | Actual clients receive independent distributed limits | [ ] NOT VERIFIED; proxy peers may share one process-local bucket |
+| Independent review / public deployment | Rate-limit suitability and deployment controls reviewed | [~] Bounded R1–R3 PROVISIONAL PASS; R1 code findings resolved and R2 security-table wording corrected. Public readiness remains unverified |
+
+Evidence: [GR-073 report](GR-073-OPEN-RATE-LIMIT.md),
+[review bundle](reviews/GR-073/). Project GPT remains INCOMPLETE; upstream
+publication remains LOCKED.
+
 ## GR-072 — post-change ONLYOFFICE regression on real synthetic Seafile
 
 | Scenario | Expected | Result |

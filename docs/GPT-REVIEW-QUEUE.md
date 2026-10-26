@@ -1,5 +1,19 @@
 # GPT Review Queue
 
+## GR-073 — gateway `/open/` rate limit
+
+Bounded implementation adds a process-local 60-per-60-second fixed window per
+observed TCP peer, capped at 1,024 entries. Rejected requests return 429 with
+`Retry-After` before reaching Seafile. Forwarded headers are ignored. Behind a
+reverse proxy clients may share the proxy's bucket; distributed rate limiting,
+proxy identity, public deployment and broader security remain NOT VERIFIED.
+Independent R1 requested two P2 and one P3 changes; connection closure, locked
+clock sampling, and default-threshold regression coverage are now recorded.
+R2 confirmed the code fixes and found one stale security-table entry, corrected
+and verified in R3. Bounded R1–R3 reviews are PROVISIONAL PASS; project GPT
+remains INCOMPLETE and upstream publication LOCKED. Evidence:
+`docs/GR-073-OPEN-RATE-LIMIT.md`, `docs/reviews/GR-073/`.
+
 ## GR-072 — post-change ONLYOFFICE regression smoke
 
 The operator-recorded run used Seafile's ONLYOFFICE route for a synthetic DOCX

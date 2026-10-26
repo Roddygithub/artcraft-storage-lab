@@ -22,7 +22,8 @@ import urllib.parse
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "integration"))
 
 from gateway.server import (MAX_CONTENT_TYPES_XML_BYTES, Gateway, Handler,
-                            load_dispatch, payload_matches_name)  # noqa: E402
+                            OpenRateLimiter, load_dispatch,
+                            payload_matches_name)  # noqa: E402
 from gateway.seafile import Seafile, SeafileError  # noqa: E402
 from gateway.sessions import SessionStore  # noqa: E402
 
@@ -46,6 +47,7 @@ class FakeSeafile:
         self.written = []
         self.save_calls = 0
         self.detail_calls = 0
+        self.open_info_calls = 0
         self.user = "alice"
         self.head_id = "head-a"
         self.save_detail_barrier = None
@@ -57,6 +59,7 @@ class FakeSeafile:
         return {"id": self.obj_id, "permission": self.permission, "size": len(self.content)}
 
     def thirdparty_file_info(self, access_token):
+        self.open_info_calls += 1
         return {"repo_id": "repo", "file_path": "/a.docx", "file_name": "a.docx",
                 "username": self.user, "file_id": self.obj_id,
                 "head_commit_id": self.head_id, "permission": self.permission,
@@ -171,6 +174,98 @@ def open_user_session(gw):
 
 
 def main():
+    # ---- bounded /open rate limit ----------------------------------------
+    capacity_clock = [0.0]
+    capacity_limiter = OpenRateLimiter(
+        limit=2, window_seconds=60, max_peers=1, clock=lambda: capacity_clock[0])
+    capacity_first = capacity_limiter.retry_after("192.0.2.1")
+    capacity_full = capacity_limiter.retry_after("192.0.2.2")
+    check("rate limiter rejects new peers when its bounded map is full",
+          capacity_first is None and capacity_full == 60
+          and len(capacity_limiter._windows) == 1)
+    capacity_clock[0] = 60.0
+    check("a full peer map admits a new peer after window expiry",
+          capacity_limiter.retry_after("192.0.2.2") is None
+          and len(capacity_limiter._windows) == 1)
+
+    default_limiter = OpenRateLimiter(clock=lambda: 10.25)
+    default_admissions = [default_limiter.retry_after("192.0.2.3")
+                          for _ in range(60)]
+    default_retry = default_limiter.retry_after("192.0.2.3")
+    check("default limiter admits 60 requests and then rejects the 61st",
+          all(delay is None for delay in default_admissions) and default_retry == 60)
+
+    fractional_clock = [0.0]
+    fractional_limiter = OpenRateLimiter(
+        limit=1, window_seconds=60, clock=lambda: fractional_clock[0])
+    fractional_limiter.retry_after("192.0.2.4")
+    fractional_clock[0] = 59.25
+    check("fractional Retry-After rounds up to a whole second",
+          fractional_limiter.retry_after("192.0.2.4") == 1)
+
+    sampled_under_lock = []
+    lock_check_limiter = None
+
+    def lock_check_clock():
+        sampled_under_lock.append(lock_check_limiter._lock.locked())
+        return 0.0
+
+    lock_check_limiter = OpenRateLimiter(clock=lock_check_clock)
+    lock_check_limiter.retry_after("192.0.2.5")
+    check("rate-limit clock is sampled under its state lock",
+          sampled_under_lock == [True])
+
+    rate_clock = [0.0]
+    rate_seafile = FakeSeafile()
+    rate_gw = make_gateway(rate_seafile)
+    rate_gw.open_rate_limiter = OpenRateLimiter(
+        limit=1, window_seconds=60, max_peers=1, clock=lambda: rate_clock[0])
+    rate_httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    rate_httpd.gateway = rate_gw
+    rate_thread = threading.Thread(target=rate_httpd.serve_forever, daemon=True)
+    rate_thread.start()
+    rate_origin = f"http://127.0.0.1:{rate_httpd.server_port}"
+
+    def open_request(extra_headers=None):
+        conn = http.client.HTTPConnection("127.0.0.1", rate_httpd.server_port, timeout=3)
+        headers = {"Content-Type": "application/x-www-form-urlencoded",
+                   "Origin": rate_origin}
+        headers.update(extra_headers or {})
+        conn.request("POST", "/open/?format=json",
+                     urllib.parse.urlencode({"access_token": "user-token"}), headers)
+        response = conn.getresponse()
+        body = response.read()
+        result = (response.status, response.getheader("Retry-After"),
+                  response.getheader("Connection"), body)
+        conn.close()
+        return result
+
+    try:
+        allowed_status, _, _, _ = open_request()
+        limited_status, retry_after, close_header, _ = open_request(
+            {"X-Forwarded-For": "198.51.100.8"})
+        check("/open admits requests below the peer rate limit", allowed_status == 200,
+              f"HTTP {allowed_status}")
+        check("spoofed X-Forwarded-For cannot bypass /open rate limit",
+              limited_status == 429 and retry_after == "60",
+              f"HTTP {limited_status}, Retry-After={retry_after}")
+        check("rate-limited /open closes the HTTP connection with its unread body",
+              close_header == "close", f"Connection={close_header}")
+        check("rate-limited /open is rejected before calling Seafile",
+              rate_seafile.open_info_calls == 1,
+              f"thirdparty_file_info calls={rate_seafile.open_info_calls}")
+        check("rate-limit peer map stays bounded",
+              len(rate_gw.open_rate_limiter._windows) <= 1,
+              f"tracked peers={len(rate_gw.open_rate_limiter._windows)}")
+        rate_clock[0] = 60.0
+        expired_status, _, _, _ = open_request()
+        check("/open rate limit resets after its window", expired_status == 200,
+              f"HTTP {expired_status}")
+    finally:
+        rate_httpd.shutdown()
+        rate_thread.join(timeout=3)
+        rate_httpd.server_close()
+
     # ---- the extension rule ------------------------------------------------
     gw = make_gateway(FakeSeafile())
     check("the extension is the one after the last dot",

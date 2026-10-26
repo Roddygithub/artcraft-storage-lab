@@ -15,12 +15,15 @@ import hashlib
 import io
 import ipaddress
 import json
+import math
 import mimetypes
 import os
 import posixpath
 import re
 import secrets
 import struct
+import threading
+import time
 import urllib.parse
 import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -46,6 +49,42 @@ APP_ALIASES = {
     "pdfcraft": "pdfcraft",
     "vectorcraft": "vectorcraft",
 }
+
+
+class OpenRateLimiter:
+    """Per-peer fixed-window limit for capability-bearing open requests."""
+
+    def __init__(self, limit=60, window_seconds=60, max_peers=1024, clock=None):
+        self.limit = limit
+        self.window_seconds = window_seconds
+        self.max_peers = max_peers
+        self.clock = clock or time.monotonic
+        self._windows = {}
+        self._lock = threading.Lock()
+
+    def retry_after(self, peer):
+        """Return None when admitted, or integer seconds to wait when denied."""
+        with self._lock:
+            # Keep the timestamp and its window mutation in one serialized step.
+            now = self.clock()
+            expired = [key for key, (started, _) in self._windows.items()
+                       if now - started >= self.window_seconds]
+            for key in expired:
+                del self._windows[key]
+
+            window = self._windows.get(peer)
+            if window is None:
+                if len(self._windows) >= self.max_peers:
+                    earliest = min(started for started, _ in self._windows.values())
+                    return max(1, math.ceil(self.window_seconds - (now - earliest)))
+                self._windows[peer] = (now, 1)
+                return None
+
+            started, count = window
+            if count >= self.limit:
+                return max(1, math.ceil(self.window_seconds - (now - started)))
+            self._windows[peer] = (started, count + 1)
+            return None
 
 
 def payload_matches_name(name, data):
@@ -114,6 +153,7 @@ class Gateway:
         self.max_bytes = max_bytes or int(
             os.environ.get("ARTCRAFT_MAX_BYTES", 50 * 1024 * 1024))
         self.sessions = SessionStore()
+        self.open_rate_limiter = OpenRateLimiter()
 
     def app_for(self, filename):
         ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
@@ -318,8 +358,8 @@ class Handler(BaseHTTPRequestHandler):
         if self.command != "HEAD":
             self.wfile.write(body)
 
-    def _json(self, status, payload):
-        self._send(status, json.dumps(payload), "application/json; charset=utf-8")
+    def _json(self, status, payload, headers=None):
+        self._send(status, json.dumps(payload), "application/json; charset=utf-8", headers)
 
     def _read_body(self, limit=None):
         length = int(self.headers.get("Content-Length") or 0)
@@ -366,6 +406,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(403, {"ok": False, "error": "same-origin request required"})
 
         if path == "/open/":
+            retry_after = gateway.open_rate_limiter.retry_after(self.client_address[0])
+            if retry_after is not None:
+                self.close_connection = True
+                return self._json(429, {"ok": False, "error": "too many open requests"},
+                                  headers={"Retry-After": str(retry_after),
+                                           "Connection": "close"})
             return self._open(gateway)
 
         if path.startswith("/session/") and path.endswith("/save"):

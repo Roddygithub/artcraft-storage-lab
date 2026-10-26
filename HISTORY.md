@@ -1,3 +1,22 @@
+## 2026-10-26 — GR-073 gateway `/open/` rate limit
+
+- Added a bounded process-local fixed-window limiter before `/open/` body parsing
+  and Seafile access: 60 requests per 60 seconds per TCP peer; state caps at
+  1,024 peers and resets on restart. The limiter ignores forwarding headers.
+- Gateway unit checks passed for threshold, retry delay, expiry, bounded state,
+  spoofed `X-Forwarded-For`, and no Seafile call after rejection.
+- Independent R1 requested changes for connection reuse with unread POST bodies,
+  clock sampling outside the limiter lock, and testing the configured 60-request
+  threshold. The current patch adds `Connection: close`, samples time under the
+  lock, and tests the actual default boundary. R2 confirmed those fixes and found
+  one stale security-table entry, corrected and verified in R3. Bounded R1–R3
+  reviews are PROVISIONAL PASS (`docs/reviews/GR-073/INDEPENDENT-REVIEW-R1.md`
+  through `INDEPENDENT-REVIEW-R3.md`).
+- Behind a reverse proxy, clients may share the proxy's peer bucket; this does
+  not establish public deployment readiness. No live service was accessed.
+  Project GPT remains INCOMPLETE and upstream publication LOCKED.
+- Evidence: `docs/GR-073-OPEN-RATE-LIMIT.md` and `docs/reviews/GR-073/`.
+
 ## 2026-10-26 — GR-072 post-change ONLYOFFICE regression smoke
 
 - Operator-recorded opening of the existing synthetic DOCX outside the

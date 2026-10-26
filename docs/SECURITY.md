@@ -31,9 +31,10 @@ This note supersedes older statements below when they conflict:
   Seafile persistence test.
 * The dynamic capability host page now sends a nonce-based CSP and restricts
   `frame-ancestors` to the configured Seahub origin (GR-039). The policy does
-  not cover static Craft editor HTML or deployment proxy responses; rate
-  limiting is also still missing. The system is not approved for public
-  Internet deployment.
+  not cover static Craft editor HTML or deployment proxy responses. GR-073 adds
+  an in-process limit for `/open/`; behind a reverse proxy, clients may share
+  the proxy's peer address. The system is not approved for public Internet
+  deployment.
 
 ## 0. The threat model, in one picture
 
@@ -176,7 +177,7 @@ browser *without an error* while the document showed as saved.
 | **expired sessions** | 30 minutes absolute, 15 minutes idle; an expired session id gets 404 | addressed |
 | **symlink escape from the static root** | `os.path.realpath` on both the file and the root | addressed (REVIEW-02 G1) |
 | **the account token reaching the file server** | the file-server calls send no `Authorization` header | addressed (REVIEW-02 G4) |
-| **a session store flood** | 256 sessions maximum, oldest evicted; no per-IP rate limit | **open** — acceptable for a prototype, needed for production |
+| **a session store flood** | Session store is capped at 256 entries with oldest-entry eviction; GR-073 also limits `/open/` to 60 requests per 60 seconds per observed TCP peer (1,024 peer entries per process) | **partially addressed** — process-local peer limits do not coordinate across workers, and proxy clients may share a bucket |
 | **the TOCTOU window on the conflict check** | stock public API has no user-bound conditional file save; GR-015 binds the opened file id to Seafile's transactional branch compare-and-update | **blocked pending build and deployment** — see `docs/reviews/GR-015/` |
 
 ## 5. The rules the code must never break
@@ -214,8 +215,8 @@ service:
 | # | Item | Why it blocks |
 | --- | --- | --- |
 | S-1 | a `Content-Security-Policy` for gateway host and editor documents | `/open/` host HTML is covered; editor HTML and deployed proxy behavior remain unverified |
-| S-2 | an `Origin` / `Referer` check on the state-changing endpoints | a cross-site form POST to `/open/` is possible without a token; the session id is the only thing protecting `/save` |
-| S-3 | a rate limit on `/open/` | the session store's cap is a backstop, not a limit |
+| S-2 | an `Origin` / `Referer` check on the state-changing endpoints | gateway Origin checks are implemented; behavior behind Nginx Proxy Manager remains unverified |
+| S-3 | a rate limit on `/open/` | GR-073 limits requests by the gateway-observed TCP peer; reverse-proxy clients may share one bucket |
 | S-4 | a bound on the **expanded** size of an OOXML document | a 50 MB limit on the compressed file is not a limit on what it expands to; the Craft app must bound its own expansion |
 | S-7 | a formal abuse-case list per endpoint | the threat list above is a checklist, not a model |
 
@@ -226,8 +227,8 @@ a share link never reaches the hook, so it behaves exactly as it did before.
 | # | Item | Priority |
 | --- | --- | --- |
 | S-1 | CSP for gateway host and editor documents | host page implemented in GR-039; editor documents and deployed proxy behavior before any public deployment |
-| S-2 | Verify `Origin` behavior behind Nginx Proxy Manager; gateway check is implemented | before any public deployment |
-| S-3 | A per-IP / per-user rate limit on `/open/` | before any public deployment |
+| S-2 | Verify `Origin` behavior behind Nginx Proxy Manager | before any public deployment |
+| S-3 | Validate `/open/` rate limit against deployment topology and expected client volume | GR-073 adds 60 requests per 60-second fixed window per observed TCP peer; 1,024 peer entries maximum per process. Behind a reverse proxy, clients may share one bucket; forwarded headers are not trusted |
 | S-4 | A bound on the *expanded* size of an OOXML document | upstream (the Craft app) |
 | S-5 | The share-link path | out of scope for the MVP; needs the upstream Seafile patch |
 | S-6 | A read-only mode that is enforced by the gateway, not only by the Craft app | **done** (the write path checks the permission) |
