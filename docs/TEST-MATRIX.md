@@ -129,15 +129,15 @@ rebuilding. Existing PDF dispatch and allowlist were unchanged.
 |---|---|---|
 | Candidate inventory and active static-root assets | Exact pinned EffectCraft candidate served | [x] 11 files, 57,470,921 bytes; build, staged, and active-root hashes match |
 | Synthetic Seafile file-list open | Actual EffectCraft WASM loads native project | [x] `/open/`, index, JS, runtime snippet, WASM and document GET returned 200 after restoring one omitted snippet |
-| Visible edit and Ctrl+S | Host ACK and Seafile version confirmed | [x] Canvas text edit; `Saved to host`, new-version confirmation, gateway save POST 200 |
-| Seafile history | Editor save creates a version after setup upload | [x] Versions UI listed current and preceding versions; history screenshot omitted because account name was visible |
+| Visible edit and Ctrl+S | Host ACK and Seafile version confirmed | [x] Canvas text edit; operator-recorded `Saved to host`; retained screenshot shows Seafile new-version confirmation; gateway save POST 200 |
+| Seafile history | Editor save creates a version after setup upload | [~] Operator observed current and preceding Versions entries; no history capture retained. The save screenshot separately shows Seafile's new-version confirmation |
 | Fresh-session reopen | New editor session renders saved edit | [x] Navigated away to file list and opened again in a new tab/session; saved text displayed |
 | Edited-output download/manual upload | Not used | [x] None occurred; fixture upload was setup only |
 | Exact save-message/readback byte identity | Matching hashes | [ ] NOT VERIFIED |
 | ONLYOFFICE edit/save/version after route change | Full regression | [ ] NOT VERIFIED; no ONLYOFFICE setting/route changed, but edit/save was not rerun |
 | In-app close before reopen | Document explicitly closed | [ ] NOT VERIFIED; old editor view exited by navigation |
 | Broader format compatibility and production security | General readiness | [ ] NOT VERIFIED |
-| Independent review | Separate exact evidence review | [x] R1 bounded PROVISIONAL PASS, no findings; project GPT remains INCOMPLETE and upstream publication LOCKED |
+| Independent review | Separate exact evidence review | [~] R1–R4 bounded PROVISIONAL PASS; two evidence minors, one tracking minor, and two P3 documentation findings corrected; runtime limits remain |
 
 Evidence: `docs/reviews/GR-067/`; reused GR-046 actual-WASM candidate without
 rebuilding. The missing snippet found on the first attempt was copied from the

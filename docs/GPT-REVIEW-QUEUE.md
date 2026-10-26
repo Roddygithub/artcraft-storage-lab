@@ -109,8 +109,11 @@ INCOMPLETE and upstream publication LOCKED. Evidence:
 
 ## GR-067 — EffectCraft real synthetic Seafile roundtrip
 
-Independent R1 returned a bounded PROVISIONAL PASS with no findings. The
-reviewer verified all 11 assets, source and patch identity, transport pin,
+Independent R1–R3 returned bounded PROVISIONAL PASS results. R1's two evidence
+minors, R2's tracking minor, and R3's two P3 documentation findings are
+corrected; the R1 follow-up's old pending statement is explicitly historical,
+and the README checksum is current. R4 returned bounded PROVISIONAL PASS with no
+new findings. Reviewers verified all 11 assets, source and patch identity, transport pin,
 screenshots, and retained checksums. Runtime chronology, fresh-session creation,
 history timestamps, cleanup, and service state remain implementer-reported.
 Save/readback byte identity, explicit in-app close, and post-change ONLYOFFICE

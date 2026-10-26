@@ -116,8 +116,12 @@ only; no edited output was downloaded or manually uploaded. The first editor
 was exited by navigation, not explicit in-app close. Save/readback byte
 identity and a post-change ONLYOFFICE edit/save regression remain unverified.
 Temporary routing/configuration was restored and Seahub is active. Independent
-R1 returned bounded PROVISIONAL PASS with no findings; live runtime details
-remain implementer-reported. Project GPT remains **INCOMPLETE** and upstream
+R1's bounded PROVISIONAL PASS was followed by two evidence-presentation minors,
+both corrected. R2 returned bounded PROVISIONAL PASS with one tracking minor,
+also corrected. R3 returned bounded PROVISIONAL PASS with two P3 documentation
+findings, both corrected; R4 returned bounded PROVISIONAL PASS with no new
+findings. Live runtime details remain implementer-reported. Project GPT remains
+**INCOMPLETE** and upstream
 publication **LOCKED**. See `docs/GR-067-EFFECTCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
 `docs/reviews/GR-067/`.
 

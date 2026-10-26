@@ -163,8 +163,15 @@
   The old editor was exited by navigation; an explicit in-app close was not
   recorded. Save/readback byte identity and a post-change ONLYOFFICE edit/save
   regression remain unverified. Restored the previous Seahub config exactly,
-  removed the temporary dispatch route, and stopped the gateway. Independent
-  R1 returned bounded PROVISIONAL PASS with no findings; live sequence and
+  removed the temporary dispatch route, and stopped the gateway. R1 returned
+  bounded PROVISIONAL PASS; follow-up minors led to marking history evidence
+  partial and qualifying that the editor toast is operator-recorded, not shown
+  in the retained screenshot. R2 returned bounded PROVISIONAL PASS with a
+  tracking minor because the closing summary omitted the follow-up; it is now
+  corrected. R3 returned bounded PROVISIONAL PASS; its two P3 documentation
+  findings (historically qualified R2-pending text and stale README checksum)
+  are corrected. R4 returned bounded PROVISIONAL PASS with no new findings.
+  Live sequence and
   cleanup remain implementer-reported. Project GPT remains INCOMPLETE and
   upstream publication LOCKED.
 - Evidence: `docs/GR-067-EFFECTCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and

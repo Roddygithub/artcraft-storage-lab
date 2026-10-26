@@ -24,9 +24,12 @@ file-list reopen for `GR-067-synthetic.ecproj`.
    and the subsequent request returned HTTP 200.
 4. In EffectCraft's canvas, replaced the visible text with
    `EffectCraft GR-067 saved`. The editor showed `Unsaved changes`.
-5. Ctrl+S returned `Saved — new version …`; the editor also displayed `Saved to
-   host`. The browser recorded one gateway save POST with HTTP 200. The saved
-   screen is retained in `reviews/GR-067/runtime/save-confirmation.png`.
+5. The sanitized operator observation records Ctrl+S displaying `Saved to
+   host`, one gateway save POST returning HTTP 200, and Seafile displaying
+   `Saved — new version …`. The retained
+   `reviews/GR-067/runtime/save-confirmation.png` shows the canvas edit and
+   Seafile's new-version confirmation; it does not show the editor's `Saved to
+   host` message.
 6. Navigated the original editor tab away to the Seafile library list, then
    opened the file from that list in a new tab/session. The new open and
    document GET returned HTTP 200; the composition displayed the saved text.
@@ -81,8 +84,13 @@ library list; an explicit in-app close action was not recorded.
 See [`docs/reviews/GR-067/`](reviews/GR-067/README.md) for provenance, hashes,
 sanitized observations, and the candidate verifier.
 
-Independent R1 returned a bounded **PROVISIONAL PASS** with no findings.
-Runtime chronology, fresh-session creation, history timestamps, cleanup, and
-service state remain implementer-reported. Exact save/readback identity,
-explicit in-app close, and post-change ONLYOFFICE edit/save remain
-**NOT VERIFIED**. This is not project GPT PASS or upstream authorization.
+R1's bounded **PROVISIONAL PASS** was followed by two MINOR evidence-presentation
+findings, both corrected. R2 returned a bounded **PROVISIONAL PASS** with one
+tracking MINOR, also corrected. R3 returned a bounded **PROVISIONAL PASS** with
+two P3 documentation findings: the R1 follow-up's R2-pending statement is now
+qualified as historical, and the evidence README checksum has been refreshed.
+R4 returned a bounded **PROVISIONAL PASS** with no new findings. Runtime chronology, fresh-session creation,
+history timestamps, cleanup, and service state remain implementer-reported.
+Exact save/readback identity, explicit in-app close, and post-change ONLYOFFICE
+edit/save remain **NOT VERIFIED**. This is not project GPT PASS or upstream
+authorization.
