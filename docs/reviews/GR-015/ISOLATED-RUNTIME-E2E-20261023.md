@@ -114,8 +114,12 @@ the WASM editor finished rendering, it showed `Concurrent editor session A`.
 The current Seafile file-info and file-content endpoints reported the same new
 head and file ID; the retrieved DOCX was 5,340 bytes, its `word/document.xml`
 contained session A and the earlier committed content, and it did not contain
-session B. The screenshot is
-[`concurrent-editor-save-reopen.png`](concurrent-editor-save-reopen.png).
+session B. The cited [`concurrent-editor-save-reopen.png`](concurrent-editor-save-reopen.png)
+is byte-identical to `concurrent-save-reopen.png` and displays `Concurrent
+writer A`, not `Concurrent editor session A`. It does not visually corroborate
+this later two-editor reopen. The semantic reopen and readback details above
+are operator-recorded; a distinct screenshot for this second run was not
+retained.
 
 This reproduces two real editor saves competing through the host bridge and
 patched local Seahub/C fileserver; one committed, the other stayed dirty, and a

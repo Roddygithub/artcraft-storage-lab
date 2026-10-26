@@ -17,8 +17,9 @@ desktop workflow, filesystem mount, manual upload, or production MCP protocol.
 ```text
 Seafile Web
   └─ per-library allow-list + file extension
-       └─ same-origin `/open/` POST with a short-lived Seafile token
-            └─ ArtCraft gateway
+       └─ cross-origin form POST to gateway `/open/` with short-lived token
+            └─ ArtCraft gateway + Craft iframe (same origin, separate from Seahub)
+                 ├─ accepts only the configured Seahub origin
                  ├─ identifies user, repository and path from the token
                  ├─ selects one Craft app from the extension table
                  ├─ embeds the app and passes document bytes
@@ -26,11 +27,11 @@ Seafile Web
 ```
 
 The common host contract carries filename, bytes, dirty state and save result;
-it contains no Seafile API, library id or account credential. The production
-save path still depends on the user-bound conditional endpoint drafts in
-[`reviews/GR-015/`](reviews/GR-015/README.md); those drafts are not built or
-deployed. Synthetic runtime evidence below does not establish production
-conflict or permission handling.
+it contains no Seafile API, library id or account credential. GR-015's
+user-bound conditional endpoint patches were built and exercised in an
+isolated synthetic runtime ([evidence](reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md));
+they are not installed in production. Synthetic runtime evidence below does
+not establish production conflict or permission handling.
 
 Repository-scoped routing remains mandatory. Only the synthetic test library is
 allow-listed for ArtCraft. Other libraries must continue to use their existing
@@ -45,11 +46,11 @@ does not claim all bundles are present in this checkout's active static root.
 
 | Extension | Tracked app | Synthetic Seafile runtime evidence | Remaining limit |
 | --- | --- | --- | --- |
-| `.docx` | WordCraft | GR-059 primary roundtrip; GR-076 allow-list recheck; GR-078 combined replay retained `gr078docx` after reopen | GR-076 and GR-080 post-change ONLYOFFICE checks are inconclusive; byte identity and broader compatibility are not established |
-| `.xlsx` | GridCraft | GR-061 individual roundtrip; GR-078 combined replay retained B2/B3 = 1338 after reopen | Exact save/readback byte identity and production behavior remain unverified |
-| `.pdf` | PdfCraft | GR-068 individual roundtrip; GR-078 combined replay retained `GR078savededit` after reopen | Exact save/readback byte identity and broader PDF semantics remain unverified |
-| `.svg` | VectorCraft | GR-063 individual export roundtrip; GR-078 combined replay retained the added rectangle after reopen | Exact save/readback byte identity remains unverified |
-| `.pcraft` | PhotoCraft | GR-076 per-file roundtrip/readback; GR-078 combined replay retained the added layer after reopen | Low-optimization build only; production, optimized bundle and serialization peak memory remain unverified |
+| `.docx` | WordCraft | GR-059 primary roundtrip; GR-076 allow-list recheck; GR-078 combined replay screenshots show the save marker; the exact new-version confirmation is operator-recorded, not captured | GR-076 and GR-080 post-change ONLYOFFICE checks are inconclusive; byte identity and broader compatibility are not established |
+| `.xlsx` | GridCraft | GR-061 individual roundtrip; GR-078 screenshot shows B2/B3 = 1338 after reopen | Exact save/readback byte identity and production behavior remain unverified |
+| `.pdf` | PdfCraft | GR-068 individual roundtrip; GR-078 screenshot shows `GR078savededit` after reopen | Exact save/readback byte identity and broader PDF semantics remain unverified |
+| `.svg` | VectorCraft | GR-063 individual export roundtrip; GR-078 screenshot shows the added rectangle after reopen | Exact save/readback byte identity remains unverified |
+| `.pcraft` | PhotoCraft | GR-076 per-file roundtrip/readback; GR-078 added-layer save/reopen was operator-recorded, but retained PNGs are reused GR-076 captures showing Layer 1/2 | GR-078 images do not corroborate its later edit; low-optimization build only; production, optimized bundle and serialization peak memory remain unverified |
 
 GR-037 separately recorded PhotoCraft editor-message, gateway-body and Seafile
 readback hashes matching at 8,555 bytes. GR-076's PhotoCraft readback instead

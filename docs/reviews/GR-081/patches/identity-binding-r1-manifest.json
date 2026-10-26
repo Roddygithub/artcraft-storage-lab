@@ -1,0 +1,123 @@
+{
+  "status": "PROVISIONAL \u2014 NOT VERIFIED; source-only implementation",
+  "workspace": "~/.cache/artcraft-storage-lab/gr081-identity-implementation",
+  "storageLabHead": "d572f2d550278a7f4aad91a1bac650105c19812b",
+  "baseCommits": {
+    "wordcraft": "00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d",
+    "gridcraft": "06920de8da609c19de7446945cfc62b844691efd"
+  },
+  "transportDependency": {
+    "repository": "https://github.com/Roddygithub/artcraft-storage-lab.git",
+    "rev": "d572f2d550278a7f4aad91a1bac650105c19812b",
+    "remoteAvailability": "NOT VERIFIED; commit is local"
+  },
+  "files": {
+    "wordcraft": [
+      {
+        "path": "Cargo.lock",
+        "baselineSha256": "53eb56ed4d87e58b5915ed4e6fa320cee8c86b1848fa2cfdb1eb4982192a5c83",
+        "implementationSha256": "c4519b8b56632277295adc5ef37243f90af0c8285c30f1d3c632aa73806a0755"
+      },
+      {
+        "path": "Cargo.toml",
+        "baselineSha256": "c30a22de37fd6107c0588986e5cf9b692948f177cdf2a4e5dc6fc813b22b9456",
+        "implementationSha256": "ba2bec2680814b5eb9834180e883a3ce6566f64203733ec7733cdf96a6a02029"
+      },
+      {
+        "path": "apps/wordcraft-web/src/host.rs",
+        "baselineSha256": "89f89e674a33842fe5714277c3c46deca556c6ffcb28b7731b54770833f59dba",
+        "implementationSha256": "3398e44356bbcc00f8c28c77604abbb2e89f6d521621da30acca74fb69a85c35"
+      },
+      {
+        "path": "apps/wordcraft-web/src/web.rs",
+        "baselineSha256": "21469675d8e71d2327671c08ae4aa91bb4f31acdcc25fa9042fb9c11f08ab189",
+        "implementationSha256": "9f5e7217fdde82d4e79297e4850c36463fb5e3872a4af81b5d1113b63101f1be"
+      },
+      {
+        "path": "crates/engine/src/cmd/file.rs",
+        "baselineSha256": "04e6161ed097e97c3c5d40d3285df18157a773df91d9bcfe2b5ec2d435b714e9",
+        "implementationSha256": "a79ad0a8f423a7ae93d2292274fc69a41ec60ff86ef380210000bd574e60ef34"
+      },
+      {
+        "path": "crates/engine/src/session.rs",
+        "baselineSha256": "ea2868df5532ce7c6a6562cf2dd8a184cbec813b8328085445545453ac433c0c",
+        "implementationSha256": "4764aeb23e280949a92edf03c38bafa0cf9de4700d19785a2a9a3fdd21ede5de"
+      },
+      {
+        "path": "crates/ui-egui/src/dialogs.rs",
+        "baselineSha256": "8152061721f7c914df1160b2824909c4c7822ce8fc7b876c34266c883c5a15ed",
+        "implementationSha256": "ce7a5d77f5d5ac621a056b5c0afbb6b29a627b73995e42d36dce8e43bf68d709"
+      },
+      {
+        "path": "crates/ui-egui/src/file_dialogs.rs",
+        "baselineSha256": "ace9c9f47f900caf47411641454ccacec281e0d72aae7f1589c3203e1f89536d",
+        "implementationSha256": "018ca82103f070d093042b51d29244581fb2121caa3fa94e7b42bda08eca5dd3"
+      },
+      {
+        "path": "crates/ui-egui/src/lib.rs",
+        "baselineSha256": "ff48b2e2c1e89298c3e8110d8c6aa65da5e0fc1467ae5db3ec613ff72d944baf",
+        "implementationSha256": "b76f3f081adc07d504ef8ddb67ea72f68621786c7535e49f87bbf59ef33229b0"
+      }
+    ],
+    "gridcraft": [
+      {
+        "path": "Cargo.lock",
+        "baselineSha256": "8d829f3705e19cd8e06ea18d1b10bab5e0b60eec291ff68307c1bb8e13c0d748",
+        "implementationSha256": "57c762f66be13a0a41000dfb37f0b0cb3569a03d1d15230791180e0c59c2551c"
+      },
+      {
+        "path": "Cargo.toml",
+        "baselineSha256": "f629fb2bd8e309d31a5d4515952c9905c94d445a900f7082fb85b4ed8b913e20",
+        "implementationSha256": "5ac888c719d0a72ab61c5133c1e6dc480a06d964914a94d6e19c7d966dc2ffbc"
+      },
+      {
+        "path": "apps/gridcraft-web/src/host.rs",
+        "baselineSha256": "d29cda8f17d8e0d310bac90c93bfcf8910dda619f9405b1e3b287329c68afa4b",
+        "implementationSha256": "711ac906ade5b467c49225998acdd357e08dfac3f811a44579d0002794d33244"
+      },
+      {
+        "path": "apps/gridcraft-web/src/web.rs",
+        "baselineSha256": "c4cac64fbe2be572fb635e514a343bf74876087fe690aa0480624685eeca2c0d",
+        "implementationSha256": "267c2a2edc84971797bd531f1862933eda400cc2cb3bc8ddd09ae52d20e75ab0"
+      },
+      {
+        "path": "crates/engine/src/cmd/file.rs",
+        "baselineSha256": "6fa7a2d16660917062987c5d4336d8b53957bc737736b049a5bbf68fc4fe73f4",
+        "implementationSha256": "78b0465ccb5617424b88db9922684077e13a5fa82369f7f80b81a3a15daf8cc3"
+      },
+      {
+        "path": "crates/engine/src/lib.rs",
+        "baselineSha256": "a22e619c26195ed5d69d64c82b24bfee46f00a7463c34463146d09e7e98877ee",
+        "implementationSha256": "4778e687304c4dfdb12cf836d9c37de5673b03428d949d15e95df91def952037"
+      },
+      {
+        "path": "crates/ui-egui/src/backstage.rs",
+        "baselineSha256": "730c280754bfc56ac2d7976e5a7f81bc9b4866368f1d492a79fb37beb9beaae3",
+        "implementationSha256": "4470c30f6ce3f6ea7489889448fcf27120f417662639051b133e61cb83169f0b"
+      },
+      {
+        "path": "crates/ui-egui/src/dialogs.rs",
+        "baselineSha256": "89bc6347bfa637ca4853e900b5c3289f7371139d2612700d65065c361a6afb1f",
+        "implementationSha256": "11bfa77df7e4d44fa43b519cf6ab8f699d6065b2ed5d2aec7657cb0bbcf15ecf"
+      },
+      {
+        "path": "crates/ui-egui/src/lib.rs",
+        "baselineSha256": "568c46d915b0e5244c65e800dca2b4c1dc499c7ab6f4f0b756b1e3aaf457b3c6",
+        "implementationSha256": "75c993c8a43dd31fb7903819abec2ef818477ecd45142e91d50e0cfc95b0793b"
+      }
+    ],
+    "storage-lab": [
+      {
+        "path": "integration/gateway/hostpage.py",
+        "baselineSha256": "1c6d713ade6760739dfe8f406ac349f47c2363c58c310778694b14768d0f4d8b",
+        "implementationSha256": "e30eea97defe9f2817614e569c0a77d5ce935a7ffaaf388165848a559cc2e688"
+      }
+    ]
+  },
+  "localOnly": [],
+  "patchSha256": {
+    "wordcraft-identity-binding-r1.patch": "437324f9a16278c7327a0a84b62a6b166b387d0444a1347917fb295695be4d10",
+    "gridcraft-identity-binding-r1.patch": "909628a048d2241749469435344798ef2932334b1e1d23e18422981b4502f80a",
+    "storage-lab-identity-binding-r1.patch": "e00e99fb930a7e5fee49659eb31eeb0cc3e43de22580802741db3a1fdfe63748"
+  }
+}

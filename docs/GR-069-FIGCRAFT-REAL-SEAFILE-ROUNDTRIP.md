@@ -2,7 +2,7 @@
 
 ## Result
 
-The exact optimized GR-048 FigCraft Web candidate opened a native `.figcraft`
+The exact GR-048 FigCraft Web candidate opened a native `.figcraft`
 document from the existing synthetic Seafile library. A visible rectangle was
 created through FigCraft’s UI, the editor submitted a host save, Seafile
 returned a new head/version identifier, and a fresh Seafile file-list open
@@ -20,7 +20,7 @@ publication remains **LOCKED**.
 | Source | `storytold/figcraft`, commit `8d790607ff1ad40e32343ca2116d8fdcf3244c8d` |
 | Host-save patch | GR-019 exact patch, SHA-256 `954850ba5aff7362e776b2331a5a5ff54bf9d71374d7b29bc856c2b7a47c4798` |
 | Shared transport | `craft-platform` revision `56c5e16d79b77751106173c13111ef4fe0a2c0ec` |
-| Candidate | Existing optimized GR-048 WASM build; no rebuild for this run |
+| Candidate | Existing GR-048 WASM build; no rebuild for this run. GR-048's full build stdout is absent, so exact `wasm-opt -Oz` execution is NOT VERIFIED from retained evidence |
 | Served files | `index.html`, hashed JavaScript, hashed WASM; 23,650,333 bytes total |
 | Fixture | `GR-069-synthetic.figcraft`, 268 bytes; SHA-256 `899204d7ab596e9efd9d86df7935474ef15df0bc2cbb80a8798ad8ce102b3d8a` |
 | Target | The existing `ArtCraft GPT Review Synthetic` library only |

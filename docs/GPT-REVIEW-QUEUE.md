@@ -34,6 +34,33 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-081 — project GPT FAIL remediation
+
+The project GPT review of candidate
+`70fa192ed5d414daf28087315f0f77f8312e98b5` returned **FAIL**. Its record is
+`docs/reviews/GR-081/PROJECT-GPT-REVIEW-70FA192.md`. GR-081 corrects the
+Seahub/gateway origin instructions, static index symlink confinement, the
+five-route dispatcher verifier, screenshot attribution and stale/broken
+documentation. Identity-aware WordCraft/GridCraft source patches now bind the
+parsed native document and guard replacement/Save As before ordinary Save
+serialization. Code/security R1 found dependency-pin and pending-save dirty
+ordering defects; R2 source review found their corrections and no new MAJOR
+regression. Two R2 MINOR artifact findings were corrected. The source patches
+and responses are in `docs/reviews/GR-081/`.
+
+The save-identity MAJOR remains open: builds, runtime refusal-before-
+serialization, save/ACK behavior, Seafile version/reopen, and remote resolution
+of local transport commit `d572f2d550278a7f4aad91a1bac650105c19812b` are NOT
+VERIFIED. ONLYOFFICE current-route preservation remains INCONCLUSIVE / NOT
+VERIFIED after the configured client API script returned 404; settings and
+services were not changed. No tests, builds, browser runs or service checks
+were performed. Docs/evidence R3 returned PROVISIONAL FAIL; R4–R7 returned
+PROVISIONAL PASS. A fresh project GPT review is required. Upstream publication
+remains LOCKED.
+
+Evidence: `docs/GR-081-PROJECT-GPT-REVIEW-REMEDIATION.md`,
+`docs/reviews/GR-081/`.
+
 ## GR-080 — security evidence and ONLYOFFICE status reconciliation
 
 `docs/SECURITY.md` now reflects the later GR-015 isolated synthetic Seahub and
@@ -71,15 +98,19 @@ the same Seafile library: open, edit, host-bound save, editor-tab close and
 reopen. GridCraft, PdfCraft and VectorCraft retained screenshots show
 new-version IDs. WordCraft's retained screenshots show saved state and the
 marker; its new-version confirmation was observed during the run but not
-captured. PhotoCraft's host save returned HTTP 200 and a clean editor state.
-Each retained the semantic edit after reopen. No download/manual upload was
-used. PhotoCraft's in-app close is unavailable for a host-bound document; the
+captured. PhotoCraft's save/reopen observations are operator-recorded; its
+retained PNGs duplicate earlier GR-076 captures showing Layer 1/2, not the
+later GR-078 edit. The other retained evidence shows the semantic edits after
+reopen. The combined matrix row is evidence-limited. No download/manual upload
+was used. PhotoCraft's in-app close is unavailable for a host-bound document; the
 tab was closed instead. R1 found two MAJOR and two MINOR findings; all were
 remediated. R2 verified the fixes and returned PROVISIONAL PASS with no new
 findings. Screenshots and sanitized observations are in
 `docs/reviews/GR-078/runtime/`.
-This demonstrates the combined replay in the active lab deployment; it does not
-promote the absent four app bundles into this checkout's ignored
+This records the sequential replay in the active lab deployment with an
+evidence-limited combined matrix row because PhotoCraft's save/reopen chronology
+is operator-recorded and its retained screenshots show an earlier state. It
+does not promote the absent four app bundles into this checkout's ignored
 `integration/static/`. At the GR-078 capture, history pages had not been
 checked; GR-079 later verified current rows for all five files. Saved-byte
 identity, production behavior, and post-change ONLYOFFICE UI remain NOT VERIFIED.

@@ -13,8 +13,11 @@ The reopened editor retained the edit.
 - [`runtime/observations.json`](runtime/observations.json): sanitized,
   per-route summary. Session capability IDs, cookies, account names and server
   addresses are not retained.
-- [`runtime/screenshots/`](runtime/screenshots/): save and reopen screenshots
-  for the synthetic editors. SHA-256 digests are listed in the runtime README.
+- [`runtime/screenshots/`](runtime/screenshots/): retained screenshots for the
+  synthetic editors. PhotoCraft's two PNGs are byte-identical to earlier GR-076
+  captures and show Layer 1/2, not the later GR-078 added-layer state; they do
+  not corroborate that GR-078 save/reopen observation. SHA-256 digests are
+  listed in the runtime README.
 
 ## Independent review
 

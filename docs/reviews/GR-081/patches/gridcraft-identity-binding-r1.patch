@@ -1,0 +1,385 @@
+diff --git a/Cargo.lock b/Cargo.lock
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -748 +748 @@
+-source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=90c261de22ef75c4c7c5c5cd1c712d483be0bbc8#90c261de22ef75c4c7c5c5cd1c712d483be0bbc8"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=d572f2d550278a7f4aad91a1bac650105c19812b#d572f2d550278a7f4aad91a1bac650105c19812b"
+diff --git a/Cargo.toml b/Cargo.toml
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -15 +15 @@
+-craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8", package = "craft-platform" }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "d572f2d550278a7f4aad91a1bac650105c19812b", package = "craft-platform" }
+diff --git a/apps/gridcraft-web/src/host.rs b/apps/gridcraft-web/src/host.rs
+--- a/apps/gridcraft-web/src/host.rs
++++ b/apps/gridcraft-web/src/host.rs
+@@ -1 +1 @@
+-//! GridCraft adapter for the shared Craft parent-frame transport.
++//! GridCraft's strict, single-workbook parent-frame adapter.
+@@ -5 +5 @@
+-use craft_platform::browser::host::{HostListener, HostMessage, HostTransport};
++use craft_platform::browser::host::{DocumentIdentity, HostListener, HostTransport, IdentityHostMessage};
+@@ -7 +7 @@
+-use gridcraft_ui_egui::{Inbox, SaveSnapshot, Services, SheetApp};
++use gridcraft_ui_egui::{SaveSnapshot, Services, SheetApp};
+@@ -9,0 +10,7 @@
++const SAVE_TIMEOUT_MS: i32 = 30_000;
++
++struct PendingSave {
++    identity: DocumentIdentity,
++    snapshot: SaveSnapshot,
++    rejection: u64,
++}
+@@ -15,2 +22,4 @@
+-    results: Rc<RefCell<Vec<(PendingSave, bool, String)>>>,
+-    errors: Rc<RefCell<Vec<String>>>,
++    results: Rc<RefCell<Vec<(PendingSave, SaveTicket, bool, String)>>>,
++    initial: Rc<RefCell<Option<(String, String, Vec<u8>)>>>,
++    binding: Rc<RefCell<Option<DocumentIdentity>>>,
++    last_ack: Rc<RefCell<Option<SaveTicket>>>,
+@@ -22,5 +30,0 @@
+-struct PendingSave {
+-    name: String,
+-    snapshot: Option<SaveSnapshot>,
+-}
+-
+@@ -28 +31,0 @@
+-    /// `None` when not framed by a same-origin parent.
+@@ -34 +37,3 @@
+-            errors: Rc::default(),
++            initial: Rc::default(),
++            binding: Rc::default(),
++            last_ack: Rc::default(),
+@@ -41,2 +46,5 @@
+-    pub fn connect(&self, services: &mut Services, inbox: Inbox, ctx: egui::Context) {
+-        self.listen(inbox, ctx.clone());
++    pub fn connect(&self, services: &mut Services, ctx: egui::Context) {
++        self.listen(ctx.clone());
++        // Export/save-copy callbacks are not host updates.
++        services.download = None;
++        services.open_async = None;
+@@ -44,16 +52 @@
+-        services.open_async = Some(Box::new(move || {
+-            if let Err(error) = bridge.transport.post_open_request("open") {
+-                let error = error.as_string().unwrap_or_else(|| "host message failed".into());
+-                log::error!("couldn't ask the host to open a workbook: {error}");
+-            }
+-        }));
+-
+-        let bridge = self.clone();
+-        let errors = self.errors.clone();
+-        let error_ctx = ctx.clone();
+-        services.download = Some(Box::new(move |path: &str, bytes: &[u8], snapshot| {
+-            if let Err(error) = bridge.post_save(path, bytes, snapshot) {
+-                errors.borrow_mut().push(format!("couldn't send {path} to the host: {error}"));
+-                error_ctx.request_repaint();
+-            }
+-        }));
++        services.host_save = Some(Box::new(move |name, bytes, snapshot, rejection| bridge.post_save(name, bytes, snapshot, rejection, ctx.clone())));
+@@ -68 +60,0 @@
+-
+@@ -70 +62 @@
+-        let _ = self.transport.post_ready(env!("CARGO_PKG_VERSION"));
++        let _ = self.transport.post_identity_ready(env!("CARGO_PKG_VERSION"));
+@@ -76 +67,0 @@
+-    /// Source workbook becomes clean only after durable host acknowledgement.
+@@ -78,4 +69,26 @@
+-        for (pending, ok, error) in std::mem::take(&mut *self.results.borrow_mut()) {
+-            if ok {
+-                if let Some((uid, workbook)) = pending.snapshot {
+-                    app.session.mark_saved(uid, workbook, Some(&pending.name));
++        if let Some((open_id, name, bytes)) = self.initial.borrow_mut().take() {
++            match app.session.open_host_document(&name, &bytes) {
++                Ok(uid) => {
++                    let identity = DocumentIdentity { open_id, document_id: uid.to_string() };
++                    if self.transport.post_opened(&identity).is_ok() {
++                        *self.binding.borrow_mut() = Some(identity);
++                    } else {
++                        app.session.block_host();
++                        self.post_failed("could not confirm the initial workbook");
++                    }
++                    app.backstage = None;
++                }
++                Err(error) => {
++                    app.message = Some(("GridCraft".into(), error.to_string()));
++                    self.post_failed("the initial workbook could not be parsed");
++                }
++            }
++        }
++        for (pending, ticket, ok, error) in std::mem::take(&mut *self.results.borrow_mut()) {
++            let current =
++                app.session.active().is_some_and(|doc| doc.uid == pending.snapshot.0) && self.binding.borrow().as_ref() == Some(&pending.identity);
++            if ok && current {
++                let (uid, workbook) = pending.snapshot;
++                if app.session.mark_saved(uid, workbook, None) {
++                    app.session.host_acknowledged(pending.rejection);
++                    *self.last_ack.borrow_mut() = Some(ticket);
+@@ -84 +97,3 @@
+-                app.message = Some(("GridCraft".into(), if error.is_empty() { "The host could not save the workbook.".into() } else { error }));
++                let _ = app.session.host_refuse();
++                app.message =
++                    Some(("GridCraft".into(), if error.is_empty() { "the host did not confirm this workbook's save".into() } else { error }));
+@@ -85,0 +101 @@
++            self.reported.set(None);
+@@ -87,2 +103,10 @@
+-        for error in std::mem::take(&mut *self.errors.borrow_mut()) {
+-            app.message = Some(("GridCraft".into(), error));
++        let binding = self.binding.borrow();
++        let Some(identity) = binding.as_ref() else {
++            return;
++        };
++        if !app.session.active().is_some_and(|doc| doc.uid.to_string() == identity.document_id) {
++            if self.reported.get() != Some(true) {
++                let _ = self.transport.post_identity_dirty(identity, true, None);
++                self.reported.set(Some(true));
++            }
++            return;
+@@ -90,2 +114,11 @@
+-        let dirty = app.session.documents().iter().any(|document| document.is_dirty());
+-        if self.reported.get() != Some(dirty) && self.transport.post_dirty(dirty).is_ok() {
++        // Saving commits active edits before serialization. That snapshot can still look dirty
++        // until the host ACK arrives; suppress only the exact in-flight workbook, so later edits
++        // continue to advance the host dirty state.
++        let snapshot_in_flight = app.session.active().is_some_and(|active| {
++            self.pending.borrow().any(|pending| pending.snapshot.0 == active.uid && std::sync::Arc::ptr_eq(&pending.snapshot.1, &active.wb))
++        });
++        let dirty = !snapshot_in_flight && (app.session.host_rejected() || app.session.documents().iter().any(|document| document.is_dirty()));
++        if !dirty && !self.pending.borrow().is_empty() {
++            return;
++        }
++        if self.reported.get() != Some(dirty) && self.transport.post_identity_dirty(identity, dirty, self.last_ack.borrow().as_ref()).is_ok() {
+@@ -96,3 +129,7 @@
+-    fn post_save(&self, path: &str, bytes: &[u8], snapshot: Option<SaveSnapshot>) -> Result<(), String> {
+-        let name = std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| path.to_string());
+-        let next = self.next_ticket.get().wrapping_add(1).max(1);
++    fn post_save(&self, name: &str, bytes: &[u8], snapshot: SaveSnapshot, rejection: u64, ctx: egui::Context) -> Result<(), String> {
++        let binding = self.binding.borrow().clone().ok_or_else(|| "the host has not bound a workbook".to_string())?;
++        if binding.document_id != snapshot.0.to_string() {
++            return Err("the serialized workbook is not the host workbook".into());
++        }
++        let identity = DocumentIdentity { open_id: binding.open_id, document_id: snapshot.0.to_string() };
++        let next = self.next_ticket.get().checked_add(1).ok_or("save ticket counter exhausted; reopen the session")?;
+@@ -100 +137 @@
+-        let ticket = SaveTicket::new(format!("gridcraft:{next}")).ok_or_else(|| "empty save ticket".to_string())?;
++        let ticket = SaveTicket::new(format!("gridcraft:{next}")).ok_or("invalid save ticket")?;
+@@ -103,3 +140,3 @@
+-            .insert(ticket.clone(), PendingSave { name: name.clone(), snapshot })
+-            .map_err(|_| "duplicate save ticket".to_string())?;
+-        if let Err(error) = self.transport.post_save(&ticket, &name, bytes, false) {
++            .insert(ticket.clone(), PendingSave { identity: identity.clone(), snapshot, rejection })
++            .map_err(|_| "too many pending saves".to_string())?;
++        if let Err(error) = self.transport.post_identity_save(&identity, &ticket, name, bytes) {
+@@ -107 +144,17 @@
+-            return Err(error.as_string().unwrap_or_else(|| "host message failed".to_string()));
++            return Err(js_error(error));
++        }
++        let bridge = self.clone();
++        let timeout_ticket = ticket.clone();
++        let timeout = wasm_bindgen::closure::Closure::once_into_js(move || {
++            if let Some(pending) = bridge.pending.borrow_mut().complete(&timeout_ticket) {
++                bridge.results.borrow_mut().push((pending, timeout_ticket, false, "host save confirmation timed out; retry Save".into()));
++                ctx.request_repaint();
++            }
++        });
++        let scheduled = web_sys::window().ok_or_else(|| "no browser window".to_string()).and_then(|window| {
++            use wasm_bindgen::JsCast as _;
++            window.set_timeout_with_callback_and_timeout_and_arguments_0(timeout.unchecked_ref(), SAVE_TIMEOUT_MS).map_err(js_error)
++        });
++        if let Err(error) = scheduled {
++            self.pending.borrow_mut().complete(&ticket);
++            return Err(error);
+@@ -112,6 +165,5 @@
+-    fn listen(&self, inbox: Inbox, ctx: egui::Context) {
+-        let results = self.results.clone();
+-        let pending = self.pending.clone();
+-        let listener = self.transport.listen(move |message| match message {
+-            HostMessage::Open { name, bytes } => {
+-                inbox.lock().unwrap_or_else(|e| e.into_inner()).push((name, bytes));
++    fn listen(&self, ctx: egui::Context) {
++        let bridge = self.clone();
++        let listener = self.transport.listen_identity(move |message| match message {
++            IdentityHostMessage::Open { open_id, name, bytes } => {
++                *bridge.initial.borrow_mut() = Some((open_id, name, bytes));
+@@ -120,3 +172,6 @@
+-            HostMessage::SaveResult { ticket, ok, error } => {
+-                if let Some(pending) = pending.borrow_mut().complete(&ticket) {
+-                    results.borrow_mut().push((pending, ok, error.unwrap_or_default()));
++            IdentityHostMessage::SaveResult { identity, ticket, ok, error } => {
++                if bridge.binding.borrow().as_ref() != Some(&identity) {
++                    return;
++                }
++                if let Some(pending) = bridge.pending.borrow_mut().complete(&ticket) {
++                    bridge.results.borrow_mut().push((pending, ticket, ok, error.unwrap_or_default()));
+@@ -131,0 +187,4 @@
++
++fn js_error(error: wasm_bindgen::JsValue) -> String {
++    error.as_string().unwrap_or_else(|| "host message failed".to_string())
++}
+diff --git a/apps/gridcraft-web/src/web.rs b/apps/gridcraft-web/src/web.rs
+--- a/apps/gridcraft-web/src/web.rs
++++ b/apps/gridcraft-web/src/web.rs
+@@ -41 +41,2 @@
+-        let bridge = if query_param("host").as_deref() == Some("parent") { crate::host::Bridge::new() } else { None };
++        let host = query_param("host").as_deref() == Some("parent");
++        let bridge = if host { crate::host::Bridge::new() } else { None };
+@@ -51 +52 @@
+-                    let q = if app_bridge.is_some() { String::new() } else { query() };
++                    let q = if host { String::new() } else { query() };
+@@ -59 +60 @@
+-                        bridge.connect(&mut services, inbox.clone(), cc.egui_ctx.clone());
++                        bridge.connect(&mut services, cc.egui_ctx.clone());
+@@ -61,0 +63 @@
++                    if host { app.session.lock_to_host(); }
+@@ -128 +130,6 @@
+-        for f in dropped {
++        if self.app.session.host_update_only() && !dropped.is_empty() {
++            let error = self.app.session.host_refuse().to_string();
++            self.app.message = Some(("GridCraft".into(), error));
++        }
++        let hosted = self.app.session.host_update_only();
++        for f in dropped.into_iter().filter(|_| !hosted) {
+@@ -141,0 +149 @@
++        if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+@@ -142,0 +151 @@
++        if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+diff --git a/crates/engine/src/cmd/file.rs b/crates/engine/src/cmd/file.rs
+--- a/crates/engine/src/cmd/file.rs
++++ b/crates/engine/src/cmd/file.rs
+@@ -44 +44 @@
+-fn open(s: &mut Session, p: &Json) -> Result<Json> {
++pub(crate) fn open(s: &mut Session, p: &Json) -> Result<Json> {
+diff --git a/crates/engine/src/lib.rs b/crates/engine/src/lib.rs
+--- a/crates/engine/src/lib.rs
++++ b/crates/engine/src/lib.rs
+@@ -285,0 +286,5 @@
++    host_document: Option<Option<u64>>,
++    host_open_attempted: bool,
++    host_name: Option<String>,
++    host_rejections: std::cell::Cell<u64>,
++    host_saved_rejections: u64,
+@@ -324,0 +330,57 @@
++    /// Call before exposing the UI; a missing/old parent leaves it locked.
++    pub fn lock_to_host(&mut self) {
++        if self.host_document.is_none() { self.host_document = Some(None); }
++    }
++    pub fn block_host(&mut self) {
++        if self.host_document.is_some() {
++            self.host_document = Some(None);
++            self.host_open_attempted = true;
++        }
++    }
++    pub fn host_update_only(&self) -> bool { self.host_document.is_some() }
++    pub fn host_rejection_revision(&self) -> u64 { self.host_rejections.get() }
++    pub fn host_rejected(&self) -> bool { self.host_rejections.get() != self.host_saved_rejections }
++    pub fn host_acknowledged(&mut self, revision: u64) {
++        if revision == self.host_rejections.get() && revision != u64::MAX { self.host_saved_rejections = revision; }
++    }
++    pub fn host_refuse(&self) -> EngineError {
++        self.host_rejections.set(self.host_rejections.get().saturating_add(1));
++        EngineError::BadParams { cmd: "host.update".into(), msg: "this session can only update the host's initial workbook".into() }
++    }
++    pub fn host_document_id(&self) -> Result<u64> {
++        match self.host_document {
++            Some(Some(uid)) if self.active().is_some_and(|d| d.uid == uid) => Ok(uid),
++            Some(Some(_)) => Err(self.host_refuse()),
++            _ => Err(EngineError::BadParams { cmd: "host.update".into(), msg: "waiting for the trusted host workbook".into() }),
++        }
++    }
++    /// Sole trusted-open entry. Failed parsing consumes the attempt; picker/drop input never
++    /// calls this method. No password prompt/retry can substitute another initial document.
++    pub fn open_host_document(&mut self, name: &str, bytes: &[u8]) -> Result<u64> {
++        if self.host_document != Some(None) || self.host_open_attempted { return Err(self.host_refuse()); }
++        self.host_open_attempted = true;
++        cmd::file::open(self, &serde_json::json!({ "name": name, "base64": io::base64_encode(bytes) }))?;
++        let uid = self.doc()?.uid;
++        self.host_name = Some(name.to_string());
++        self.host_document = Some(Some(uid));
++        Ok(uid)
++    }
++    pub fn check_host_command(&self, id: &str, params: &Json) -> Result<()> {
++        if !self.host_update_only() { return Ok(()); }
++        self.host_document_id()?;
++        let denied = (id.starts_with("file.") && !matches!(id, "file.save" | "file.properties" | "file.options"))
++            || matches!(id, "window.activate" | "view.newWindow" | "view.hideWindow" | "view.unhideWindow")
++            || (id == "file.save" && !params.is_null() && params.as_object().is_none_or(|p| !p.is_empty()));
++        if denied { return Err(self.host_refuse()); }
++        Ok(())
++    }
++    /// Capture UID and Arc from the exact workbook serialized. No command parameters or
++    /// alternate destination can enter this path. Generic file.saveBytes remains blocked.
++    pub fn serialize_host_save(&self) -> Result<(u64, Arc<Workbook>, String, Vec<u8>)> {
++        let uid = self.host_document_id()?;
++        let name = self.host_name.as_ref().ok_or_else(|| self.host_refuse())?;
++        let snapshot = self.doc()?.wb.clone();
++        let bytes = io::save_bytes(&snapshot, name)?;
++        Ok((uid, snapshot, name.clone(), bytes))
++    }
++
+@@ -422,0 +485,8 @@
++        self.check_host_command(id, &params)?;
++        // A direct engine/macro Save asks the UI to use the same host route. It never
++        // serializes to a path here and never claims the asynchronous write is complete.
++        if self.host_update_only() && id == "file.save" {
++            let uid = self.host_document_id()?;
++            self.ui_requests.push(UiRequest::Dialog("hostSave".into(), serde_json::json!({"documentId": uid.to_string()})));
++            return Ok(serde_json::json!({"pendingHostSave": true}));
++        }
+diff --git a/crates/ui-egui/src/backstage.rs b/crates/ui-egui/src/backstage.rs
+--- a/crates/ui-egui/src/backstage.rs
++++ b/crates/ui-egui/src/backstage.rs
+@@ -251 +251 @@
+-    if app.session.active().is_some_and(|d| d.path.is_some()) {
++    if app.session.host_update_only() || app.session.active().is_some_and(|d| d.path.is_some()) {
+@@ -663,0 +664,4 @@
++    if app.session.host_update_only() {
++        ui.label("Save As is unavailable in this hosted session. Use Save to update the selected workbook.");
++        return;
++    }
+@@ -880,0 +885,3 @@
++    if app.session.host_update_only() {
++        let error = app.session.host_refuse().to_string(); app.alert(error); return false;
++    }
+diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
+--- a/crates/ui-egui/src/dialogs.rs
++++ b/crates/ui-egui/src/dialogs.rs
+@@ -120,0 +121,3 @@
++        if app.session.host_update_only() && matches!(name, "open" | "openPassword" | "saveAs" | "saveChanges") {
++            let error = app.session.host_refuse().to_string(); app.alert(error); return None;
++        }
+diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
+--- a/crates/ui-egui/src/lib.rs
++++ b/crates/ui-egui/src/lib.rs
+@@ -197,0 +198,2 @@
++    /// Ordinary host Save only. Snapshot UID is captured before serialization.
++    pub host_save: Option<Box<dyn Fn(&str, &[u8], SaveSnapshot, u64) -> Result<(), String>>>,
+@@ -393,0 +396,13 @@
++        self.session.check_host_command(id, &params).map_err(|e| e.to_string())?;
++        if self.session.host_update_only() && id == "file.save" {
++            // Pathless browser Save is an ordinary Save, including Backstage and shortcuts.
++            if self.services.host_save.is_none() { return Err(self.session.host_refuse().to_string()); }
++            if !self.commit_edit(0, 0, false, false) { return Err("the active cell edit could not be committed".into()); }
++            self.commit_text_box_edit()?;
++            self.store_view_state();
++            let rejection = self.session.host_rejection_revision();
++            let (uid, workbook, name, bytes) = self.session.serialize_host_save().map_err(|e| e.to_string())?;
++            self.services.host_save.as_ref().ok_or_else(|| "host Save is unavailable".to_string())?(
++                &name, &bytes, (uid, workbook), rejection)?;
++            return Ok(json!({"pendingSave": true}));
++        }
+@@ -534,0 +550 @@
++        if let Err(error) = self.session.check_host_command(id, &params) { self.alert(error.to_string()); return; }
+@@ -762,0 +779,11 @@
++        if name == "hostSave" {
++            let document = params.get("documentId").and_then(Json::as_str);
++            if self.session.host_update_only() && document.is_some()
++                && self.session.host_document_id().ok().map(|id| id.to_string()).as_deref() == document {
++                self.run_or_alert("file.save", json!({}));
++            } else { let error = self.session.host_refuse().to_string(); self.alert(error); }
++            return;
++        }
++        if self.session.host_update_only() && matches!(name, "open" | "openPassword" | "saveAs" | "saveChanges") {
++            let error = self.session.host_refuse().to_string(); self.alert(error); return;
++        }
+@@ -1257 +1284 @@
+-        if self.session.active().is_none() {
++        if self.session.active().is_none() && !self.session.host_update_only() {

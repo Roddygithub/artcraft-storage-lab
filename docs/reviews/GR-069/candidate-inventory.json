@@ -1,5 +1,5 @@
 {
-  "candidate": "GR-048 optimized FigCraft Web bundle",
+  "candidate": "GR-048 FigCraft Web bundle; exact wasm-opt execution NOT VERIFIED from retained build evidence",
   "source_repository": "storytold/figcraft",
   "source_commit": "8d790607ff1ad40e32343ca2116d8fdcf3244c8d",
   "host_save_patch_sha256": "954850ba5aff7362e776b2331a5a5ff54bf9d71374d7b29bc856c2b7a47c4798",

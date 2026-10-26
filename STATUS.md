@@ -1,6 +1,34 @@
 # STATUS
 
-## CURRENT GR: GR-080 — security evidence and ONLYOFFICE status reconciliation
+## CURRENT GR: GR-081 — project GPT review remediation
+
+The project GPT review of candidate `70fa192ed5d414daf28087315f0f77f8312e98b5`
+returned **FAIL**; its findings and evidence are retained in
+`docs/reviews/GR-081/PROJECT-GPT-REVIEW-70FA192.md`. GR-081 corrects the
+deployment topology instructions, static index symlink confinement, five-route
+dispatcher verifier, stale evidence claims, screenshot attribution and broken
+links. The gateway rejects WordCraft/GridCraft saves without the negotiated
+native identity, matching opening/document IDs, `intent:"save"`, and a fresh
+ticket; filename/format checks remain additional constraints. Source patches
+for WordCraft and GridCraft bind the parsed native document and guard
+replacement/Save As before ordinary Save serialization. Code/security R1's
+dependency and save-confirmation findings were corrected in the R2 patches;
+the R2 independent source review found no new MAJOR regression, with its two
+MINOR artifact findings corrected. See
+`docs/reviews/GR-081/RESPONSE-R2-CODE.md`.
+
+This is source-only: no app build, tests, browser run or service check was
+performed. Same-name replacement refusal in running editors, save/ACK behavior,
+the Seafile version/reopen gate, and fresh resolution of local transport commit
+`d572f2d550278a7f4aad91a1bac650105c19812b` remain **NOT VERIFIED**. The save
+identity MAJOR therefore remains open. ONLYOFFICE's current route remains
+**INCONCLUSIVE / NOT VERIFIED**; its configuration and service were not
+changed. Docs/evidence R3 returned PROVISIONAL FAIL and R4–R7 PROVISIONAL PASS;
+the identity design note is separate from that docs review chain. Candidate
+`70fa192` remains GPT **FAIL** and upstream publication remains **LOCKED**.
+See `docs/GR-081-PROJECT-GPT-REVIEW-REMEDIATION.md` and `docs/reviews/GR-081/`.
+
+## PREVIOUS GR: GR-080 — security evidence and ONLYOFFICE status reconciliation
 
 Updated `docs/SECURITY.md` to reflect the later GR-015 isolated synthetic
 Seahub/C-fileserver build and runtime, while retaining the historical GPT FAIL
@@ -33,10 +61,12 @@ open/edit/host-save/close-tab/reopen workflow in one browser profile and
 synthetic library. GridCraft, PdfCraft and VectorCraft retained screenshots show
 new-version IDs. WordCraft's retained screenshots show the saved state and
 marker; its new-version confirmation was observed but not captured. PhotoCraft's
-host save returned HTTP 200 and its editor returned to a clean state. All
-semantic edits remained visible after reopen. Evidence and limitations are in
-`docs/reviews/GR-078/runtime/`. This closes the combined replay gap for the
-active lab deployment; the other four app bundles remain absent from this
+save/reopen observations are operator-recorded; its retained PNGs are
+byte-identical to GR-076 captures showing the earlier Layer 1/2 state and do
+not visually corroborate the GR-078 added-layer edit. Evidence and limitations are in
+`docs/reviews/GR-078/runtime/`. The combined matrix row is evidence-limited
+because PhotoCraft's save/reopen is operator-recorded and its screenshots show
+an earlier state. The other four app bundles remain absent from this
 checkout's ignored `integration/static/`. At the GR-078 cutoff, history-page
 verification had not been performed; GR-079 later confirmed current rows for
 all five files. Editor-payload/readback byte identity, production behavior and
@@ -161,8 +191,9 @@ returned PROVISIONAL PASS with no remaining findings; project GPT remains
 
 ## PREVIOUS GR: GR-069 — FigCraft real synthetic Seafile roundtrip
 
-The exact optimized GR-048 FigCraft candidate was verified across its build,
-staged, and active static roots. In the existing synthetic Seafile library,
+The exact GR-048 FigCraft candidate was verified across its recorded build,
+staged, and active static roots. GR-048's full build stdout is absent, so exact
+`wasm-opt -Oz` execution is NOT VERIFIED from retained evidence. In the existing synthetic Seafile library,
 the native `.figcraft` fixture opened from the file list, a visible rectangle
 was created, and Ctrl+S returned HTTP 200 with a new-version identifier and a
 clean editor state. Navigating to the library and opening the file again in a
@@ -451,9 +482,10 @@ review is PROVISIONAL PASS, no findings. Actual network-loss/browser/Seafile
 runtime NOT VERIFIED. GPT REVIEW PENDING; no project GPT PASS.
 See `docs/GR-049-IDEMPOTENT-SAVE-RETRY.md` and `docs/reviews/GR-049/`.
 
-PREVIOUS GR: GR-048 — exact GR-019 patched FigCraft built as optimized actual
-Web/WASM and passed a bounded synthetic browser open/edit/save/ACK/clean/fresh
-iframe reopen smoke. Captured 3,464 bytes under `figcraft:1`; the rectangle
+PREVIOUS GR: GR-048 — exact GR-019 patched FigCraft Web/WASM passed a bounded
+synthetic browser open/edit/save/ACK/clean/fresh iframe reopen smoke. The Trunk
+release command and artifact hashes are retained; exact `wasm-opt -Oz`
+execution is NOT VERIFIED because full build stdout is absent. Captured 3,464 bytes under `figcraft:1`; the rectangle
 remained visible after reopen. Parent bytes were memory-only. Durable Seafile
 version/readback, dispatch and deployment remain **NOT VERIFIED**. GPT REVIEW
 PENDING; independent free R1 PROVISIONAL PASS, no blocker/major. No project

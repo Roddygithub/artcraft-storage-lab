@@ -14,7 +14,7 @@ lab evidence, not production verification.
 
 | File / app | Save observation | Reopen observation | Screenshots |
 |---|---|---|---|
-| `photocraft-fixture/photocraft-smoke.pcraft` / PhotoCraft | Added a layer; host save returned HTTP 200; editor returned to clean state | Added layer visible after reopen | `photocraft-save.png`, `photocraft-reopen.png` |
+| `photocraft-fixture/photocraft-smoke.pcraft` / PhotoCraft | Operator-recorded: added a layer; host save returned HTTP 200; editor returned to clean state | Operator-recorded: added layer visible after reopen | Retained PNGs are byte-identical to earlier GR-076 captures and show Layer 1/2; they do not corroborate the GR-078 edit, save or reopen. |
 | `synthetic.docx` / WordCraft | Added `gr078docx`; retained screenshot shows marker and saved state. New-version confirmation was observed during the run but is not captured in the screenshot | Marker visible after fresh Seafile open | `wordcraft-save.png`, `wordcraft-reopen.png` |
 | `synthetic.xlsx` / GridCraft | B2 changed to 1338; B3 `=SUM(B2:B2)` recalculated to 1338; new version `5724ff96254801716d84bb07b8e8705060d410f9` | B2 and B3 remained 1338 | `gridcraft-save.png`, `gridcraft-reopen.png` |
 | `form.pdf` / PdfCraft | First form field changed to `GR078savededit`; new version `9e9a8b9a7e2fa90df924cab8d6da9798676e7630` | Field value remained visible | `pdfcraft-save.png`, `pdfcraft-reopen.png` |
@@ -49,5 +49,9 @@ wordcraft-save.png     480b11ffee42b226b2a3a5091c523786efc952b18c424ba82151f06c5
 ```
 
 The record omits server addresses, cookies, credentials, usernames and session
-capability identifiers. Screenshots contain only synthetic document content
-and editor UI. ONLYOFFICE was not used or changed.
+capability identifiers. The retained PhotoCraft screenshots are reused earlier
+captures: their SHA-256 values match GR-076's `photocraft-seafile-saved.png`
+and `photocraft-seafile-reopen.png`. They show Layer 1 and Layer 2, not the
+later GR-078 added layer; the GR-078 PhotoCraft save/reopen chronology is
+operator-recorded and not visually corroborated by these PNGs. ONLYOFFICE was
+not used or changed.

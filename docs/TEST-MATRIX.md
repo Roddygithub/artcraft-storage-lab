@@ -7,6 +7,22 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-081 — project GPT review remediation
+
+| Scenario | Expected | Result |
+|---|---|---|
+| WordCraft/GridCraft native document binding | Refuse replacement/Save As before serialization; ordinary Save persists and confirms only the bound native document | [~] Source patches use native IDs and identity-aware transport; R1/R2 source reviews corrected dependency and pending-save ordering. Build, runtime refusal, Save/ACK, Seafile version/reopen, and remote resolution of transport commit `d572f2d550278a7f4aad91a1bac650105c19812b` remain NOT VERIFIED |
+| Static directory index confinement | Reject an index symlink whose resolved target escapes the static root | [~] Final index path is now resolved and confined; runtime symlink exercise NOT RUN |
+| Dispatcher route mapping | Verifier accepts exactly the five tracked extension routes | [~] Expected map updated for `.docx`, `.xlsx`, `.pdf`, `.svg`, `.pcraft`; verifier NOT RUN |
+| Evidence and documentation accuracy | Correct deployment topology, screenshot attribution, stale evidence statements and broken links | [x] R3–R6 findings corrected; R7 PROVISIONAL PASS with no new documentation findings; identity implementation is covered separately by code/security R2 |
+| Current-route ONLYOFFICE preservation | Complete current-route edit/save/version/fresh-reopen outside the ArtCraft allowlist | [ ] NOT VERIFIED; configured API script returned 404 in GR-080, no editor appeared; no settings/service changes |
+| Independent review | Separate review of GR-081 implementation and evidence | [~] Code/security R1 PROVISIONAL FAIL; R2 found no new MAJOR and two MINOR artifact findings now corrected; docs/evidence R3 PROVISIONAL FAIL, R4–R7 PROVISIONAL PASS; save-identity and ONLYOFFICE MAJOR gates remain open |
+
+Evidence: [GR-081 report](GR-081-PROJECT-GPT-REVIEW-REMEDIATION.md),
+[project GPT review record](reviews/GR-081/PROJECT-GPT-REVIEW-70FA192.md).
+Candidate 70fa192 received project GPT **FAIL**. GR-081 does not claim
+project approval; upstream publication remains locked.
+
 ## GR-080 — security evidence and ONLYOFFICE status reconciliation
 
 | Scenario | Expected | Result |
@@ -43,8 +59,8 @@ production or project GPT PASS is implied.
 | GridCraft `.xlsx` route | Edit a cell, save a new version, close and reopen with value/formula result retained | [x] B2 and B3 both 1338 after reopen |
 | PdfCraft `.pdf` route | Edit an interactive field, save a new version, close and reopen with value retained | [x] `form.pdf`; `GR078savededit` retained |
 | VectorCraft `.svg` route | Add a shape, save through SVG export, close and reopen with shape retained | [x] New 20 × 20 px rectangle remained visible |
-| PhotoCraft `.pcraft` route | Add a layer, receive host-save success, close and reopen with layer retained | [x] Save HTTP 200; app close unavailable for host-bound doc, browser tab closed |
-| Combined active lab replay | Exercise all five tracked routes from one synthetic Seafile library/browser profile | [x] Sequential replay; no manual download/upload |
+| PhotoCraft `.pcraft` route | Add a layer, receive host-save success, close and reopen with layer retained | [~] Operator-recorded save/reopen; retained PNGs are reused GR-076 captures showing Layer 1/2, not the GR-078 edit |
+| Combined active lab replay | Exercise all five tracked routes from one synthetic Seafile library/browser profile | [~] Sequential replay; PhotoCraft save/reopen is operator-recorded and retained PNGs are reused GR-076 captures; no manual download/upload |
 | History rows for all five routes | Seafile History lists a current version for each replayed file | [x] Verified in GR-079; five current rows recorded |
 | Saved-byte identity | Compare editor payload to Seafile readback bytes for all routes | [ ] NOT VERIFIED |
 | Production security, conflict and ONLYOFFICE post-change UI | Verify production permissions/proxy/CSP/concurrency; confirm ONLYOFFICE UI after changes | [ ] NOT VERIFIED; ONLYOFFICE not used or changed in GR-078 |
@@ -162,7 +178,7 @@ it neither contacts Seafile nor changes dispatch.
 | Broader compatibility and production security | General readiness | [ ] NOT VERIFIED |
 | Independent review | Separate exact evidence review | [x] R1 bounded PROVISIONAL PASS, no findings; project GPT remains INCOMPLETE and upstream publication LOCKED |
 
-Evidence: `docs/reviews/GR-069/`; reused optimized GR-048 actual-WASM candidate
+Evidence: `docs/reviews/GR-069/`; reused GR-048 actual-WASM candidate; exact wasm-opt execution NOT VERIFIED because the GR-048 build stdout is absent
 without rebuilding. Temporary `.figcraft` allowlist and dispatch changes were
 restored after the run.
 
@@ -582,7 +598,7 @@ Patch and bounded-review reports: `docs/reviews/GR-018/`.
 | 11.6 | Host timeout, wrong-origin/source and production security | failure paths remain safe in a real browser topology | [ ] NOT VERIFIED; source implements 120-second unknown-outcome warning; runtime path not exercised |
 | 11.7 | Single-document scope guards | host mode refuses new/open/duplicate/version-duplicate, branches and collaboration; unexpected extra dirty tabs remain visible and cannot be saved as the bound file | [x] synthetic UI test covers these dispatch paths, extra-tab dirty reporting and fail-closed save; browser controls NOT VERIFIED |
 | 11.8 | Independent bounded patch review and transport re-pin | no blocker/major correctness finding on the exact patch | [x] Sol low round 3 PASS; repin R2 confirmed only transport pin changes beyond the accepted source hunks. One MINOR: dirty-state transport failure is not retried until state changes; project verdict unchanged |
-| 11.9 | Actual-WASM browser host-only smoke | same-origin native open, visible engine edit, ticketed save bytes, matching ACK, dirty-to-clean, fresh iframe reopen | [x] GR-048 optimized exact patched build; 3,464-byte save, rectangle visible after fresh reopen; synthetic memory-only parent; independent free R1 PROVISIONAL PASS, no blocker/major; GPT REVIEW PENDING (`docs/GR-048-FIGCRAFT-WASM-SMOKE.md`) |
+| 11.9 | Actual-WASM browser host-only smoke | same-origin native open, visible engine edit, ticketed save bytes, matching ACK, dirty-to-clean, fresh iframe reopen | [x] GR-048 exact patched WASM; 3,464-byte save, rectangle visible after fresh reopen; synthetic memory-only parent. Exact `wasm-opt -Oz` execution NOT VERIFIED because build stdout is absent (`docs/GR-048-FIGCRAFT-WASM-SMOKE.md`) |
 
 Patch and limits: `docs/reviews/GR-019/README.md`.
 
@@ -957,7 +973,7 @@ PROVISIONAL implementation; GPT REVIEW PENDING; no project GPT PASS.
 | Check | Evidence / status |
 |---|---|
 | Exact source/core/adapter/transport and locked dependency resolution | Exact pins in `reviews/GR-076/pins.json`; retained-base locked WASM check passed |
-| Captured snapshot ACK, stale incarnation, later edits | PASS, 4 engine tests and focused UI lifecycle cases; `reviews/GR-076/checks.log` |
+| Captured snapshot ACK, stale incarnation, later edits | PASS per retained `reviews/GR-076/check-result.json`; the original test stdout (`checks.log`) was not retained |
 | Matching/negative/unknown/duplicate ACK, timeout/no retry and payload bounds | PASS, selected host cases in 7-test host filter |
 | Menu/direct/nested commands, local/picker/drop/Save As/duplicate/close guards | PASS, source guards and focused UI test; all denial events not replayed in browser |
 | Standalone/native file-open and save/download baseline regressions | PASS, 47 file-open tests including confirmed/unconfirmed writer regression |

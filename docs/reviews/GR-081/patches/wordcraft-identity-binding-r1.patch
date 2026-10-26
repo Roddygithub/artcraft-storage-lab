@@ -1,0 +1,463 @@
+diff --git a/Cargo.lock b/Cargo.lock
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -884 +884 @@
+-source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=90c261de22ef75c4c7c5c5cd1c712d483be0bbc8#90c261de22ef75c4c7c5c5cd1c712d483be0bbc8"
++source = "git+https://github.com/Roddygithub/artcraft-storage-lab.git?rev=d572f2d550278a7f4aad91a1bac650105c19812b#d572f2d550278a7f4aad91a1bac650105c19812b"
+diff --git a/Cargo.toml b/Cargo.toml
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -15 +15 @@
+-craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "90c261de22ef75c4c7c5c5cd1c712d483be0bbc8", package = "craft-platform" }
++craft-platform = { git = "https://github.com/Roddygithub/artcraft-storage-lab.git", rev = "d572f2d550278a7f4aad91a1bac650105c19812b", package = "craft-platform" }
+diff --git a/apps/wordcraft-web/src/host.rs b/apps/wordcraft-web/src/host.rs
+--- a/apps/wordcraft-web/src/host.rs
++++ b/apps/wordcraft-web/src/host.rs
+@@ -1 +1 @@
+-//! WordCraft adapter for the shared Craft parent-frame transport.
++//! WordCraft's strict, single-document parent-frame adapter.
+@@ -5 +5 @@
+-use craft_platform::browser::host::{HostListener, HostMessage, HostTransport};
++use craft_platform::browser::host::{DocumentIdentity, HostListener, HostTransport, IdentityHostMessage};
+@@ -8 +8 @@
+-use wordcraft_ui_egui::{Inbox, Services};
++use wordcraft_ui_egui::{Services, WordApp};
+@@ -10,0 +11,8 @@
++const SAVE_TIMEOUT_MS: i32 = 30_000;
++
++struct PendingSave {
++    save_id: u64,
++    identity: DocumentIdentity,
++    rejection: u64,
++    revision: u64,
++}
+@@ -16 +24,5 @@
+-    pending: Rc<RefCell<PendingSaves<u64>>>,
++    pending: Rc<RefCell<PendingSaves<PendingSave>>>,
++    initial: Rc<RefCell<Option<(String, String, Vec<u8>)>>>,
++    binding: Rc<RefCell<Option<DocumentIdentity>>>,
++    results: Rc<RefCell<Vec<(PendingSave, SaveTicket, bool, String)>>>,
++    last_ack: Rc<RefCell<Option<SaveTicket>>>,
+@@ -18,0 +31 @@
++    saved_revision: Rc<Cell<Option<u64>>>,
+@@ -22 +34,0 @@
+-    /// `None` when this page is not framed by a same-origin parent.
+@@ -27,0 +40,4 @@
++            initial: Rc::default(),
++            binding: Rc::default(),
++            results: Rc::default(),
++            last_ack: Rc::default(),
+@@ -29,0 +46 @@
++            saved_revision: Rc::default(),
+@@ -33,2 +50,5 @@
+-    pub fn connect(&self, services: &mut Services, inbox: Inbox, ctx: egui::Context) {
+-        self.listen(inbox, ctx);
++    pub fn connect(&self, services: &mut Services, ctx: egui::Context) {
++        self.listen(ctx.clone());
++        // Generic export/download callbacks never enter the host update path.
++        services.download = Some(Box::new(|_, _| Err("exports are unavailable in this hosted session".into())));
++        services.open_async = None;
+@@ -36,17 +56,2 @@
+-        services.download = Some(Box::new(move |path: &str, bytes: &[u8]| {
+-            let name = file_name(path);
+-            let save_id = bridge.saves.start();
+-            let Some(ticket) = SaveTicket::new(format!("wordcraft:{save_id}")) else {
+-                bridge.saves.finish(save_id, SaveOutcome::Failed("couldn't create save ticket".into()));
+-                return Err("couldn't create save ticket".to_string());
+-            };
+-            if bridge.pending.borrow_mut().insert(ticket.clone(), save_id).is_err() {
+-                bridge.saves.finish(save_id, SaveOutcome::Failed("too many saves are waiting for the host".into()));
+-                return Err("too many saves are waiting for the host".to_string());
+-            }
+-            if let Err(error) = bridge.transport.post_save(&ticket, &name, bytes, false) {
+-                bridge.pending.borrow_mut().complete(&ticket);
+-                bridge.saves.finish(save_id, SaveOutcome::Failed(js_error(error)));
+-                return Err("couldn't send save to host".to_string());
+-            }
+-            Ok(())
++        services.host_save = Some(Box::new(move |document, rejection, revision, path, bytes| {
++            bridge.post_save(document, rejection, revision, path, bytes, ctx.clone())
+@@ -54,17 +59,3 @@
+-
+-        let bridge = self.clone();
+-        services.open_async = Some(Box::new(move |purpose: &str| {
+-            let _ = bridge.transport.post_open_request(purpose);
+-        }));
+-
+-        let bridge = self.clone();
+-        let previous = services.on_dirty.take();
+-        services.on_dirty = Some(Box::new(move |dirty| {
+-            if let Some(previous) = &previous {
+-                previous(dirty);
+-            }
+-            bridge.post_dirty(dirty);
+-        }));
+-    }
+-
+-    pub fn set_author(app: &mut wordcraft_ui_egui::WordApp, author: &str) {
++    }
++
++    pub fn set_author(app: &mut WordApp, author: &str) {
+@@ -76 +66,0 @@
+-
+@@ -78,3 +68,2 @@
+-        let _ = self.transport.post_ready(env!("CARGO_PKG_VERSION"));
+-    }
+-
++        let _ = self.transport.post_identity_ready(env!("CARGO_PKG_VERSION"));
++    }
+@@ -85,5 +74,74 @@
+-    pub fn post_dirty(&self, dirty: bool) {
+-        if self.reported.get() == Some(dirty) {
+-            return;
+-        }
+-        if self.transport.post_dirty(dirty).is_ok() {
++    /// Consume only trusted opens, directly; never route one through the picker/drop inbox.
++    pub fn sync(&self, app: &mut WordApp) {
++        if let Some((open_id, name, bytes)) = self.initial.borrow_mut().take() {
++            match app.session.open_host_document(&name, &bytes) {
++                Ok(document) => {
++                    let identity = DocumentIdentity { open_id, document_id: document.to_string() };
++                    if self.transport.post_opened(&identity).is_ok() {
++                        *self.binding.borrow_mut() = Some(identity);
++                        self.saved_revision.set(Some(app.session.rev()));
++                    } else {
++                        app.session.block_host();
++                        self.post_failed("could not confirm the initial document");
++                    }
++                }
++                Err(error) => {
++                    app.status(error.to_string());
++                    self.post_failed("the initial document could not be parsed");
++                }
++            }
++        }
++        for (pending, ticket, ok, error) in std::mem::take(&mut *self.results.borrow_mut()) {
++            let current =
++                app.session.document_id().to_string() == pending.identity.document_id && self.binding.borrow().as_ref() == Some(&pending.identity);
++            if ok && current {
++                app.session.host_acknowledged(pending.rejection);
++                self.saved_revision.set(Some(pending.revision));
++                // Undo can restore dirty=false from old history. Only the exact serialized
++                // revision is clean after this acknowledgement; newer revisions stay dirty.
++                app.session.dirty = app.session.rev() != pending.revision;
++                *self.last_ack.borrow_mut() = Some(ticket);
++            } else {
++                let _ = app.session.host_refuse();
++                if current {
++                    app.session.dirty = true;
++                }
++            }
++            self.saves.finish(
++                pending.save_id,
++                if ok && current {
++                    SaveOutcome::Saved
++                } else {
++                    SaveOutcome::Failed(if error.is_empty() { "the host did not confirm this document's save".into() } else { error })
++                },
++            );
++            self.reported.set(None);
++        }
++        let binding = self.binding.borrow();
++        let Some(identity) = binding.as_ref() else {
++            return;
++        };
++        if app.session.document_id().to_string() != identity.document_id {
++            if self.reported.get() != Some(true) {
++                let _ = self.transport.post_identity_dirty(identity, true, None);
++                self.reported.set(Some(true));
++            }
++            return;
++        }
++        if self.pending.borrow().is_empty() && self.saved_revision.get() != Some(app.session.rev()) {
++            app.session.dirty = true;
++        }
++        // The current revision is already included in an outstanding serialized save. Do not
++        // send a post-save dirty=true for that same snapshot; edits after serialization have a
++        // newer revision and still report normally.
++        if self.pending.borrow().any(|pending| pending.identity == *identity && pending.revision == app.session.rev()) {
++            self.reported.set(Some(false));
++            return;
++        }
++        let dirty = app.host_dirty();
++        // Do not claim clean while a durable result is outstanding. Resetting reported at
++        // serialization still lets a new edit emit dirty=true during that wait.
++        if !dirty && !self.pending.borrow().is_empty() {
++            return;
++        }
++        if self.reported.get() != Some(dirty) && self.transport.post_identity_dirty(identity, dirty, self.last_ack.borrow().as_ref()).is_ok() {
+@@ -94,7 +152,27 @@
+-    fn listen(&self, inbox: Inbox, ctx: egui::Context) {
+-        let saves = self.saves.clone();
+-        let pending = self.pending.clone();
+-        let reported = self.reported.clone();
+-        let listener = self.transport.listen(move |message| match message {
+-            HostMessage::Open { name, bytes } => {
+-                inbox.lock().unwrap_or_else(|e| e.into_inner()).push((name, bytes));
++    fn post_save(&self, document: u64, rejection: u64, revision: u64, path: &str, bytes: &[u8], ctx: egui::Context) -> Result<(), String> {
++        let identity = self.binding.borrow().clone().ok_or_else(|| "the host has not bound a document".to_string())?;
++        if identity.document_id != document.to_string() {
++            return Err("the serialized document is not the host document".into());
++        }
++        // Identity comes from the native ID captured immediately before serialization.
++        let identity = DocumentIdentity { open_id: identity.open_id, document_id: document.to_string() };
++        let name = std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).ok_or("missing save name")?;
++        let save_id = self.saves.start();
++        let Some(ticket) = SaveTicket::new(format!("wordcraft:{save_id}")) else {
++            self.saves.finish(save_id, SaveOutcome::Failed("invalid save ticket".into()));
++            return Err("invalid save ticket".into());
++        };
++        if self.pending.borrow_mut().insert(ticket.clone(), PendingSave { save_id, identity: identity.clone(), rejection, revision }).is_err() {
++            self.saves.finish(save_id, SaveOutcome::Failed("too many pending saves".into()));
++            return Err("too many pending saves".into());
++        }
++        if let Err(error) = self.transport.post_identity_save(&identity, &ticket, &name, bytes) {
++            self.pending.borrow_mut().complete(&ticket);
++            self.saves.finish(save_id, SaveOutcome::Failed(js_error(error)));
++            return Err("could not send save to host".into());
++        }
++        let bridge = self.clone();
++        let timeout_ticket = ticket.clone();
++        let timeout = wasm_bindgen::closure::Closure::once_into_js(move || {
++            if let Some(pending) = bridge.pending.borrow_mut().complete(&timeout_ticket) {
++                bridge.results.borrow_mut().push((pending, timeout_ticket, false, "host save confirmation timed out; retry Save".into()));
+@@ -103,2 +181,23 @@
+-            HostMessage::SaveResult { ticket, ok, error } => {
+-                let Some(save_id) = pending.borrow_mut().complete(&ticket) else {
++        });
++        let scheduled = web_sys::window().ok_or_else(|| "no browser window".to_string()).and_then(|window| {
++            use wasm_bindgen::JsCast as _;
++            window.set_timeout_with_callback_and_timeout_and_arguments_0(timeout.unchecked_ref(), SAVE_TIMEOUT_MS).map_err(js_error)
++        });
++        if let Err(error) = scheduled {
++            self.pending.borrow_mut().complete(&ticket);
++            self.saves.finish(save_id, SaveOutcome::Failed(error.clone()));
++            return Err(error);
++        }
++        self.reported.set(Some(false));
++        Ok(())
++    }
++
++    fn listen(&self, ctx: egui::Context) {
++        let bridge = self.clone();
++        let listener = self.transport.listen_identity(move |message| match message {
++            IdentityHostMessage::Open { open_id, name, bytes } => {
++                *bridge.initial.borrow_mut() = Some((open_id, name, bytes));
++                ctx.request_repaint();
++            }
++            IdentityHostMessage::SaveResult { identity, ticket, ok, error } => {
++                if bridge.binding.borrow().as_ref() != Some(&identity) {
+@@ -106,6 +205,5 @@
+-                };
+-                let outcome =
+-                    if ok { SaveOutcome::Saved } else { SaveOutcome::Failed(error.unwrap_or_else(|| "the host couldn't save the file".to_string())) };
+-                saves.finish(save_id, outcome);
+-                reported.set(None);
+-                ctx.request_repaint();
++                }
++                if let Some(pending) = bridge.pending.borrow_mut().complete(&ticket) {
++                    bridge.results.borrow_mut().push((pending, ticket, ok, error.unwrap_or_default()));
++                    ctx.request_repaint();
++                }
+@@ -120,4 +217,0 @@
+-fn file_name(path: &str) -> String {
+-    std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| "document.docx".to_string())
+-}
+-
+diff --git a/apps/wordcraft-web/src/web.rs b/apps/wordcraft-web/src/web.rs
+--- a/apps/wordcraft-web/src/web.rs
++++ b/apps/wordcraft-web/src/web.rs
+@@ -66 +66 @@
+-                    let sample = query().contains("sample");
++                    let sample = !host && query().contains("sample");
+@@ -74,0 +75 @@
++                    if host { app.session.lock_to_host(); }
+@@ -78 +79 @@
+-                        bridge.connect(&mut app.services, inbox.clone(), cc.egui_ctx.clone());
++                        bridge.connect(&mut app.services, cc.egui_ctx.clone());
+@@ -99 +100 @@
+-                    Ok(Box::new(WebShell { app, inbox, messages, prefs }))
++                    Ok(Box::new(WebShell { app, inbox, messages, prefs, bridge }))
+@@ -133,0 +135 @@
++    bridge: Option<crate::host::Bridge>,
+@@ -148 +150,6 @@
+-        for f in dropped {
++        // Hosted drops are refused before their bytes are read, including before binding.
++        if self.app.session.host_update_only() && !dropped.is_empty() {
++            let error = self.app.session.host_refuse().to_string(); self.app.status(error);
++        }
++        let hosted = self.app.session.host_update_only();
++        for f in dropped.into_iter().filter(|_| !hosted) {
+@@ -165,0 +173 @@
++        if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+@@ -166,0 +175 @@
++        if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+@@ -185,0 +195 @@
++        if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+diff --git a/crates/engine/src/cmd/file.rs b/crates/engine/src/cmd/file.rs
+--- a/crates/engine/src/cmd/file.rs
++++ b/crates/engine/src/cmd/file.rs
+@@ -220 +220 @@
+-fn open(s: &mut Session, v: &Value) -> CmdResult {
++pub(crate) fn open(s: &mut Session, v: &Value) -> CmdResult {
+diff --git a/crates/engine/src/session.rs b/crates/engine/src/session.rs
+--- a/crates/engine/src/session.rs
++++ b/crates/engine/src/session.rs
+@@ -363,0 +364,5 @@
++    // None = standalone; Some(None) = locked until the trusted initial parse succeeds.
++    host_document: Option<Option<u64>>,
++    host_open_attempted: bool,
++    host_rejections: std::cell::Cell<u64>,
++    host_saved_rejections: u64,
+@@ -694,0 +700,4 @@
++            host_document: None,
++            host_open_attempted: false,
++            host_rejections: std::cell::Cell::new(0),
++            host_saved_rejections: 0,
+@@ -800,0 +810,54 @@
++    /// Lock before exposing the UI, even if no valid parent transport exists.
++    pub fn lock_to_host(&mut self) {
++        if self.host_document.is_none() { self.host_document = Some(None); }
++    }
++    pub fn block_host(&mut self) {
++        if self.host_document.is_some() {
++            self.host_document = Some(None);
++            self.host_open_attempted = true;
++        }
++    }
++    pub fn host_update_only(&self) -> bool { self.host_document.is_some() }
++    pub fn host_rejection_revision(&self) -> u64 { self.host_rejections.get() }
++    pub fn host_rejected(&self) -> bool { self.host_rejections.get() != self.host_saved_rejections }
++    pub fn host_acknowledged(&mut self, revision: u64) {
++        if revision == self.host_rejections.get() && revision != u64::MAX { self.host_saved_rejections = revision; }
++    }
++    pub fn host_refuse(&self) -> CmdError {
++        self.host_rejections.set(self.host_rejections.get().saturating_add(1));
++        CmdError::Disabled("this session can only update the host's initial document".into())
++    }
++    pub fn host_document_id(&self) -> Result<u64, CmdError> {
++        match self.host_document {
++            Some(Some(id)) if id == self.document_id => Ok(id),
++            Some(Some(_)) => Err(self.host_refuse()),
++            _ => Err(CmdError::Disabled("waiting for the trusted host document".into())),
++        }
++    }
++    /// Sole trusted-open entry, called directly by the parent adapter, never the picker inbox.
++    /// A failed parse consumes the attempt and leaves the session locked.
++    pub fn open_host_document(&mut self, name: &str, bytes: &[u8]) -> Result<u64, CmdError> {
++        if self.host_document != Some(None) || self.host_open_attempted { return Err(self.host_refuse()); }
++        self.host_open_attempted = true;
++        crate::cmd::file::open(self, &serde_json::json!({
++            "path": name, "data": crate::cmd::insert::base64_encode(bytes),
++        }))?;
++        let id = self.document_id();
++        self.host_document = Some(Some(id));
++        Ok(id)
++    }
++    /// Shared UI/engine gate, before prompts, document side effects and serialization.
++    pub fn check_host_command(&self, id: &str, params: &Value) -> Result<(), CmdError> {
++        if !self.host_update_only() { return Ok(()); }
++        self.host_document_id()?;
++        let denied = (id.starts_with("file.") && !matches!(id,
++            "file.save" | "file.setAuthor" | "file.options" | "file.accessibility" |
++            "file.inspect" | "file.protect" | "file.encrypt" | "file.printMarkup"))
++            || matches!(id, "mailings.labels" | "mailings.envelopes" | "mailings.finish" |
++                "review.compare" | "review.combine" | "ui.startScreen" | "ui.openFileDialog" |
++                "ui.fileBrowser" | "ui.saveChanges")
++            || (id == "file.save" && !params.is_null() && params.as_object().is_none_or(|p| !p.is_empty()));
++        if denied { return Err(self.host_refuse()); }
++        Ok(())
++    }
++
+@@ -1290,0 +1354,4 @@
++            host_document: _,
++            host_open_attempted: _,
++            host_rejections: _,
++            host_saved_rejections: _,
+@@ -1384,0 +1452,8 @@
++        self.check_host_command(id, params)?;
++        // Direct engine/macro Save delegates to the guarded UI route, never to a native
++        // path. The return value explicitly does not claim that the write has completed.
++        if self.host_update_only() && id == "file.save" {
++            let document = self.host_document_id()?;
++            self.ui_requests.push(serde_json::json!({"hostSave": document.to_string()}));
++            return Ok(serde_json::json!({"pendingHostSave": true}));
++        }
+diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
+--- a/crates/ui-egui/src/dialogs.rs
++++ b/crates/ui-egui/src/dialogs.rs
+@@ -1031,0 +1032,5 @@
++        if app.session.host_update_only() && matches!(name,
++            "openFile" | "saveAs" | "saveTemplate" | "exportPdf" | "exportPng" |
++            "envelopes" | "labels" | "finishMerge" | "compare" | "combine") {
++            let error = app.session.host_refuse().to_string(); app.status(error); return None;
++        }
+diff --git a/crates/ui-egui/src/file_dialogs.rs b/crates/ui-egui/src/file_dialogs.rs
+--- a/crates/ui-egui/src/file_dialogs.rs
++++ b/crates/ui-egui/src/file_dialogs.rs
+@@ -133,0 +134,3 @@
++        if self.session.host_update_only() && matches!(&after, AfterPick::OpenDocument | AfterPick::SaveAs { .. } | AfterPick::Export { .. }) {
++            return Asked::Done(Err(self.session.host_refuse().to_string()));
++        }
+@@ -363,0 +367,3 @@
++        if self.session.host_update_only() {
++            let error = self.session.host_refuse().to_string(); self.status(error); return;
++        }
+@@ -413,0 +420 @@
++        if self.session.host_update_only() { return Some(self.session.host_refuse().to_string()); }
+@@ -430,0 +438,3 @@
++        if self.session.host_update_only() {
++            let error = self.session.host_refuse().to_string(); self.status(error); return;
++        }
+@@ -444,0 +455,3 @@
++        if self.session.host_update_only() {
++            let error = self.session.host_refuse().to_string(); self.status(error); return;
++        }
+diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
+--- a/crates/ui-egui/src/lib.rs
++++ b/crates/ui-egui/src/lib.rs
+@@ -125,0 +126,2 @@
++    /// Host ordinary Save only: native identity and rejection revision captured before serialization.
++    pub host_save: Option<Box<dyn Fn(u64, u64, u64, &str, &[u8]) -> Result<(), String>>>,
+@@ -890,0 +893 @@
++        self.session.check_host_command(id, &params).map_err(|e| e.to_string())?;
+@@ -971,0 +975 @@
++        self.session.check_host_command(id, &params).map_err(|e| e.to_string())?;
+@@ -1006 +1010,4 @@
+-        if self.services.download.is_some() && matches!(id, "file.save" | "file.saveAs" | "file.exportPdf" | "file.exportPng") {
++        if (self.services.download.is_some() || self.session.host_update_only()) && matches!(id, "file.save" | "file.saveAs" | "file.exportPdf" | "file.exportPng") {
++            if self.session.host_update_only() && self.services.host_save.is_none() {
++                return Err(self.session.host_refuse().to_string());
++            }
+@@ -1025,0 +1033,4 @@
++            // Capture the actual native document that is about to produce these bytes.
++            let host_identity = if self.session.host_update_only() {
++                Some((self.session.host_document_id().map_err(|e| e.to_string())?, self.session.host_rejection_revision(), self.session.rev()))
++            } else { None };
+@@ -1032,3 +1043,4 @@
+-            if let Some(d) = &self.services.download
+-                && let Err(e) = d(&name, &bytes)
+-            {
++            let delivered = if let Some((document, rejection, revision)) = host_identity {
++                self.services.host_save.as_ref().ok_or_else(|| "host Save is unavailable".to_string())?(document, rejection, revision, &name, &bytes)
++            } else if let Some(d) = &self.services.download { d(&name, &bytes) } else { Ok(()) };
++            if let Err(e) = delivered {
+@@ -1441,0 +1454,7 @@
++        if let Some(document) = req.get("hostSave").and_then(Value::as_str) {
++            let result = if self.session.host_document_id().ok().map(|id| id.to_string()).as_deref() == Some(document) {
++                self.run("file.save", json!({}))
++            } else { Err(self.session.host_refuse().to_string()) };
++            if let Err(error) = result { self.status(error); }
++            return;
++        }
+@@ -2261,0 +2281,5 @@
++    /// Includes uncommitted comment drafts and refused host replacement/save-copy actions.
++    pub fn host_dirty(&self) -> bool {
++        self.session.dirty || self.session.host_rejected() || panes::has_comment_drafts(self)
++    }
++
+@@ -2264,3 +2288 @@
+-        if let Some(f) = &self.services.on_dirty {
+-            f(self.session.dirty || panes::has_comment_drafts(self));
+-        }
++        if let Some(f) = &self.services.on_dirty { f(self.host_dirty()); }

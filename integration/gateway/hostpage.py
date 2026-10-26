@@ -12,6 +12,12 @@ implements the host half of the protocol described in docs/HOST-CONTRACT.md:
     child -> host   <app>:dirty  { dirty }
     child -> host   <app>:failed { error }
 
+WordCraft/GridCraft additionally require `ready {saveIdentity: 1}`, a one-shot
+`open {saveIdentity: 1, openId, mode: "update-only", ...}`, and `opened
+{openId, documentId}` before a write. Their saves require the same identity,
+`intent: "save"`, and a fresh ticket. Results and dirty signals carry that
+identity; a clean acknowledgement carries the successful save ticket.
+
 The browser never holds a Seafile credential. The only thing it holds is the
 session id, which the server maps to one document for one user.
 """
@@ -84,6 +90,29 @@ function fileExtension(name) {
 // polls the saved files instead.
 // ---------------------------------------------------------------------------
 const VECTORCRAFT = (APP === "vectorcraft");
+const IDENTITY_REQUIRED = APP === "wordcraft" || APP === "gridcraft";
+const MAX_DOCUMENT_BYTES = 256 * 1024 * 1024;
+let identityPhase = "waiting";
+let binding = null;
+let confirmationTicket = null;
+// Bounded replay protection; exhausting it requires reopening the session.
+const usedTickets = new Set();
+function boundedId(value, max = 128) {
+  return typeof value === "string" && value.length <= max && value.trim().length > 0;
+}
+function matchesBinding(data) {
+  return identityPhase === "bound" && binding &&
+    data.openId === binding.openId && data.documentId === binding.documentId;
+}
+function saveReply(data, ok, error) {
+  if (IDENTITY_REQUIRED) {
+    if (!boundedId(data.openId) || !boundedId(data.documentId) || !boundedId(data.ticket, 256)) return;
+    toCraft("saveResult", { openId: data.openId, documentId: data.documentId,
+      ticket: data.ticket, ok, error });
+  } else if (data.ticket !== undefined && data.ticket !== null) {
+    toCraft("saveResult", { ticket: data.ticket, ok, error });
+  }
+}
 let lastSavedBytes = null;     // exact bytes from Seafile or the last committed save
 let saving = false;
 window.__lastDirty = false;
@@ -91,6 +120,9 @@ window.__editorConfirmedSave = false;
 window.__saveConfirmationPending = false;
 let dirtyRevision = 0;
 let saveRevision = -1;
+// A refused document replacement is not an editor save result. Keep the
+// session dirty until a later save for the bound revision is actually stored.
+let rejectedSaveRevision = null;
 
 // The frame we are about to drive must be the one we created, on our own
 // origin. A direct property read crosses no boundary that postMessage would
@@ -228,16 +260,45 @@ window.addEventListener("message", async (event) => {
   switch (data.type) {
     case APP + ":ready":
       if (VECTORCRAFT) break;           // VectorCraft is driven by its own API above
+      if (IDENTITY_REQUIRED) {
+        if (identityPhase !== "waiting") break;
+        identityPhase = "opening";
+        if (data.saveIdentity !== 1) {
+          identityPhase = "blocked";
+          say("This editor cannot bind the selected document; reopen with an updated editor", "err");
+          break;
+        }
+      }
       say("Loading " + FILE_NAME + "…");
       try {
+        if (IDENTITY_REQUIRED) {
+          const id = crypto.getRandomValues(new Uint8Array(16));
+          binding = { openId: Array.from(id, (byte) => byte.toString(16).padStart(2, "0")).join(""), documentId: null };
+        }
         const resp = await fetch("/session/" + SID + "/document", { credentials: "same-origin" });
         if (!resp.ok) throw new Error("HTTP " + resp.status);
         const buf = await resp.arrayBuffer();
-        toCraft("open", { name: FILE_NAME, bytes: new Uint8Array(buf) });
-        say(FILE_NAME + " opened", "ok");
+        if (IDENTITY_REQUIRED) {
+          if (buf.byteLength > MAX_DOCUMENT_BYTES) throw new Error("document exceeds size limit");
+          toCraft("open", { saveIdentity: 1, openId: binding.openId,
+            mode: "update-only", name: FILE_NAME, bytes: new Uint8Array(buf) });
+          say("Waiting for the editor to parse " + FILE_NAME + "…", "busy");
+        } else {
+          toCraft("open", { name: FILE_NAME, bytes: new Uint8Array(buf) });
+          say(FILE_NAME + " opened", "ok");
+        }
       } catch (err) {
+        if (IDENTITY_REQUIRED) identityPhase = "blocked";
         say("Could not load the document: " + err.message, "err");
       }
+      break;
+
+    case APP + ":opened":
+      if (!IDENTITY_REQUIRED || identityPhase !== "opening" || !binding ||
+          data.openId !== binding.openId || !boundedId(data.documentId)) break;
+      binding = Object.freeze({ openId: binding.openId, documentId: data.documentId });
+      identityPhase = "bound";
+      say(FILE_NAME + " opened", "ok");
       break;
 
     case APP + ":openRequest":
@@ -252,11 +313,19 @@ window.addEventListener("message", async (event) => {
       const bytes = data.bytes instanceof ArrayBuffer ? new Uint8Array(data.bytes) : data.bytes;
       // The ticket the app gave this save, if it uses one (WordCraft's async_saves).
       const ticket = data.ticket;
-      // This session is bound to exactly one Seafile document. Editors may
-      // serialize their internal project title, which is not the storage name;
-      // pin the write to the selected file and refuse Save As / exports.
-      const requestedName = typeof data.name === "string" ? data.name : FILE_NAME;
-      if (data.saveAs === true || fileExtension(requestedName) !== fileExtension(FILE_NAME)) {
+      // Names/formats are additional constraints, never document identity.
+      // Other Craft apps retain their existing protocol.
+      const hasRequestedName = typeof data.name === "string";
+      const requestedName = hasRequestedName ? data.name : FILE_NAME;
+      const documentNameMissing = (APP === "wordcraft" || APP === "gridcraft") && !hasRequestedName;
+      const documentNameChanged = (APP === "wordcraft" || APP === "gridcraft") && requestedName !== FILE_NAME;
+      const identityInvalid = IDENTITY_REQUIRED && (!CAN_EDIT || !matchesBinding(data) ||
+        data.intent !== "save" || !boundedId(ticket, 256) || usedTickets.has(ticket) ||
+        usedTickets.size >= 4096 || !(bytes instanceof Uint8Array) ||
+        bytes.byteLength > MAX_DOCUMENT_BYTES);
+      if (identityInvalid || data.saveAs === true || documentNameMissing || documentNameChanged || fileExtension(requestedName) !== fileExtension(FILE_NAME)) {
+        dirtyRevision += 1;
+        rejectedSaveRevision = dirtyRevision;
         window.__lastDirty = true;
         window.__editorConfirmedSave = false;
         window.__saveConfirmationPending = false;
@@ -264,11 +333,8 @@ window.addEventListener("message", async (event) => {
           method: "POST", credentials: "same-origin",
           headers: { "Content-Type": "text/plain" }, body: "true",
         }).catch(() => {});
-        if (ticket !== undefined && ticket !== null) {
-          toCraft("saveResult", { ticket: ticket, ok: false,
-            error: "Save As and exports are not supported in this session" });
-        }
-        say("Save rejected: this session can only overwrite the selected file", "err");
+        saveReply(data, false, "this session can only save the bound document");
+        say("Save rejected: this session can only save the selected document", "err");
         break;
       }
       // The host's state is document-wide, while editor save tickets are
@@ -283,12 +349,11 @@ window.addEventListener("message", async (event) => {
           method: "POST", credentials: "same-origin",
           headers: { "Content-Type": "text/plain" }, body: "true",
         }).catch(() => {});
-        if (ticket !== undefined && ticket !== null) {
-          toCraft("saveResult", { ticket: ticket, ok: false, error: "another save is still in progress" });
-        }
+        saveReply(data, false, "another save is still in progress");
         say("Save not started; wait for the current save, then retry", "busy");
         break;
       }
+      if (IDENTITY_REQUIRED) usedTickets.add(ticket);
       say("Saving…", "busy");
       window.__saveInFlight = true;
       window.__lastDirty = true;
@@ -316,6 +381,10 @@ window.addEventListener("message", async (event) => {
         }
         window.__lastSave = result;
         if (ok) {
+          if (rejectedSaveRevision !== null && saveRevision >= rejectedSaveRevision) {
+            rejectedSaveRevision = null;
+          }
+          confirmationTicket = ticket;
           window.__saveConfirmationPending = true;
           say("Stored" + (result.version ? " — new version " + result.version : ""), "busy");
         } else {
@@ -337,17 +406,26 @@ window.addEventListener("message", async (event) => {
         const shown = ok ? "" : (sessionUnavailable
           ? "this editing session expired or is unavailable; return to Seafile and reopen the file"
           : "the file could not be stored");
-        toCraft("saveResult", { ticket: ticket, ok: ok, error: shown });
+        saveReply(data, ok, shown);
       }
       window.__saveInFlight = false;
       break;
     }
 
     case APP + ":dirty":
+      if (IDENTITY_REQUIRED) {
+        if (!matchesBinding(data) || typeof data.dirty !== "boolean") break;
+        if (!data.dirty && (usedTickets.size > 0 || window.__saveConfirmationPending) &&
+            (!window.__saveConfirmationPending || data.ticket !== confirmationTicket)) break;
+      }
       if (data.dirty) {
         dirtyRevision += 1;
         window.__lastDirty = true;
         window.__editorConfirmedSave = false;
+      } else if (rejectedSaveRevision !== null) {
+        // A refused replacement/Save As cannot be cleared by an editor clean
+        // event, even if the preceding save was successful.
+        window.__lastDirty = true;
       } else if (window.__saveInFlight) {
         // Craft can report clean as soon as it starts its own save. Keep the
         // host dirty until the durable write and the editor's post-result
@@ -360,6 +438,8 @@ window.addEventListener("message", async (event) => {
         window.__lastDirty = dirtyRevision !== saveRevision;
         window.__editorConfirmedSave = !window.__lastDirty;
         window.__saveConfirmationPending = false;
+      } else if (IDENTITY_REQUIRED && usedTickets.size > 0) {
+        window.__lastDirty = true;
       } else if (!window.__lastSave || window.__lastSave.ok === true) {
         window.__lastDirty = false;
       } else {
@@ -383,6 +463,18 @@ window.addEventListener("message", async (event) => {
       break;
 
     case APP + ":failed":
+      if (IDENTITY_REQUIRED) {
+        identityPhase = "blocked";
+        if (binding?.documentId) {
+          window.__lastDirty = true;
+          window.__editorConfirmedSave = false;
+          window.__saveConfirmationPending = false;
+          fetch("/session/" + SID + "/dirty", {
+            method: "POST", credentials: "same-origin",
+            headers: { "Content-Type": "text/plain" }, body: "true",
+          }).catch(() => {});
+        }
+      }
       say("The editor could not start: " + (data.error || "unknown error"), "err");
       break;
   }

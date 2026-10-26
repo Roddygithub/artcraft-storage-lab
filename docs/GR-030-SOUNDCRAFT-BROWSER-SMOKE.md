@@ -22,7 +22,7 @@ SoundCraft remains out of `integration/config/dispatch.json`.
 
 | Item | Value |
 |---|---|
-| SoundCraft source | `storytold/soundcraft` `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`, with the exact GR-025 → GR-027 → GR-028 → GR-029 overlay sequence documented in [`GR-029`](../GR-029-SOUNDCRAFT-EGUI-WASM.md) |
+| SoundCraft source | `storytold/soundcraft` `d47abe484d4f9ef0cc9f8e872e0b3880a61a4588`, with the exact GR-025 → GR-027 → GR-028 → GR-029 overlay sequence documented in [`GR-029`](GR-029-SOUNDCRAFT-EGUI-WASM.md) |
 | Shared transport | `craft-platform` `56c5e16d79b77751106173c13111ef4fe0a2c0ec` |
 | Browser | Chromium via the T3 collaborative preview; loopback static server on `localhost:18779` |
 | Frame topology | Same-origin `host-smoke.html` parent and `index.html?host=parent` child; parent checked both `event.origin` and `event.source` |

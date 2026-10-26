@@ -1,3 +1,48 @@
+# 2026-10-26 — GR-081 project GPT review remediation
+
+- Recorded the FAIL on project candidate
+  `70fa192ed5d414daf28087315f0f77f8312e98b5` and preserved all findings in the
+  GR-081 review bundle.
+- Corrected gateway/Craft versus Seahub origin instructions and added the
+  required `ARTCRAFT_SEAFILE_ORIGIN` setting to the quickstart.
+- Confined the resolved static directory index, added the fifth `pcraft` route
+  to the dispatcher verifier, and corrected stale evidence descriptions and
+  broken links.
+- Narrowed GR-015 and GR-078 screenshot claims where retained PNGs were reused
+  or showed an earlier state. Those later semantic observations remain
+  operator-recorded, not visually corroborated by those images.
+- Added a native-identity protocol and source patches for WordCraft/GridCraft:
+  bind the parsed document, guard replacement/Save As before serialization,
+  route ordinary Save with identity and a fresh ticket, and bind ACK/dirty state
+  to the same document. The host retains filename/format constraints.
+- Code/security R1 identified dependency-pin and pending-save dirty-ordering
+  defects. R2 source review found their corrections in the regenerated patches,
+  confirmed the app manifests/locks pin local transport commit
+  `d572f2d550278a7f4aad91a1bac650105c19812b`, and found no new MAJOR source
+  regression. Two MINOR artifact issues were corrected: the GridCraft MSRV
+  delta was removed, and the artifact checker now compares applied output with
+  every manifest hash. The local transport commit's remote availability is
+  NOT VERIFIED.
+- ONLYOFFICE remains INCONCLUSIVE / NOT VERIFIED; no settings or service were
+  changed. No test suite, build, browser workflow or service check was run.
+  R3 code/security and docs/evidence reviews returned PROVISIONAL FAIL; code/
+  security R4 also returned PROVISIONAL FAIL. R1/R2 source reviews now cover
+  the identity implementation; save identity and ONLYOFFICE remain
+  open. Docs/evidence R4/R5 returned PROVISIONAL PASS with their MINOR
+  documentation findings addressed. Bounded ONLYOFFICE research did not
+  establish cause; docs R6 returned PROVISIONAL PASS with one MINOR missing-log
+  reference corrected. Document-identity design is recorded at
+  `docs/reviews/GR-081/IDENTITY-BINDING-DESIGN-R1.md`, with source patches and
+  R2 review in the evidence bundle. App compilation, running-editor
+  refusal-before-serialization, Seafile version/reopen, and fresh dependency
+  resolution are NOT VERIFIED. Docs/evidence R7 returned PROVISIONAL PASS with
+  no new findings; it did not cover the later identity implementation.
+  Project GPT
+  remains FAIL pending
+  a fresh candidate review, and upstream publication remains locked.
+- Evidence: `docs/GR-081-PROJECT-GPT-REVIEW-REMEDIATION.md`,
+  `docs/reviews/GR-081/`.
+
 # 2026-10-26 — GR-080 security evidence reconciliation
 
 - Updated `docs/SECURITY.md` to distinguish the historical GPT FAIL candidate
@@ -34,8 +79,10 @@
   the synthetic Seafile library: WordCraft DOCX, GridCraft XLSX, PdfCraft
   interactive PDF, VectorCraft SVG and PhotoCraft Pcraft.
 - Each editor showed its host-bound save result and the edit remained visible
-  after closing the editor tab and reopening from Seafile Web. No download or
-  manual upload was used.
+  after closing the editor tab and reopening from Seafile Web. PhotoCraft's
+  save/reopen observations are operator-recorded; its retained PNGs duplicate
+  earlier GR-076 screenshots and show Layer 1/2, not the later GR-078 edit. No
+  download or manual upload was used.
 - Captured save/reopen screenshots and a sanitized observation record. The
   PhotoCraft in-app close command is unavailable for a host-bound document, so
   its tab was closed before reopening. At the GR-078 cutoff, Seafile
@@ -200,8 +247,10 @@ See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
 
 ## 2026-10-26 — GR-069 FigCraft real synthetic Seafile roundtrip
 
-- Reused the optimized GR-048 FigCraft candidate after verifying source,
-  staged, and active static-root asset hashes. Opened the native synthetic
+- Reused the GR-048 FigCraft candidate after verifying source, staged, and
+  active static-root asset hashes. GR-048's full build stdout is absent, so
+  exact `wasm-opt -Oz` execution is NOT VERIFIED from retained evidence.
+  Opened the native synthetic
   `.figcraft` fixture from the existing Seafile library and created a visible
   rectangle in the editor.
 - The first save attempt returned 502 because the local gateway had exited; it
@@ -547,9 +596,10 @@ See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
 
 ## 2026-10-25 — GR-048 FigCraft browser host-save smoke
 
-- Applied the exact accepted GR-019 patch to clean FigCraft `8d790607`;
-  built optimized actual Web/WASM against transport `56c5e16d` with persistent
-  Cargo caches and the configured wasm-opt pass.
+- Applied the exact accepted GR-019 patch to clean FigCraft `8d790607`; the
+  Trunk release and wasm-opt run were operator-recorded against transport
+  `56c5e16d` with persistent Cargo caches. Full build stdout was not retained,
+  so exact wasm-opt execution is NOT VERIFIED from the current evidence bundle.
 - T3 collaborative Chromium opened a synthetic native fixture, created a
   visible rectangle through UI input, emitted 3,464 save bytes, stayed dirty
   before matching ACK, became clean, and reopened the captured bytes visibly

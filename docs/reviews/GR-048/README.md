@@ -10,11 +10,9 @@ integration is recorded in project status and history.
 | `../../GR-048-FIGCRAFT-WASM-SMOKE.md` | Result, exact pins, commands, warnings, limitations |
 | `provenance.txt` | Lab main/worktree start, exact source/patch hash, toolchain, global persistent Cargo config |
 | `checks.txt` | Four successful focused checks, including reverse patch applicability and whitespace |
-| `build.log` | Actual optimized Trunk/WASM build and wasm-opt success |
 | `check_evidence.py` | Runnable retained-record, host/fixture response hash and accepted-patch check |
 | `commands.sh` | Reproduction commands (source worktree creation/apply documented; no app patch mutation) |
 | `artifacts.txt` | Disk asset sizes and SHA-256 values, including distinct pre-packaging WASM |
-| `network.log` | Loopback HTTP server request/status log |
 | `runtime/make_fixture.py`, `runtime/synthetic.figcraft` | Runnable deterministic native ZIP fixture generator and input |
 | `runtime/host.html` | Same-origin/source checked, synthetic memory-only parent; ACK held explicitly |
 | `runtime/draw.js` | Exact UI event sequence evaluated through T3 preview to create visible engine rectangle |
@@ -27,6 +25,11 @@ filesystem-backed platform save. The harness's matching ACK confirms receipt
 by that synthetic page. No Seafile, production, ONLYOFFICE, external uploads,
 manual file save/upload, or upstream issue/PR occurred. Accepted GR-019 patch
 and app sources were not altered beyond applying that exact patch to scratch.
+Full build stdout and a standalone HTTP server log were not retained; the Trunk
+release command, artifact hashes and sanitized browser transcript are retained.
+The exact `wasm-opt -Oz` execution is NOT VERIFIED from retained evidence. The preserved R1 review cites `build.log` and
+`network.log`, but those files are absent from this bundle; those specific
+citations cannot be independently checked against retained logs.
 
 Independent free review: **PROVISIONAL PASS**, no BLOCKER/MAJOR; warning and
 setup MINOR observations remain disclosed. See

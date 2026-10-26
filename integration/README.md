@@ -33,6 +33,7 @@ session id. Production save requires the user-bound conditional endpoint in
 
 ```sh
 export ARTCRAFT_SEAFILE_URL=https://seafile.example.org
+export ARTCRAFT_SEAFILE_ORIGIN=https://seafile.example.org
 cd integration
 python3 -m gateway --host 127.0.0.1 --port 8777
 ```
@@ -40,6 +41,7 @@ python3 -m gateway --host 127.0.0.1 --port 8777
 | Environment variable | Meaning | Default |
 | --- | --- | --- |
 | `ARTCRAFT_SEAFILE_URL` | the Seafile base URL | required |
+| `ARTCRAFT_SEAFILE_ORIGIN` | exact Seahub origin accepted for the `/open/` handoff and host-page `frame-ancestors` policy | required for browser integration |
 | `ARTCRAFT_SEAFILE_TOKEN` | optional token for test fixture upload/diagnostics; not required by the gateway |
 | `ARTCRAFT_SEAFILE_ACCESS_TOKEN` | test-only Seafile hook token for integration runs | not set |
 | `ARTCRAFT_MAX_BYTES` | the largest document the gateway will read or write | 50 MiB |
@@ -120,9 +122,16 @@ see — see `docs/reviews/GR-005/README.md` §4.2.
 
 ## The deployment shape
 
-The gateway is a plain HTTP service. It must sit behind the same HTTPS origin as
-Seafile on `/open/`, `/session/`, and `/artcraft/`, so the host page and Craft
-app are **same-origin** — required by the existing `?host=parent` bridges.
+The gateway is a plain HTTP service behind a TLS proxy. Seahub and the gateway
+must use **different origins**; the gateway and its Craft iframe share one
+origin so the existing `?host=parent` bridges work. Set
+`ARTCRAFT_SEAFILE_ORIGIN` to Seahub's exact origin. Route `/open/` from Seahub
+to the gateway and serve `/session/` and `/artcraft/` on the gateway/Craft
+origin. Use a distinct gateway hostname and ensure Seahub cookies are scoped so
+they are not sent to the gateway; an origin split alone does not guarantee
+cookie isolation across ports or broadly scoped domain cookies. The editor
+frame must not receive Seahub's DOM or the capability form. Deployed cookie
+isolation is **NOT VERIFIED**.
 
 ```nginx
 location /artcraft/ {

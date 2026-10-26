@@ -652,7 +652,9 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(400, {"ok": False, "error": "bad path"})
         if os.path.isdir(target):
             # "/artcraft/<app>/" and "/artcraft/<app>" both serve the app's index.
-            index = os.path.join(target, "index.html")
+            index = os.path.realpath(os.path.join(target, "index.html"))
+            if index != real_root and not index.startswith(real_root + os.sep):
+                return self._json(400, {"ok": False, "error": "bad path"})
             target = index if os.path.isfile(index) else ""
         if not target or not os.path.isfile(target):
             return self._json(404, {"ok": False, "error": "not found"})

@@ -1,0 +1,145 @@
+diff --git a/integration/gateway/hostpage.py b/integration/gateway/hostpage.py
+--- a/integration/gateway/hostpage.py
++++ b/integration/gateway/hostpage.py
+@@ -13,0 +14,6 @@
++
++WordCraft/GridCraft additionally require `ready {saveIdentity: 1}`, a one-shot
++`open {saveIdentity: 1, openId, mode: "update-only", ...}`, and `opened
++{openId, documentId}` before a write. Their saves require the same identity,
++`intent: "save"`, and a fresh ticket. Results and dirty signals carry that
++identity; a clean acknowledgement carries the successful save ticket.
+@@ -86,0 +93,23 @@
++const IDENTITY_REQUIRED = APP === "wordcraft" || APP === "gridcraft";
++const MAX_DOCUMENT_BYTES = 256 * 1024 * 1024;
++let identityPhase = "waiting";
++let binding = null;
++let confirmationTicket = null;
++// Bounded replay protection; exhausting it requires reopening the session.
++const usedTickets = new Set();
++function boundedId(value, max = 128) {
++  return typeof value === "string" && value.length <= max && value.trim().length > 0;
++}
++function matchesBinding(data) {
++  return identityPhase === "bound" && binding &&
++    data.openId === binding.openId && data.documentId === binding.documentId;
++}
++function saveReply(data, ok, error) {
++  if (IDENTITY_REQUIRED) {
++    if (!boundedId(data.openId) || !boundedId(data.documentId) || !boundedId(data.ticket, 256)) return;
++    toCraft("saveResult", { openId: data.openId, documentId: data.documentId,
++      ticket: data.ticket, ok, error });
++  } else if (data.ticket !== undefined && data.ticket !== null) {
++    toCraft("saveResult", { ticket: data.ticket, ok, error });
++  }
++}
+@@ -93,0 +123,3 @@
++// A refused document replacement is not an editor save result. Keep the
++// session dirty until a later save for the bound revision is actually stored.
++let rejectedSaveRevision = null;
+@@ -230,0 +263,9 @@
++      if (IDENTITY_REQUIRED) {
++        if (identityPhase !== "waiting") break;
++        identityPhase = "opening";
++        if (data.saveIdentity !== 1) {
++          identityPhase = "blocked";
++          say("This editor cannot bind the selected document; reopen with an updated editor", "err");
++          break;
++        }
++      }
+@@ -232,0 +274,4 @@
++        if (IDENTITY_REQUIRED) {
++          const id = crypto.getRandomValues(new Uint8Array(16));
++          binding = { openId: Array.from(id, (byte) => byte.toString(16).padStart(2, "0")).join(""), documentId: null };
++        }
+@@ -236,2 +281,9 @@
+-        toCraft("open", { name: FILE_NAME, bytes: new Uint8Array(buf) });
+-        say(FILE_NAME + " opened", "ok");
++        if (IDENTITY_REQUIRED) {
++          if (buf.byteLength > MAX_DOCUMENT_BYTES) throw new Error("document exceeds size limit");
++          toCraft("open", { saveIdentity: 1, openId: binding.openId,
++            mode: "update-only", name: FILE_NAME, bytes: new Uint8Array(buf) });
++          say("Waiting for the editor to parse " + FILE_NAME + "…", "busy");
++        } else {
++          toCraft("open", { name: FILE_NAME, bytes: new Uint8Array(buf) });
++          say(FILE_NAME + " opened", "ok");
++        }
+@@ -238,0 +291 @@
++        if (IDENTITY_REQUIRED) identityPhase = "blocked";
+@@ -240,0 +294,8 @@
++      break;
++
++    case APP + ":opened":
++      if (!IDENTITY_REQUIRED || identityPhase !== "opening" || !binding ||
++          data.openId !== binding.openId || !boundedId(data.documentId)) break;
++      binding = Object.freeze({ openId: binding.openId, documentId: data.documentId });
++      identityPhase = "bound";
++      say(FILE_NAME + " opened", "ok");
+@@ -255,5 +316,13 @@
+-      // This session is bound to exactly one Seafile document. Editors may
+-      // serialize their internal project title, which is not the storage name;
+-      // pin the write to the selected file and refuse Save As / exports.
+-      const requestedName = typeof data.name === "string" ? data.name : FILE_NAME;
+-      if (data.saveAs === true || fileExtension(requestedName) !== fileExtension(FILE_NAME)) {
++      // Names/formats are additional constraints, never document identity.
++      // Other Craft apps retain their existing protocol.
++      const hasRequestedName = typeof data.name === "string";
++      const requestedName = hasRequestedName ? data.name : FILE_NAME;
++      const documentNameMissing = (APP === "wordcraft" || APP === "gridcraft") && !hasRequestedName;
++      const documentNameChanged = (APP === "wordcraft" || APP === "gridcraft") && requestedName !== FILE_NAME;
++      const identityInvalid = IDENTITY_REQUIRED && (!CAN_EDIT || !matchesBinding(data) ||
++        data.intent !== "save" || !boundedId(ticket, 256) || usedTickets.has(ticket) ||
++        usedTickets.size >= 4096 || !(bytes instanceof Uint8Array) ||
++        bytes.byteLength > MAX_DOCUMENT_BYTES);
++      if (identityInvalid || data.saveAs === true || documentNameMissing || documentNameChanged || fileExtension(requestedName) !== fileExtension(FILE_NAME)) {
++        dirtyRevision += 1;
++        rejectedSaveRevision = dirtyRevision;
+@@ -267,5 +336,2 @@
+-        if (ticket !== undefined && ticket !== null) {
+-          toCraft("saveResult", { ticket: ticket, ok: false,
+-            error: "Save As and exports are not supported in this session" });
+-        }
+-        say("Save rejected: this session can only overwrite the selected file", "err");
++        saveReply(data, false, "this session can only save the bound document");
++        say("Save rejected: this session can only save the selected document", "err");
+@@ -286,3 +352 @@
+-        if (ticket !== undefined && ticket !== null) {
+-          toCraft("saveResult", { ticket: ticket, ok: false, error: "another save is still in progress" });
+-        }
++        saveReply(data, false, "another save is still in progress");
+@@ -291,0 +356 @@
++      if (IDENTITY_REQUIRED) usedTickets.add(ticket);
+@@ -318,0 +384,4 @@
++          if (rejectedSaveRevision !== null && saveRevision >= rejectedSaveRevision) {
++            rejectedSaveRevision = null;
++          }
++          confirmationTicket = ticket;
+@@ -340 +409 @@
+-        toCraft("saveResult", { ticket: ticket, ok: ok, error: shown });
++        saveReply(data, ok, shown);
+@@ -346,0 +416,5 @@
++      if (IDENTITY_REQUIRED) {
++        if (!matchesBinding(data) || typeof data.dirty !== "boolean") break;
++        if (!data.dirty && (usedTickets.size > 0 || window.__saveConfirmationPending) &&
++            (!window.__saveConfirmationPending || data.ticket !== confirmationTicket)) break;
++      }
+@@ -350,0 +425,4 @@
++      } else if (rejectedSaveRevision !== null) {
++        // A refused replacement/Save As cannot be cleared by an editor clean
++        // event, even if the preceding save was successful.
++        window.__lastDirty = true;
+@@ -362,0 +441,2 @@
++      } else if (IDENTITY_REQUIRED && usedTickets.size > 0) {
++        window.__lastDirty = true;
+@@ -385,0 +466,12 @@
++      if (IDENTITY_REQUIRED) {
++        identityPhase = "blocked";
++        if (binding?.documentId) {
++          window.__lastDirty = true;
++          window.__editorConfirmedSave = false;
++          window.__saveConfirmationPending = false;
++          fetch("/session/" + SID + "/dirty", {
++            method: "POST", credentials: "same-origin",
++            headers: { "Content-Type": "text/plain" }, body: "true",
++          }).catch(() => {});
++        }
++      }

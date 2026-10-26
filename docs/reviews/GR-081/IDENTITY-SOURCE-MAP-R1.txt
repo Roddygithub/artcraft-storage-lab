@@ -1,0 +1,92 @@
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:31: saved_revision: Rc<Cell<Option<u64>>>,
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:46: saved_revision: Rc::default(),
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:56: services.host_save = Some(Box::new(move |document, rejection, revision, path, bytes| {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:75: pub fn sync(&self, app: &mut WordApp) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:77: match app.session.open_host_document(&name, &bytes) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:82: self.saved_revision.set(Some(app.session.rev()));
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:98: app.session.host_acknowledged(pending.rejection);
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:99: self.saved_revision.set(Some(pending.revision));
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:126: let _ = self.transport.post_identity_dirty(identity, true, None);
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:131: if self.pending.borrow().is_empty() && self.saved_revision.get() != Some(app.session.rev()) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:140: if self.reported.get() != Some(dirty) && self.transport.post_identity_dirty(identity, dirty, self.last_ack.borrow().as_ref()).is_ok() {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:162: if let Err(error) = self.transport.post_identity_save(&identity, &ticket, &name, bytes) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/host.rs:190: let listener = self.transport.listen_identity(move |message| match message {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/web.rs:75: if host { app.session.lock_to_host(); }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/web.rs:151: if self.app.session.host_update_only() && !dropped.is_empty() {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/web.rs:173: if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/web.rs:175: if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/apps/wordcraft-web/src/web.rs:195: if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/cmd/file.rs:281: fn save(s: &mut Session, v: &Value) -> CmdResult {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/cmd/file.rs:350: fn save_as(s: &mut Session, v: &Value) -> CmdResult {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:368: host_saved_rejections: u64,
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:703: host_saved_rejections: 0,
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:811: pub fn lock_to_host(&mut self) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:822: pub fn host_rejected(&self) -> bool { self.host_rejections.get() != self.host_saved_rejections }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:823: pub fn host_acknowledged(&mut self, revision: u64) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:824: if revision == self.host_rejections.get() && revision != u64::MAX { self.host_saved_rejections = revision; }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:839: pub fn open_host_document(&mut self, name: &str, bytes: &[u8]) -> Result<u64, CmdError> {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:850: pub fn check_host_command(&self, id: &str, params: &Value) -> Result<(), CmdError> {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:1357: host_saved_rejections: _,
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:1452: self.check_host_command(id, params)?;
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/engine/src/session.rs:1458: return Ok(serde_json::json!({"pendingHostSave": true}));
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/ui-egui/src/file_dialogs.rs:392: pub(crate) fn save_as(&mut self, after: AfterSave) -> Asked {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/ui-egui/src/lib.rs:127: pub host_save: Option<Box<dyn Fn(u64, u64, u64, &str, &[u8]) -> Result<(), String>>>,
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/ui-egui/src/lib.rs:893: self.session.check_host_command(id, &params).map_err(|e| e.to_string())?;
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/ui-egui/src/lib.rs:975: self.session.check_host_command(id, &params).map_err(|e| e.to_string())?;
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/ui-egui/src/lib.rs:1011: if self.session.host_update_only() && self.services.host_save.is_none() {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/wordcraft/crates/ui-egui/src/lib.rs:1044: self.services.host_save.as_ref().ok_or_else(|| "host Save is unavailable".to_string())?(document, rejection, revision, &name, &bytes)
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/host.rs:52: services.host_save = Some(Box::new(move |name, bytes, snapshot, rejection| bridge.post_save(name, bytes, snapshot, rejection, ctx.clone())));
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/host.rs:68: pub fn sync(&self, app: &mut SheetApp) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/host.rs:70: match app.session.open_host_document(&name, &bytes) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/host.rs:93: app.session.host_acknowledged(pending.rejection);
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/host.rs:109: let _ = self.transport.post_identity_dirty(identity, true, None);
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/host.rs:118: if self.reported.get() != Some(dirty) && self.transport.post_identity_dirty(identity, dirty, self.last_ack.borrow().as_ref()).is_ok() {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/host.rs:136: if let Err(error) = self.transport.post_identity_save(&identity, &ticket, name, bytes) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/host.rs:161: let listener = self.transport.listen_identity(move |message| match message {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/web.rs:63: if host { app.session.lock_to_host(); }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/web.rs:130: if self.app.session.host_update_only() && !dropped.is_empty() {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/web.rs:149: if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/web.rs:151: if let Some(bridge) = &self.bridge { bridge.sync(&mut self.app); }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/apps/gridcraft-web/src/web.rs:175: bridge.sync(&mut self.app);
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/cmd/file.rs:106: fn save(s: &mut Session, p: &Json) -> Result<Json> {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/cmd/file.rs:145: fn save_as(s: &mut Session, p: &Json) -> Result<Json> {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:290: host_saved_rejections: u64,
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:331: pub fn lock_to_host(&mut self) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:342: pub fn host_rejected(&self) -> bool { self.host_rejections.get() != self.host_saved_rejections }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:343: pub fn host_acknowledged(&mut self, revision: u64) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:344: if revision == self.host_rejections.get() && revision != u64::MAX { self.host_saved_rejections = revision; }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:359: pub fn open_host_document(&mut self, name: &str, bytes: &[u8]) -> Result<u64> {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:368: pub fn check_host_command(&self, id: &str, params: &Json) -> Result<()> {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:379: pub fn serialize_host_save(&self) -> Result<(u64, Arc<Workbook>, String, Vec<u8>)> {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:485: self.check_host_command(id, &params)?;
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/engine/src/lib.rs:491: return Ok(serde_json::json!({"pendingHostSave": true}));
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/backstage.rs:247: fn save(app: &mut SheetApp, out: &mut Outcome) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/backstage.rs:663: fn save_as(app: &mut SheetApp, ui: &mut Ui, bs: &mut Backstage, out: &mut Outcome) {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/backstage.rs:884: pub fn export_as(app: &mut SheetApp, fmt: &str) -> bool {
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/lib.rs:199: pub host_save: Option<Box<dyn Fn(&str, &[u8], SaveSnapshot, u64) -> Result<(), String>>>,
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/lib.rs:396: self.session.check_host_command(id, &params).map_err(|e| e.to_string())?;
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/lib.rs:399: if self.services.host_save.is_none() { return Err(self.session.host_refuse().to_string()); }
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/lib.rs:404: let (uid, workbook, name, bytes) = self.session.serialize_host_save().map_err(|e| e.to_string())?;
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/lib.rs:405: self.services.host_save.as_ref().ok_or_else(|| "host Save is unavailable".to_string())?(
+/home/roddy/.cache/artcraft-storage-lab/gr081-identity-implementation/work/gridcraft/crates/ui-egui/src/lib.rs:550: if let Err(error) = self.session.check_host_command(id, &params) { self.alert(error.to_string()); return; }
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:93: const IDENTITY_REQUIRED = APP === "wordcraft" || APP === "gridcraft";
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:97: let confirmationTicket = null;
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:103: function matchesBinding(data) {
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:108: if (IDENTITY_REQUIRED) {
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:263: if (IDENTITY_REQUIRED) {
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:274: if (IDENTITY_REQUIRED) {
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:281: if (IDENTITY_REQUIRED) {
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:291: if (IDENTITY_REQUIRED) identityPhase = "blocked";
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:297: if (!IDENTITY_REQUIRED || identityPhase !== "opening" || !binding ||
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:322: const identityInvalid = IDENTITY_REQUIRED && (!CAN_EDIT || !matchesBinding(data) ||
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:326: if (identityInvalid || data.saveAs === true || documentNameMissing || documentNameChanged || fileExtension(requestedName) !== fileExtension(FILE_NAME)) {
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:356: if (IDENTITY_REQUIRED) usedTickets.add(ticket);
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:387: confirmationTicket = ticket;
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:416: if (IDENTITY_REQUIRED) {
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:417: if (!matchesBinding(data) || typeof data.dirty !== "boolean") break;
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:419: (!window.__saveConfirmationPending || data.ticket !== confirmationTicket)) break;
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:441: } else if (IDENTITY_REQUIRED && usedTickets.size > 0) {
+/home/roddy/artcraft-storage-lab/integration/gateway/hostpage.py:466: if (IDENTITY_REQUIRED) {
+/home/roddy/artcraft-storage-lab/integration/rust/craft-platform/src/browser/host.rs:196: pub fn listen_identity(
+/home/roddy/artcraft-storage-lab/integration/rust/craft-platform/src/browser/host.rs:249: pub fn post_identity_save(&self, identity: &DocumentIdentity, ticket: &SaveTicket,
+/home/roddy/artcraft-storage-lab/integration/rust/craft-platform/src/browser/host.rs:265: pub fn post_identity_dirty(&self, identity: &DocumentIdentity, dirty: bool,

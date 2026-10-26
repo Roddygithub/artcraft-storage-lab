@@ -73,12 +73,11 @@ current anchors are in `source-evidence.txt` and the exact patch.
 | `git apply --check`, apply and byte comparison in clean exact-base checkout | PASS, all 14 changed/new source files byte-identical; `patch-check.txt` |
 | `git diff --check` / script syntax | PASS at current stage |
 
-Final script output is `checks.log`. Original engine test command without
-`--lib` also passed 4 selected tests and ran many integration binaries with zero
-selected cases; retained in `initial-engine.log`. `initial-ui.log` records the
-first host test run. `retained-gr032-base-wasm.log` is explicitly baseline
-compilation, not evidence for the final candidate. `source-evidence.txt` and
-`transport-source-evidence.txt` record exact source anchors at the pinned inputs.
+The final check result is summarized in `check-result.json`; patch application
+and dependency-lock evidence are retained in `patch-check.txt` and
+`lock-check.txt`. `source-evidence.txt` and `transport-source-evidence.txt`
+record exact source anchors at the pinned inputs. No `checks.log` or initial
+test stdout logs are retained in this bundle.
 
 ## Final result and retained state
 
@@ -88,7 +87,7 @@ remain in the report; this is not a project PASS or deployment authorization.
 
 - Combined patch SHA-256: `b3375bc2e9f29a9624df0428df3916b2013ba9aa11be9b7e27825cd103c07d85`.
 - Cargo.lock SHA-256: `166c9984b3e3706eabd88400ab9bed50840cd146043e6dd4ac900a285cb4a3d0`.
-- Final check script exit: `0`; see `check-result.json` and `checks.log`.
+- Final check script exit: `0`; see `check-result.json`, `patch-check.txt` and `lock-check.txt`.
 - `lock-check.txt`: every preexisting external dependency version/source/checksum unchanged.
 - Parent checkout `/home/roddy/.t3/worktrees/artcraft-storage-lab/t3-96b37bb6`
   remains clean at `dc105220ae934f9779eb357a4cda901ee0aa0c0b`.
@@ -102,7 +101,9 @@ Runnable check from the isolated lab worktree:
 ./scripts/check-gr076-photocraft.sh /home/roddy/.cache/artcraft-storage-lab/gr076-photocraft
 ```
 
-Browser iframe/ACK/unload/repaint runtime, persistence/version/reopen, full
-native desktop/visual/clippy/corpus checks and total serialization-memory bound
-remain **NOT VERIFIED** (serialization peak is explicitly not bounded by the
-post-serialization cap). No service was accessed for this slice.
+Synthetic Seafile persistence, version creation, readback and semantic reopen
+are **PASS** in the runtime follow-up above. Editor-payload/readback byte
+identity, browser unload/clock behavior, optimized bundle, full native
+desktop/visual/clippy/corpus checks and total serialization-memory bound remain
+**NOT VERIFIED** (serialization peak is explicitly not bounded by the
+post-serialization cap). No production service was accessed for this slice.

@@ -9,12 +9,17 @@ closed and the file reopened from Seafile. GridCraft, PdfCraft and VectorCraft
 screenshots show a new-version ID. The WordCraft retained screenshots show the
 edit and saved state; a new-version confirmation was observed during the run
 but was not captured. PhotoCraft's host save returned HTTP 200 and its editor
-returned to a clean state. No manual download or upload was used. Per-route
+returned to a clean state, as operator-recorded. Its retained save/reopen PNGs
+are byte-identical to earlier GR-076 captures and show Layer 1/2, so they do
+not visually corroborate the GR-078 added-layer edit or reopen. No manual
+download or upload was used. Per-route
 screenshots and a sanitized observation record are in
 [`reviews/GR-078/runtime/`](reviews/GR-078/runtime/).
 
-This closes the combined synthetic browser replay gap identified in GR-077 for
-the running lab deployment used in this session. It does not mean the four
+This records the sequential combined replay in the running lab deployment.
+The PhotoCraft portion is evidence-limited: save/reopen chronology is
+operator-recorded, and its retained PNGs show the earlier state. The combined
+row is therefore marked `[~]` in the test matrix. This does not mean the four
 non-PhotoCraft bundles were promoted into this checkout's ignored
 `integration/static/`; that directory still contains only the PhotoCraft
 bundle. It also does not establish production readiness, byte-for-byte
@@ -29,7 +34,7 @@ CSP behavior, or ONLYOFFICE post-change UI behavior.
 | `synthetic.xlsx` | `.xlsx` → GridCraft | Changed B2 from 1337 to 1338; formula cell B3 recalculated to 1338; save displayed version `5724ff96254801716d84bb07b8e8705060d410f9` | B2 and formula result remained 1338 |
 | `form.pdf` | `.pdf` → PdfCraft | Changed the first interactive field to `GR078savededit`; save displayed version `9e9a8b9a7e2fa90df924cab8d6da9798676e7630` | Field value remained visible |
 | `synthetic.svg` | `.svg` → VectorCraft | Added a 20 × 20 px rectangle and used Export As SVG; host save displayed version `55962c8fedfe0e0a25a547a8a9b1992f8daf9b32` | New rectangle remained visible |
-| `photocraft-fixture/photocraft-smoke.pcraft` | `.pcraft` → PhotoCraft | Added a layer; Ctrl+S returned HTTP 200 and the editor showed its clean/saved state | Added layer remained after tab close and reopen |
+| `photocraft-fixture/photocraft-smoke.pcraft` | `.pcraft` → PhotoCraft | Operator-recorded: added a layer; Ctrl+S returned HTTP 200 and the editor showed its clean/saved state | Operator-recorded: added layer remained after tab close and reopen; retained PNGs are reused GR-076 captures and do not show this later edit |
 
 For PhotoCraft, the in-app File → Close command is unavailable for a host-bound
 document. The editor tab was closed and reopened from Seafile; this is the

@@ -130,7 +130,8 @@ That is the single most important property of this design:
 ## 2. The contract, generalised
 
 The generalised contract is the GridCraft/PdfCraft one, with the per-app
-namespace made explicit. We do **not** invent new message names.
+namespace made explicit. GR-081 adds a stricter source-only update mode for
+WordCraft/GridCraft; it is not yet an adopted shared/upstream contract.
 
 ```text
 HOST  ->  CRAFT
@@ -140,10 +141,29 @@ HOST  ->  CRAFT
 CRAFT -> HOST
 
   <app>:ready     { version: string }
-  <app>:save      { name: string, bytes: ArrayBuffer, saveAs?: boolean }
+  <app>:save      { name: string, bytes: ArrayBuffer, ticket?: string, saveAs?: boolean }
   <app>:dirty     { dirty: boolean }
   <app>:failed    { error: string }
 ```
+
+For the GR-081 WordCraft/GridCraft source patches, writable host mode also
+negotiates and binds the actual native editor document. The exact source-only
+extension is:
+
+```text
+CRAFT -> HOST  <app>:ready   { saveIdentity: 1 }
+HOST  -> CRAFT <app>:open    { saveIdentity: 1, mode: "update-only", openId, name, bytes }
+CRAFT -> HOST  <app>:opened  { openId, documentId }             (only after parse succeeds)
+CRAFT -> HOST  <app>:save    { openId, documentId, intent: "save", ticket, name, bytes }
+HOST  -> CRAFT <app>:saveResult { openId, documentId, ticket, ok, error? }
+CRAFT -> HOST  <app>:dirty   { openId, documentId, dirty, ticket? }
+```
+
+`openId` and `documentId` are bounded correlation strings, not credentials.
+An old host or editor cannot fall back to filename-only writes. The extension
+is represented by local source patches and a pinned transport commit; build,
+browser compatibility, durable save behavior, and remote dependency resolution
+remain **NOT VERIFIED**.
 
 ### 2.1 Rules
 
@@ -153,11 +173,12 @@ CRAFT -> HOST
 | R2 | The Craft page only ever talks to `window.parent` | not `opener`, not a wildcard |
 | R3 | Every incoming message is checked on **both** `event.origin` and `event.source` | a page on the same origin could otherwise be tricked into injecting bytes |
 | R4 | Every outgoing message names an **explicit `targetOrigin`**, never `"*"` | required by the mission |
-| R5 | The parent is the **only** party that can open a document or receive bytes | the Craft app has no storage of its own in host mode |
+| R5 | The parent is the **only** party that can open a document or receive bytes; in a one-document host session, the app must refuse New/Open/replacement paths that can make Save serialize a different document | the Seafile capability is bound to one file; reusing it for a replacement would overwrite the selected file |
 | R6 | The Craft app reports `dirty`; it never decides that a save succeeded | the host owns persistence |
 | R7 | The Craft app reports `failed` when it cannot start | the host must be able to show the error |
-| R8 | The host must be able to detect **stale** documents | the contract carries the document name; the *version* is the host's business (GR-008) |
-| R9 | **The host tells the Craft app whether the save succeeded** | the Craft app must not believe a save succeeded when the host refused it (§3.5). Ticketed local patches now implement this for WordCraft and GridCraft, with isolated synthetic Seafile runtime evidence; the shared behavior is not adopted upstream (§3.7). |
+| R8 | The host must reject saves unless they match the bound native editor document and the selected file | The GR-081 source extension carries native identity and validates it before storage; filename and format checks remain additional constraints. Runtime enforcement is NOT VERIFIED. |
+| R9 | **The host tells the Craft app whether the save succeeded** | the Craft app must not believe a save succeeded when the host refused it (§3.5). Ticketed local patches implement this for WordCraft and GridCraft, with isolated synthetic Seafile runtime evidence; the shared behavior is not adopted upstream (§3.7). |
+| R10 | Save As and replacement operations must be refused before serialization in one-document host sessions | GR-081 source patches add editor-side command gates and a typed ordinary-Save path. Compilation and proof of zero serialization/upload on refusal remain NOT VERIFIED. |
 
 ### 2.2 Deliberately **not** in the contract
 
@@ -336,23 +357,19 @@ CRAFT -> HOST
   <app>:save        { name, bytes, ticket: "..." }
 ```
 
-The proposed common wire ticket is an **opaque string**, echoed unchanged in
+The common wire ticket is an **opaque string**, echoed unchanged in
 `saveResult`; do not put a JavaScript number on the wire. Each app may keep its
-own internal ticket and snapshot type, adapting it at the boundary. This avoids
-the current local WordCraft patch's numeric ticket and GridCraft patch's string
-ticket from becoming two incompatible host protocols. WordCraft's internal
-`AsyncSaves` ticket (`start()` / `finish(ticket, Saved | Failed(error))`) stays
-app-owned; GridCraft's exact workbook snapshot also stays app-owned. PdfCraft's
-current synchronous `Result` is not sufficient for a durable remote write and
-needs an asynchronous outcome.
+own internal ticket and snapshot type, adapting it at the boundary. The GR-081
+WordCraft/GridCraft source patches use the shared transport and string ticket;
+WordCraft's `AsyncSaves` ticket and GridCraft's exact workbook snapshot stay
+app-owned. PdfCraft's current synchronous `Result` is not sufficient for a
+durable remote write and needs an asynchronous outcome.
 
-> This extension remains a proposal for a shared upstream contract. WordCraft's
-> bridge patch (GR-014) and the GridCraft ticketed patch (GR-010) implement it
-> locally. Real-browser saves and fresh editor reopens were reproduced against
-> the isolated synthetic Seafile stack for both apps; neither patch is
-> upstreamed and the broader suite has not adopted one shared implementation.
-> Their current ticket encodings differ and must be normalized when they migrate
-> to a shared transport.
+> This remains a proposal for an adopted upstream contract. Earlier local
+> WordCraft/GridCraft patches and the GR-081 identity-aware source patches are
+> not upstreamed. Earlier synthetic Seafile save/reopen evidence does not verify
+> the GR-081 identity binding, current bundles, or current route. The GR-081
+> patches have not been compiled or run.
 
 Until it exists, the host page must keep **its own** "not persisted" state and
 warn on close, because a GridCraft-style app will believe the document is

@@ -1,0 +1,29 @@
+Rust formatter syntax parse only (no type checking/code generation): exit=0 wordcraft/apps/wordcraft-web/src/host.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 wordcraft/apps/wordcraft-web/src/web.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 wordcraft/crates/engine/src/cmd/file.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 wordcraft/crates/engine/src/session.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 wordcraft/crates/ui-egui/src/dialogs.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 wordcraft/crates/ui-egui/src/file_dialogs.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 wordcraft/crates/ui-egui/src/lib.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 gridcraft/apps/gridcraft-web/src/host.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 gridcraft/apps/gridcraft-web/src/web.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 gridcraft/crates/engine/src/cmd/file.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 gridcraft/crates/engine/src/lib.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 gridcraft/crates/ui-egui/src/backstage.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 gridcraft/crates/ui-egui/src/dialogs.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 gridcraft/crates/ui-egui/src/lib.rs
+Rust formatter syntax parse only (no type checking/code generation): exit=0 storage-lab/integration/rust/craft-platform/src/browser/host.rs
+Python ast.parse only: hostpage.py accepted; module not imported or executed
+JavaScript node --check only: exit=0; script not executed
+wordcraft: exact base commit; original source equals baseline; only recorded copy edits
+gridcraft: exact base commit; original source equals baseline; only recorded copy edits
+wordcraft: content hashes match; git apply --check accepted incremental patch
+gridcraft: content hashes match; git apply --check accepted incremental patch
+storage-lab: content hashes match; git apply --check accepted incremental patch
+Static artifact check complete. Compilation, tests, runtime behavior and security properties NOT VERIFIED.
+Tracked-file whitespace diff check: exit=0
+Historical GR-016 patches and tracked tests: no git diff
+The initial rustfmt shim invocation failed because mise had no selected version; the installed 1.95.0 formatter was used directly, without changing environment configuration.
+One formatter stdout copy briefly included filename headers in isolated adapter files; the final syntax parse caught this, the headers were removed, and all artifacts were regenerated before these results.
+No Cargo, tests, builds, browser, network or service commands were run. No commit or push was made.
+Compilation/type checking, security/refusal behavior, dirty/save ordering and actual-WASM/Seafile roundtrips: NOT VERIFIED.

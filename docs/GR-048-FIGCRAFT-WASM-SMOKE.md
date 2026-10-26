@@ -23,14 +23,16 @@ accepted patch. Cargo used the global persistent target directory
 `/home/roddy/.cache/cargo-target` and temporary directory
 `/home/roddy/.cache/cargo-tmp`. No environment override or cache move was used.
 See [provenance](reviews/GR-048/provenance.txt),
-[build log](reviews/GR-048/build.log), and
-[reproduction commands](reviews/GR-048/commands.sh).
+[retained checks](reviews/GR-048/checks.txt), and
+[reproduction commands](reviews/GR-048/commands.sh). A full build stdout log
+was not retained; the build claim above is limited to the recorded command,
+artifact hashes and browser-fetched outputs.
 
 ## Runtime
 
 | Step | Observation / evidence |
 | --- | --- |
-| Actual optimized build | PASS, Rust web-release 6m56s followed by configured `wasm-opt -Oz`; Trunk success in `build.log` |
+| Build evidence | Trunk release command and pre-/post-packaging artifact hashes are recorded; full stdout was not retained, so the exact `wasm-opt -Oz` invocation/result is **NOT VERIFIED** from retained evidence |
 | Packaged WASM | 23,480,217 bytes; SHA-256 `029d1e23bb231c307c4d51e3ffafc7cd92052edf35833e3e38bb95b9b0ebc757` |
 | Pre-packaging WASM | 28,210,786 bytes; SHA-256 `2cebbe07c1e46cd0ef52b9532c3408f147143da457f51228a0c8ae6e03f8ca10` |
 | Native fixture | 268-byte ZIP; SHA-256 `899204d7ab596e9efd9d86df7935474ef15df0bc2cbb80a8798ad8ce102b3d8a`; empty synthetic page |
@@ -45,8 +47,9 @@ See [provenance](reviews/GR-048/provenance.txt),
 Evidence: [browser transcript](reviews/GR-048/runtime/browser-evidence.json),
 [visible edit](reviews/GR-048/runtime/figcraft-visible-edit.png),
 [fresh reopen](reviews/GR-048/runtime/figcraft-reopen.png),
-[HTTP log](reviews/GR-048/network.log),
 [artifact hashes](reviews/GR-048/artifacts.txt).
+No standalone HTTP `network.log` was retained; request/status observations are
+bounded by the sanitized browser transcript and browser-fetched hashes.
 Build warnings concern missing optional `craft-fonts`, unused code/imports;
 browser warnings concern preload integrity, software rasterizer and unimplemented
 system-theme viewport command. No runtime error occurred in the positive flow.

@@ -90,7 +90,7 @@ Everything below follows from that.
 | --- | --- | --- |
 | a Seafile account token | **no** | it would give the whole account |
 | a seafhttp access token | **no** | an update token is library-wide; a download token is a URL the browser could leak |
-| a Seahub session cookie | not used by the gateway | the gateway does not read or forward it; browser cookie scope depends on deployment origin |
+| a Seahub session cookie | not used by the gateway | the gateway does not read or forward it; cookie delivery depends on hostname and cookie Domain/Path/SameSite scope, not origin alone; deployed isolation is NOT VERIFIED |
 | the ONLYOFFICE JWT secret | **no** | it is a server-side secret |
 | **an opaque session id** | **yes** | it is the *only* thing the browser holds |
 
@@ -123,9 +123,13 @@ is what makes the session id a *capability* rather than a parameter.
 
 The host page and the Craft app are **same-origin with each other**, but both
 must be on an origin **different from Seahub**. This prevents the untrusted
-editor frame from reading Seahub's hidden capability form or cookies. The
-browser posts the capability to `/open/` by navigation; the gateway stores it
-server-side before rendering the host page.
+editor frame from reading Seahub's hidden capability form or DOM. Origin
+separation alone does not guarantee cookie isolation: the gateway must use a
+distinct hostname and Seahub cookies must be scoped so they are not sent to
+that hostname (for example, avoid broadly scoped `Domain` cookies). Deployed
+cookie isolation is **NOT VERIFIED**. The browser posts the capability to
+`/open/` by navigation; the gateway stores it server-side before rendering the
+host page.
 
 **Incoming** (the host page listens on `window`):
 

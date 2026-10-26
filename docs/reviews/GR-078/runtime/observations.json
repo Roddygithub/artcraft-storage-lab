@@ -46,7 +46,8 @@
       "edit": "Added a layer",
       "save_confirmation": "Host save returned HTTP 200; editor returned to clean state",
       "reopen": "Added layer remained visible",
-      "close_note": "In-app close unavailable for host-bound document; browser editor tab was closed"
+      "close_note": "In-app close unavailable for host-bound document; browser editor tab was closed",
+      "screenshot_evidence": "Retained save and reopen PNGs are byte-identical to GR-076 captures showing Layer 1/2; they do not corroborate this GR-078 edit, save, or reopen. Those observations are operator-recorded."
     }
   ],
   "limitations": [
