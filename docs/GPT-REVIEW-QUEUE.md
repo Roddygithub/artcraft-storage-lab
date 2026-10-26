@@ -1,5 +1,20 @@
 # GPT Review Queue
 
+## GR-062 — PdfCraft real synthetic Seafile roundtrip
+
+The exact GR-057 candidate completed Seafile file-list open → AcroForm edit →
+editor save acknowledgement → library-history modification → fresh list
+reopen with the edited field intact. The fixture upload was setup only; the
+editor save created the persisted edit. PDF was added to the same synthetic
+library allowlist while preserving DOCX/WordCraft and XLSX/GridCraft.
+`ENABLE_ONLYOFFICE=True` remained set; no ONLYOFFICE settings or routes changed.
+Byte-level save-message/readback identity and a post-change ONLYOFFICE
+edit/save regression remain **NOT VERIFIED**. Independent R1–R2 returned bounded
+PROVISIONAL PASS with no blocker/major; R1's wording MINOR was corrected and
+closed in R2. Project remains **INCOMPLETE**; upstream publication **LOCKED**.
+See [report](GR-062-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md) and
+[evidence](reviews/GR-062/). GR-062 remains **GPT REVIEW PENDING**.
+
 ## GR-061 — GridCraft real synthetic Seafile roundtrip
 
 **Bounded independent review: R1–R3 PROVISIONAL PASS**, no blocker/major; two

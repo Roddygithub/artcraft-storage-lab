@@ -1,0 +1,41 @@
+GR-062 sanitized browser observations — 2026-10-26
+
+Preparation:
+- Confirmed the authenticated Seafile file list contained the existing
+  synthetic DOCX and XLSX fixtures.
+- Uploaded the 655-byte synthetic PDF as fixture setup and opened it in
+  PdfCraft without editing it.
+- Uploaded the 1,744-byte repository AcroForm fixture `form.pdf` through
+  Seafile's UI. The setup upload returned HTTP 200 and appeared in the list.
+- Deployed candidate inventory verification passed: three PdfCraft assets;
+  the index's JavaScript and WASM references resolve. Existing DOCX and XLSX
+  gateway routes remained available.
+- Seahub and gateway services were active after the scoped change. The
+  `ENABLE_ONLYOFFICE` setting remained true.
+
+Editor flow:
+- Clicking `form.pdf` in the Seafile list opened the actual PdfCraft WASM.
+  Gateway `/open/`, app index/JS/WASM, and session document GET returned HTTP
+  200. PdfCraft displayed five interactive form fields.
+- Edited one form field to `GR062 PDF host save roundtrip`; the editor showed
+  unsaved changes.
+- Ctrl+S produced one observed gateway session save POST with HTTP 200. The
+  editor displayed “Saved — new version …”; its following dirty-state POST
+  returned HTTP 200.
+- Seafile's authenticated library-history UI showed `Modified "form.pdf"`
+  after `Added "form.pdf"`.
+- A second click from the Seafile file list created a different gateway
+  session. The fresh PdfCraft page fetched the document (HTTP 200) and rendered
+  the edited form value.
+
+Evidence boundaries:
+- This was the owner's real Seafile instance and the explicitly synthetic
+  library; it was not an in-memory parent or a manual upload of edited bytes.
+- The direct browser network observations contain private origins and opaque
+  session capabilities. This transcript records only route suffixes, methods
+  and statuses; capabilities, hostnames and library identifiers are omitted.
+- History was confirmed in Seafile's authenticated UI. No direct content API
+  hash/readback was obtained, and editor save-message bytes were not captured
+  for byte-for-byte comparison.
+- This was a single-document functional roundtrip, not a concurrency,
+  authorization, production-security, or ONLYOFFICE regression test.

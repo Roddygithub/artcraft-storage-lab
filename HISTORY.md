@@ -1,3 +1,22 @@
+## 2026-10-26 — GR-062 PdfCraft real synthetic Seafile roundtrip
+
+- Staged the exact reviewed GR-057 PdfCraft candidate on the existing gateway;
+  added PDF dispatch and the PDF extension to the same synthetic-library
+  allowlist. DOCX/WordCraft and XLSX/GridCraft routes were preserved, and
+  `ENABLE_ONLYOFFICE=True` remained set. A private rollback archive is retained
+  outside Git.
+- Uploaded a generated AcroForm PDF through Seafile for setup, edited a form
+  field in the actual PdfCraft WASM, saved through the editor protocol, observed
+  a new-version confirmation and a Seafile history `Modified` event, then
+  reopened from the file list in a fresh session with the field intact.
+- Independent R1–R2 reviews returned bounded PROVISIONAL PASS with no
+  blocker/major; the R1 documentation MINOR was corrected and closed in R2.
+  Byte-level browser-message to Seafile readback, optimized output and
+  post-change ONLYOFFICE edit/save remain unverified. Project GPT remains
+  INCOMPLETE; upstream publication remains LOCKED.
+- Evidence: `docs/GR-062-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-062/`.
+
 ## 2026-10-26 — GR-061 GridCraft real synthetic Seafile roundtrip
 
 - Staged the exact reviewed GR-056 GridCraft candidate on the existing gateway

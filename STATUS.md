@@ -1,6 +1,23 @@
 # STATUS
 
-## CURRENT GR: GR-061 — GridCraft real synthetic Seafile roundtrip
+## CURRENT GR: GR-062 — PdfCraft real synthetic Seafile roundtrip
+
+The exact GR-057 PdfCraft WASM candidate now completes Seafile file-list open,
+AcroForm edit, save confirmation, a new library-history modification, and fresh
+Seafile-backed reopen with the edited field intact. The gateway added PDF →
+PdfCraft while preserving DOCX → WordCraft and XLSX → GridCraft. Seahub's
+extension allowlist remains restricted to the same single synthetic library.
+Fixture uploads were setup only, not persistence of the edit. The scoped
+Seahub restart retained `ENABLE_ONLYOFFICE=True`; no ONLYOFFICE settings or
+routes changed, and an ONLYOFFICE edit/save regression was not run. The
+candidate verifier passed against the live static root. Independent R1–R2
+reviews returned bounded PROVISIONAL PASS with no blocker/major; R1's wording
+MINOR was corrected and closed in R2. GR-062 remains **GPT REVIEW PENDING**.
+Project GPT remains
+**INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-062-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and `docs/reviews/GR-062/`.
+
+## PREVIOUS GR: GR-061 — GridCraft real synthetic Seafile roundtrip
 
 The exact GR-056 GridCraft WASM candidate now completes Seafile file-list open,
 visible XLSX edit, save confirmation, a new library-history modification, and

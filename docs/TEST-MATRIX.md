@@ -7,6 +7,24 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-062 — PdfCraft on real synthetic Seafile
+
+The exact GR-057 bundle is now dispatched for PDF in the single synthetic
+library already used by GR-059/061. The AcroForm fixture upload is setup only;
+the edited field was persisted through the editor save route. Project GPT
+remains INCOMPLETE and upstream publication LOCKED.
+
+| Check | Result | Scope |
+|---|---|---|
+| Deployed PdfCraft candidate | [x] GR-057 verifier passes against live static root | Three served files, sizes, hashes and index references; provenance is recorded separately |
+| Seafile file-list open → form edit → save → version → fresh reopen | [x] Edited AcroForm value survives a fresh editor session | One synthetic PDF; history UI showed `Modified`; screenshots retained |
+| Existing DOCX/XLSX routes and ONLYOFFICE flag | [x] Both routes preserved; `ENABLE_ONLYOFFICE=True` after Seahub restart | Post-change ONLYOFFICE edit/save regression not run |
+| Byte provenance, permission/concurrency failures and deployment security | [ ] NOT VERIFIED | No editor-message/readback hash or negative-path/production security test |
+| Independent exact-evidence review | [x] R1–R2 bounded PROVISIONAL PASS, no blocker/major; R1 wording MINOR corrected and closed | Work-item remains GPT REVIEW PENDING; project GPT still required |
+
+Evidence: `docs/GR-062-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+`docs/reviews/GR-062/`.
+
 ## GR-061 — GridCraft on real synthetic Seafile
 
 The exact GR-056 bundle is now dispatched for XLSX in the single synthetic
