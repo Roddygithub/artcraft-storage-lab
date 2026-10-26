@@ -17,10 +17,13 @@ the R2 independent source review found no new MAJOR regression, with its two
 MINOR artifact findings corrected. See
 `docs/reviews/GR-081/RESPONSE-R2-CODE.md`.
 
-This is source-only: no app build, tests, browser run or service check was
-performed. Same-name replacement refusal in running editors, save/ACK behavior,
-the Seafile version/reopen gate, and fresh resolution of local transport commit
-`d572f2d550278a7f4aad91a1bac650105c19812b` remain **NOT VERIFIED**. The save
+Both identity-patched apps now pass locked Rust 1.95 WASM checks; the existing
+WordCraft UI suite passes 824 tests (2 ignored) and the GridCraft UI suite
+passes 151 tests. The gateway browser protocol test was not run because Python
+Playwright is unavailable. Same-name replacement refusal in running editors,
+browser save/ACK behavior, the Seafile version/reopen gate, and fresh resolution
+of local transport commit `d572f2d550278a7f4aad91a1bac650105c19812b` remain
+**NOT VERIFIED**. See `docs/reviews/GR-081/VALIDATION-R3.md`. The save
 identity MAJOR therefore remains open. ONLYOFFICE's current route remains
 **INCONCLUSIVE / NOT VERIFIED**; its configuration and service were not
 changed. Docs/evidence R3 returned PROVISIONAL FAIL and R4–R7 PROVISIONAL PASS;

@@ -11,7 +11,7 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 
 | Scenario | Expected | Result |
 |---|---|---|
-| WordCraft/GridCraft native document binding | Refuse replacement/Save As before serialization; ordinary Save persists and confirms only the bound native document | [~] Source patches use native IDs and identity-aware transport; R1/R2 source reviews corrected dependency and pending-save ordering. Build, runtime refusal, Save/ACK, Seafile version/reopen, and remote resolution of transport commit `d572f2d550278a7f4aad91a1bac650105c19812b` remain NOT VERIFIED |
+| WordCraft/GridCraft native document binding | Refuse replacement/Save As before serialization; ordinary Save persists and confirms only the bound native document | [~] Both locked WASM checks pass; existing UI suites pass (WordCraft 824 passed/2 ignored; GridCraft 151 passed). These do not test identity refusal or browser Save/ACK. Runtime refusal, Seafile version/reopen, and public-remote resolution of transport commit `d572f2d550278a7f4aad91a1bac650105c19812b` remain NOT VERIFIED |
 | Static directory index confinement | Reject an index symlink whose resolved target escapes the static root | [~] Final index path is now resolved and confined; runtime symlink exercise NOT RUN |
 | Dispatcher route mapping | Verifier accepts exactly the five tracked extension routes | [~] Expected map updated for `.docx`, `.xlsx`, `.pdf`, `.svg`, `.pcraft`; verifier NOT RUN |
 | Evidence and documentation accuracy | Correct deployment topology, screenshot attribution, stale evidence statements and broken links | [x] R3–R6 findings corrected; R7 PROVISIONAL PASS with no new documentation findings; identity implementation is covered separately by code/security R2 |
@@ -19,7 +19,8 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | Independent review | Separate review of GR-081 implementation and evidence | [~] Code/security R1 PROVISIONAL FAIL; R2 found no new MAJOR and two MINOR artifact findings now corrected; docs/evidence R3 PROVISIONAL FAIL, R4–R7 PROVISIONAL PASS; save-identity and ONLYOFFICE MAJOR gates remain open |
 
 Evidence: [GR-081 report](GR-081-PROJECT-GPT-REVIEW-REMEDIATION.md),
-[project GPT review record](reviews/GR-081/PROJECT-GPT-REVIEW-70FA192.md).
+[project GPT review record](reviews/GR-081/PROJECT-GPT-REVIEW-70FA192.md),
+[validation R3](reviews/GR-081/VALIDATION-R3.md).
 Candidate 70fa192 received project GPT **FAIL**. GR-081 does not claim
 project approval; upstream publication remains locked.
 

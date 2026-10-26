@@ -44,8 +44,13 @@ and ONLYOFFICE preservation gate remain open.
 
 ## Validation and limits
 
-No tests were added or run, and no browser workflow, build or service check was
-performed for GR-081. Current local checks include Python AST parsing, selected
+No tests were added. Since the initial source-only review, both identity-patched
+apps passed locked Rust 1.95 WASM checks and their existing UI suites (WordCraft
+824 passed/2 ignored; GridCraft 151 passed). The gateway browser protocol test
+was not run because Python Playwright is unavailable. No Seafile workflow or
+service check was performed. Full results and limits are in
+[`reviews/GR-081/VALIDATION-R3.md`](reviews/GR-081/VALIDATION-R3.md). Current
+local checks include Python AST parsing, selected
 JSON parsing, shell syntax, `git diff --check`, GR-069 manifest verification,
 and local Markdown target checks. The identity artifact checker confirms patch
 applicability and exact output hashes. The dispatcher verifier itself,

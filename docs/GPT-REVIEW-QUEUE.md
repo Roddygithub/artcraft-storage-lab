@@ -48,18 +48,22 @@ ordering defects; R2 source review found their corrections and no new MAJOR
 regression. Two R2 MINOR artifact findings were corrected. The source patches
 and responses are in `docs/reviews/GR-081/`.
 
-The save-identity MAJOR remains open: builds, runtime refusal-before-
-serialization, save/ACK behavior, Seafile version/reopen, and remote resolution
-of local transport commit `d572f2d550278a7f4aad91a1bac650105c19812b` are NOT
-VERIFIED. ONLYOFFICE current-route preservation remains INCONCLUSIVE / NOT
+Both locked WASM checks pass, and the existing WordCraft (824 passed, 2
+ignored) and GridCraft (151 passed) UI suites pass. These are not browser
+protocol or identity-refusal tests. The save-identity MAJOR remains open:
+refusal-before-serialization, browser save/ACK behavior, Seafile version/reopen,
+and public-remote resolution of local transport commit
+`d572f2d550278a7f4aad91a1bac650105c19812b` are NOT VERIFIED. ONLYOFFICE
+current-route preservation remains INCONCLUSIVE / NOT
 VERIFIED after the configured client API script returned 404; settings and
-services were not changed. No tests, builds, browser runs or service checks
-were performed. Docs/evidence R3 returned PROVISIONAL FAIL; R4–R7 returned
+services were not changed. No browser workflow or service check was performed;
+the gateway browser protocol test was not run because Python Playwright is
+unavailable. Docs/evidence R3 returned PROVISIONAL FAIL; R4–R7 returned
 PROVISIONAL PASS. A fresh project GPT review is required. Upstream publication
 remains LOCKED.
 
 Evidence: `docs/GR-081-PROJECT-GPT-REVIEW-REMEDIATION.md`,
-`docs/reviews/GR-081/`.
+`docs/reviews/GR-081/VALIDATION-R3.md`, and `docs/reviews/GR-081/`.
 
 ## GR-080 — security evidence and ONLYOFFICE status reconciliation
 

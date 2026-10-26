@@ -27,11 +27,13 @@ identity, matching open/document IDs, `intent:"save"`, and a fresh ticket;
 filename and format checks remain additional constraints. The source patches
 bind the native editor document after parsing, guard replacement/Save As before
 serialization, and use a typed ordinary-Save route. They also correct pending
-save dirty reporting for an exact snapshot/revision. Independent R2 review
-found no new MAJOR source regression, but no app build or runtime check was run.
-The save-identity MAJOR remains open until compilation, actual refusal-before-
-serialization checks, and the Seafile version/reopen gate are established.
-The dependency commit is local and remote availability is **NOT VERIFIED**.
+save dirty reporting for an exact snapshot/revision. Both identity-patched apps
+now pass locked Rust 1.95 WASM checks, and their existing UI unit suites pass;
+exact results and limits are recorded in
+[`VALIDATION-R3.md`](VALIDATION-R3.md). Same-name replacement refusal before
+serialization, browser save/ACK behavior, and the Seafile version/reopen gate
+remain **NOT VERIFIED**. The dependency commit is local and fresh public-remote
+resolution is **NOT VERIFIED**.
 
 The directory index is resolved and confined before serving. The tracked route
 verifier now expects all five routes, while noting that only four
@@ -51,11 +53,12 @@ were attributed to.
 ## Validation state
 
 `git diff --check`, Python and shell syntax checks, modified JSON parsing, and
-local Markdown target checks are being repeated after the R6 response edits.
-No test files
-are modified and no tests were run. Browser workflows, builds,
-runtime symlink exercise, dispatcher verifier execution and service checks were
-not performed. ONLYOFFICE's current-route UI remains INCONCLUSIVE / NOT
+local Markdown target checks were recorded before the app builds. Both app
+WASM checks and both existing UI suites subsequently passed; see
+[`VALIDATION-R3.md`](VALIDATION-R3.md). The gateway browser protocol test was
+not run because Python Playwright is unavailable. Browser workflows, runtime
+symlink exercise, dispatcher verifier execution and service checks were not
+performed. ONLYOFFICE's current-route UI remains INCONCLUSIVE / NOT
 VERIFIED. Code/security R3/R4 and docs/evidence R3 returned PROVISIONAL FAIL;
 docs/evidence R4/R5/R6 returned PROVISIONAL PASS with their MINOR findings
 addressed in [`RESPONSE-R4-DOCS.md`](RESPONSE-R4-DOCS.md),

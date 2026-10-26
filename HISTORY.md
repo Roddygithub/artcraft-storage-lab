@@ -1,5 +1,11 @@
 # 2026-10-26 — GR-081 project GPT review remediation
 
+- Validated both identity-patched app copies with locked Rust 1.95 WASM checks;
+  WordCraft UI tests passed 824 (2 ignored) and GridCraft UI tests passed 151.
+  The browser protocol test could not run because Python Playwright is absent.
+  These checks do not establish identity refusal, browser save/ACK, or Seafile
+  version/reopen. See `docs/reviews/GR-081/VALIDATION-R3.md`.
+
 - Recorded the FAIL on project candidate
   `70fa192ed5d414daf28087315f0f77f8312e98b5` and preserved all findings in the
   GR-081 review bundle.
