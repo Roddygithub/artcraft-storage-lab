@@ -1,6 +1,19 @@
 # STATUS
 
-## CURRENT GR: GR-076 — bounded PhotoCraft host adapter
+## CURRENT GR: GR-077 — Seafile integration coverage reconciliation
+
+Reconciled the global app-coverage document and test matrix with the current
+five-route tracked dispatcher and retained per-app synthetic Seafile evidence.
+The checkout's `integration/static/` contains only the GR-076 PhotoCraft bundle;
+the combined five-route replay and active serving of all five bundles remain
+**NOT VERIFIED**. This documentation work performed no runtime test or service
+change. Independent R1/R2 returned PROVISIONAL PASS; R1's ten minor wording and
+reference findings were remediated, and R2 found no new findings. Project GPT
+review remains incomplete and upstream publication remains locked. See
+`docs/GR-077-INTEGRATION-COVERAGE-RECONCILIATION.md` and
+`docs/reviews/GR-077/`.
+
+## PREVIOUS GR: GR-076 — bounded PhotoCraft host adapter
 
 Source candidate `5637bf2` is committed on `main`; runtime follow-up docs/evidence
 are committed and pushed on `main`. Based on local main
@@ -17,8 +30,10 @@ open/edit/save/version/readback/close/reopen; current file hash matches the
 latest of three history versions. The tracked dispatcher now includes the
 verified `pcraft` route, and the synthetic library extension allowlist and
 PhotoCraft static bundle were updated for the runtime. ONLYOFFICE
-settings/service were untouched. Post-change ONLYOFFICE UI check remains
-INCONCLUSIVE/NOT VERIFIED. WordCraft DOCX was re-opened after the allowlist
+settings/service were untouched. The post-change ONLYOFFICE attempt did not
+instantiate its editor: the configured client `api.js` URL returned 404 while
+the Document Server API and healthcheck returned 200 on direct probes; this
+check remains INCONCLUSIVE/NOT VERIFIED. WordCraft DOCX was re-opened after the allowlist
 change, edited, saved as a new version and reopened with the marker intact.
 Independent runtime/docs R1 findings were closed; R2 and R3 returned
 PROVISIONAL PASS. The tracked dispatcher route received an independent

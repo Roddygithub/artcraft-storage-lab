@@ -7,6 +7,21 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-077 — integration coverage reconciliation
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Tracked dispatcher summary | App/extension mapping matches `integration/config/dispatch.json` | [x] Five routes: DOCX, XLSX, PDF, SVG and `.pcraft`; PhotoCraft addition is GR-076 |
+| Per-app synthetic evidence summary | Summary points to retained app reports and does not imply one combined run | [x] WordCraft, GridCraft, PdfCraft, VectorCraft and PhotoCraft evidence is linked in `docs/ARTCRAFT-GLOBAL-INTEGRATION.md` |
+| Active local static assets | To pass, all five tracked routes must have matching assets in `integration/static/` for a combined replay | [ ] NOT VERIFIED; this checkout contains the GR-076 PhotoCraft bundle only |
+| Combined five-route Seafile replay | All tracked routes work together in one synthetic library/session | [ ] NOT VERIFIED; prior runtime checks were per-app |
+| Production security and conflict behavior | Production-readiness gate: verify save authorization, proxy, CSP, concurrency and permissions | [ ] NOT VERIFIED |
+| Independent review | Separate review of this documentation reconciliation | [x] R1/R2 PROVISIONAL PASS; ten R1 MINOR findings remediated; R2 found none new |
+
+Evidence: [GR-077 report](GR-077-INTEGRATION-COVERAGE-RECONCILIATION.md),
+[evidence bundle](reviews/GR-077/). This is a documentation reconciliation,
+not a new runtime test or project GPT PASS.
+
 ## GR-074 — gateway request-body framing
 
 | Scenario | Expected | Result |
@@ -71,10 +86,10 @@ project GPT PASS or upstream authorization.
 
 | Scenario | Expected | Result |
 |---|---|---|
-| Tracked dispatch mapping | DOCX/XLSX/PDF/SVG map to WordCraft/GridCraft/PdfCraft/VectorCraft | [x] Exact mapping checked against `integration/config/dispatch.json` |
+| Tracked dispatch mapping at GR-071 | DOCX/XLSX/PDF/SVG map to WordCraft/GridCraft/PdfCraft/VectorCraft | [x] GR-071 checked the four existing routes; GR-076 later added the `pcraft` → PhotoCraft route |
 | Candidate assets in one local test root | All four candidates match their per-app manifests | [x] 20 files, 207,970,569 bytes; GR-055–058 verifiers pass against the GR-059 test static root |
-| One combined four-route Seafile replay | All four routes work in one run | [ ] NOT VERIFIED; prior Seafile runs are per-app, not one combined replay |
-| Repository `integration/static` promotion / active serving | Deployed root matches candidates | [ ] NOT VERIFIED; GR-071 uses a separate cache test root and makes no promotion |
+| One combined five-route Seafile replay | All tracked routes work in one run | [ ] NOT VERIFIED; prior Seafile runs are per-app, not one combined replay |
+| Repository `integration/static` promotion / active serving | All five tracked routes have matching active assets | [ ] NOT VERIFIED; GR-076 staged PhotoCraft in this checkout, but the other four bundles are absent |
 | ONLYOFFICE post-change edit/save | Existing integration still saves after route changes | [x] GR-072 operator-recorded: synthetic DOCX edit, `All changes saved`, new Seafile history versions and later editor load with the final edit; explicit in-app close and byte identity remain unverified |
 | Production security and byte identity | Deployment security and save/readback identity established | [ ] NOT VERIFIED |
 | Independent review | Exact bounded evidence review | [x] R1–R3 PROVISIONAL PASS, no remaining findings; this is not project GPT PASS |
@@ -903,7 +918,7 @@ PROVISIONAL implementation; GPT REVIEW PENDING; no project GPT PASS.
 | Rust 1.95 locked WASM, format, whitespace and clean-base patch application | PASS, final script exit 0 and `reviews/GR-076/patch-check.txt` |
 | Live iframe Open/save/ACK/fresh reopen | PASS, actual GR-076 patched WASM in T3 Chromium; in-memory smoke, low-optimization bundle; `reviews/GR-076/runtime/` |
 | Dispatcher route `pcraft` → PhotoCraft | PASS, recorded in `integration/config/dispatch.json`; deployed synthetic route passed the browser workflow below |
-| Synthetic Seafile click/open/edit/save/version/close/reopen | PASS, history has 3 versions; current readback hash and reopened two-layer view recorded in `reviews/GR-076/runtime/README.md` and `seafile-readback.json` |
+| Synthetic Seafile click/open/edit/save/version/close/reopen | PASS, history has 3 versions; current readback hash and reopened two-layer view recorded in `reviews/GR-076/runtime/README.md` and `reviews/GR-076/runtime/seafile-readback.json` |
 | WordCraft synthetic DOCX after `.pcraft` allowlist addition | PASS, edit/save/new version/close/reopen; marker remained visible; history count is 4; `reviews/GR-076/runtime/README.md` |
 | Browser unload/clock and optimized bundle | NOT VERIFIED |
 | ONLYOFFICE UI regression after GR-076 runtime deployment | NOT VERIFIED; configured API script URL returned 404, `docEditor` undefined. Document Server API and healthcheck returned 200 when probed on the service. ONLYOFFICE settings remained unchanged/enabled; prior GR-072 evidence is separate |

@@ -34,6 +34,20 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-077 — Seafile integration coverage reconciliation
+
+Documentation now distinguishes the five routes in the tracked dispatcher
+from per-app synthetic Seafile evidence. Only the PhotoCraft asset bundle is
+present in this checkout's `integration/static/`; the other four bundles are
+absent. One combined five-route Seafile replay, active serving of every route,
+and production save/security behavior remain **NOT VERIFIED**. No runtime test
+or service change was performed. Independent R1/R2 returned PROVISIONAL PASS;
+R1's ten minor findings were remediated and R2 found no new findings. Project
+remains INCOMPLETE and upstream publication LOCKED.
+
+Evidence: `docs/GR-077-INTEGRATION-COVERAGE-RECONCILIATION.md`,
+`docs/reviews/GR-077/`.
+
 ## GR-076 — bounded PhotoCraft browser host adapter
 
 Exact low-optimization GR-076 bundle completed the synthetic Seafile
@@ -44,9 +58,11 @@ verified `pcraft` → PhotoCraft route; its independent route review is PROVISIO
 PASS. Independent source R1/R2 and runtime/docs R2/R3 are PROVISIONAL PASS;
 runtime R1 findings are closed. GPT review is pending.
 WordCraft DOCX was re-saved as a new version and reopened after the `.pcraft`
-allowlist addition. ONLYOFFICE settings were unchanged; its API script route
-returned 404 while the Document Server API itself returned 200, so the
-post-change browser UI check remains inconclusive.
+allowlist addition. ONLYOFFICE settings were unchanged. In the separate
+post-change ONLYOFFICE check, the configured client `api.js` URL returned 404,
+so that attempt did not instantiate the editor and remains inconclusive. The
+Document Server API/healthcheck returned 200 when queried directly; GR-072's
+earlier synthetic DOCX edit/save regression is recorded separately.
 No production data or upstream publication.
 
 ## GR-073 — gateway `/open/` rate limit
@@ -91,9 +107,10 @@ results, per-app verifier linkage and reconciliation with GR-054. The directory 
 `/home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static`,
 not a production or proven live service root. Do not contact services, promote
 assets, or change dispatch. Per-app Seafile runs are evidence for their
-respective candidates; one combined four-route replay, repository
-`integration/static` promotion, save/readback byte identity, and production
-security remain **NOT VERIFIED**. The post-change ONLYOFFICE smoke was
+respective candidates; one combined replay, repository `integration/static`
+promotion, save/readback byte identity, and production security remain
+**NOT VERIFIED**. GR-076 later added the `pcraft` route, making the current
+combined replay a five-route run. The post-change ONLYOFFICE smoke was
 subsequently recorded in GR-072. Project must remain **INCOMPLETE** and upstream
 publication **LOCKED**.
 Evidence: `docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md`,

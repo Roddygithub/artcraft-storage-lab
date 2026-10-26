@@ -1,3 +1,18 @@
+# 2026-10-26 — GR-077 Seafile integration coverage reconciliation
+
+- Corrected the global integration summary to distinguish the five tracked
+  routes, individual synthetic Seafile evidence, and missing combined replay.
+- Recorded that only the PhotoCraft bundle is present under this checkout's
+  ignored `integration/static/`; the other four routes are not represented as
+  actively served here.
+- Updated the test matrix and evidence bundle. No application test, build,
+  service change or production access was performed. Independent review is
+  pending; project GPT remains incomplete and upstream publication locked.
+- Independent R1/R2 returned PROVISIONAL PASS. R1's ten minor documentation
+  findings were addressed; R2 found no new findings.
+- Evidence: `docs/GR-077-INTEGRATION-COVERAGE-RECONCILIATION.md`,
+  `docs/reviews/GR-077/`.
+
 ## 2026-10-26 — GR-076 bounded PhotoCraft host adapter
 
 Source candidate committed as `5637bf2` on `main`; runtime evidence/docs were
