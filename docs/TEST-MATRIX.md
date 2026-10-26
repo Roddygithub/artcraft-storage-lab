@@ -7,6 +7,22 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-074 — gateway request-body framing
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Oversized `/open/` body | Reject before Seafile lookup and close the connection | [x] Loopback HTTP test: 413, close, no Seafile lookup |
+| Oversized `/dirty` report | Preserve prior unsaved state and close the connection | [x] Loopback HTTP test: 413, prior dirty flag remains true |
+| Invalid/duplicate lengths, unsupported transfer encoding, truncated bodies | Reject with connection closure; preserve `/dirty` state | [x] Raw loopback matrix asserts 400/EOF and dirty preservation; the oversized `/open/` test separately asserts no Seafile lookup |
+| Oversized `/save` request | Return 413 and close before persistence | [x] Loopback HTTP test; active fake records no write |
+| HTTP/0.9 legacy GET | Reject before assuming header-object shape | [x] Raw HTTP/0.9 GET is closed without dispatch |
+| Parser-leftover malformed headers | Reject raw CR/LF residue before body framing | [x] Two pipelined raw cases return one 400, close, and preserve dirty state |
+| Proxy / production behavior | Confirm front-proxy framing and deployment behavior | [ ] NOT VERIFIED |
+
+Evidence: [GR-074 report](GR-074-HTTP-BODY-FRAMING.md),
+[review bundle](reviews/GR-074/). R1–R5 bounded reviews are PROVISIONAL PASS;
+no project GPT approval is implied.
+
 ## GR-073 — gateway `/open/` rate limit
 
 | Scenario | Expected | Result |

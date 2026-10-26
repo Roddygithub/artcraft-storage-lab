@@ -1,3 +1,19 @@
+## GR-074 — gateway request-body framing
+
+The shared POST body reader now rejects unsupported transfer encoding, duplicate
+or invalid content lengths, truncated reads and over-limit bodies, closing the
+connection on rejection. This also prevents an oversized `/dirty` body from
+clearing unsaved state. Loopback tests use a synthetic Seafile double only.
+R1's P2 Unicode-whitespace bypass and P3 false-positive test were fixed. R2
+reproduced a parser-reported malformed-header bypass; header defects and the
+unknown-route body path were addressed. R3's HTTP/0.9 and matrix-wording P3s
+were corrected. R4 found malformed header residue in `get_payload()` without
+parser defects; the reader now rejects it and raw tests cover both sequences.
+Independent R1–R5 bounded reviews are PROVISIONAL PASS with no remaining
+findings. Project GPT remains INCOMPLETE and upstream
+publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
+`docs/reviews/GR-074/`.
+
 # GPT Review Queue
 
 ## GR-073 — gateway `/open/` rate limit

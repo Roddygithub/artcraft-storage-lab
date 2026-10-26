@@ -15,6 +15,7 @@ import zipfile
 import io
 import http.client
 import re
+import socket
 import warnings
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import urllib.parse
@@ -171,6 +172,19 @@ def open_user_session(gw):
     session, error = gw.open_session("user-token")
     check("a user-bound token opens", session is not None, str(error))
     return session
+
+
+def raw_http_request(port, request):
+    connection = socket.create_connection(("127.0.0.1", port), timeout=3)
+    connection.sendall(request)
+    response = b""
+    while True:
+        chunk = connection.recv(4096)
+        if not chunk:
+            break
+        response += chunk
+    connection.close()
+    return response
 
 
 def main():
@@ -331,6 +345,9 @@ def main():
     check("an extension with no editor is refused", gw.app_for("a.unknownext") is None)
 
     # ---- direct HTTP-style opening is closed -----------------------------
+    seafile = FakeSeafile()
+    gw = make_gateway(seafile)
+    gw.max_bytes = 10
     session, error = gw.open_session_direct("repo", "/a.docx")
     check("direct repo/path opening is disabled", session is None and "disabled" in error)
 
@@ -361,6 +378,292 @@ def main():
     connection.close()
     check("cross-origin POST cannot open or save a document", response.status == 403,
           f"HTTP {response.status}")
+
+    embedded_get = (f"GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{httpd.server_port}\r\n\r\n"
+                    .encode())
+    cross_origin_pipelined = raw_http_request(
+        httpd.server_port,
+        f"POST /session/missing/dirty HTTP/1.1\r\n".encode()
+        + f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: https://attacker.invalid\r\n".encode()
+        + f"Content-Length: {len(embedded_get)}\r\n\r\n".encode()
+        + embedded_get)
+    check("cross-origin rejection closes instead of parsing its body as another request",
+          cross_origin_pipelined.startswith(b"HTTP/1.1 403")
+          and cross_origin_pipelined.count(b"HTTP/1.1 ") == 1
+          and b"Connection: close" in cross_origin_pipelined,
+          cross_origin_pipelined[:160].decode("latin-1", "replace"))
+
+    expired_pipelined = raw_http_request(
+        httpd.server_port,
+        f"POST /session/not-a-session/dirty HTTP/1.1\r\n".encode()
+        + f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n".encode()
+        + f"Content-Length: {len(embedded_get)}\r\n\r\n".encode()
+        + embedded_get)
+    check("expired-session rejection closes instead of parsing its body as another request",
+          expired_pipelined.startswith(b"HTTP/1.1 404")
+          and expired_pipelined.count(b"HTTP/1.1 ") == 1
+          and b"Connection: close" in expired_pipelined,
+          expired_pipelined[:160].decode("latin-1", "replace"))
+
+    unknown_route_pipelined = raw_http_request(
+        httpd.server_port,
+        b"POST /unimplemented HTTP/1.1\r\n"
+        + f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n".encode()
+        + f"Content-Length: {len(embedded_get)}\r\n\r\n".encode()
+        + embedded_get)
+    check("unknown POST route closes instead of parsing its body as another request",
+          unknown_route_pipelined.startswith(b"HTTP/1.1 404")
+          and unknown_route_pipelined.count(b"HTTP/1.1 ") == 1
+          and b"Connection: close" in unknown_route_pipelined,
+          unknown_route_pipelined[:160].decode("latin-1", "replace"))
+
+    get_with_body = raw_http_request(
+        httpd.server_port,
+        f"GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{httpd.server_port}\r\n".encode()
+        + f"Content-Length: {len(embedded_get)}\r\n\r\n".encode()
+        + embedded_get)
+    check("GET body is rejected without parsing pipelined bytes",
+          get_with_body.startswith(b"HTTP/1.1 413")
+          and get_with_body.count(b"HTTP/1.1 ") == 1
+          and b"Connection: close" in get_with_body,
+          get_with_body[:160].decode("latin-1", "replace"))
+
+    legacy_get = raw_http_request(httpd.server_port, b"GET /healthz\r\n")
+    check("HTTP/0.9 GET is closed before accessing its header map", legacy_get == b"",
+          legacy_get[:120].decode("latin-1", "replace"))
+
+    http_session, http_open_error = gw.open_session("user-token")
+    check("HTTP body tests use a bound synthetic session", http_session is not None,
+          str(http_open_error))
+    seafile_calls_before_body_tests = seafile.open_info_calls
+    oversized_open = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
+    oversized_open.request(
+        "POST", "/open/?format=json", b"x" * (64 * 1024 + 1),
+        {"Content-Type": "application/x-www-form-urlencoded", "Origin": origin})
+    oversized_open_response = oversized_open.getresponse()
+    oversized_open_response.read()
+    check("oversized /open body is rejected and connection is closed",
+          oversized_open_response.status == 413
+          and oversized_open_response.getheader("Connection") == "close",
+          f"HTTP {oversized_open_response.status}")
+    check("oversized /open body never reaches Seafile",
+          seafile.open_info_calls == seafile_calls_before_body_tests,
+          f"thirdparty_file_info calls={seafile.open_info_calls}")
+    oversized_open.close()
+
+    http_session.unsaved = True
+    oversized_dirty = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
+    oversized_dirty.request(
+        "POST", f"/session/{http_session.sid}/dirty", b"false" + b" " * 60,
+        {"Content-Type": "text/plain", "Origin": origin})
+    oversized_dirty_response = oversized_dirty.getresponse()
+    oversized_dirty_response.read()
+    check("oversized dirty report is rejected with a closed connection",
+          oversized_dirty_response.status == 413
+          and oversized_dirty_response.getheader("Connection") == "close",
+          f"HTTP {oversized_dirty_response.status}")
+    check("oversized dirty report cannot clear unsaved state", http_session.unsaved is True)
+    oversized_dirty.close()
+
+    exact_dirty = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
+    exact_dirty.request(
+        "POST", f"/session/{http_session.sid}/dirty", b"true" + b" " * 60,
+        {"Content-Type": "text/plain", "Origin": origin})
+    exact_dirty_response = exact_dirty.getresponse()
+    exact_dirty_body = exact_dirty_response.read()
+    check("exact 64-byte dirty report is accepted",
+          exact_dirty_response.status == 200 and b'"unsaved": true' in exact_dirty_body,
+          f"HTTP {exact_dirty_response.status}")
+    exact_dirty.close()
+
+    oversized_save = http.client.HTTPConnection("127.0.0.1", httpd.server_port, timeout=3)
+    oversized_save.request(
+        "POST", f"/session/{http_session.sid}/save", b"x" * 11,
+        {"Content-Type": "application/octet-stream", "Origin": origin})
+    oversized_save_response = oversized_save.getresponse()
+    oversized_save_body = oversized_save_response.read().decode()
+    check("oversized save body is rejected and connection is closed",
+          oversized_save_response.status == 413
+          and oversized_save_response.getheader("Connection") == "close",
+          f"HTTP {oversized_save_response.status}: {oversized_save_body}")
+    check("oversized save body does not write to Seafile", seafile.written == [])
+    oversized_save.close()
+
+    embedded_get = (f"GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{httpd.server_port}\r\n\r\n"
+                    .encode())
+    invalid_frames = (
+        ("duplicate Content-Length", b"Content-Length: 0\r\nContent-Length: 0\r\n"),
+        ("comma-separated Content-Length", b"Content-Length: 0, 0\r\n"),
+        ("Transfer-Encoding with Content-Length",
+         b"Content-Length: 0\r\nTransfer-Encoding: chunked\r\n"),
+    )
+    for label, framing in invalid_frames:
+        invalid_frame_reply = raw_http_request(
+            httpd.server_port,
+            f"POST /session/{http_session.sid}/dirty HTTP/1.1\r\n".encode()
+            + f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n".encode()
+            + framing + b"\r\n" + embedded_get)
+        check(f"{label} is rejected with connection closure",
+              invalid_frame_reply.startswith(b"HTTP/1.1 400")
+              and invalid_frame_reply.count(b"HTTP/1.1 ") == 1
+              and b"Connection: close" in invalid_frame_reply,
+              invalid_frame_reply[:160].decode("latin-1", "replace"))
+        check(f"{label} cannot clear unsaved state", http_session.unsaved is True)
+
+    truncated = socket.create_connection(("127.0.0.1", httpd.server_port), timeout=3)
+    truncated.sendall((
+        f"POST /session/{http_session.sid}/dirty HTTP/1.1\r\n"
+        f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n"
+        "Content-Length: 5\r\n\r\ntrue"
+    ).encode())
+    truncated.shutdown(socket.SHUT_WR)
+    truncated_reply = b""
+    while True:
+        chunk = truncated.recv(4096)
+        if not chunk:
+            break
+        truncated_reply += chunk
+    truncated.close()
+    check("truncated dirty report is rejected without clearing state",
+          truncated_reply.startswith(b"HTTP/1.1 400")
+          and b"Connection: close" in truncated_reply
+          and http_session.unsaved is True,
+          truncated_reply[:160].decode("latin-1", "replace"))
+
+    truncated_save = socket.create_connection(("127.0.0.1", httpd.server_port), timeout=3)
+    truncated_save.sendall((
+        f"POST /session/{http_session.sid}/save HTTP/1.1\r\n"
+        f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n"
+        "Content-Length: 10\r\n\r\n12345"
+    ).encode())
+    truncated_save.shutdown(socket.SHUT_WR)
+    truncated_save_reply = b""
+    while True:
+        chunk = truncated_save.recv(4096)
+        if not chunk:
+            break
+        truncated_save_reply += chunk
+    truncated_save.close()
+    check("truncated save body is rejected and connection is closed",
+          truncated_save_reply.startswith(b"HTTP/1.1 400")
+          and b"Connection: close" in truncated_save_reply
+          and seafile.written == [],
+          truncated_save_reply[:160].decode("latin-1", "replace"))
+
+    malformed = socket.create_connection(("127.0.0.1", httpd.server_port), timeout=3)
+    malformed.sendall((
+        f"POST /session/{http_session.sid}/dirty HTTP/1.1\r\n"
+        f"Host: 127.0.0.1:{httpd.server_port}\r\n"
+        f"Origin: {origin}\r\nContent-Length: -1\r\n\r\n"
+        f"GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{httpd.server_port}\r\n\r\n"
+    ).encode())
+    malformed_reply = b""
+    while True:
+        chunk = malformed.recv(4096)
+        if not chunk:
+            break
+        malformed_reply += chunk
+    malformed.close()
+    check("negative Content-Length is rejected without parsing pipelined bytes",
+          malformed_reply.startswith(b"HTTP/1.1 400")
+          and malformed_reply.count(b"HTTP/1.1 ") == 1
+          and b"Connection: close" in malformed_reply,
+          malformed_reply[:160].decode("latin-1", "replace"))
+
+    huge_length_socket = socket.create_connection(("127.0.0.1", httpd.server_port), timeout=3)
+    huge_length_socket.sendall((
+        f"POST /session/{http_session.sid}/dirty HTTP/1.1\r\n"
+        f"Host: 127.0.0.1:{httpd.server_port}\r\n"
+        f"Origin: {origin}\r\nContent-Length: {'9' * 5000}\r\n\r\n"
+        f"GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{httpd.server_port}\r\n\r\n"
+    ).encode())
+    huge_length_reply = b""
+    while True:
+        chunk = huge_length_socket.recv(4096)
+        if not chunk:
+            break
+        huge_length_reply += chunk
+    huge_length_socket.close()
+    check("unrepresentably long Content-Length is rejected and connection closed",
+          huge_length_reply.startswith(b"HTTP/1.1 400")
+          and huge_length_reply.count(b"HTTP/1.1 ") == 1
+          and b"Connection: close" in huge_length_reply,
+          huge_length_reply[:160].decode("latin-1", "replace"))
+
+    empty_transfer_encoding = socket.create_connection(
+        ("127.0.0.1", httpd.server_port), timeout=3)
+    empty_transfer_encoding.sendall((
+        f"POST /session/{http_session.sid}/dirty HTTP/1.1\r\n"
+        f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n"
+        "Transfer-Encoding:\r\n\r\n0\r\n\r\n"
+        f"GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{httpd.server_port}\r\n\r\n"
+    ).encode())
+    transfer_reply = b""
+    while True:
+        chunk = empty_transfer_encoding.recv(4096)
+        if not chunk:
+            break
+        transfer_reply += chunk
+    empty_transfer_encoding.close()
+    check("empty Transfer-Encoding is rejected and connection closed",
+          transfer_reply.startswith(b"HTTP/1.1 400")
+          and transfer_reply.count(b"HTTP/1.1 ") == 1
+          and b"Connection: close" in transfer_reply,
+          transfer_reply[:160].decode("latin-1", "replace"))
+
+    for label, raw_length in (("leading NBSP", b"\xa05"),
+                              ("trailing NEL", b"5\x85")):
+        http_session.unsaved = True
+        bad_whitespace = socket.create_connection(
+            ("127.0.0.1", httpd.server_port), timeout=3)
+        bad_whitespace.sendall(
+            f"POST /session/{http_session.sid}/dirty HTTP/1.1\r\n".encode()
+            + f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n".encode()
+            + b"Content-Length: " + raw_length + b"\r\n\r\nfalse"
+            + f"GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{httpd.server_port}\r\n\r\n".encode())
+        whitespace_reply = b""
+        while True:
+            chunk = bad_whitespace.recv(4096)
+            if not chunk:
+                break
+            whitespace_reply += chunk
+        bad_whitespace.close()
+        check(f"{label} in Content-Length is rejected without parsing pipelined bytes",
+              whitespace_reply.startswith(b"HTTP/1.1 400")
+              and whitespace_reply.count(b"HTTP/1.1 ") == 1
+              and b"Connection: close" in whitespace_reply,
+              whitespace_reply[:160].decode("latin-1", "replace"))
+        check(f"{label} in Content-Length cannot clear unsaved state",
+              http_session.unsaved is True)
+
+    malformed_header_variants = (
+        ("space before Content-Length colon",
+         b"Content-Length : " + str(len(embedded_get)).encode() + b"\r\n"),
+        ("tab before Content-Length colon",
+         b"Content-Length\t: " + str(len(embedded_get)).encode() + b"\r\n"),
+        ("malformed field before valid Content-Length",
+         b"Malformed Header\r\nContent-Length: "
+         + str(len(embedded_get)).encode() + b"\r\n"),
+        ("stray carriage return before Content-Length",
+         b"X-Review: x\r\rContent-Length: "
+         + str(len(embedded_get)).encode() + b"\r\n"),
+        ("line feed then carriage return before Content-Length",
+         b"X-Review: x\n\rContent-Length: "
+         + str(len(embedded_get)).encode() + b"\r\n"),
+    )
+    for label, malformed_header in malformed_header_variants:
+        http_session.unsaved = True
+        malformed_headers_reply = raw_http_request(
+            httpd.server_port,
+            f"POST /session/{http_session.sid}/dirty HTTP/1.1\r\n".encode()
+            + f"Host: 127.0.0.1:{httpd.server_port}\r\nOrigin: {origin}\r\n".encode()
+            + malformed_header + b"\r\n" + embedded_get)
+        check(f"{label} is rejected without parsing pipelined bytes",
+              malformed_headers_reply.startswith(b"HTTP/1.1 400")
+              and malformed_headers_reply.count(b"HTTP/1.1 ") == 1
+              and b"Connection: close" in malformed_headers_reply,
+              malformed_headers_reply[:160].decode("latin-1", "replace"))
+        check(f"{label} cannot clear unsaved state", http_session.unsaved is True)
 
     previous_seafile_origin = os.environ.get("ARTCRAFT_SEAFILE_ORIGIN")
     os.environ["ARTCRAFT_SEAFILE_ORIGIN"] = "https://seafile.example.test"

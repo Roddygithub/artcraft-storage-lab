@@ -1,3 +1,22 @@
+## 2026-10-26 — GR-074 gateway request-body framing
+
+- Rejected POST bodies with duplicate/non-decimal lengths, unsupported transfer
+  encoding, truncated reads or limits exceeded; responses close the connection.
+- Fixed oversized `/dirty` input being interpreted as an empty body and clearing
+  the unsaved flag. Loopback HTTP regression and gateway suite pass.
+- R1 reproduced Unicode-whitespace Content-Length injection and found a test
+  observing the wrong Seafile fake; both are fixed. R2 reproduced malformed
+  header parsing bypass; header parser defects are now rejected, with raw tests
+  for the observed forms and unknown-route body handling. R3 found HTTP/0.9
+  compatibility and matrix-wording P3s; both are corrected. R4 found malformed
+  header bytes retained as parser payload despite no parser defect; the reader
+  now rejects that residue and raw tests cover both reported sequences. R5
+  returned a bounded PROVISIONAL PASS with no new findings after 36 additional
+  raw route probes.
+- Proxy behavior and live Seafile/ONLYOFFICE remain NOT VERIFIED; project GPT
+  remains INCOMPLETE and upstream publication LOCKED.
+- Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`, `docs/reviews/GR-074/`.
+
 ## 2026-10-26 — GR-073 gateway `/open/` rate limit
 
 - Added a bounded process-local fixed-window limiter before `/open/` body parsing

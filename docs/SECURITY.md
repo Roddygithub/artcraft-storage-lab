@@ -104,7 +104,7 @@ The session id is:
 | 4 | the file still exists | local patch binds reads/saves to the opened file id | deletion/revocation runtime **NOT VERIFIED** |
 | 5 | the file has not changed since it was opened | local C patch checks the file id and uses branch compare-and-update even for same-content saves | exact source patch only; build/runtime **NOT VERIFIED**; Go route remains unpatched |
 | 6 | the document is not too large | `ARTCRAFT_MAX_BYTES` | 413 |
-| 7 | the request body is the document, not something else | the length limit and the content type | 413 |
+| 7 | request-body framing and size | GET/POST handlers reject parser defects and leftover header payload, require supported framing, enforce route limits, and close on malformed/oversized bodies; HTTP/0.9 is rejected | 400 / 413; `/dirty` state is unchanged |
 
 **Check 2 deserves a note:** the path, the repository and the user are read from the
 **session**, never from the request. A request cannot name a different file. This
@@ -218,7 +218,7 @@ service:
 | S-2 | an `Origin` / `Referer` check on the state-changing endpoints | gateway Origin checks are implemented; behavior behind Nginx Proxy Manager remains unverified |
 | S-3 | a rate limit on `/open/` | GR-073 limits requests by the gateway-observed TCP peer; reverse-proxy clients may share one bucket |
 | S-4 | a bound on the **expanded** size of an OOXML document | a 50 MB limit on the compressed file is not a limit on what it expands to; the Craft app must bound its own expansion |
-| S-7 | a formal abuse-case list per endpoint | the threat list above is a checklist, not a model |
+| S-7 | a formal abuse-case list per endpoint | GR-074 records body-framing cases; endpoint-wide abuse-case coverage remains open |
 
 S-5 (the share-link path) and S-6 (read-only enforced by the gateway) are
 different: S-6 is **done**, and S-5 is a **scope decision** rather than a hole —
@@ -232,4 +232,4 @@ a share link never reaches the hook, so it behaves exactly as it did before.
 | S-4 | A bound on the *expanded* size of an OOXML document | upstream (the Craft app) |
 | S-5 | The share-link path | out of scope for the MVP; needs the upstream Seafile patch |
 | S-6 | A read-only mode that is enforced by the gateway, not only by the Craft app | **done** (the write path checks the permission) |
-| S-7 | A formal threat model with an abuse-case list per endpoint | recommended before the public deployment |
+| S-7 | A formal threat model with an abuse-case list per endpoint | GR-074 covers gateway body-framing abuse cases; complete per-endpoint register remains open before public deployment |

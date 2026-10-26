@@ -362,14 +362,60 @@ class Handler(BaseHTTPRequestHandler):
         self._send(status, json.dumps(payload), "application/json; charset=utf-8", headers)
 
     def _read_body(self, limit=None):
-        length = int(self.headers.get("Content-Length") or 0)
-        if limit and length > limit:
+        self._body_read_error = None
+        if (not hasattr(self.headers, "get_payload")
+                or self.headers.defects or self.headers.get_payload()):
+            self._body_read_error = (400, "malformed request headers")
+            self.close_connection = True
             return None
-        return self.rfile.read(length) if length else b""
+        lengths = self.headers.get_all("Content-Length", [])
+        if self.headers.get_all("Transfer-Encoding") or len(lengths) > 1:
+            self._body_read_error = (400, "invalid request body framing")
+            self.close_connection = True
+            return None
+        # HTTP optional whitespace is SP / HTAB only; Unicode whitespace is
+        # invalid framing and must not be normalized into a valid length.
+        raw_length = lengths[0].strip(" \t") if lengths else "0"
+        if not raw_length.isascii() or not raw_length.isdecimal():
+            self._body_read_error = (400, "invalid request body length")
+            self.close_connection = True
+            return None
+        try:
+            length = int(raw_length)
+        except ValueError:
+            self._body_read_error = (400, "invalid request body length")
+            self.close_connection = True
+            return None
+        if limit is not None and length > limit:
+            self._body_read_error = (413, "request body exceeds the size limit")
+            self.close_connection = True
+            return None
+        body = self.rfile.read(length) if length else b""
+        if len(body) != length:
+            self._body_read_error = (400, "incomplete request body")
+            self.close_connection = True
+            return None
+        return body
+
+    def _body_read_rejected(self):
+        status, message = self._body_read_error or (400, "invalid request body")
+        return self._reject_connection(status, {"ok": False, "error": message})
+
+    def _reject_connection(self, status, payload):
+        self.close_connection = True
+        return self._json(status, payload,
+                          headers={"Connection": "close"})
 
     # -- routes -----------------------------------------------------------
 
     def do_GET(self):
+        # HTTP/0.9 has no header block or request-body framing; reject it before
+        # touching routes or assuming the parsed headers object is an EmailMessage.
+        if self.request_version == "HTTP/0.9":
+            self.close_connection = True
+            return
+        if self._read_body(limit=0) is None:
+            return self._body_read_rejected()
         path = urllib.parse.urlparse(self.path).path
         gateway = self.server.gateway
 
@@ -403,7 +449,8 @@ class Handler(BaseHTTPRequestHandler):
         # that one capability-bearing handoff from the configured Seafile
         # origin; every browser API POST remains same-origin with the gateway.
         if not same_origin and not (path == "/open/" and self._from_seafile_origin()):
-            return self._json(403, {"ok": False, "error": "same-origin request required"})
+            return self._reject_connection(
+                403, {"ok": False, "error": "same-origin request required"})
 
         if path == "/open/":
             retry_after = gateway.open_rate_limiter.retry_after(self.client_address[0])
@@ -418,14 +465,14 @@ class Handler(BaseHTTPRequestHandler):
             sid = path.split("/")[2]
             session = gateway.sessions.get(sid)
             if session is None:
-                return self._json(404, {
+                return self._reject_connection(404, {
                     "ok": False,
                     "error": "the editing session expired or is unavailable; "
                              "return to Seafile and reopen the file",
                 })
             data = self._read_body(limit=gateway.max_bytes)
             if data is None:
-                return self._json(413, {"ok": False, "error": "the document is larger than the limit"})
+                return self._body_read_rejected()
             name = self.headers.get("X-ArtCraft-Filename")
             result, status = gateway.save(session, data, name=name)
             return self._json(status, result)
@@ -434,18 +481,23 @@ class Handler(BaseHTTPRequestHandler):
             sid = path.split("/")[2]
             session = gateway.sessions.get(sid)
             if session is None:
-                return self._json(404, {"ok": False, "error": "unknown or expired session"})
-            body = self._read_body(limit=64) or b""
+                return self._reject_connection(
+                    404, {"ok": False, "error": "unknown or expired session"})
+            body = self._read_body(limit=64)
+            if body is None:
+                return self._body_read_rejected()
             with session.lock:
                 session.unsaved = body.strip().lower() in (b"true", b"1")
                 result = {"ok": True, "unsaved": session.unsaved}
             return self._json(200, result)
 
-        return self._json(404, {"ok": False, "error": "not found"})
+        return self._reject_connection(404, {"ok": False, "error": "not found"})
 
     def _open(self, gateway):
         parsed = urllib.parse.urlparse(self.path)
         body = self._read_body(limit=64 * 1024)
+        if body is None:
+            return self._body_read_rejected()
         fields = urllib.parse.parse_qs(body.decode("utf-8", "replace"))
         access_token = (fields.get("access_token") or [""])[0]
         repo_id = (fields.get("repo_id") or [""])[0]
