@@ -7,6 +7,23 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-064 — DeckCraft on real synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Candidate inventory and active static-root assets | Exact pinned DeckCraft candidate served | [x] Four files, paths, sizes, SHA-256, index references, and each per-file SRI association match |
+| Synthetic Seafile file-list open | Actual DeckCraft WASM loads the PPTX | [x] T3 Chromium preview; one synthetic library |
+| Visible edit and Ctrl+S | Matching positive ACK clears dirty state and Seafile creates a version | [x] `Saved — new version …`; gateway `/open`, document GET, and save POST returned 200 |
+| Seafile history | Fixture setup is distinct from editor save | [x] `Added` followed by `Modified` for `synthetic.pptx` |
+| Fresh Seafile file-list reopen | New editor session renders the edit | [x] Text intact; editor reports no changes |
+| ONLYOFFICE outside ArtCraft allowlist | Existing route still opens | [x] Synthetic DOCX opens read-only; no edit/save attempted |
+| ONLYOFFICE edit/save/version after route change | Full regression | [ ] NOT VERIFIED |
+| Browser popup lifecycle without test shim | Standard popup path | [ ] NOT VERIFIED; T3 preview redirected test-file popup to same tab |
+| Broader PPTX compatibility, production topology/security, byte-level readback | General readiness | [ ] NOT VERIFIED |
+| Independent review | Separate evidence/source review | [~] R1–R4 bounded PROVISIONAL PASS; all wording/verifier findings corrected |
+
+Evidence: `docs/reviews/GR-064/`. Reused GR-044 optimized candidate; no rebuild in GR-064. GPT REVIEW PENDING; project verdict INCOMPLETE and upstream publication LOCKED.
+
 ## GR-062 — PdfCraft on real synthetic Seafile
 
 The exact GR-057 bundle is now dispatched for PDF in the single synthetic

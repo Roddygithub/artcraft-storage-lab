@@ -1,0 +1,37 @@
+GR-064 sanitized runtime observations — 2026-10-26
+
+Target: one synthetic `.pptx` in the existing synthetic Seafile library.
+Private origin, repository ID, account identity, and session capability omitted.
+
+Setup: uploaded the 4,700-byte synthetic fixture through the Seafile UI.
+This was fixture setup, not an upload of edited output.
+
+Editor flow:
+- Seafile file-list click opened the staged DeckCraft Web WASM.
+- The slide text was changed to `GR-064 DeckCraft Seafile edit`; editor showed
+  unsaved state.
+- Ctrl+S produced the host confirmation `Saved — new version …` and DeckCraft
+  confirmation `Saved to file host`; the editor returned to clean state.
+- Sanitized browser request observations: POST `/open` 200; GET
+  `/session/<redacted>/document` 200; POST `/session/<redacted>/save` 200.
+- Seafile history showed `Added "synthetic.pptx"` for setup and then
+  `Modified "synthetic.pptx"` after the editor save.
+- The first editor was navigated away from. A later Seafile file-list click
+  created a fresh editor session; the edited text was visible and the editor
+  reported no changes pending.
+
+Browser harness note: T3 preview did not surface the popup created by the
+Seafile file-view handler. A page-local, test-file-only `window.open` shim
+redirected that target to the same tab. The file-list click, Seafile
+third-party-editor view, gateway handoff, and storage-backed reopen still ran.
+
+ONLYOFFICE preservation:
+- `ENABLE_ONLYOFFICE=True` before and after.
+- ONLYOFFICE-prefixed settings assignments matched the private pre-change
+  backup; no ONLYOFFICE setting was edited.
+- A synthetic DOCX outside the ArtCraft allowlist opened in ONLYOFFICE's
+  read-only Community view. No editing or saving was attempted.
+
+No browser download or manual upload of the edited PPTX occurred. Only the
+synthetic test library was used. Production, broader compatibility, and
+post-change ONLYOFFICE edit/save remain NOT VERIFIED.

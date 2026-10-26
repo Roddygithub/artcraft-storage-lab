@@ -1,6 +1,22 @@
 # STATUS
 
-## CURRENT GR: GR-063 — VectorCraft real synthetic Seafile roundtrip
+## CURRENT GR: GR-064 — DeckCraft real synthetic Seafile roundtrip
+
+The pinned DeckCraft Web candidate opened the synthetic `synthetic.pptx` from
+Seafile, saved the visible slide edit through the ticketed host bridge, created
+a new Seafile history modification, and reopened with the edit intact in a
+fresh session. The editor returned to clean state after acknowledgement. The
+PPTX route and extension were added only to the existing one-library synthetic
+allowlist; DOCX, XLSX, PDF, and SVG routes were retained. `ENABLE_ONLYOFFICE=True`
+and its settings remained unchanged; a synthetic out-of-allowlist DOCX opened
+in ONLYOFFICE read-only, with no edit/save. T3's popup-to-same-tab test shim is
+disclosed in the report. R1–R4 bounded PROVISIONAL PASS reviews identified
+wording/verifier findings, which were remediated. GR-064 remains **GPT
+REVIEW PENDING**; project GPT is **INCOMPLETE** and upstream publication
+**LOCKED**. See `docs/GR-064-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+`docs/reviews/GR-064/`.
+
+## PREVIOUS GR: GR-063 — VectorCraft real synthetic Seafile roundtrip
 
 The exact GR-058 VectorCraft candidate completed Seafile file-list open, an SVG
 rectangle edit, automatic gateway persistence after File → Export → Export As

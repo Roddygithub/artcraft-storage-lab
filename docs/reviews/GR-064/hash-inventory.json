@@ -1,0 +1,32 @@
+{
+  "source_commit": "0f4fffcf6c71ffa16029d07ac23752fedd783547",
+  "craft_platform_revision": "56c5e16d79b77751106173c13111ef4fe0a2c0ec",
+  "host_save_patch": "docs/reviews/GR-020/deckcraft-host-save-ack.patch",
+  "host_save_patch_sha256": "8d7f98468ce446add5357e10ed8e10e729eb3306fee359d320f09805acc3ee4a",
+  "build": {
+    "profile": "release",
+    "rust": "1.95.0",
+    "trunk": "0.22.0",
+    "wasm_opt": "-Oz",
+    "rebuilt_for_gr064": false,
+    "prior_browser_smoke": "GR-044"
+  },
+  "candidate_parent": "/home/roddy/.cache/artcraft-storage-lab/gr064-deckcraft-static",
+  "active_static_root": "/home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static",
+  "files": [
+    {"path":"index.html","size_bytes":1622,"sha256":"9dee2bb4c4b521ea267945a7b1c2172c2a0967459b140ef056c19324576f9b95"},
+    {"path":"deckcraft-web-6cf742ab986d4a86.js","size_bytes":157846,"sha256":"c10193dd6f945cafe986799c2703035c2c762e1820f76bd44a141b2e3d002c62"},
+    {"path":"deckcraft-web-17df9e6669a6dc99_bg.wasm","size_bytes":30605628,"sha256":"eebe27c9c42ee46be33e1285b37a9d8d51d5108ff70182fdea3110c5a9835ee9"},
+    {"path":"ai.storyteller.deckcraft-74e97653dd8dd002.png","size_bytes":1475,"sha256":"61ce7f8438d6738d42cb6a1697b561ba11b25f43d1ab7f9c7a2ef07bbcf72f4c"}
+  ],
+  "index_references": [
+    "deckcraft-web-6cf742ab986d4a86.js",
+    "deckcraft-web-17df9e6669a6dc99_bg.wasm",
+    "ai.storyteller.deckcraft-74e97653dd8dd002.png"
+  ],
+  "index_integrity": [
+    {"path":"deckcraft-web-6cf742ab986d4a86.js","value":"sha384-n4MCY2h1ON/SjFAmDdfGk/hleaNzHvwGzz6qFPRDl/7O8088EOCBuqt/b9oAo1uI"},
+    {"path":"deckcraft-web-17df9e6669a6dc99_bg.wasm","value":"sha384-PDy7GrO+/jb42jIf4GJKRJawkbP4rnERPKMkoFIaTDYhp6DThH76wdLaNVCV/57U"},
+    {"path":"ai.storyteller.deckcraft-74e97653dd8dd002.png","value":"sha384-THDce39ERZRgdnEtM/35FnmU4IExPfz9k2XrApCGWP0NUMC98NUWG1VYUMNXNCiD"}
+  ]
+}

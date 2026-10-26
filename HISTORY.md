@@ -1,3 +1,26 @@
+## 2026-10-26 — GR-064 DeckCraft real synthetic Seafile roundtrip
+
+- Reused the exact GR-044 DeckCraft browser candidate, verified its four-file
+  inventory and active static-root copy, and added PPTX dispatch only inside the
+  existing single synthetic-library allowlist. Existing DOCX/XLSX/PDF/SVG
+  routes stayed present; `ENABLE_ONLYOFFICE=True` and ONLYOFFICE assignments
+  were unchanged.
+- Opened the synthetic PPTX from Seafile, edited its visible slide text, saved
+  through the host ACK protocol, observed a Seafile `Modified` history event,
+  and opened it again from the file list in a fresh editor session. The edit
+  was intact and DeckCraft was clean after ACK. No download/manual upload of
+  the edited output occurred.
+- A read-only synthetic DOCX check outside the ArtCraft allowlist opened in
+  ONLYOFFICE Community view. No edit/save was attempted. Candidate uses the
+  previously built GR-044 optimized WASM; GR-064 did not rebuild it. The T3
+  preview's test-only popup-to-same-tab shim is documented.
+- Independent reviews R1–R4 returned bounded PROVISIONAL PASS and identified
+  documentation/verifier wording findings, which were remediated. Post-change ONLYOFFICE edit/save, broad PPTX
+  compatibility, production security, and other deployments remain unverified.
+  Project GPT remains INCOMPLETE; upstream publication remains LOCKED.
+- Evidence: `docs/GR-064-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-064/`.
+
 ## 2026-10-26 — GR-063 VectorCraft real synthetic Seafile roundtrip
 
 - Verified the exact GR-058 candidate against the active static root, then

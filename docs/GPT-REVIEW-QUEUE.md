@@ -1,5 +1,22 @@
 # GPT Review Queue
 
+## GR-064 — DeckCraft real synthetic Seafile roundtrip
+
+Review the exact GR-064 evidence, current local candidate inventory, and source
+patch provenance. Check the Seafile file-list open/edit/host-ACK/new-version/
+fresh-session reopen claim and the disclosed T3 same-tab popup adjustment.
+Confirm the route and allowlist scope stays limited to the single synthetic
+library, existing DOCX/XLSX/PDF/SVG routes remain, and ONLYOFFICE settings are
+unchanged. Do not access services or repeat the browser flow. The post-change
+ONLYOFFICE check was open-only; edit/save remains NOT VERIFIED. Project verdict
+must remain INCOMPLETE and upstream publication LOCKED.
+
+R1–R4 were bounded PROVISIONAL PASS reviews; all wording/verifier findings
+were corrected. See `docs/reviews/GR-064/INDEPENDENT-REVIEW-R1.md` through
+`R4.md`. Bounded review only, not project GPT PASS.
+Evidence: `docs/GR-064-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+`docs/reviews/GR-064/`.
+
 ## GR-063 — VectorCraft real synthetic Seafile roundtrip
 
 The exact GR-058 candidate opened the synthetic SVG through Seafile; an actual
