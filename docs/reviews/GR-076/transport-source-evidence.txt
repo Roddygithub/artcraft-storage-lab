@@ -1,0 +1,17 @@
+Transport rev 56c5e16d79b77751106173c13111ef4fe0a2c0ec: integration/rust/craft-platform/src/browser/host.rs
+7: use crate::host_protocol::{OpenAdmission, SaveTicket, accepts_parent_message};
+9: const MAX_OPEN_BYTES: usize = 256 * 1024 * 1024;
+11: const MAX_NAME_UTF16_UNITS: u32 = 1024;
+12: const MAX_TICKET_UTF16_UNITS: u32 = 256;
+13: const MAX_ERROR_UTF16_UNITS: u32 = 4096;
+74: let parent: JsValue = self.parent.clone().into();
+79: let source_is_parent = event
+82: if !accepts_parent_message(&event.origin(), &origin, source_is_parent) {
+100: if !open_admission.borrow_mut().admit(length, MAX_OPEN_BYTES) {
+158: self.parent
+159: .post_message_with_transfer(&object, &self.origin, &Array::of1(&buffer))
+177: self.parent
+178: .post_message_with_transfer(&object, &self.origin, &Array::of1(&buffer))
+186: self.parent.post_message(&object, &self.origin)
+260: fn parse_save_result(data: &JsValue) -> Option<HostMessage> {
+265: .as_bool()?;

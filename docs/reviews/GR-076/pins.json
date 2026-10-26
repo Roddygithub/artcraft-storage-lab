@@ -1,0 +1,42 @@
+{
+  "labBase": "dc105220ae934f9779eb357a4cda901ee0aa0c0b",
+  "photoCraftBase": "a02f2ee41059d3312e7ff24a5af5edcac7b6435a",
+  "corePatchSha256": "4ca7ea1e88bf215f80e6edc137417b8b21d0302e82b9a7a496ffd4e60b0cd3e4",
+  "reusedAdapterPatchSha256": "487935d8f6db33cf82c85f8d9c8aa0686016612510f15cf34f6b3f05a2c53fe7",
+  "cargoLockSha256": "166c9984b3e3706eabd88400ab9bed50840cd146043e6dd4ac900a285cb4a3d0",
+  "gitDependencies": [
+    [
+      "craft-docpath",
+      "0.1.0",
+      "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
+    ],
+    [
+      "craft-platform",
+      "0.1.0",
+      "git+https://github.com/Roddygithub/artcraft-storage-lab?rev=56c5e16d79b77751106173c13111ef4fe0a2c0ec#56c5e16d79b77751106173c13111ef4fe0a2c0ec"
+    ],
+    [
+      "craft-print",
+      "0.1.0",
+      "git+https://github.com/storytold/craft-libs?rev=3d37da389a3618ab9b76109da11416e9ca4ea719#3d37da389a3618ab9b76109da11416e9ca4ea719"
+    ],
+    [
+      "craft-ui",
+      "0.1.0",
+      "git+https://github.com/storytold/craft-libs?rev=5c874d51eeb3de70e735c8ce87a59a7dedd47675#5c874d51eeb3de70e735c8ce87a59a7dedd47675"
+    ],
+    [
+      "craft-winprint-gdi",
+      "0.1.0",
+      "git+https://github.com/storytold/winprint.rs?rev=417ac3c4d14d3da5485a99c7d5ce8f05664ec312#417ac3c4d14d3da5485a99c7d5ce8f05664ec312"
+    ],
+    [
+      "winprint",
+      "0.2.1",
+      "git+https://github.com/storytold/winprint.rs?rev=5f80b9baf6b58937c401656634e42d33f00ddf49#5f80b9baf6b58937c401656634e42d33f00ddf49"
+    ]
+  ],
+  "compiler": "rustc 1.95.0 (59807616e 2026-04-14)",
+  "sourceWorktree": "/home/roddy/.cache/artcraft-storage-lab/gr076-photocraft",
+  "combinedPatchSha256": "b3375bc2e9f29a9624df0428df3916b2013ba9aa11be9b7e27825cd103c07d85"
+}

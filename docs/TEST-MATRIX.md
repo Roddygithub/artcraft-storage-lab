@@ -889,3 +889,17 @@ PROVISIONAL implementation; GPT REVIEW PENDING; no project GPT PASS.
 | Gateway suite / pycompile / diff check | PASS; docs/reviews/GR-053/ |
 | Real Seafile redirects / browser MVP | NOT VERIFIED; no external access |
 | Independent review | [x] R1–R2 PROVISIONAL PASS, no blocker/major; GPT REVIEW PENDING |
+
+## GR-076 — bounded PhotoCraft browser host adapter
+
+| Check | Evidence / status |
+|---|---|
+| Exact source/core/adapter/transport and locked dependency resolution | Exact pins in `reviews/GR-076/pins.json`; retained-base locked WASM check passed |
+| Captured snapshot ACK, stale incarnation, later edits | PASS, 4 engine tests and focused UI lifecycle cases; `reviews/GR-076/checks.log` |
+| Matching/negative/unknown/duplicate ACK, timeout/no retry and payload bounds | PASS, selected host cases in 7-test host filter |
+| Menu/direct/nested commands, local/picker/drop/Save As/duplicate/close guards | PASS, source guards and focused UI test; live Web events NOT VERIFIED |
+| Standalone/native file-open and save/download baseline regressions | PASS, 47 file-open tests including confirmed/unconfirmed writer regression |
+| One Open across inbox drains, unknown/duplicate ACK flood, listener failure | PASS, 2 inbox tests; actual browser listener NOT VERIFIED |
+| Rust 1.95 locked WASM, format, whitespace and clean-base patch application | PASS, final script exit 0 and `reviews/GR-076/patch-check.txt` |
+| Live iframe messaging/unload, Seafile persistence/version/reopen, ONLYOFFICE | NOT VERIFIED for GR-076; no services accessed |
+| Full desktop suite / visual QA / clippy / corpus | NOT VERIFIED |

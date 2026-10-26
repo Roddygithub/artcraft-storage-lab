@@ -248,3 +248,16 @@ GridCraft's in-app Open still used the browser picker, and its declared Rust
 in scratch patches with new browser/toolchain checks and a fresh bounded review.
 This is an implementation review only, not the final ArtCraft project verdict.
 No upstream changes or Seafile production access are involved.
+
+## 2026-10-26 — GR-076 independent source reviews
+
+Implementation remains the user-assigned Codex implementation sub-agent.
+Independent `artcraft-reviewer` role delegated via T3 provider
+`acpRegistry_opencode`, model `nvidia/nvidia/nemotron-3-ultra-550b-a55b`.
+R1 live catalog accepted effort `thinking` and returned PROVISIONAL PASS.
+R2 first launch rejected `thinking`: “Option effort must be one of: none,
+medium, high, default.” Refreshed live catalog advertised `high`, matching the
+repository role definition; retried same stable round request with `high`.
+R2 returned PROVISIONAL PASS on final patch. No pending task was duplicated.
+No DeepSeek task used. Reports/results in
+`docs/reviews/GR-076/`; free verdicts remain PROVISIONAL.

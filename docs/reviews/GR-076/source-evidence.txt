@@ -1,0 +1,61 @@
+crates/engine/src/lib.rs:263: pub struct SavedSnapshot {
+crates/engine/src/lib.rs:283: pub fn saved_snapshot(&self) -> SavedSnapshot {
+crates/engine/src/lib.rs:618: pub fn acknowledge_saved_snapshot(&mut self, snapshot: SavedSnapshot) -> Result<()> {
+crates/ui-egui/src/lib.rs:567: pub host_mode: bool,
+crates/ui-egui/src/lib.rs:1027: pub fn save_host_snapshot(&mut self) -> Result<String, String> {
+crates/ui-egui/src/lib.rs:1043: host_document::check_size(bytes.len())?;
+crates/ui-egui/src/lib.rs:1053: pub fn host_save_result(&mut self, ticket: &str, ok: bool, error: Option<&str>) -> bool {
+crates/ui-egui/src/lib.rs:1079: pub fn host_save_timed_out(&mut self) {
+crates/ui-egui/src/lib.rs:1090: session.authorize = Some(if session.documents().is_empty() { host_document::authorize_waiting } else { host_document::authorize });
+crates/ui-egui/src/lib.rs:1340: pub fn run(&mut self, id: &str, params: Value) -> Result<Value, String> {
+crates/ui-egui/src/lib.rs:1690: pub fn open_bytes(&mut self, name: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
+crates/ui-egui/src/lib.rs:1753: pub fn open_automation_bytes(&mut self, name: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
+crates/ui-egui/src/lib.rs:1773: fn import_automation_document(&mut self, name: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
+crates/ui-egui/src/lib.rs:1807: pub(crate) fn save_dialog_flow(&mut self, path: Option<String>, choices: FormatChoices, plain_save: bool) -> Result<Value, String> {
+crates/ui-egui/src/lib.rs:1870: pub(crate) fn save_to(&mut self, path: String, choices: FormatChoices) -> Result<Value, String> {
+crates/ui-egui/src/lib.rs:2238: pub fn save_automation_with(&mut self, path: Option<String>, choices: FormatChoices) -> Result<Value, String> {
+crates/ui-egui/src/host_document.rs:5: pub(crate) const MAX_BYTES: usize = 50 * 1024 * 1024;
+crates/ui-egui/src/host_document.rs:7: pub(crate) fn check_size(length: usize) -> Result<(), String> {
+crates/ui-egui/src/host_document.rs:14: pub(crate) fn authorize(id: &str, params: &Value) -> photocraft_engine::Result<()> {
+crates/ui-egui/src/host_document.rs:38: pub(crate) fn authorize_waiting(id: &str, params: &Value) -> photocraft_engine::Result<()> {
+crates/ui-egui/src/file_open.rs:95: pub fn open_file_pathless(&mut self, host_name: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
+crates/ui-egui/src/file_open.rs:112: pub fn open_file(&mut self, path: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
+crates/ui-egui/src/file_open.rs:153: pub fn open_path(&mut self, path: &str) -> Result<Vec<String>, String> {
+crates/ui-egui/src/file_open.rs:172: pub fn open_path(&mut self, path: &str) -> Result<Vec<String>, String> {
+crates/ui-egui/src/file_open.rs:180: pub fn open_paths(&mut self, paths: &[String]) -> usize {
+crates/ui-egui/src/file_dialog.rs:244: pub fn open_dialog_file(&mut self) -> Result<Value, String> {
+crates/ui-egui/src/file_dialog.rs:265: fn open_contents(&mut self, mut files: Vec<(String, Vec<u8>)>) {
+crates/ui-egui/src/menus.rs:70: pub fn invoke(app: &mut PhotocraftApp, ctx: &egui::Context, id: &str, params: Value) -> Result<Value, String> {
+crates/ui-egui/src/discard_ui.rs:69: pub fn intercept(app: &mut PhotocraftApp, id: &str, params: &Value) -> bool {
+crates/ui-egui/src/discard_ui.rs:124: pub fn has_unsaved_work(&self) -> bool {
+crates/ui-egui/src/discard_ui.rs:134: pub fn guard_window_close(app: &mut PhotocraftApp, ctx: &egui::Context) {
+apps/photocraft-web/src/web.rs:60: let host_requested = q.split(['?', '&']).any(|part| part == "host=parent");
+apps/photocraft-web/src/web.rs:111: let repaint = cc.egui_ctx.clone();
+apps/photocraft-web/src/web.rs:124: repaint.request_repaint();
+apps/photocraft-web/src/web.rs:129: let host_listener = match crate::host_inbox::require_listener(host_transport.is_some(), listener.unwrap_or(Ok(None))) {
+apps/photocraft-web/src/web.rs:154: let _ = host.post_ready(env!("CARGO_PKG_VERSION"));
+apps/photocraft-web/src/web.rs:261: fn guard_unload(unsaved: Arc<AtomicBool>) {
+apps/photocraft-web/src/web.rs:416: fn logic(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+apps/photocraft-web/src/web.rs:429: if self.host_save_started.get().is_some_and(|started| js_sys::Date::now() - started > 30_000.0) {
+apps/photocraft-web/src/web.rs:434: ctx.request_repaint_after(std::time::Duration::from_millis(100));
+apps/photocraft-web/src/web.rs:437: if self.host_transport.is_none() && !dropped.is_empty() {
+apps/photocraft-web/src/web.rs:497: fn services(
+apps/photocraft-web/src/web.rs:518: if let Err(error) = transport.post_save(&ticket, name, bytes, false) {
+apps/photocraft-web/src/web.rs:533: let limits = photocraft_format::LoadOptions {
+apps/photocraft-web/src/web.rs:585: write: Some(Box::new(move |path: &str, bytes: &[u8]| {
+apps/photocraft-web/src/web.rs:593: write_unconfirmed: true,
+apps/photocraft-web/src/web.rs:609: fn host_instance_id() -> Result<String, String> {
+apps/photocraft-web/src/host_inbox.rs:10: pub struct HostInbox {
+apps/photocraft-web/src/host_inbox.rs:18: pub fn push(&mut self, event: HostEvent, expected_ticket: Option<&str>) {
+apps/photocraft-web/src/host_inbox.rs:31: pub fn take(&mut self) -> (Option<(String, Vec<u8>)>, Option<(String, bool, Option<String>)>) {
+apps/photocraft-web/src/host_inbox.rs:45: fn unknown_and_duplicate_results_cannot_grow_or_fill_queue_ahead_of_valid_ack() {
+apps/photocraft-web/src/host_inbox.rs:65: fn host_listener_failure_propagates_instead_of_allowing_ready() {
+crates/ui-egui/src/file_open/tests.rs:84: fn pathless_host_open_uses_name_without_binding_or_recent_entry() {
+crates/ui-egui/src/file_open/tests.rs:95: fn host_save_dispatch_waits_for_matching_durable_ack_and_guards_bypass_routes() {
+crates/ui-egui/src/file_open/tests.rs:1157: fn host_guards_cover_direct_picker_drop_duplicate_replacement_and_close_routes() {
+crates/ui-egui/src/file_open/tests.rs:1224: fn host_acknowledges_only_captured_revision_and_bounds_payloads() {
+crates/ui-egui/src/file_open/tests.rs:1264: fn standalone_confirmed_write_cleans_but_unconfirmed_download_stays_dirty() {
+crates/engine/src/saved_snapshot_tests.rs:11: fn acknowledging_a_stale_snapshot_keeps_later_edits_dirty() {
+crates/engine/src/saved_snapshot_tests.rs:33: fn acknowledging_the_current_snapshot_marks_it_saved() {
+crates/engine/src/saved_snapshot_tests.rs:53: fn snapshot_ack_is_rejected_after_its_document_closes() {
+crates/engine/src/saved_snapshot_tests.rs:61: fn snapshot_ack_is_rejected_after_same_id_reopens() {

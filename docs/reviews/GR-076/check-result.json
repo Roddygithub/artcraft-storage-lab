@@ -1,0 +1,15 @@
+{
+  "script": "scripts/check-gr076-photocraft.sh",
+  "source": "/home/roddy/.cache/artcraft-storage-lab/gr076-photocraft",
+  "exitCode": 0,
+  "format": "PASS",
+  "engineSnapshotTests": 4,
+  "uiHostFilterTests": 7,
+  "uiFileOpenTests": 47,
+  "webInboxTests": 2,
+  "lockedWasmCheck": "PASS",
+  "patchApplyAndByteComparison": "PASS",
+  "whitespace": "PASS",
+  "browserRuntime": "NOT VERIFIED",
+  "externalServices": "NOT ACCESSED"
+}

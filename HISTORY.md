@@ -1,3 +1,17 @@
+## 2026-10-26 — GR-076 bounded PhotoCraft host adapter
+
+Isolated uncommitted candidate from local main `dc105220ae934f9779eb357a4cda901ee0aa0c0b`.
+Reuses exact GR-026/GR-032 PhotoCraft base and transport; adds payload/decoded
+bounds, nested-command and direct API guards, idle ACK/deadline repaint, and
+focused lifecycle/standalone regressions. Retained patches omitted the engine
+snapshot test module; repaired explicitly. Rust 1.95 locked snapshot/host/file-open/inbox tests (4/7/47/2), format, Web
+WASM, clean-base patch application and whitespace checks PASS. Independent
+R1/R2 source reviews returned PROVISIONAL PASS. **GPT REVIEW PENDING**; no GPT
+PASS. Serialization peak memory and live browser/external persistence remain
+NOT VERIFIED. No external services, deployment, dispatch, commit,
+push or publication. See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
+`docs/reviews/GR-076/`.
+
 ## 2026-10-26 — GR-075 gateway request-body deadline
 
 - Added a 120-second total deadline for nonempty request-body reads, enforced

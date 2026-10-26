@@ -1,0 +1,4 @@
+PASS: clean detached checkout at a02f2ee41059d3312e7ff24a5af5edcac7b6435a
+PASS: git apply --check and git apply combined GR-076 patch
+PASS: all 14 changed/untracked source files byte-identical to applied patch checkout
+SHA-256: b3375bc2e9f29a9624df0428df3916b2013ba9aa11be9b7e27825cd103c07d85

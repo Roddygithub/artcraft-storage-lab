@@ -1,0 +1,4 @@
+PASS: no removed packages or changed external dependency versions/sources/checksums vs exact PhotoCraft base
+Added package: craft-platform at exact pinned rev56c5e16d79b77751106173c13111ef4fe0a2c0ec (retained GR-032 addition)
+Only changed existing package: photocraft-web; dependencies add craft-platform and existing workspace photocraft-format
+Final Cargo.lock SHA-256: 166c9984b3e3706eabd88400ab9bed50840cd146043e6dd4ac900a285cb4a3d0
