@@ -60,6 +60,10 @@ impl<T> PendingSaves<T> {
     pub fn is_empty(&self) -> bool {
         self.pending.is_empty()
     }
+    /// Whether any outstanding save carries a matching snapshot or revision.
+    pub fn any(&self, predicate: impl FnMut(&T) -> bool) -> bool {
+        self.pending.values().any(predicate)
+    }
 }
 
 impl OpenAdmission {

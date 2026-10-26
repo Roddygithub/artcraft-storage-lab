@@ -30,6 +30,19 @@ pub enum HostMessage {
     },
 }
 
+/// Correlation for one parsed native document. These strings are not credentials.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct DocumentIdentity {
+    pub open_id: String,
+    pub document_id: String,
+}
+
+/// Strict protocol used only by identity-aware WordCraft/GridCraft adapters.
+pub enum IdentityHostMessage {
+    Open { open_id: String, name: String, bytes: Vec<u8> },
+    SaveResult { identity: DocumentIdentity, ticket: SaveTicket, ok: bool, error: Option<String> },
+}
+
 /// Same-origin parent window transport for one named Craft app.
 #[derive(Clone)]
 pub struct HostTransport {
@@ -178,6 +191,87 @@ impl HostTransport {
             .post_message_with_transfer(&object, &self.origin, &Array::of1(&buffer))
     }
 
+    /// No fallback to the legacy listener: an old host cannot open a writable document.
+    /// Only one initial open is admitted, including when parsing that open later fails.
+    pub fn listen_identity(
+        &self,
+        mut callback: impl FnMut(IdentityHostMessage) + 'static,
+    ) -> Result<HostListener, JsValue> {
+        let window = web_sys::window().ok_or_else(|| JsValue::from_str("no browser window"))?;
+        let transport = self.clone();
+        let mut received_open = false;
+        let handler = Closure::<dyn FnMut(MessageEvent)>::new(move |event: MessageEvent| {
+            let source_is_parent = event.source().is_some_and(|source|
+                Object::is(source.as_ref(), transport.parent.as_ref()));
+            if !accepts_parent_message(&event.origin(), &transport.origin, source_is_parent) { return; }
+            let data = event.data();
+            let Ok(kind) = string_field(&data, "type", MAX_TYPE_UTF16_UNITS) else { return; };
+            if kind == format!("{}:open", transport.app) {
+                if received_open { return; }
+                if Reflect::get(&data, &"saveIdentity".into()).ok().and_then(|v| v.as_f64()) != Some(1.0)
+                    || string_field(&data, "mode", 32).ok().as_deref() != Some("update-only") { return; }
+                let Some(open_id) = identity_field(&data, "openId") else { return; };
+                let Ok(name) = string_field(&data, "name", MAX_NAME_UTF16_UNITS) else { return; };
+                let Ok(value) = Reflect::get(&data, &"bytes".into()) else { return; };
+                let Some(length) = bytes_len(&value).filter(|n| *n <= MAX_OPEN_BYTES) else { return; };
+                if !transport.open_admission.borrow_mut().admit(length, MAX_OPEN_BYTES) { return; }
+                received_open = true;
+                let Some(bytes) = read_bytes(&value, MAX_OPEN_BYTES) else { return; };
+                callback(IdentityHostMessage::Open { open_id, name, bytes });
+            } else if kind == format!("{}:saveResult", transport.app) {
+                let Some(open_id) = identity_field(&data, "openId") else { return; };
+                let Some(document_id) = identity_field(&data, "documentId") else { return; };
+                if let Some(HostMessage::SaveResult { ticket, ok, error }) = parse_save_result(&data) {
+                    callback(IdentityHostMessage::SaveResult {
+                        identity: DocumentIdentity { open_id, document_id }, ticket, ok, error,
+                    });
+                }
+            }
+        });
+        window.add_event_listener_with_callback("message", handler.as_ref().unchecked_ref())?;
+        Ok(HostListener { target: window.unchecked_into(), handler: Some(handler) })
+    }
+
+    pub fn post_identity_ready(&self, version: &str) -> Result<(), JsValue> {
+        self.post(&format!("{}:ready", self.app), &[
+            ("version", &JsValue::from_str(version)), ("saveIdentity", &JsValue::from_f64(1.0)),
+        ])
+    }
+
+    /// Call only after the trusted initial file parsed and the native identity was captured.
+    pub fn post_opened(&self, identity: &DocumentIdentity) -> Result<(), JsValue> {
+        self.post(&format!("{}:opened", self.app), &[
+            ("openId", &identity.open_id.as_str().into()),
+            ("documentId", &identity.document_id.as_str().into()),
+        ])
+    }
+
+    pub fn post_identity_save(&self, identity: &DocumentIdentity, ticket: &SaveTicket,
+        name: &str, bytes: &[u8]) -> Result<(), JsValue> {
+        if bytes.len() > MAX_OPEN_BYTES { return Err(JsValue::from_str("save exceeds size limit")); }
+        let object = self.message(&format!("{}:save", self.app));
+        Reflect::set(&object, &"openId".into(), &identity.open_id.as_str().into())?;
+        Reflect::set(&object, &"documentId".into(), &identity.document_id.as_str().into())?;
+        Reflect::set(&object, &"intent".into(), &"save".into())?;
+        Reflect::set(&object, &"ticket".into(), &ticket.as_str().into())?;
+        Reflect::set(&object, &"name".into(), &name.into())?;
+        let buffer = Uint8Array::from(bytes).buffer();
+        Reflect::set(&object, &"bytes".into(), &buffer)?;
+        self.parent.post_message_with_transfer(&object, &self.origin, &Array::of1(&buffer))
+    }
+
+    /// A clean acknowledgement includes the successful ticket, so an unrelated clean event
+    /// cannot confirm a durable write. Initial clean state has no ticket.
+    pub fn post_identity_dirty(&self, identity: &DocumentIdentity, dirty: bool,
+        ticket: Option<&SaveTicket>) -> Result<(), JsValue> {
+        let object = self.message(&format!("{}:dirty", self.app));
+        Reflect::set(&object, &"openId".into(), &identity.open_id.as_str().into())?;
+        Reflect::set(&object, &"documentId".into(), &identity.document_id.as_str().into())?;
+        Reflect::set(&object, &"dirty".into(), &dirty.into())?;
+        if let Some(ticket) = ticket { Reflect::set(&object, &"ticket".into(), &ticket.as_str().into())?; }
+        self.parent.post_message(&object, &self.origin)
+    }
+
     fn post(&self, kind: &str, fields: &[(&str, &JsValue)]) -> Result<(), JsValue> {
         let object = self.message(kind);
         for (key, value) in fields {
@@ -231,6 +325,10 @@ fn string_field(value: &JsValue, key: &str, max_utf16_units: u32) -> Result<Stri
     field
         .as_string()
         .ok_or_else(|| JsValue::from_str("expected string field"))
+}
+
+fn identity_field(value: &JsValue, key: &str) -> Option<String> {
+    string_field(value, key, 128).ok().filter(|s| !s.trim().is_empty())
 }
 
 fn bytes_len(value: &JsValue) -> Option<usize> {
