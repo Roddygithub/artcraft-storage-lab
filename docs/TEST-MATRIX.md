@@ -586,6 +586,24 @@ Bounded synthetic evidence only; independent review was PROVISIONAL ACCEPT
 without blocker/major; final wording MINOR corrected afterward. See
 `docs/reviews/GR-037/`.
 
+## GR-063. VectorCraft real synthetic Seafile roundtrip
+
+| Scenario | Result |
+|---|---|
+| Exact deployed VectorCraft candidate | [x] GR-058 verifier passes against active static root: nine files, hashes, index references, and SRI |
+| Synthetic SVG opened from Seafile file list | [x] Actual VectorCraft WASM and session document returned HTTP 200 |
+| Edit SVG and persist without browser download/manual upload | [x] Added rectangle; File → Export → Export As SVG was captured in page memory and gateway save returned HTTP 200 |
+| Host save confirmation and version history | [x] New-version confirmation; Seafile UI history shows Modified after Added |
+| Fresh-session open from Seafile file list | [x] A second editor/session displays the stored rectangle; first session was not explicitly closed |
+| Ctrl+S native dirty marker | [ ] Limitation: opens Save As for imported SVG; cancelled; export succeeds but app's asterisk remains |
+| Exact editor-export bytes vs Seafile content readback | [ ] NOT VERIFIED; no direct readback/hash comparison |
+| Permission revocation, external writer, response loss, concurrency, production security | [ ] NOT VERIFIED |
+| Post-change ONLYOFFICE edit/save regression | [ ] NOT RUN; integration stayed enabled and its settings/routes were untouched |
+| Independent review | [x] R1–R2 bounded PROVISIONAL PASS, no remaining findings; reviewers did not replay live behavior |
+
+Evidence: `docs/reviews/GR-063/`; report: `docs/GR-063-VECTORCRAFT-REAL-SEAFILE-ROUNDTRIP.md`.
+Project GPT remains INCOMPLETE; upstream publication remains LOCKED.
+
 ## 29. Craft Web asset ingestion safety (GR-038, GR-041)
 
 | # | Test | Expected | Result |

@@ -1,0 +1,27 @@
+GR-063 local evidence checks (implementer-run, 2026-10-26)
+
+1. Candidate verification against the active local static root
+   Command: python3 docs/reviews/GR-058/verify_candidate.py --static-root \
+            /home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static
+   Result: PASS, 9 VectorCraft files; sizes and SHA-256 match; 2 index
+           references resolve; 2 SHA-384 integrity values match.
+
+2. Active local dispatcher file
+   Result: PASS, DOCX -> WordCraft, XLSX -> GridCraft, PDF -> PdfCraft, and
+           SVG -> VectorCraft.
+
+3. Browser artifact status
+   Result: PASS, the collaborative browser download list was empty after the
+           VectorCraft Export As SVG action.
+
+4. Retained evidence integrity
+   Command: (cd docs/reviews/GR-063 && sha256sum -c SHA256SUMS)
+   Result: PASS for the two PNG screenshots and sanitized browser transcript.
+
+5. Whitespace check
+   Command: git diff --check
+   Result: PASS.
+
+These checks do not independently establish Seafile's live state, the history
+event, or the storage-backed browser reopen; those are recorded as observed in
+the runtime transcript and remain implementer-reported live observations.

@@ -1,0 +1,32 @@
+GR-063 sanitized browser observations
+Date: 2026-10-26
+Scope: authenticated synthetic-library browser session; private identifiers omitted
+
+Fixture setup
+- Seafile file-list upload: tests/fixtures/synthetic.svg, 270 bytes.
+- Upload was setup only; the editor performed the changed export/save.
+
+First editor session
+- Seafile file-list open launched the VectorCraft route through gateway /open/: HTTP 200.
+- VectorCraft index, JS, WASM, required font files, and session document request: HTTP 200.
+- Visible edit: added a 20 x 20 px rectangle to the synthetic SVG.
+- Ctrl+S opened the editor's Save As dialog; it was cancelled.
+- File > Export > Export As SVG completed in the editor. The host page captured the export in memory; no browser download was recorded.
+- Gateway session save POST: HTTP 200.
+- Browser download list after export: empty.
+- Host page displayed: “Saved — new version [identifier omitted]”.
+- Seafile library history UI showed, in order, Modified "synthetic.svg" and Added "synthetic.svg".
+
+Fresh reopen
+- Clicked synthetic.svg again in the Seafile file list, creating a second editor/gateway session.
+- Fresh gateway /open/ handoff and session document GET: HTTP 200.
+- Fresh VectorCraft instance displayed the added rectangle.
+
+Limits
+- No editor-export byte capture/hash was compared with Seafile readback.
+- The first editor's title retained an asterisk after SVG export although the host
+  displayed its successful new-version confirmation. Fresh reopen rendered the
+  persisted rectangle.
+- No ONLYOFFICE edit/save regression or security-negative test was run.
+- No raw private hostname, library identifier, account identity, or session capability
+  is retained here.

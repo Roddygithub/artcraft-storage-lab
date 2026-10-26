@@ -1,6 +1,25 @@
 # STATUS
 
-## CURRENT GR: GR-062 — PdfCraft real synthetic Seafile roundtrip
+## CURRENT GR: GR-063 — VectorCraft real synthetic Seafile roundtrip
+
+The exact GR-058 VectorCraft candidate completed Seafile file-list open, an SVG
+rectangle edit, automatic gateway persistence after File → Export → Export As
+SVG, a new library-history modification, and fresh Seafile-backed reopen with
+the rectangle intact. The SVG uses VectorCraft's page-API polling adapter, not
+the common `?host=parent` protocol. Ctrl+S opened Save As; it was cancelled.
+The host showed a new-version confirmation, although VectorCraft's native dirty
+asterisk remained after export. Exact export-byte/readback identity is
+**NOT VERIFIED**. SVG was added to the same synthetic-library dispatch and
+allowlist; DOCX/WordCraft, XLSX/GridCraft, and PDF/PdfCraft were preserved.
+`ENABLE_ONLYOFFICE=True` remained set and no ONLYOFFICE settings/routes changed;
+no post-change edit/save regression was run. Candidate verification passed;
+independent R1–R2 returned bounded PROVISIONAL PASS with no remaining findings;
+R1's wording MINOR was corrected. R2 did not replay the browser or verify live
+service state. GR-063 is **GPT REVIEW PENDING**. Project GPT remains
+**INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-063-VECTORCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and `docs/reviews/GR-063/`.
+
+## PREVIOUS GR: GR-062 — PdfCraft real synthetic Seafile roundtrip
 
 The exact GR-057 PdfCraft WASM candidate now completes Seafile file-list open,
 AcroForm edit, save confirmation, a new library-history modification, and fresh

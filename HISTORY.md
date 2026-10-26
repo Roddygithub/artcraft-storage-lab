@@ -1,3 +1,25 @@
+## 2026-10-26 — GR-063 VectorCraft real synthetic Seafile roundtrip
+
+- Verified the exact GR-058 candidate against the active static root, then
+  added SVG → VectorCraft to the existing synthetic-library route and
+  allowlist. DOCX/WordCraft, XLSX/GridCraft, and PDF/PdfCraft stayed configured;
+  `ENABLE_ONLYOFFICE=True` remained set and ONLYOFFICE settings/routes were not
+  changed. A private rollback archive is outside Git.
+- In the actual VectorCraft WASM, added a rectangle to `synthetic.svg`, used
+  Export As SVG, observed the host's new-version confirmation and Seafile
+  history `Modified` entry, then reopened from the file list in a fresh
+  session with the rectangle intact. No browser download/manual upload was
+  used. Ctrl+S opened Save As and was cancelled; the app's native dirty marker
+  remained after export.
+- Exact export-byte/readback identity and a post-change ONLYOFFICE edit/save
+  regression remain unverified. Independent R1–R2 returned bounded PROVISIONAL
+  PASS with no remaining findings; R1's wording MINOR was corrected by
+  describing a second fresh-session open without claiming the first editor was
+  closed. R2 did not replay the browser or verify live service state. Project
+  GPT remains INCOMPLETE and upstream publication LOCKED.
+- Evidence: `docs/GR-063-VECTORCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-063/`.
+
 ## 2026-10-26 — GR-062 PdfCraft real synthetic Seafile roundtrip
 
 - Staged the exact reviewed GR-057 PdfCraft candidate on the existing gateway;

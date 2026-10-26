@@ -1,5 +1,21 @@
 # GPT Review Queue
 
+## GR-063 — VectorCraft real synthetic Seafile roundtrip
+
+The exact GR-058 candidate opened the synthetic SVG through Seafile; an actual
+VectorCraft edit was exported as SVG, captured by the in-page adapter and saved
+through the gateway. Seafile history shows a modification and a fresh
+file-list/editor session reopens the rectangle. This is the existing
+VectorCraft page-API/export path, not the shared `?host=parent` protocol. Ctrl+S
+opened Save As and was cancelled; the native dirty asterisk remains after the
+export. Exact export-byte/readback identity and a post-change ONLYOFFICE
+edit/save regression are **NOT VERIFIED**. ONLYOFFICE remained enabled and was
+not reconfigured. Independent R1–R2 returned bounded PROVISIONAL PASS with no
+remaining findings; R1's wording MINOR was corrected. R2 did not replay the
+browser or verify live service state. Project remains INCOMPLETE; upstream
+publication LOCKED. See `docs/GR-063-VECTORCRAFT-REAL-SEAFILE-ROUNDTRIP.md`
+and `docs/reviews/GR-063/`.
+
 ## GR-062 — PdfCraft real synthetic Seafile roundtrip
 
 The exact GR-057 candidate completed Seafile file-list open → AcroForm edit →
