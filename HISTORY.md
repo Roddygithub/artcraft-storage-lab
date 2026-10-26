@@ -1,7 +1,7 @@
 ## 2026-10-26 — GR-076 bounded PhotoCraft host adapter
 
-Committed as `5637bf2` on `main` (matching its local `origin/main` tracking
-ref), based on local main
+Source candidate committed as `5637bf2` on `main`; runtime evidence/docs were
+committed and pushed on `main`. Based on local main
 `dc105220ae934f9779eb357a4cda901ee0aa0c0b`.
 Reuses exact GR-026/GR-032 PhotoCraft base and transport; adds payload/decoded
 bounds, nested-command and direct API guards, idle ACK/deadline repaint, and
@@ -9,9 +9,16 @@ focused lifecycle/standalone regressions. Retained patches omitted the engine
 snapshot test module; repaired explicitly. Rust 1.95 locked snapshot/host/file-open/inbox tests (4/7/47/2), format, Web
 WASM, clean-base patch application and whitespace checks PASS. Independent
 R1/R2 source reviews returned PROVISIONAL PASS. **GPT REVIEW PENDING**; no GPT
-PASS. Serialization peak memory and live browser/external persistence remain
-NOT VERIFIED. No external services, deployment, dispatch or upstream
-publication. See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
+PASS. Exact GR-076 WASM completed a low-optimization browser Open/edit/save/ACK/
+fresh-iframe-reopen smoke and a synthetic Seafile
+open/edit/save/new-version/readback/close/reopen flow. Three Seafile versions
+are recorded and current readback matches the latest. Only the synthetic
+ArtCraft extension allowlist, gateway dispatch and PhotoCraft static bundle
+were changed. ONLYOFFICE settings/service were untouched; post-change UI
+regression attempt is inconclusive. Serialization peak memory, optimized bundle
+and production remain NOT VERIFIED. Runtime/docs R1 findings were closed and
+R2 returned PROVISIONAL PASS; GPT review is pending.
+See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
 `docs/reviews/GR-076/`.
 
 ## 2026-10-26 — GR-075 gateway request-body deadline

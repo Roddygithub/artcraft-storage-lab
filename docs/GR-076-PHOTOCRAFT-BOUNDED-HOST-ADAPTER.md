@@ -1,8 +1,9 @@
 # GR-076 — PhotoCraft bounded browser host adapter follow-up
 
-**Status: GPT REVIEW PENDING — committed as `5637bf2` on `main`, matching its local `origin/main` tracking ref.**
-No deployment, dispatch or upstream publication. This is a bounded source slice,
-not a project verdict or Seafile MVP.
+**Status: GPT REVIEW PENDING — source candidate `5637bf2`; synthetic Seafile runtime evidence committed and pushed on `main`.**
+The exact GR-076 bundle now completes open/edit/save/new-version/close/reopen
+against the synthetic Seafile library. No production library or upstream
+project was changed.
 
 ## Scope and immutable inputs
 
@@ -60,8 +61,8 @@ evidence; it does not promote PhotoCraft into Seafile dispatch.
 | Actual host `.pcraft` decode | Manifest 8 MiB, one blob 50 MiB, aggregate decoded tile/blob bytes 256 MiB, canvas 16,777,216 pixels; actual format decoder rather than extension-based generic import. These are admission limits, not a total process-memory guarantee |
 | Inbox / outstanding write | One initial Open slot, one ACK slot matching expected ticket, one retained snapshot; duplicate/unknown floods cannot displace accepted ACK |
 | ACK metadata | Pinned transport limits ticket (256 UTF-16 units plus Rust ticket 256-byte limit), error 4096 UTF-16 units and requires a boolean `ok` |
-| Browser lifecycle | Real iframe Open/ACK/reopen, browser clock/unload behavior and idle repaint runtime **NOT VERIFIED** for this candidate; source compilation and focused tests only |
-| External systems | Seafile authorization, version creation, persistence/reopen, ONLYOFFICE regression and production behavior **NOT VERIFIED** in this work; none accessed |
+| Browser lifecycle | Low-optimization T3 Chromium and actual Seafile file-list flow both completed. Synthetic `.pcraft`: edit, host save confirmation, Seafile version creation, close, then click/open again with both edits visible. Browser unload/clock and optimized bundle remain **NOT VERIFIED** |
+| External systems | Synthetic Seafile persistence/version/readback/reopen **PASS**; current ONLYOFFICE UI regression attempt is **NOT VERIFIED** (file route showed a blank preview, no editor assets). Seafile configuration was changed only to add `pcraft` to the existing ArtCraft extension allowlist; ONLYOFFICE settings were not changed and remained enabled. Production behavior **NOT VERIFIED** |
 | Wider validation | Full PhotoCraft suite, native desktop UI/visual QA, clippy/layer gates and adversarial corpus **NOT VERIFIED** unless separately recorded in checks |
 
 Host save ticket namespaces require successful browser `Crypto.getRandomValues`;
@@ -76,6 +77,12 @@ tests passed. Format, locked Web WASM check, clean-base patch application and
 whitespace checks passed; independent R1/R2 source reviews returned only
 **PROVISIONAL PASS**. Commands/results, patch digest and reviews are retained in
 [the evidence bundle](reviews/GR-076/README.md). Runnable check:
+
+The exact patched source completed both a T3 Chromium in-memory host smoke and a
+synthetic Seafile open/edit/save/version/close/reopen flow. Bundle settings,
+version/readback hashes, sanitized browser observations, screenshots, rollback
+locations and remaining limitations are recorded in
+[runtime evidence](reviews/GR-076/runtime/README.md).
 
 ```sh
 ./scripts/check-gr076-photocraft.sh /home/roddy/.cache/artcraft-storage-lab/gr076-photocraft

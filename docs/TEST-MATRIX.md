@@ -897,9 +897,13 @@ PROVISIONAL implementation; GPT REVIEW PENDING; no project GPT PASS.
 | Exact source/core/adapter/transport and locked dependency resolution | Exact pins in `reviews/GR-076/pins.json`; retained-base locked WASM check passed |
 | Captured snapshot ACK, stale incarnation, later edits | PASS, 4 engine tests and focused UI lifecycle cases; `reviews/GR-076/checks.log` |
 | Matching/negative/unknown/duplicate ACK, timeout/no retry and payload bounds | PASS, selected host cases in 7-test host filter |
-| Menu/direct/nested commands, local/picker/drop/Save As/duplicate/close guards | PASS, source guards and focused UI test; live Web events NOT VERIFIED |
+| Menu/direct/nested commands, local/picker/drop/Save As/duplicate/close guards | PASS, source guards and focused UI test; all denial events not replayed in browser |
 | Standalone/native file-open and save/download baseline regressions | PASS, 47 file-open tests including confirmed/unconfirmed writer regression |
-| One Open across inbox drains, unknown/duplicate ACK flood, listener failure | PASS, 2 inbox tests; actual browser listener NOT VERIFIED |
+| One Open across inbox drains, unknown/duplicate ACK flood, listener failure | PASS, 2 inbox tests; GR-076 browser received Open/save/ACK and fresh iframe reopen |
 | Rust 1.95 locked WASM, format, whitespace and clean-base patch application | PASS, final script exit 0 and `reviews/GR-076/patch-check.txt` |
-| Live iframe messaging/unload, Seafile persistence/version/reopen, ONLYOFFICE | NOT VERIFIED for GR-076; no services accessed |
+| Live iframe Open/save/ACK/fresh reopen | PASS, actual GR-076 patched WASM in T3 Chromium; in-memory smoke, low-optimization bundle; `reviews/GR-076/runtime/` |
+| Synthetic Seafile click/open/edit/save/version/close/reopen | PASS, history has 3 versions; current readback hash and reopened two-layer view recorded in `reviews/GR-076/runtime/README.md` and `seafile-readback.json` |
+| Browser unload/clock and optimized bundle | NOT VERIFIED |
+| ONLYOFFICE UI regression after GR-076 runtime deployment | NOT VERIFIED; file route rendered blank preview and loaded no editor assets. ONLYOFFICE settings were checked unchanged/enabled; prior GR-072 evidence is separate |
+| Independent runtime/docs evidence review | PASS, R1 MINOR findings closed in R2; both free-model verdicts PROVISIONAL; `reviews/GR-076/runtime/review-r1-and-response.md` |
 | Full desktop suite / visual QA / clippy / corpus | NOT VERIFIED |

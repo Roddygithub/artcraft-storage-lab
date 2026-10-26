@@ -2,17 +2,25 @@
 
 ## CURRENT GR: GR-076 — bounded PhotoCraft host adapter
 
-Committed candidate `5637bf2` on `main`, matching its local `origin/main`
-tracking ref; based on local main `dc105220ae934f9779eb357a4cda901ee0aa0c0b`.
+Source candidate `5637bf2` is committed on `main`; runtime follow-up docs/evidence
+are committed and pushed on `main`. Based on local main
+`dc105220ae934f9779eb357a4cda901ee0aa0c0b`.
 Reuses exact GR-026/GR-032 PhotoCraft base and transport; adds payload/decoded
 bounds, nested-command and direct API guards, idle ACK/deadline repaint, and
 focused lifecycle/standalone regressions. Retained patches omitted the engine
 snapshot test module; repaired explicitly. Rust 1.95 locked snapshot/host/file-open/inbox tests (4/7/47/2), format, Web
 WASM, clean-base patch application and whitespace checks PASS. Independent
 R1/R2 source reviews returned PROVISIONAL PASS. **GPT REVIEW PENDING**; no GPT
-PASS. Serialization peak memory and live browser/external persistence remain
-NOT VERIFIED. No external services, deployment, dispatch or upstream
-publication. See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
+PASS. Exact GR-076 WASM completed a low-optimization browser Open/edit/save/ACK/
+fresh-iframe-reopen smoke. The exact bundle also completed synthetic Seafile
+open/edit/save/version/readback/close/reopen; current file hash matches the
+latest of three history versions. Only the extension allowlist, dispatch, and
+new PhotoCraft static bundle were changed for the synthetic library; ONLYOFFICE
+settings/service were untouched. Post-change ONLYOFFICE UI check remains
+INCONCLUSIVE/NOT VERIFIED. Independent runtime/docs review R1 findings were
+closed; R2 returned PROVISIONAL PASS. Runtime evidence commit is pending. No
+production data or upstream publication.
+See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
 `docs/reviews/GR-076/`.
 
 

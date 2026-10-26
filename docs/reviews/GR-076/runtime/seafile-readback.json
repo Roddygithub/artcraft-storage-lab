@@ -1,0 +1,47 @@
+{
+  "scope": "synthetic Seafile library and synthetic PhotoCraft document only",
+  "fixture": {
+    "bytes": 4000,
+    "sha256": "c5fe5c8fb2bd9b38b4a0de1ad4ebc9c6e97006100e2b25e147265e2666b5a3c2"
+  },
+  "workflow": {
+    "open_from_file_list": "PASS; gateway open and editor document fetch returned HTTP 200",
+    "first_edit": "Layer 1",
+    "first_save": "PASS; gateway save returned HTTP 200; editor confirmed Saved to host",
+    "second_edit": "Layer 2",
+    "second_save": "PASS; gateway save returned HTTP 200; editor confirmed Saved to host",
+    "close_and_reopen_from_file_list": "PASS; new open/document requests returned HTTP 200; both layers visible; editor showed no changes"
+  },
+  "seafile_readback": {
+    "history_count": 3,
+    "history_sizes_bytes_newest_first": [5968, 4984, 4000],
+    "current_size_bytes": 5968,
+    "current_matches_latest_history_entry": true,
+    "current_sha256": "38ec64312bc6220f8afdaebb61120d027a826abfe0f3c8152812faaf124f101d",
+    "method": "read in browser memory through the authenticated Seafile page context; no download or manual upload"
+  },
+  "dispatch": {
+    "before_sha256": "af3c4cbbb76f3583b0bb70118c48ebd7445bc2841e577658918edd7c43f83c2d",
+    "after_sha256": "5626251152dc05fb1949a8fcc1dc6cd18d55bce75c2abd8b0e9b70b822fcf3d3",
+    "existing_routes_preserved": 7,
+    "new_route": "pcraft"
+  },
+  "seafile_settings": {
+    "before_sha256": "38162e03aef79c048e5a9334e2fd70ae04ca145b62703027f9caddacb0f69741",
+    "after_sha256": "52ad0470c2c63c72605e9d129df0be25522a3ffd670c0fa644e387996d95f23b",
+    "changed_setting": "ARTCRAFT_FILE_EXTENSIONS only; added pcraft",
+    "onlyoffice_enabled_before_and_after": true,
+    "onlyoffice_settings_or_service_changed": false
+  },
+  "bundle_sha256": {
+    "wasm": "71e6594e78d33fa75ceebec5d981e7efaa1ab8bbafd21f86fdf2412f8f14a23a",
+    "javascript": "f5280d32f337882597b4118ea6d528d975374933c3cfd865a1be6c417dd76484",
+    "index": "a60830b647db7dcacfb43e7de45cd4bdd9cf7f1174a71b502a89d4bef7c7772d"
+  },
+  "limitations": [
+    "functional low-optimization build; optimized bundle not verified",
+    "ONLYOFFICE post-change browser UI regression inconclusive: blank preview and no editor assets",
+    "production behavior, proxy/CSP behavior, concurrency conflicts, token expiry and maximum-size behavior not verified"
+  ],
+  "secrets_or_personal_data_retained": false
+}
