@@ -1,5 +1,24 @@
 # GPT Review Queue
 
+## GR-072 — post-change ONLYOFFICE regression smoke
+
+The operator-recorded run used Seafile's ONLYOFFICE route for a synthetic DOCX
+outside the ArtCraft allowlist. The marker was initially GR-071 and then
+corrected to GR-072. Screenshots show the final marker and `All changes saved`;
+Seafile history and navigation chronology are operator-recorded, not
+independently established by screenshots. The correction created a second
+retained version and is disclosed. The editor was exited by navigation, not
+explicit in-app close. Exact payload/readback identity and broader
+compatibility/security remain NOT VERIFIED. No server route, allowlist or
+ONLYOFFICE setting changed. Project remains INCOMPLETE; upstream publication
+LOCKED. Bounded evidence only, not project GPT PASS.
+Evidence: `docs/GR-072-ONLYOFFICE-REAL-SEAFILE-REGRESSION.md`,
+`docs/reviews/GR-072/`. R1 returned PROVISIONAL ACCEPT with two documentation
+minors; both are remediated. R2 returned PROVISIONAL ACCEPT with one
+matrix-attribution minor, now corrected. R3 returned PROVISIONAL ACCEPT with no
+remaining findings. Runtime claims remain operator-recorded, not independently
+replayed.
+
 ## GR-071 — dispatched candidate provenance recheck
 
 Independent R1–R3 bounded reviews returned PROVISIONAL PASS with no remaining
@@ -10,9 +29,10 @@ results, per-app verifier linkage and reconciliation with GR-054. The directory 
 not a production or proven live service root. Do not contact services, promote
 assets, or change dispatch. Per-app Seafile runs are evidence for their
 respective candidates; one combined four-route replay, repository
-`integration/static` promotion, save/readback byte identity, production
-security and post-change ONLYOFFICE edit/save remain **NOT VERIFIED**. Project
-must remain **INCOMPLETE** and upstream publication **LOCKED**.
+`integration/static` promotion, save/readback byte identity, and production
+security remain **NOT VERIFIED**. The post-change ONLYOFFICE smoke was
+subsequently recorded in GR-072. Project must remain **INCOMPLETE** and upstream
+publication **LOCKED**.
 Evidence: `docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md`,
 `docs/reviews/GR-071/`.
 

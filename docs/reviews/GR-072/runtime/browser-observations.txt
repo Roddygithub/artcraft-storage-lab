@@ -1,0 +1,32 @@
+GR-072 — sanitized observations, 2026-10-26
+
+Target: existing synthetic OnlyOffice/artcraft-lab/synthetic.docx, outside the
+ArtCraft file-type allowlist. No library UUID, private origin, account name,
+session capability, cookie, or token is retained here.
+
+1. Seafile opened the document in its existing ONLYOFFICE route. The editor
+   displayed ONLYOFFICE branding; representative ONLYOFFICE static assets
+   returned HTTP 200 in the browser network observations.
+2. Switched the editor UI to desktop layout using the editor's own restart
+   prompt. No server or ONLYOFFICE configuration was changed.
+3. Initially appended the marker `GR-071 ONLYOFFICE regression save
+   2026-10-26.` and pressed Ctrl+S. The editor showed `All changes saved`.
+4. Seafile file history showed a current version at 2026-10-26 06:13:23, 25.3
+   KB, and an earlier 2026-10-22 19:32:52 version, 5.3 KB.
+5. Corrected the marker prefix from GR-071 to GR-072 and saved again. History
+   then showed the current version at 2026-10-26 06:16:13, 25.4 KB; the earlier
+   5.3 KB version remained listed. The extra 25.3 KB version is disclosed.
+6. Navigated away from the editor, viewed history, and loaded the file route
+   again. The later ONLYOFFICE editor load displayed the final GR-072 marker.
+   The first editor was exited by navigation, not explicit in-app close.
+7. No edited output was downloaded or manually uploaded. No route, allowlist,
+   server configuration, or ONLYOFFICE setting was changed for this test.
+
+Retained screenshots:
+- onlyoffice-save-confirmation.png: final marker and `All changes saved`.
+- onlyoffice-fresh-reopen.png: final marker after navigating away and loading
+  the Seafile file route again.
+
+Limits: no editor-payload/readback byte hash comparison; no history screenshot
+because the history view included an account name; no explicit in-app close;
+one synthetic DOCX only.

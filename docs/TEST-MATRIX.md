@@ -7,6 +7,23 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-072 — post-change ONLYOFFICE regression on real synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Existing route | Synthetic DOCX outside ArtCraft allowlist opens in ONLYOFFICE | [x] Operator-recorded browser open; representative assets returned HTTP 200 in its network view |
+| Edit and save | Visible edit persists; editor confirms completion | [x] Operator-recorded GR-071→GR-072 marker edit and Ctrl+S; screenshot shows final marker with `All changes saved` |
+| Seafile version history | Save appears as current version | [x] Operator-recorded history showed 25.3 KB then 25.4 KB after the disclosed marker correction; earlier 5.3 KB version remained |
+| Later editor load | Saved edit remains visible | [x] Operator-recorded navigation and later file-route load; screenshot shows final GR-072 marker |
+| Explicit in-app close | Close action observed before reopen | [ ] NOT VERIFIED; the editor was exited by navigation |
+| Exact editor payload/readback identity | Matching bytes or hashes | [ ] NOT VERIFIED |
+| Broader ONLYOFFICE compatibility/security | Other files, versions, users and deployment topology | [ ] NOT VERIFIED |
+| Independent review | Separate review of retained evidence | [x] R1–R3 PROVISIONAL ACCEPT; R1/R2 documentation minors corrected; no remaining findings |
+
+Evidence: [GR-072 report](GR-072-ONLYOFFICE-REAL-SEAFILE-REGRESSION.md),
+[evidence bundle](reviews/GR-072/). This is a bounded one-file regression, not a
+project GPT PASS or upstream authorization.
+
 ## GR-071 — shared test-root candidate provenance recheck
 
 | Scenario | Expected | Result |
@@ -15,7 +32,7 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | Candidate assets in one local test root | All four candidates match their per-app manifests | [x] 20 files, 207,970,569 bytes; GR-055–058 verifiers pass against the GR-059 test static root |
 | One combined four-route Seafile replay | All four routes work in one run | [ ] NOT VERIFIED; prior Seafile runs are per-app, not one combined replay |
 | Repository `integration/static` promotion / active serving | Deployed root matches candidates | [ ] NOT VERIFIED; GR-071 uses a separate cache test root and makes no promotion |
-| ONLYOFFICE post-change edit/save | Existing integration still saves after route changes | [ ] NOT VERIFIED; prior bounded preservation evidence does not exercise this later combined candidate |
+| ONLYOFFICE post-change edit/save | Existing integration still saves after route changes | [x] GR-072 operator-recorded: synthetic DOCX edit, `All changes saved`, new Seafile history versions and later editor load with the final edit; explicit in-app close and byte identity remain unverified |
 | Production security and byte identity | Deployment security and save/readback identity established | [ ] NOT VERIFIED |
 | Independent review | Exact bounded evidence review | [x] R1–R3 PROVISIONAL PASS, no remaining findings; this is not project GPT PASS |
 

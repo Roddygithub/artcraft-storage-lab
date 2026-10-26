@@ -1,6 +1,23 @@
 # STATUS
 
-## CURRENT GR: GR-071 — dispatched candidate provenance recheck
+## CURRENT GR: GR-072 — post-change ONLYOFFICE preservation smoke
+
+The operator-recorded Seafile ONLYOFFICE run opened the existing synthetic DOCX
+outside the ArtCraft allowlist, edited and saved it, observed new history
+versions, then navigated away and loaded the file route again. Screenshots show
+the save-status display and final marker; they do not independently establish
+the history or chronology. The marker-label correction produced a second
+recorded version; both entries are documented. No server route, allowlist or
+ONLYOFFICE setting was changed. Exact editor-payload/readback identity and
+explicit in-app close remain **NOT VERIFIED**. This bounded smoke closes only the post-change
+ONLYOFFICE edit/save/version check for this synthetic DOCX. Project GPT remains
+**INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-072-ONLYOFFICE-REAL-SEAFILE-REGRESSION.md` and
+`docs/reviews/GR-072/`. Independent R1–R3 bounded reviews returned
+PROVISIONAL ACCEPT; the R1/R2 documentation minors are corrected, with no
+remaining findings.
+
+## PREVIOUS GR: GR-071 — dispatched candidate provenance recheck
 
 The four current source-pinned WordCraft, GridCraft, PdfCraft and VectorCraft
 candidates coexist in the GR-059 local test static root. The tracked dispatch
@@ -9,8 +26,9 @@ for 20 files totaling 207,970,569 bytes. These are the candidates used in the
 separate GR-059 and GR-061–063 Seafile runs. GR-071 does not modify or promote
 assets into the historical repository `integration/static` tree, prove what a
 running service serves, or run all four routes in one Seafile session.
-Production security, save/readback byte identity, and a post-change ONLYOFFICE
-edit/save check remain **NOT VERIFIED**. Independent R1–R3 bounded reviews
+Production security and save/readback byte identity remain **NOT VERIFIED**.
+The post-change ONLYOFFICE edit/save smoke was subsequently recorded in GR-072.
+Independent R1–R3 bounded reviews
 returned PROVISIONAL PASS with no remaining findings; project GPT remains
 **INCOMPLETE** and upstream publication **LOCKED**. See
 `docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md` and `docs/reviews/GR-071/`.

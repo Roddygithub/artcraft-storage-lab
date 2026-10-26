@@ -1,3 +1,25 @@
+## 2026-10-26 — GR-072 post-change ONLYOFFICE regression smoke
+
+- Operator-recorded opening of the existing synthetic DOCX outside the
+  ArtCraft allowlist through Seafile's ONLYOFFICE route. The first marker read
+  GR-071; it was corrected to GR-072 and saved. Screenshots show the final
+  marker and `All changes saved`, but do not independently establish chronology.
+- Seafile history showed the saved document as a new current version. Correcting
+  the marker label generated a second version; both timestamps/sizes are
+  retained in the sanitized evidence. Navigated away and loaded the file route
+  again; the final marker appeared in the reopened editor. The first editor was
+  exited by navigation, not explicit in-app close.
+- No server route, allowlist, or ONLYOFFICE setting was changed. Exact
+  editor-payload/readback identity, explicit in-app close, and broader
+  compatibility/security remain unverified. Project GPT remains INCOMPLETE and
+  upstream publication LOCKED.
+- Evidence: `docs/GR-072-ONLYOFFICE-REAL-SEAFILE-REGRESSION.md` and
+  `docs/reviews/GR-072/`.
+- Independent R1–R3 returned bounded PROVISIONAL ACCEPT. The marker chronology,
+  screenshot-vs-transcript attribution, and matrix attribution findings were
+  corrected; R3 found no remaining findings. Runtime events remain
+  operator-recorded rather than independently replayed.
+
 ## 2026-10-26 — GR-071 dispatched candidate provenance recheck
 
 - Rechecked tracked DOCX/XLSX/PDF/SVG dispatch against the exact WordCraft,
