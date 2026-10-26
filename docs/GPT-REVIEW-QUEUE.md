@@ -1,5 +1,20 @@
 # GPT Review Queue
 
+## GR-061 — GridCraft real synthetic Seafile roundtrip
+
+**Bounded independent review: R1–R3 PROVISIONAL PASS**, no blocker/major; two
+documentation minors corrected. Exact comparison against unavailable earlier
+review snapshots remains NOT VERIFIED. The exact GR-056 GridCraft candidate
+was staged on the existing gateway. In one synthetic library,
+Seafile file-list open → visible B2 edit → save confirmation → library-history
+modification → fresh Seafile-backed reopen completed; B2 and formula result B3
+both display 1337. The fixture upload was setup only, not persistence of the
+edit. DOCX/WordCraft routing remains; the extension addition is limited to the
+same synthetic library; `ENABLE_ONLYOFFICE=True` remained set. The previous
+GR-059 open-only ONLYOFFICE check was not repeated. Project GPT remains
+**INCOMPLETE**; upstream publication **LOCKED**. See [report](GR-061-GRIDCRAFT-REAL-SEAFILE-ROUNDTRIP.md)
+and [evidence](reviews/GR-061/). GR-061 remains **GPT REVIEW PENDING**.
+
 ## GR-060 — dedicated tailnet gateway LXC (paused)
 
 The isolated non-privileged Debian LXC and loopback-only gateway were staged;

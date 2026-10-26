@@ -1,0 +1,35 @@
+GR-061 sanitized browser observations — 2026-10-26
+
+Preparation:
+- Seafile file list initially contained the synthetic DOCX only.
+- Uploaded generated synthetic.xlsx through the Seafile UI as fixture setup;
+  the upload returned HTTP 200 and the list showed the file. This upload did
+  not contain or persist the later edit.
+- The live gateway served the verified GR-056 GridCraft index, JavaScript,
+  and WASM assets with HTTP 200. WordCraft's index also returned HTTP 200.
+- Seahub and Seafile services were active after the scoped Seahub settings
+  restart. ENABLE_ONLYOFFICE remained True.
+
+Editor flow:
+- Seafile file-list click opened GridCraft. The `/open/` request returned
+  HTTP 200; GridCraft static assets and the gateway document request returned
+  HTTP 200.
+- Edited B2 from 42 to 1337. The visible B3 formula was `=SUM(B2:B2)` and its
+  result recalculated to 1337.
+- Ctrl+S produced one observed gateway `/session/[redacted]/save` POST with
+  HTTP 200. The editor displayed “Saved — new version …” and returned to clean
+  state. A subsequent dirty-state POST returned HTTP 200.
+- Seafile's library history view showed both the fixture `Added` event and a
+  later `Modified "synthetic.xlsx"` event after the editor save.
+- A second click from the Seafile list opened a fresh editor session. The
+  gateway document GET returned HTTP 200 and the workbook displayed B2=1337,
+  `=SUM(B2:B2)`, and B3=1337.
+
+Evidence boundaries:
+- This was a real browser and the owner-managed synthetic Seafile instance;
+  it was not an in-memory parent or a manual upload of the edited bytes.
+- No API account token or session capability is retained here. The optional
+  direct file-history API probe returned HTTP 403; history was confirmed in
+  Seafile's authenticated UI instead.
+- This was a single-document functional roundtrip, not a concurrency,
+  authorization, production-security, or ONLYOFFICE regression test.

@@ -1,3 +1,22 @@
+## 2026-10-26 — GR-061 GridCraft real synthetic Seafile roundtrip
+
+- Staged the exact reviewed GR-056 GridCraft candidate on the existing gateway
+  and added XLSX dispatch plus the XLSX extension to the same single synthetic
+  library allowlist. DOCX/WordCraft remains present; `ENABLE_ONLYOFFICE=True`
+  remains set. A private rollback backup of gateway files and Seahub settings
+  is retained outside Git.
+- Through the Seafile file list, opened the actual GridCraft WASM, edited B2
+  from 42 to 1337, confirmed B3's `SUM(B2:B2)` recalculated to 1337, saved,
+  observed a new-version confirmation and library-history `Modified` event,
+  then reopened from the file list in a fresh editor session with the values
+  intact. Fixture upload was setup only.
+- Independent R1–R3 reviews returned bounded PROVISIONAL PASS with no
+  blocker/major; two documentation minors were corrected. Project GPT remains
+  INCOMPLETE; upstream publication remains LOCKED. No project-level PASS is
+  claimed.
+- Evidence: `docs/GR-061-GRIDCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-061/`.
+
 ## 2026-10-25 — GR-060 dedicated tailnet gateway LXC (paused by owner)
 
 - Created an unprivileged Debian 13 LXC and staged the existing WordCraft
@@ -1347,7 +1366,7 @@ Running log. Newest first.
   are **Rust-only, native egui/eframe + wgpu, explicitly not Tauri/Electron/webview**,
   and that the CI gate includes a `wasm` check. The Web/WASM story must be
   re-verified specifically for this project (GR-003).
-* Located the Seafile reference host: `svc-seafile-host.tailb64fb1.ts.net`.
+* Identified the private Seafile instance through the authorized tailnet; hostname omitted.
   No local Seafile/Docker runtime on this workstation. No production change made.
 
 ### Decisions

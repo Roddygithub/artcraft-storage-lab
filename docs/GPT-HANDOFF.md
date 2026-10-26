@@ -236,13 +236,13 @@ anywhere.**
 
 | Item | Value |
 | --- | --- |
-| Seafile | **12.0.14 Professional**, LXC `108` (192.168.1.108) |
+| Seafile | **12.0.14 Professional**, LXC `108` ([private LAN address omitted]) |
 | Seahub | on `:8000`; the file server on `:8082` |
-| reverse proxy | Nginx Proxy Manager, LXC `103` (192.168.1.103) |
-| public name | `svc-seafile-host.tailb64fb1.ts.net` |
+| reverse proxy | Nginx Proxy Manager, LXC `103` ([private LAN address omitted]) |
+| public name | [private Seafile hostname omitted] |
 | ONLYOFFICE | Document Server 24.04, LXC `112` — **untouched** |
-| test library | `c82cc792-389d-43e6-b963-0dab1a47a9a8` ("OnlyOffice"), folder `/artcraft-lab/` |
-| the real data | library `46ea6c3c-8df3-48b6-bf95-fdc300dcf65c` ("Google Drive") — **never touched** |
+| test library | Dedicated synthetic library; identifier omitted |
+| production libraries | Not accessed; identifiers and names omitted |
 
 ### 6.1 Historical Seafile configuration and current state
 

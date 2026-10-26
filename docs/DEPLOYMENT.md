@@ -13,23 +13,21 @@ nothing sensitive is stored in this repository.
 ```text
 browser
    |
-   | https://svc-seafile-host.tailb64fb1.ts.net   (Tailscale hostname, -> 192.168.1.103)
+   | https://<private-seafile-tailnet-host>
    v
-Nginx Proxy Manager  (LXC 103, 192.168.1.103)
+Nginx Proxy Manager (private LAN address omitted)
    |
-   +-- /            ->  http://192.168.1.108:8000   (Seahub)
-   +-- /seafhttp/   ->  http://192.168.1.108:8082   (Seafile file server)
-   +-- /onlyoffice/  ->  http://192.168.1.112        (ONLYOFFICE Document Server)
+   +-- /            ->  http://<seahub-private-address>:8000
+   +-- /seafhttp/   ->  http://<fileserver-private-address>:8082
+   +-- /onlyoffice/ ->  http://<onlyoffice-private-address>
    v
-Seafile Server (Professional 12.0.14)   (LXC 108, 192.168.1.108)
+Seafile Server (Professional 12.0.14; private address omitted)
    - Seahub (Django)  : 8000
    - seafhttp         : 8082
-   - /opt/seafile/seafile-server-12.0.14/
-   - pro-data/ present  -> Professional edition
+   - ONLYOFFICE       : 24.04
 ```
 
-The proxy host is `seafile.home.arpa` (internal), published on the Tailscale
-hostname. **ONLYOFFICE is served from the same origin as Seafile** through the
+The proxy host has a private internal DNS name (omitted) and is published on the Tailscale tailnet. **ONLYOFFICE is served from the same origin as Seafile** through the
 reverse proxy (`/onlyoffice/`), which is why the browser sees a single origin
 for both the host page and the editor frame.
 
@@ -48,7 +46,7 @@ From `/opt/seafile/conf/seahub_settings.py`:
 
 ```python
 ENABLE_ONLYOFFICE = True
-ONLYOFFICE_APIJS_URL = 'https://svc-seafile-host.tailb64fb1.ts.net/onlyoffice/web-apps/apps/api/documents/api.js'
+ONLYOFFICE_APIJS_URL = 'https://<private-seafile-tailnet-host>/onlyoffice/web-apps/apps/api/documents/api.js'
 ONLYOFFICE_FILE_EXTENSION = ('doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'odt', 'fodt', 'odp', 'fodp', 'ods', 'fods', 'csv', 'ppsx', 'pps')
 ONLYOFFICE_EDIT_FILE_EXTENSION = ('docx', 'pptx', 'xlsx')
 ONLYOFFICE_JWT_SECRET = <REDACTED>

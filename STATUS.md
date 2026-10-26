@@ -1,13 +1,31 @@
 # STATUS
 
-## CURRENT GR: GR-060 — dedicated gateway LXC (paused by owner)
+## CURRENT GR: GR-061 — GridCraft real synthetic Seafile roundtrip
+
+The exact GR-056 GridCraft WASM candidate now completes Seafile file-list open,
+visible XLSX edit, save confirmation, a new library-history modification, and
+fresh Seafile-backed editor reopen with the edit intact. The gateway dispatch
+retains DOCX → WordCraft and adds XLSX → GridCraft; Seahub's extension allowlist
+remains restricted to the same single synthetic library. The fixture was
+uploaded only for setup, not to persist the editor's changes.
+`ENABLE_ONLYOFFICE=True` remained set; the prior GR-059 post-deployment
+ONLYOFFICE open-only check is the relevant runtime evidence, and this change did
+not touch that integration. Independent R1–R3 reviews are bounded PROVISIONAL
+PASS with no blocker/major; both documentation minors were corrected. R3 did
+not verify exact comparison against unavailable earlier review snapshots.
+GR-061 remains **GPT REVIEW PENDING**.
+Project GPT remains **INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-061-GRIDCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and `docs/reviews/GR-061/`.
+
+## PREVIOUS GR: GR-060 — dedicated gateway LXC (paused by owner)
 
 The authorized non-privileged Debian 13 LXC is provisioned. Before shutdown,
 its gateway passed local health/static checks as a restricted service account,
 and the exact staged WordCraft bundle verified. Tailscale is installed but the
 node reports `NeedsLogin`; Serve and Seahub migration are pending
-owner-authenticated enrollment. At the owner’s request the LXC is stopped with auto-start disabled;
-the verified GR-059 route remains in service. Details:
+owner-authenticated enrollment. At the owner’s request the LXC is stopped with
+auto-start disabled; the existing gateway now serves the GR-059 DOCX route and
+the GR-061 synthetic XLSX route. Details:
 `docs/GR-060-DEDICATED-TAILNET-GATEWAY-LXC.md` and `docs/reviews/GR-060/`.
 Independent R1–R2 documentation reviews: bounded PROVISIONAL PASS, no remaining
 findings. Project status remains **INCOMPLETE** and upstream publication
@@ -474,10 +492,10 @@ NEXT:
 | --- | --- |
 | OpenCode | v2.1.0, V2 agent format (Markdown + frontmatter, `~/.config/opencode/agents/`) |
 | Agent definitions | `config/opencode/agents/` -> installed with `scripts/install-agents.sh` |
-| Seafile reference host | `svc-seafile-host.tailb64fb1.ts.net` (LXC 108, Pro 12.0.14) |
+| Seafile reference host | Private tailnet hostname omitted (Seafile Pro 12.0.14) |
 | Reverse proxy | Nginx Proxy Manager, LXC 103 |
 | ONLYOFFICE | LXC 112, Document Server 24.04, **untouched** |
-| Test library | `c82cc792-389d-43e6-b963-0dab1a47a9a8` ("OnlyOffice"), folder `/artcraft-lab/` |
+| Test library | Dedicated synthetic library; identifier omitted |
 | Gateway | `integration/gateway/`; running in the development workspace only, not installed on LXC 108 |
 | Craft web builds | pinned releases are staged under `integration/static/candidates/`; protocol-check before manual promotion |
 | Rust toolchain | 1.97.0 + `wasm32-unknown-unknown`; `trunk` 0.22.0 in `~/.local/bin` |

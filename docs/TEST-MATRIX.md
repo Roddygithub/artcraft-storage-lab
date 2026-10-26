@@ -7,6 +7,24 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-061 — GridCraft on real synthetic Seafile
+
+The exact GR-056 bundle is now dispatched for XLSX in the single synthetic
+library already used by GR-059. The fixture upload is setup only; the edited
+workbook was persisted through the editor save route. Project GPT remains
+INCOMPLETE and upstream publication LOCKED.
+
+| Check | Result | Scope |
+|---|---|---|
+| Deployed GridCraft candidate | [x] GR-056 verifier passes against live static root | Four assets, exact recorded hashes/provenance |
+| Seafile file-list open → edit → save → version → fresh reopen | [x] B2 42→1337; B3 formula recalculated and reopened as 1337 | One synthetic XLSX; history UI showed a `Modified` event; screenshots retained |
+| WordCraft route and ONLYOFFICE flag | [x] DOCX dispatch remains; `ENABLE_ONLYOFFICE=True` after Seahub restart | New ONLYOFFICE edit/save regression not run; previous GR-059 check was open-only |
+| Permission/concurrency/response-loss and deployment security | [ ] NOT VERIFIED | No negative-path or production topology test in this slice |
+| Independent exact-evidence review | [x] R1–R3 bounded PROVISIONAL PASS; two documentation minors corrected | Exact historical comparison with earlier review snapshots not verified; project-level GPT review still required |
+
+Evidence: `docs/GR-061-GRIDCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+`docs/reviews/GR-061/`.
+
 ## GR-060 — dedicated tailnet gateway LXC (paused)
 
 A non-privileged Debian 13 LXC was provisioned and staged with the existing
