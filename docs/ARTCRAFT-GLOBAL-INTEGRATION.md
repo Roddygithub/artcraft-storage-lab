@@ -45,11 +45,11 @@ does not claim all bundles are present in this checkout's active static root.
 
 | Extension | Tracked app | Synthetic Seafile runtime evidence | Remaining limit |
 | --- | --- | --- | --- |
-| `.docx` | WordCraft | GR-059 is the primary synthetic roundtrip; GR-076 re-verified edit/save/version/reopen after the `.pcraft` allow-list change | The GR-076 post-change ONLYOFFICE check is inconclusive; WordCraft byte identity and broader compatibility are not established |
-| `.xlsx` | GridCraft | GR-061: synthetic Seafile save/version/reopen | Combined five-route replay and production behavior are not verified |
-| `.pdf` | PdfCraft | GR-068: synthetic Seafile save/version/reopen | Exact save/readback byte identity and broader PDF semantics remain unverified |
-| `.svg` | VectorCraft | GR-063: synthetic Seafile export/version/reopen using the app's page API | This is a separate app-specific export path; exact export/readback byte identity remains unverified |
-| `.pcraft` | PhotoCraft | GR-076: synthetic Seafile open/edit/save/version/readback/close/reopen; current bytes match the latest of three history versions | Low-optimization build only; production, optimized bundle and serialization peak memory remain unverified |
+| `.docx` | WordCraft | GR-059 primary roundtrip; GR-076 allow-list recheck; GR-078 combined replay retained `gr078docx` after reopen | GR-076 post-change ONLYOFFICE check is inconclusive; byte identity and broader compatibility are not established |
+| `.xlsx` | GridCraft | GR-061 individual roundtrip; GR-078 combined replay retained B2/B3 = 1338 after reopen | Exact save/readback byte identity and production behavior remain unverified |
+| `.pdf` | PdfCraft | GR-068 individual roundtrip; GR-078 combined replay retained `GR078savededit` after reopen | Exact save/readback byte identity and broader PDF semantics remain unverified |
+| `.svg` | VectorCraft | GR-063 individual export roundtrip; GR-078 combined replay retained the added rectangle after reopen | Exact save/readback byte identity remains unverified |
+| `.pcraft` | PhotoCraft | GR-076 per-file roundtrip/readback; GR-078 combined replay retained the added layer after reopen | Low-optimization build only; production, optimized bundle and serialization peak memory remain unverified |
 
 GR-037 separately recorded PhotoCraft editor-message, gateway-body and Seafile
 readback hashes matching at 8,555 bytes. GR-076's PhotoCraft readback instead
@@ -58,13 +58,14 @@ the editor message. GR-035 also recorded an optimized PhotoCraft browser smoke,
 but GR-076's Seafile run used its low-optimization bundle.
 
 The repository's ignored `integration/static/` directory currently contains the
-GR-076 PhotoCraft bundle. The other four app bundles are not present there in
-this checkout. GR-071 used a separate test static root for the four candidate
-bundles; that historical root does not establish current static serving or
-asset promotion in this checkout. One combined five-route Seafile replay and
-active serving of all five bundles remain **NOT VERIFIED**. See the matrix
-rows for [GR-071](TEST-MATRIX.md#gr-071--shared-test-root-candidate-provenance-recheck)
-and [GR-076](TEST-MATRIX.md#gr-076--bounded-photocraft-browser-host-adapter).
+GR-076 PhotoCraft bundle; the other four app bundles remain absent from that
+checkout root. GR-071 used a separate test static root. GR-078 subsequently
+verified active serving and a combined five-route replay in the synthetic lab
+deployment, without promoting those four bundles into this checkout. This
+distinction does not establish production readiness or exact save/readback byte
+identity. See [GR-071](TEST-MATRIX.md#gr-071--shared-test-root-candidate-provenance-recheck),
+[GR-076](TEST-MATRIX.md#gr-076--bounded-photocraft-browser-host-adapter) and
+[GR-078](TEST-MATRIX.md#gr-078--combined-five-route-synthetic-seafile-browser-replay).
 
 ## Other app coverage
 

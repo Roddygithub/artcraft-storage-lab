@@ -7,14 +7,32 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-078 — combined five-route synthetic Seafile browser replay
+
+| Scenario | Expected | Result |
+|---|---|---|
+| WordCraft `.docx` route | Open, edit, host-save a new version, close and reopen with edit retained | [~] `synthetic.docx`; marker and saved state retained; new-version confirmation was operator-observed but not captured |
+| GridCraft `.xlsx` route | Edit a cell, save a new version, close and reopen with value/formula result retained | [x] B2 and B3 both 1338 after reopen |
+| PdfCraft `.pdf` route | Edit an interactive field, save a new version, close and reopen with value retained | [x] `form.pdf`; `GR078savededit` retained |
+| VectorCraft `.svg` route | Add a shape, save through SVG export, close and reopen with shape retained | [x] New 20 × 20 px rectangle remained visible |
+| PhotoCraft `.pcraft` route | Add a layer, receive host-save success, close and reopen with layer retained | [x] Save HTTP 200; app close unavailable for host-bound doc, browser tab closed |
+| Combined active lab replay | Exercise all five tracked routes from one synthetic Seafile library/browser profile | [x] Sequential replay; no manual download/upload |
+| Uniform history-page and saved-byte identity | Verify history entries and compare editor payload to Seafile readback for all routes | [ ] NOT VERIFIED |
+| Production security, conflict and ONLYOFFICE post-change UI | Verify production permissions/proxy/CSP/concurrency; confirm ONLYOFFICE UI after changes | [ ] NOT VERIFIED; ONLYOFFICE not used or changed in GR-078 |
+| Independent review | Separate final-state evidence review | [x] R1 MAJOR/MINOR findings remediated; R2 PROVISIONAL PASS, no new findings |
+
+Evidence: [GR-078 report](GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md),
+[runtime bundle](reviews/GR-078/). The result is bounded to the active
+synthetic lab deployment; no project GPT PASS is implied.
+
 ## GR-077 — integration coverage reconciliation
 
 | Scenario | Expected | Result |
 |---|---|---|
 | Tracked dispatcher summary | App/extension mapping matches `integration/config/dispatch.json` | [x] Five routes: DOCX, XLSX, PDF, SVG and `.pcraft`; PhotoCraft addition is GR-076 |
 | Per-app synthetic evidence summary | Summary points to retained app reports and does not imply one combined run | [x] WordCraft, GridCraft, PdfCraft, VectorCraft and PhotoCraft evidence is linked in `docs/ARTCRAFT-GLOBAL-INTEGRATION.md` |
-| Active local static assets | To pass, all five tracked routes must have matching assets in `integration/static/` for a combined replay | [ ] NOT VERIFIED; this checkout contains the GR-076 PhotoCraft bundle only |
-| Combined five-route Seafile replay | All tracked routes work together in one synthetic library/session | [ ] NOT VERIFIED; prior runtime checks were per-app |
+| Active local static assets in this checkout | To pass, all five tracked routes must have matching assets in repository `integration/static/` | [ ] NOT VERIFIED; this checkout contains the GR-076 PhotoCraft bundle only; GR-078 separately verified all five in the active lab deployment |
+| Combined five-route Seafile replay at GR-077 cutoff | All tracked routes work together in one synthetic library/session | [ ] NOT VERIFIED at GR-077; later completed in GR-078, with WordCraft new-version confirmation evidence-limited |
 | Production security and conflict behavior | Production-readiness gate: verify save authorization, proxy, CSP, concurrency and permissions | [ ] NOT VERIFIED |
 | Independent review | Separate review of this documentation reconciliation | [x] R1/R2 PROVISIONAL PASS; ten R1 MINOR findings remediated; R2 found none new |
 
@@ -88,8 +106,8 @@ project GPT PASS or upstream authorization.
 |---|---|---|
 | Tracked dispatch mapping at GR-071 | DOCX/XLSX/PDF/SVG map to WordCraft/GridCraft/PdfCraft/VectorCraft | [x] GR-071 checked the four existing routes; GR-076 later added the `pcraft` → PhotoCraft route |
 | Candidate assets in one local test root | All four candidates match their per-app manifests | [x] 20 files, 207,970,569 bytes; GR-055–058 verifiers pass against the GR-059 test static root |
-| One combined five-route Seafile replay | All tracked routes work in one run | [ ] NOT VERIFIED; prior Seafile runs are per-app, not one combined replay |
-| Repository `integration/static` promotion / active serving | All five tracked routes have matching active assets | [ ] NOT VERIFIED; GR-076 staged PhotoCraft in this checkout, but the other four bundles are absent |
+| One combined five-route Seafile replay at GR-071 cutoff | All tracked routes work in one run | [ ] NOT VERIFIED at GR-071; later combined synthetic replay recorded in GR-078 |
+| Repository `integration/static` promotion | All five tracked routes have matching assets in this checkout | [ ] NOT VERIFIED; GR-076 staged PhotoCraft here, but the other four bundles remain absent; GR-078 active lab replay used deployed assets |
 | ONLYOFFICE post-change edit/save | Existing integration still saves after route changes | [x] GR-072 operator-recorded: synthetic DOCX edit, `All changes saved`, new Seafile history versions and later editor load with the final edit; explicit in-app close and byte identity remain unverified |
 | Production security and byte identity | Deployment security and save/readback identity established | [ ] NOT VERIFIED |
 | Independent review | Exact bounded evidence review | [x] R1–R3 PROVISIONAL PASS, no remaining findings; this is not project GPT PASS |

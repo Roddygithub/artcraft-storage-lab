@@ -1,17 +1,33 @@
 # STATUS
 
-## CURRENT GR: GR-077 — Seafile integration coverage reconciliation
+## CURRENT GR: GR-078 — combined five-route synthetic Seafile browser replay
 
-Reconciled the global app-coverage document and test matrix with the current
-five-route tracked dispatcher and retained per-app synthetic Seafile evidence.
-The checkout's `integration/static/` contains only the GR-076 PhotoCraft bundle;
-the combined five-route replay and active serving of all five bundles remain
-**NOT VERIFIED**. This documentation work performed no runtime test or service
-change. Independent R1/R2 returned PROVISIONAL PASS; R1's ten minor wording and
-reference findings were remediated, and R2 found no new findings. Project GPT
-review remains incomplete and upstream publication remains locked. See
-`docs/GR-077-INTEGRATION-COVERAGE-RECONCILIATION.md` and
-`docs/reviews/GR-077/`.
+All five tracked dispatcher routes completed a sequential synthetic Seafile Web
+open/edit/host-save/close-tab/reopen workflow in one browser profile and
+synthetic library. GridCraft, PdfCraft and VectorCraft retained screenshots show
+new-version IDs. WordCraft's retained screenshots show the saved state and
+marker; its new-version confirmation was observed but not captured. PhotoCraft's
+host save returned HTTP 200 and its editor returned to a clean state. All
+semantic edits remained visible after reopen. Evidence and limitations are in
+`docs/reviews/GR-078/runtime/`. This closes the combined replay gap for the
+active lab deployment; the other four app bundles remain absent from this
+checkout's ignored `integration/static/`. Uniform history-page verification,
+editor-payload/readback byte identity, production behavior and the post-change
+ONLYOFFICE UI remain **NOT VERIFIED**. ONLYOFFICE was not used or changed.
+R1 found two MAJOR and two MINOR findings; all are recorded in the review
+response and remediated. R2 verified the fixes and returned PROVISIONAL PASS
+with no new findings. Project GPT review remains incomplete and upstream
+publication remains locked. See
+`docs/GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md` and `docs/reviews/GR-078/`.
+
+## PREVIOUS GR: GR-077 — Seafile integration coverage reconciliation
+
+Reconciled the global app-coverage document and test matrix with the five-route
+tracked dispatcher and retained per-app synthetic Seafile evidence. At that
+time the combined replay was NOT VERIFIED. Independent R1/R2 returned
+PROVISIONAL PASS; R1's ten minor wording and reference findings were
+remediated, and R2 found no new findings. See
+`docs/GR-077-INTEGRATION-COVERAGE-RECONCILIATION.md` and `docs/reviews/GR-077/`.
 
 ## PREVIOUS GR: GR-076 — bounded PhotoCraft host adapter
 

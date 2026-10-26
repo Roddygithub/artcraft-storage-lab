@@ -34,16 +34,41 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-078 — combined five-route synthetic Seafile browser replay
+
+All five tracked routes completed a sequential synthetic browser workflow in
+the same Seafile library: open, edit, host-bound save, editor-tab close and
+reopen. GridCraft, PdfCraft and VectorCraft retained screenshots show
+new-version IDs. WordCraft's retained screenshots show saved state and the
+marker; its new-version confirmation was observed during the run but not
+captured. PhotoCraft's host save returned HTTP 200 and a clean editor state.
+Each retained the semantic edit after reopen. No download/manual upload was
+used. PhotoCraft's in-app close is unavailable for a host-bound document; the
+tab was closed instead. R1 found two MAJOR and two MINOR findings; all were
+remediated. R2 verified the fixes and returned PROVISIONAL PASS with no new
+findings. Screenshots and sanitized observations are in
+`docs/reviews/GR-078/runtime/`.
+This demonstrates the combined replay in the active lab deployment; it does not
+promote the absent four app bundles into this checkout's ignored
+`integration/static/`. Uniform history-page verification, byte identity,
+production behavior, and post-change ONLYOFFICE UI remain NOT VERIFIED.
+ONLYOFFICE was not used or changed. Project GPT review remains INCOMPLETE and
+upstream publication LOCKED.
+
+Evidence: `docs/GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md`,
+`docs/reviews/GR-078/`.
+
 ## GR-077 — Seafile integration coverage reconciliation
 
-Documentation now distinguishes the five routes in the tracked dispatcher
-from per-app synthetic Seafile evidence. Only the PhotoCraft asset bundle is
-present in this checkout's `integration/static/`; the other four bundles are
-absent. One combined five-route Seafile replay, active serving of every route,
-and production save/security behavior remain **NOT VERIFIED**. No runtime test
-or service change was performed. Independent R1/R2 returned PROVISIONAL PASS;
-R1's ten minor findings were remediated and R2 found no new findings. Project
-remains INCOMPLETE and upstream publication LOCKED.
+Documentation reconciled the five tracked routes with per-app synthetic
+evidence. At the time of GR-077, one combined five-route replay and active
+serving of every route were NOT VERIFIED; GR-078 later completed that replay
+against the active lab deployment. Only the PhotoCraft bundle is present in
+this checkout's ignored `integration/static/`; the other four bundles remain
+absent there. Production save/security behavior remains NOT VERIFIED. No
+runtime test or service change was performed for GR-077. Independent R1/R2
+returned PROVISIONAL PASS; R1's ten minor findings were remediated and R2 found
+no new findings. Project remains INCOMPLETE and upstream publication LOCKED.
 
 Evidence: `docs/GR-077-INTEGRATION-COVERAGE-RECONCILIATION.md`,
 `docs/reviews/GR-077/`.
@@ -109,8 +134,10 @@ not a production or proven live service root. Do not contact services, promote
 assets, or change dispatch. Per-app Seafile runs are evidence for their
 respective candidates; one combined replay, repository `integration/static`
 promotion, save/readback byte identity, and production security remain
-**NOT VERIFIED**. GR-076 later added the `pcraft` route, making the current
-combined replay a five-route run. The post-change ONLYOFFICE smoke was
+**NOT VERIFIED at the GR-071 review cutoff**; GR-078 later completed a
+combined five-route run against the active synthetic lab deployment. The four
+non-PhotoCraft bundles remain absent from this checkout's `integration/static/`.
+The post-change ONLYOFFICE smoke was
 subsequently recorded in GR-072. Project must remain **INCOMPLETE** and upstream
 publication **LOCKED**.
 Evidence: `docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md`,

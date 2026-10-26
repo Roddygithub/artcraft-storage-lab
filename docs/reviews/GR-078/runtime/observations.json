@@ -1,0 +1,59 @@
+{
+  "work_item": "GR-078",
+  "date": "2026-10-26",
+  "environment": "synthetic Seafile library; active lab deployment",
+  "workflow": "open from Seafile Web, edit, host-bound save, close editor tab, reopen from Seafile Web",
+  "manual_download_or_upload": false,
+  "production_data_accessed": false,
+  "onlyoffice_changed_or_used": false,
+  "routes": [
+    {
+      "file": "synthetic.docx",
+      "app": "WordCraft",
+      "edit": "Added marker gr078docx",
+      "save_confirmation": "Retained screenshot shows saved state; new-version confirmation was observed during the run but was not captured",
+      "version_id": null,
+      "version_id_status": "NOT VERIFIED from retained evidence",
+      "reopen": "Marker visible"
+    },
+    {
+      "file": "synthetic.xlsx",
+      "app": "GridCraft",
+      "edit": "B2 changed to 1338; B3 formula recalculated to 1338",
+      "save_confirmation": "Saved — new version",
+      "version_id": "5724ff96254801716d84bb07b8e8705060d410f9",
+      "reopen": "B2 and B3 remained 1338"
+    },
+    {
+      "file": "form.pdf",
+      "app": "PdfCraft",
+      "edit": "First form field changed to GR078savededit",
+      "save_confirmation": "Saved — new version",
+      "version_id": "9e9a8b9a7e2fa90df924cab8d6da9798676e7630",
+      "reopen": "Field value remained visible"
+    },
+    {
+      "file": "synthetic.svg",
+      "app": "VectorCraft",
+      "edit": "Added 20 by 20 px rectangle and exported SVG",
+      "save_confirmation": "Saved — new version",
+      "version_id": "55962c8fedfe0e0a25a547a8a9b1992f8daf9b32",
+      "reopen": "Added rectangle remained visible"
+    },
+    {
+      "file": "photocraft-fixture/photocraft-smoke.pcraft",
+      "app": "PhotoCraft",
+      "edit": "Added a layer",
+      "save_confirmation": "Host save returned HTTP 200; editor returned to clean state",
+      "reopen": "Added layer remained visible",
+      "close_note": "In-app close unavailable for host-bound document; browser editor tab was closed"
+    }
+  ],
+  "limitations": [
+    "No history page captured in this run",
+    "No uniform editor-payload to Seafile-readback byte comparison",
+    "PhotoCraft close was by browser-tab close, not in-app close",
+    "Production, proxy, CSP, permissions, concurrency, and ONLYOFFICE post-change UI remain unverified"
+  ],
+  "secrets_or_personal_data_retained": false
+}

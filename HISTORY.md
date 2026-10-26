@@ -1,3 +1,21 @@
+# 2026-10-26 — GR-078 combined five-route synthetic Seafile browser replay
+
+- Replayed the five tracked routes in one sequential browser workflow against
+  the synthetic Seafile library: WordCraft DOCX, GridCraft XLSX, PdfCraft
+  interactive PDF, VectorCraft SVG and PhotoCraft Pcraft.
+- Each editor showed its host-bound save result and the edit remained visible
+  after closing the editor tab and reopening from Seafile Web. No download or
+  manual upload was used.
+- Captured save/reopen screenshots and a sanitized observation record. The
+  PhotoCraft in-app close command is unavailable for a host-bound document, so
+  its tab was closed before reopening. Uniform Seafile history-page checks,
+  payload/readback byte identity, production behavior and post-change
+  ONLYOFFICE UI remain NOT VERIFIED. ONLYOFFICE was not used or changed.
+- Evidence: `docs/GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md`,
+  `docs/reviews/GR-078/`. Independent R1 MAJOR findings were remediated; R2
+  returned PROVISIONAL PASS with no new findings. Project GPT review remains
+  incomplete and upstream publication locked.
+
 # 2026-10-26 — GR-077 Seafile integration coverage reconciliation
 
 - Corrected the global integration summary to distinguish the five tracked
