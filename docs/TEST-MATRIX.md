@@ -7,6 +7,20 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-079 — read-only Seafile history verification
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Current history row for each GR-078 file | Seafile History lists a current version after the browser save | [x] DOCX 5 versions; XLSX 3; PDF 4; SVG 3; Pcraft 4 |
+| Current version dates and sizes | Record the displayed current-row timestamp and size | [x] Values recorded in sanitized `history-observations.json`; no separate file-list comparison retained |
+| Personal data in retained evidence | Exclude modifier names and credentials | [x] Names omitted; no screenshots or file content retained |
+| Editor bytes versus Seafile readback | Compare saved payload and current version bytes for all five routes | [ ] NOT VERIFIED |
+| Independent review | Separate read-only evidence review | [x] R1 MINOR findings remediated; R2 PROVISIONAL PASS, no new findings |
+
+Evidence: [GR-079 report](GR-079-SEAFILE-HISTORY-VERIFICATION.md),
+[evidence bundle](reviews/GR-079/). Read-only synthetic check only; no
+production or project GPT PASS is implied.
+
 ## GR-078 — combined five-route synthetic Seafile browser replay
 
 | Scenario | Expected | Result |
@@ -17,7 +31,8 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | VectorCraft `.svg` route | Add a shape, save through SVG export, close and reopen with shape retained | [x] New 20 × 20 px rectangle remained visible |
 | PhotoCraft `.pcraft` route | Add a layer, receive host-save success, close and reopen with layer retained | [x] Save HTTP 200; app close unavailable for host-bound doc, browser tab closed |
 | Combined active lab replay | Exercise all five tracked routes from one synthetic Seafile library/browser profile | [x] Sequential replay; no manual download/upload |
-| Uniform history-page and saved-byte identity | Verify history entries and compare editor payload to Seafile readback for all routes | [ ] NOT VERIFIED |
+| History rows for all five routes | Seafile History lists a current version for each replayed file | [x] Verified in GR-079; five current rows recorded |
+| Saved-byte identity | Compare editor payload to Seafile readback bytes for all routes | [ ] NOT VERIFIED |
 | Production security, conflict and ONLYOFFICE post-change UI | Verify production permissions/proxy/CSP/concurrency; confirm ONLYOFFICE UI after changes | [ ] NOT VERIFIED; ONLYOFFICE not used or changed in GR-078 |
 | Independent review | Separate final-state evidence review | [x] R1 MAJOR/MINOR findings remediated; R2 PROVISIONAL PASS, no new findings |
 

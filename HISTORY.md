@@ -1,3 +1,18 @@
+# 2026-10-26 — GR-079 read-only Seafile history verification
+
+- Inspected Seafile Web History for the five synthetic GR-078 files. Current
+  history entries exist: DOCX 5 versions, XLSX 3, PDF 4, SVG 3 and Pcraft 4.
+- Retained only version dates, sizes and counts; modifier names were omitted,
+  and no screenshots or file content were retained. No changes were made to
+  files, services or configuration.
+- Editor-payload/readback byte identity, production behavior and post-change
+  ONLYOFFICE UI remain NOT VERIFIED. Independent R1 returned PROVISIONAL MINOR;
+  both findings were remediated. R2 returned PROVISIONAL PASS with no new
+  findings. Project GPT review remains incomplete and upstream publication
+  locked.
+- Evidence: `docs/GR-079-SEAFILE-HISTORY-VERIFICATION.md`,
+  `docs/reviews/GR-079/`.
+
 # 2026-10-26 — GR-078 combined five-route synthetic Seafile browser replay
 
 - Replayed the five tracked routes in one sequential browser workflow against
@@ -8,9 +23,11 @@
   manual upload was used.
 - Captured save/reopen screenshots and a sanitized observation record. The
   PhotoCraft in-app close command is unavailable for a host-bound document, so
-  its tab was closed before reopening. Uniform Seafile history-page checks,
-  payload/readback byte identity, production behavior and post-change
-  ONLYOFFICE UI remain NOT VERIFIED. ONLYOFFICE was not used or changed.
+  its tab was closed before reopening. At the GR-078 cutoff, Seafile
+  history-page checks had not been performed; GR-079 later confirmed current
+  history rows for all five files. Payload/readback byte identity, production
+  behavior and post-change ONLYOFFICE UI remain NOT VERIFIED. ONLYOFFICE was
+  not used or changed.
 - Evidence: `docs/GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md`,
   `docs/reviews/GR-078/`. Independent R1 MAJOR findings were remediated; R2
   returned PROVISIONAL PASS with no new findings. Project GPT review remains

@@ -1,6 +1,19 @@
 # STATUS
 
-## CURRENT GR: GR-078 — combined five-route synthetic Seafile browser replay
+## CURRENT GR: GR-079 — read-only Seafile history verification
+
+After GR-078, Seafile Web History views showed current versions for all five
+synthetic files: DOCX 5, XLSX 3, PDF 4, SVG 3 and Pcraft 4. The sanitized
+timestamps and sizes are recorded in `docs/reviews/GR-079/`; modifier names
+were excluded and no screenshots or file contents retained. This was read-only
+and changed no service or configuration. Editor-payload/readback byte identity,
+production behavior and ONLYOFFICE post-change UI remain **NOT VERIFIED**.
+R1 returned PROVISIONAL MINOR; both findings were remediated. R2 verified the
+fixes and returned PROVISIONAL PASS with no new findings. Project GPT review
+remains incomplete and upstream publication remains locked. See
+`docs/GR-079-SEAFILE-HISTORY-VERIFICATION.md` and `docs/reviews/GR-079/`.
+
+## PREVIOUS GR: GR-078 — combined five-route synthetic Seafile browser replay
 
 All five tracked dispatcher routes completed a sequential synthetic Seafile Web
 open/edit/host-save/close-tab/reopen workflow in one browser profile and
@@ -11,9 +24,11 @@ host save returned HTTP 200 and its editor returned to a clean state. All
 semantic edits remained visible after reopen. Evidence and limitations are in
 `docs/reviews/GR-078/runtime/`. This closes the combined replay gap for the
 active lab deployment; the other four app bundles remain absent from this
-checkout's ignored `integration/static/`. Uniform history-page verification,
-editor-payload/readback byte identity, production behavior and the post-change
-ONLYOFFICE UI remain **NOT VERIFIED**. ONLYOFFICE was not used or changed.
+checkout's ignored `integration/static/`. At the GR-078 cutoff, history-page
+verification had not been performed; GR-079 later confirmed current rows for
+all five files. Editor-payload/readback byte identity, production behavior and
+the post-change ONLYOFFICE UI remain **NOT VERIFIED**. ONLYOFFICE was not used
+or changed.
 R1 found two MAJOR and two MINOR findings; all are recorded in the review
 response and remediated. R2 verified the fixes and returned PROVISIONAL PASS
 with no new findings. Project GPT review remains incomplete and upstream

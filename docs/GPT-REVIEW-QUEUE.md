@@ -34,6 +34,21 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-079 — read-only Seafile history verification
+
+Seafile Web History listed current versions after the GR-078 synthetic replay:
+DOCX 5, XLSX 3, PDF 4, SVG 3 and Pcraft 4. Sanitized times/sizes are in
+`docs/reviews/GR-079/history-observations.json`; modifier names were excluded,
+and no screenshots or file contents retained. No file/config/service changes.
+Editor-payload/readback byte identity, production behavior and post-change
+ONLYOFFICE UI remain NOT VERIFIED. R1 returned PROVISIONAL MINOR; both findings
+were remediated. R2 verified the fixes and returned PROVISIONAL PASS with no
+new findings. Project GPT review remains INCOMPLETE and upstream publication
+LOCKED.
+
+Evidence: `docs/GR-079-SEAFILE-HISTORY-VERIFICATION.md`,
+`docs/reviews/GR-079/`.
+
 ## GR-078 — combined five-route synthetic Seafile browser replay
 
 All five tracked routes completed a sequential synthetic browser workflow in
@@ -50,8 +65,9 @@ findings. Screenshots and sanitized observations are in
 `docs/reviews/GR-078/runtime/`.
 This demonstrates the combined replay in the active lab deployment; it does not
 promote the absent four app bundles into this checkout's ignored
-`integration/static/`. Uniform history-page verification, byte identity,
-production behavior, and post-change ONLYOFFICE UI remain NOT VERIFIED.
+`integration/static/`. At the GR-078 capture, history pages had not been
+checked; GR-079 later verified current rows for all five files. Saved-byte
+identity, production behavior, and post-change ONLYOFFICE UI remain NOT VERIFIED.
 ONLYOFFICE was not used or changed. Project GPT review remains INCOMPLETE and
 upstream publication LOCKED.
 

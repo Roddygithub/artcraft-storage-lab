@@ -66,6 +66,8 @@ distinction does not establish production readiness or exact save/readback byte
 identity. See [GR-071](TEST-MATRIX.md#gr-071--shared-test-root-candidate-provenance-recheck),
 [GR-076](TEST-MATRIX.md#gr-076--bounded-photocraft-browser-host-adapter) and
 [GR-078](TEST-MATRIX.md#gr-078--combined-five-route-synthetic-seafile-browser-replay).
+GR-079 later confirmed current Seafile History rows for the five GR-078 files;
+it did not compare editor output bytes with Seafile readback.
 
 ## Other app coverage
 

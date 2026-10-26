@@ -1,0 +1,51 @@
+{
+  "work_item": "GR-079",
+  "date": "2026-10-26",
+  "source": "Seafile Web History view",
+  "scope": "synthetic ArtCraft GPT Review library only",
+  "mutations_performed": false,
+  "routes": [
+    {
+      "file": "synthetic.docx",
+      "version_count": 5,
+      "current_version_time": "2026-10-26 15:14:55",
+      "current_size": "15.8 KB",
+      "older_sizes": ["15.8 KB", "15.8 KB", "25.3 KB", "1.6 KB"]
+    },
+    {
+      "file": "synthetic.xlsx",
+      "version_count": 3,
+      "current_version_time": "2026-10-26 15:17:47",
+      "current_size": "4.2 KB",
+      "older_sizes": ["4.1 KB", "2.2 KB"]
+    },
+    {
+      "file": "form.pdf",
+      "version_count": 4,
+      "current_version_time": "2026-10-26 15:20:42",
+      "current_size": "3.7 KB",
+      "older_sizes": ["3.0 KB", "2.4 KB", "1.7 KB"]
+    },
+    {
+      "file": "synthetic.svg",
+      "version_count": 3,
+      "current_version_time": "2026-10-26 15:26:18",
+      "current_size": "847 B",
+      "older_sizes": ["751 B", "270 B"]
+    },
+    {
+      "file": "photocraft-fixture/photocraft-smoke.pcraft",
+      "version_count": 4,
+      "current_version_time": "2026-10-26 15:07:56",
+      "current_size": "7.0 KB",
+      "older_sizes": ["6.0 KB", "5.0 KB", "4.0 KB"]
+    }
+  ],
+  "limitations": [
+    "No editor-payload to Seafile-readback byte comparison",
+    "No production library or production behavior checked",
+    "Displayed modifier names intentionally omitted",
+    "No screenshot or file content retained"
+  ],
+  "secrets_or_personal_data_retained": false
+}
