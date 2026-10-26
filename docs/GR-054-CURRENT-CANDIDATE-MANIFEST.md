@@ -13,6 +13,18 @@ candidate-ready editor bundle**. The historical GPT first pass reviewed
 GR-054 adds documentation/evidence and a stdlib verifier only; no service, credential, Seafile,
 ONLYOFFICE, upstream, build or promotion operation was performed.
 
+## Follow-up on 2026-10-26
+
+The inventory below is a dated observation, not a mutable current-state claim.
+At capture time the four local default bundles had no matched source/build
+provenance. GR-055–058 subsequently produced pinned per-app candidates; GR-059
+and GR-061–063 used those candidates for individual synthetic Seafile runs.
+GR-071 checked their 20 files together against the separate GR-059 test static
+root and the checked-in four-route dispatch. This closes the per-app candidate
+identity gap for that local test root. It does not alter the original
+`integration/static` inventory below, promote files into it, or prove what a
+running service serves. See [GR-071](GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md).
+
 Two inventories must remain distinct:
 
 | Inventory | Observation | Meaning |
@@ -104,6 +116,11 @@ which source revision, patch or transport produced a binary.
 
 ## Available source pins versus exact operational provenance
 
+The table that follows records evidence available at the original GR-054
+capture. The per-app candidate provenance and later Seafile runs are updated in
+the 2026-10-26 follow-up above and in GR-071; don't read this historical table
+as a statement that the newer source-pinned candidates lack provenance.
+
 These are **available historical source/build records**, not proof that the
 current default local assets were built from them. Source and runtime transport
 pins differ in the records and must not be silently conflated.
@@ -148,14 +165,15 @@ reproduce a build.
 | Real isolated Seafile MVP | Historical bounded reproduction with synthetic files | GR-015/016/017/012 above; **not** a current source-plus-assets replay, production proof or all-version/type coverage. |
 | ONLYOFFICE preservation | **Proven on isolated synthetic stack** | [GR-040](reviews/GR-040/README.md): actual ONLYOFFICE 8.0.1-31 DOCX editor, two saves, HTTP-200 callbacks, history 3→5, fresh file-list reopen with both edits. Independent evidence review **PROVISIONAL ACCEPT**. The old unqualified “ONLYOFFICE regression unverified” blocker is historical and superseded for this scope. |
 | Production/deployment and broader ONLYOFFICE compatibility | **NOT VERIFIED** | GR-040 does not cover production configuration/topology, other file types or Document Server versions, TLS/proxy/CSP/CSRF, callback byte identity or all security cases. No production access in GR-054. |
-| Exact deployable editor candidate | **NOT VERIFIED / not candidate-ready** | Four dispatched local bundles lack matched exact source/patch/transport evidence; clean source contains no bundles. Index linkage alone cannot close this gate. |
+| Exact per-app candidate in the GR-059 test static root | **Verified, bounded to the local test root** | GR-071 rechecked all 20 WordCraft/GridCraft/PdfCraft/VectorCraft candidate files against their GR-055–058 manifests and confirmed tracked dispatch mapping. GR-059 and GR-061–063 record per-app Seafile runs. |
+| Original repository `integration/static` bundle promotion and live service root | **NOT VERIFIED** | GR-054 records that separate ignored/untracked tree as observed on 2026-10-25; GR-071 neither replaced it nor checked a running service. |
+| One full four-route dispatcher replay / production readiness | **NOT VERIFIED** | Per-app Seafile runs are recorded separately; production routing, security, authorization, and simultaneous ONLYOFFICE behavior remain open. |
 | Project GPT review / upstream gate | **INCOMPLETE; LOCKED** | Historical [95d first pass](reviews/GPT-FIRST-PASS-95D8983.md); no new GPT verdict. GR-054's bounded reviews do not change project status; no upstream publication allowed. |
 
-Before any planned real-instance test, independently review this inventory,
-resolve the exact intended asset/source/patch/transport combination and record
-its complete hashes plus browser evidence. Then define the real-instance
-synthetic library, preservation checks and rollback against its actual version
-and deployment. This document authorizes no deployment or production changes.
+Before promoting these candidates or testing another deployment, verify the
+exact static root and source/patch/transport combination there, then define
+rollback and run the synthetic-library preservation checks against that
+deployment. This document authorizes no deployment or production changes.
 
 ## Recheck
 

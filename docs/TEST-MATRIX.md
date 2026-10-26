@@ -7,6 +7,22 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-071 — shared test-root candidate provenance recheck
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Tracked dispatch mapping | DOCX/XLSX/PDF/SVG map to WordCraft/GridCraft/PdfCraft/VectorCraft | [x] Exact mapping checked against `integration/config/dispatch.json` |
+| Candidate assets in one local test root | All four candidates match their per-app manifests | [x] 20 files, 207,970,569 bytes; GR-055–058 verifiers pass against the GR-059 test static root |
+| One combined four-route Seafile replay | All four routes work in one run | [ ] NOT VERIFIED; prior Seafile runs are per-app, not one combined replay |
+| Repository `integration/static` promotion / active serving | Deployed root matches candidates | [ ] NOT VERIFIED; GR-071 uses a separate cache test root and makes no promotion |
+| ONLYOFFICE post-change edit/save | Existing integration still saves after route changes | [ ] NOT VERIFIED; prior bounded preservation evidence does not exercise this later combined candidate |
+| Production security and byte identity | Deployment security and save/readback identity established | [ ] NOT VERIFIED |
+| Independent review | Exact bounded evidence review | [x] R1–R3 PROVISIONAL PASS, no remaining findings; this is not project GPT PASS |
+
+Evidence: [GR-071 report](GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md),
+[checks and review](reviews/GR-071/README.md). The check is local/read-only;
+it neither contacts Seafile nor changes dispatch.
+
 ## GR-069 — FigCraft on real synthetic Seafile
 
 | Scenario | Expected | Result |
@@ -258,21 +274,25 @@ GPT remains **INCOMPLETE**.
 | Actual WordCraft synthetic browser roundtrip | [x] Edit/serialize, synthetic version acknowledgement, save confirmation and fresh reopen pass | In-memory host only; no Seafile persistence |
 | Exact-candidate Seafile history/readback/reopen | [x] GR-059 real synthetic library; a new history entry and fresh editor reopen with the edit intact | One file/library only; permission revocation, external writers, response loss, and ONLYOFFICE save regression remain unverified |
 
-## GR-054 — current inventory boundary
+## GR-054 — dated inventory and later candidate follow-up
 
 Current source snapshot: `1c7914bf1e166ac4731a1c9b11dce649210eed70`;
 95d8983 is a historical reviewed candidate. Existing runtime rows below describe
 recorded historical runs, not a replay of this snapshot plus current local assets.
 Project GPT remains INCOMPLETE; GR-054 independent R1–R2 bounded reviews are
-PROVISIONAL PASS. No current source-plus-assets replay is claimed.
+PROVISIONAL PASS. The 2026-10-25 parent `integration/static` snapshot still
+lacks matched source provenance. Later GR-055–058 candidates were checked
+together in the separate GR-059 test static root by GR-071; this does not verify
+the repository `integration/static` promotion, running service root, or one
+combined four-route Seafile replay.
 
 | Check | Result | Scope |
 | --- | --- | --- |
 | Dispatch/source inventory | [x] 55 pinned source/patch files match base and current files | Stdlib verifier; no services or builds |
 | Parent-local inventory | [x] 82 file hashes/sizes, ignored/untracked state and seven index maps match | Optional read-only verifier; clean worktree has no static tree |
-| Dispatched asset provenance | [ ] NOT VERIFIED for all four default bundles | Existing historical pins/runtime evidence cannot be bound to current JS/WASM/index bytes |
+| Captured parent `integration/static` asset provenance | [ ] NOT VERIFIED for all four observed default bundles | Later GR-071 candidate verification applies to a separate test root, not this captured tree |
 | Local index linkage | [~] Four dispatched apps link present JS/WASM | Static inspection only; non-dispatch PhotoCraft index points at missing WASM |
-| Current source-plus-assets browser/Seafile replay | [ ] NOT VERIFIED | No new browser or Seafile test performed |
+| Combined current-candidate four-route browser/Seafile replay | [ ] NOT VERIFIED | GR-071 verifies candidate bytes together; GR-059/061–063 are separate per-app runs |
 | ONLYOFFICE preservation reconciliation | [x] GR-040 isolated synthetic stack proves DOCX preservation | Production/deployment, other types/versions remain NOT VERIFIED |
 
 Evidence: [manifest](GR-054-CURRENT-CANDIDATE-MANIFEST.md),

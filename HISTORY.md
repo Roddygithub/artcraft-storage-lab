@@ -1,3 +1,19 @@
+## 2026-10-26 — GR-071 dispatched candidate provenance recheck
+
+- Rechecked tracked DOCX/XLSX/PDF/SVG dispatch against the exact WordCraft,
+  GridCraft, PdfCraft and VectorCraft candidates under the GR-059 local test
+  static root. All four existing per-app verifiers passed for 20 assets totaling
+  207,970,569 bytes.
+- The check is read-only and does not alter dispatch or copy/promote assets.
+  The older GR-054 parent `integration/static` inventory remains a distinct
+  observation; GR-071 does not establish the active service root, one combined
+  four-route Seafile run, or production readiness. Save/readback byte identity
+  and post-change ONLYOFFICE edit/save remain NOT VERIFIED.
+- Independent R1–R3 bounded reviews returned PROVISIONAL PASS with no remaining
+  findings. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+  Evidence: `docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md` and
+  `docs/reviews/GR-071/`.
+
 ## 2026-10-26 — Reconcile application Seafile rows in the test matrix
 
 - Updated DeckCraft, DesignCraft, FilmCraft, and EffectCraft Seafile rows from

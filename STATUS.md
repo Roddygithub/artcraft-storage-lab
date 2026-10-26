@@ -1,6 +1,21 @@
 # STATUS
 
-## CURRENT GR: GR-069 — FigCraft real synthetic Seafile roundtrip
+## CURRENT GR: GR-071 — dispatched candidate provenance recheck
+
+The four current source-pinned WordCraft, GridCraft, PdfCraft and VectorCraft
+candidates coexist in the GR-059 local test static root. The tracked dispatch
+mapping matches DOCX/XLSX/PDF/SVG, and all four per-app candidate verifiers pass
+for 20 files totaling 207,970,569 bytes. These are the candidates used in the
+separate GR-059 and GR-061–063 Seafile runs. GR-071 does not modify or promote
+assets into the historical repository `integration/static` tree, prove what a
+running service serves, or run all four routes in one Seafile session.
+Production security, save/readback byte identity, and a post-change ONLYOFFICE
+edit/save check remain **NOT VERIFIED**. Independent R1–R3 bounded reviews
+returned PROVISIONAL PASS with no remaining findings; project GPT remains
+**INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md` and `docs/reviews/GR-071/`.
+
+## PREVIOUS GR: GR-069 — FigCraft real synthetic Seafile roundtrip
 
 The exact optimized GR-048 FigCraft candidate was verified across its build,
 staged, and active static roots. In the existing synthetic Seafile library,
@@ -205,11 +220,12 @@ are in `docs/GR-056-*`, `docs/GR-057-*`, `docs/GR-058-*` and the corresponding
 `docs/reviews/` directories. None changes the project GPT verdict or unlocks
 upstream publication.
 
-GR-054 remains prior reviewed inventory: bounded independent R1–R2
-PROVISIONAL PASS; it documented the mismatch between current default assets and
-historical source/runtime evidence. GR-055 supplies one separate reproducible
-WordCraft candidate, but does not revalidate the four default bundles, other
-apps, Seafile, production, or ONLYOFFICE.
+GR-054 remains the dated reviewed inventory: bounded independent R1–R2
+PROVISIONAL PASS. GR-071 later verified all four source-pinned candidates
+together in the separate GR-059 test static root, while the captured parent
+`integration/static` tree and currently served root remain separate and
+**NOT VERIFIED** for these candidates. See
+`docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md`.
 
 GR-040 proves ONLYOFFICE preservation on the isolated synthetic patched stack
 (two browser edits/versions and fresh file-list reopen). Production/deployment,

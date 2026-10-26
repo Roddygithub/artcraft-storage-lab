@@ -1,0 +1,32 @@
+GR-071 read-only candidate check
+Date: 2026-10-26
+Repository: /home/roddy/Projects/artcraft-storage-lab
+Checked static root: /home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static
+
+Commands:
+  sh -n scripts/verify-dispatched-candidates.sh
+  scripts/verify-dispatched-candidates.sh /home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static
+  sha256sum integration/config/dispatch.json
+  git diff --check
+
+Output:
+  PASS: dispatch maps DOCX/XLSX/PDF/SVG to the expected four apps
+  PASS: 4 staged WordCraft files match recorded paths, sizes and SHA-256
+  PASS: all recorded index references are present in the candidate manifest
+  PASS: 4 GridCraft assets match paths, sizes and SHA-256 (25378206 bytes)
+  PASS: index references, source commit, stored patch, transport pins and overlay digest match
+  PASS: 3 staged PdfCraft files match recorded paths, sizes and SHA-256
+  PASS: both JS/WASM index references are present in the candidate manifest
+  PASS: 9 staged VectorCraft files match paths, sizes and SHA-256
+  PASS: all 2 index references resolve to manifested files
+  PASS: all 2 index SHA-384 integrity values match
+  ebf2b0438aba8b784315dc3417231c9e6a6066e44304c57b6a9dc219c40f4a4d  integration/config/dispatch.json
+  git diff --check: PASS (no output)
+
+The existing verifiers label some files as staged because that is their native
+manifest terminology; here each was invoked with --static-root pointing to the
+shared GR-059 test root above. This does not mean those files were copied into
+the per-app staging directories.
+
+No build, network call, Seafile request, service start, dispatch edit, or asset
+copy/promotion was performed by these checks.

@@ -1,5 +1,21 @@
 # GPT Review Queue
 
+## GR-071 — dispatched candidate provenance recheck
+
+Independent R1–R3 bounded reviews returned PROVISIONAL PASS with no remaining
+findings after the GridCraft source pin, GR-054 capture dates and historical
+handoff wording were corrected. The read-only wrapper checks the shared-root
+results, per-app verifier linkage and reconciliation with GR-054. The directory is
+`/home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static`,
+not a production or proven live service root. Do not contact services, promote
+assets, or change dispatch. Per-app Seafile runs are evidence for their
+respective candidates; one combined four-route replay, repository
+`integration/static` promotion, save/readback byte identity, production
+security and post-change ONLYOFFICE edit/save remain **NOT VERIFIED**. Project
+must remain **INCOMPLETE** and upstream publication **LOCKED**.
+Evidence: `docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md`,
+`docs/reviews/GR-071/`.
+
 ## GR-069 — FigCraft real synthetic Seafile roundtrip
 
 Independent R1 returned a bounded PROVISIONAL PASS with no findings. The
@@ -197,7 +213,7 @@ reviews are PROVISIONAL PASS, no remaining findings. GR-055 is GPT REVIEW
 PENDING; project remains **INCOMPLETE** and upstream publication remains locked. See
 [candidate report](GR-055-WORDCRAFT-REPRODUCIBLE-CANDIDATE.md).
 
-## GR-054 — Current candidate manifest (bounded independent review passed)
+## GR-054 — Dated candidate manifest (bounded independent review passed)
 
 Exact current **source** snapshot: `1c7914bf1e166ac4731a1c9b11dce649210eed70`.
 R1–R2 bounded independent reviews are PROVISIONAL PASS. Project GPT review is
@@ -205,9 +221,11 @@ pending; project verdict remains **INCOMPLETE**, upstream publication **LOCKED**
 
 [Manifest](GR-054-CURRENT-CANDIDATE-MANIFEST.md) and
 [evidence](reviews/GR-054/README.md) separate clean tracked source (no static
-assets) from 82 ignored/untracked parent-local static files. Four dispatched
-bundles lack matched exact source/patch/transport evidence: NOT VERIFIED,
-not candidate-ready. GR-054 performs no build, promotion or service access.
+assets) from 82 ignored/untracked parent-local static files. Follow-up GR-071
+verified later source-pinned candidates in a separate local test root; the
+captured repository `integration/static` tree and live service remain
+unverified for those candidates. GR-054 itself performed no build, promotion or
+service access.
 
 95d8983 and older candidate assertions below are historical. GR-040 closes
 ONLYOFFICE preservation on the isolated synthetic patched stack (DOCX, actual

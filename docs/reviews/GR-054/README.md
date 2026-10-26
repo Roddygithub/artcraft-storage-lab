@@ -1,12 +1,18 @@
 # GR-054 — Inventory evidence and review handoff
 
 Date: 2026-10-25. **Independent R1–R2 bounded review: PROVISIONAL PASS**.
-Uncommitted/unpushed by task instruction. No independent review is claimed;
-this implementation self-check is not independent review. Project GPT remains
-**INCOMPLETE**, no GPT PASS; upstream gate remains locked.
+At the original implementation handoff, changes were left uncommitted and
+unpublished for independent review. The R1–R2 review outcomes are recorded
+below; the implementation self-check was not treated as an independent review.
+Project GPT remains **INCOMPLETE**, no GPT PASS; upstream gate remains locked.
 
 Artifact: [current candidate manifest](../../GR-054-CURRENT-CANDIDATE-MANIFEST.md).
 Source base: `1c7914bf1e166ac4731a1c9b11dce649210eed70`.
+
+Follow-up: GR-071 later verified the GR-055–058 candidate files against one
+separate GR-059 test static root and reconciled per-app Seafile evidence. This
+does not modify the 2026-10-25 parent `integration/static` inventory or verify
+a running service; see `docs/GR-071-DISPATCHED-CANDIDATE-PROVENANCE.md`.
 
 ## Retained evidence
 
