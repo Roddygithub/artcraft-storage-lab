@@ -1,6 +1,19 @@
 # STATUS
 
-## CURRENT GR: GR-079 — read-only Seafile history verification
+## CURRENT GR: GR-080 — security evidence and ONLYOFFICE status reconciliation
+
+Updated `docs/SECURITY.md` to reflect the later GR-015 isolated synthetic
+Seahub/C-fileserver build and runtime, while retaining the historical GPT FAIL
+on candidate `0edbe52` and the production/stock/Go limitations. A fresh
+read-only open of the synthetic `synthetic.docx` in the non-allow-listed
+`OnlyOffice` library again returned 404 for the configured ONLYOFFICE API
+script; no editor instance/frame appeared. ONLYOFFICE settings and services
+were not changed. The UI result remains INCONCLUSIVE / NOT VERIFIED. R1
+independent review returned PROVISIONAL PASS with no findings. See
+`docs/GR-080-SECURITY-EVIDENCE-RECONCILIATION.md` and `docs/reviews/GR-080/`.
+Project GPT review remains incomplete and upstream publication remains locked.
+
+## PREVIOUS GR: GR-079 — read-only Seafile history verification
 
 After GR-078, Seafile Web History views showed current versions for all five
 synthetic files: DOCX 5, XLSX 3, PDF 4, SVG 3 and Pcraft 4. The sanitized

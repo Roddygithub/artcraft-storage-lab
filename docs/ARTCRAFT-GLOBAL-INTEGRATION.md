@@ -45,7 +45,7 @@ does not claim all bundles are present in this checkout's active static root.
 
 | Extension | Tracked app | Synthetic Seafile runtime evidence | Remaining limit |
 | --- | --- | --- | --- |
-| `.docx` | WordCraft | GR-059 primary roundtrip; GR-076 allow-list recheck; GR-078 combined replay retained `gr078docx` after reopen | GR-076 post-change ONLYOFFICE check is inconclusive; byte identity and broader compatibility are not established |
+| `.docx` | WordCraft | GR-059 primary roundtrip; GR-076 allow-list recheck; GR-078 combined replay retained `gr078docx` after reopen | GR-076 and GR-080 post-change ONLYOFFICE checks are inconclusive; byte identity and broader compatibility are not established |
 | `.xlsx` | GridCraft | GR-061 individual roundtrip; GR-078 combined replay retained B2/B3 = 1338 after reopen | Exact save/readback byte identity and production behavior remain unverified |
 | `.pdf` | PdfCraft | GR-068 individual roundtrip; GR-078 combined replay retained `GR078savededit` after reopen | Exact save/readback byte identity and broader PDF semantics remain unverified |
 | `.svg` | VectorCraft | GR-063 individual export roundtrip; GR-078 combined replay retained the added rectangle after reopen | Exact save/readback byte identity remains unverified |
@@ -68,6 +68,10 @@ identity. See [GR-071](TEST-MATRIX.md#gr-071--shared-test-root-candidate-provena
 [GR-078](TEST-MATRIX.md#gr-078--combined-five-route-synthetic-seafile-browser-replay).
 GR-079 later confirmed current Seafile History rows for the five GR-078 files;
 it did not compare editor output bytes with Seafile readback.
+GR-080's read-only check in the separate synthetic `OnlyOffice` library again
+found that the configured ONLYOFFICE API script path returned 404 and no editor
+instance was created; settings and services were unchanged. ONLYOFFICE
+edit/save/version/reopen through the current route remains **NOT VERIFIED**.
 
 ## Other app coverage
 

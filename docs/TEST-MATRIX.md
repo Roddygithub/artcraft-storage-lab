@@ -7,6 +7,20 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-080 — security evidence and ONLYOFFICE status reconciliation
+
+| Scenario | Expected | Result |
+|---|---|---|
+| GR-015 evidence reflected in security status | Separate historical GPT FAIL, later isolated synthetic runtime evidence, and production limits | [x] `docs/SECURITY.md` reconciled to `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` |
+| Current post-change ONLYOFFICE route | Configured API script loads and editor is instantiated | [!] Synthetic DOCX route returned 404 for API script; no editor instance/frame; no setting or service changed |
+| Retained evidence privacy | No credentials, identity, host address, session ID or document bytes | [x] Sanitized status-only observation; no screenshot retained |
+| ONLYOFFICE edit/save/version/reopen after current route failure | Full edit/save/reopen through current route | [ ] NOT VERIFIED; editor did not initialize |
+| Independent review | Separate documentation/evidence review | [x] R1 PROVISIONAL PASS, no findings |
+
+Evidence: [GR-080 report](GR-080-SECURITY-EVIDENCE-RECONCILIATION.md),
+[runtime observation](reviews/GR-080/runtime/onlyoffice-route-check.json).
+Project GPT review remains pending; upstream publication remains locked.
+
 ## GR-079 — read-only Seafile history verification
 
 | Scenario | Expected | Result |

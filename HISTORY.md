@@ -1,3 +1,18 @@
+# 2026-10-26 — GR-080 security evidence reconciliation
+
+- Updated `docs/SECURITY.md` to distinguish the historical GPT FAIL candidate
+  from later GR-015 isolated synthetic build/runtime evidence and its remaining
+  deployment limits.
+- Reopened only the synthetic DOCX from the non-allow-listed `OnlyOffice`
+  library. The configured API script path returned 404; no ONLYOFFICE editor
+  instance/frame appeared. The document was not edited or saved, and no
+  ONLYOFFICE setting or service was changed.
+- The UI result remains INCONCLUSIVE / NOT VERIFIED. Independent R1 review is
+  PROVISIONAL PASS with no findings; project GPT review remains pending and
+  upstream publication locked.
+- Evidence: `docs/GR-080-SECURITY-EVIDENCE-RECONCILIATION.md`,
+  `docs/reviews/GR-080/`.
+
 # 2026-10-26 — GR-079 read-only Seafile history verification
 
 - Inspected Seafile Web History for the five synthetic GR-078 files. Current

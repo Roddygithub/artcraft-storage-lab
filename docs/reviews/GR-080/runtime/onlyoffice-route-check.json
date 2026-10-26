@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-26",
+  "scope": "read-only open of synthetic synthetic.docx in the non-allow-listed OnlyOffice library",
+  "opened_from_seafile_file_route": true,
+  "file_edited_or_saved": false,
+  "configured_api_script_path": "/onlyoffice/web-apps/apps/api/documents/api.js",
+  "api_script_http_status": 404,
+  "api_script_content_type": "text/html; charset=utf-8",
+  "onlyoffice_api_global_type": "undefined",
+  "editor_constructor_type": "undefined",
+  "editor_instance_type": "undefined",
+  "editor_frame_count": 0,
+  "onlyoffice_settings_or_service_changed": false,
+  "secrets_or_personal_data_retained": false,
+  "limitations": [
+    "This is a lab route check against one synthetic DOCX, not a production test.",
+    "The direct Document Server service was not probed in this GR-080 check.",
+    "No editor save, history update, or ONLYOFFICE edit/save/reopen behavior was tested.",
+    "The exact proxy rule responsible for the 404 remains unidentified."
+  ]
+}

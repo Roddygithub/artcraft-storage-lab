@@ -3,7 +3,7 @@
 Status: **GPT REVIEW FAIL** (Sol, latest reviewed candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`)
 GR-009 · Independent free review: `docs/reviews/REVIEW-01.md`, `REVIEW-02.md`
 
-## Current implementation correction — 2026-10-23
+## Current implementation and evidence — 2026-10-26
 
 This note supersedes older statements below when they conflict:
 
@@ -13,16 +13,25 @@ This note supersedes older statements below when they conflict:
   the exact configured `ARTCRAFT_SEAFILE_ORIGIN`, because Seahub submits its
   capability by form navigation. The gateway and Seahub must use distinct
   origins; behavior through Nginx Proxy Manager is not yet verified.
-* Stock Seafile has no user-bound conditional-save endpoint. The gateway fails
-  closed on the deployed version. The local GR-015 patch proposes a dedicated
-  `update-conditional-api` route. Its `update-` prefix preserves the existing
-  `op=update` token check while keeping the endpoint distinct from `update-api`.
-  Stock C and Go fileservers do not expose it. The patches remain unbuilt and
-  runtime behavior is **NOT VERIFIED**; see the latest Sol finding and local
-  remediation in `docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md`.
+* Stock Seafile has no user-bound conditional-save endpoint, so this gateway's
+  save path fails closed against an unpatched server. After the historical Sol
+  FAIL on `0edbe524b4fa321b0f73f8601afef390e7f785e6`, the exact pinned GR-015
+  Seahub and C-fileserver patches were built and exercised in an isolated synthetic
+  Seafile stack. The corrected `update-conditional-api` route accepts the
+  existing `op=update` token check; the isolated runtime reproduced a DOCX
+  save/version/reopen and a concurrent-save 200/409 result. This is remediation
+  evidence, not a re-review of that failed candidate or a production
+  deployment; no ArtCraft gateway is installed on the inspected live Seafile
+  host. Stock/Go rejection, external-writer races, production proxy behavior
+  and deployment readiness remain **NOT VERIFIED**. See
+  `docs/reviews/GR-015/ISOLATED-RUNTIME-E2E-20261023.md` and the historical
+  finding in `docs/reviews/GPT-SOL-REREVIEW-0EDBE52.md`.
 * The local Seahub patch rechecks current `can_preview` permission for each
-  capability-backed read. The exact decorator passes a synthetic AST harness;
-  Django/Seafile runtime authorization remains **NOT VERIFIED**.
+  capability-backed read. Django checks/migrations passed in the isolated
+  runtime, and a URL-level save check rejected read-only and revoked cached
+  edit capabilities before token minting or fileserver calls. Live permission
+  revocation propagation, read-side revocation, expiry/replay and production
+  authorization remain **NOT VERIFIED**.
 * Capability-bearing URLs are redacted from gateway-facing errors in the local
   worktree and covered by a synthetic HTTP test, including malformed HTTP-200
   responses. Seafile document bodies are bounded while reading. The host refuses
@@ -100,9 +109,9 @@ The session id is:
 | --- | --- | --- | --- |
 | 1 | the session exists, is not expired, is not idle | `sessions.SessionStore.get` | 404 |
 | 2 | the request is for the session's own document | the path comes from the session, never from the request | — |
-| 3 | current read/write permission | local Seahub patch checks current `can_preview` on capability reads and current edit permission on saves | synthetic source harness only; runtime **NOT VERIFIED**; stock writes fail closed |
-| 4 | the file still exists | local patch binds reads/saves to the opened file id | deletion/revocation runtime **NOT VERIFIED** |
-| 5 | the file has not changed since it was opened | local C patch checks the file id and uses branch compare-and-update even for same-content saves | exact source patch only; build/runtime **NOT VERIFIED**; Go route remains unpatched |
+| 3 | current read/write permission | local Seahub patch checks current `can_preview` on capability reads and current edit permission on saves | isolated Django checks/migrations and URL-level read-only/revoked-save rejection reproduced; production and live revocation propagation **NOT VERIFIED**; unpatched live server fails closed |
+| 4 | the file still exists | local patch binds reads/saves to the opened file id | file-id binding exercised in the isolated synthetic flow; deletion and live revocation behavior **NOT VERIFIED** |
+| 5 | the file has not changed since it was opened | local C patch checks the file id and uses branch compare-and-update even for same-content saves | patched C fileserver built and exercised in the isolated runtime, including a concurrent 200/409 save; stock/Go rejection, external-writer races and production behavior remain **NOT VERIFIED** |
 | 6 | the document is not too large | `ARTCRAFT_MAX_BYTES` | 413 |
 | 7 | request-body framing, size, and read time | GET/POST handlers reject parser defects and leftover header payload, require supported framing, enforce route limits and a 120-second total body-read deadline, and close on malformed/oversized/timed-out bodies; HTTP/0.9 is rejected | 400 / 408 / 413; `/dirty` state is unchanged |
 
@@ -163,22 +172,22 @@ browser *without an error* while the document showed as saved.
 | **targetOrigin "*"** | never used | addressed |
 | **same-origin / cross-origin isolation** | the host and Craft frame are same-origin with each other and cross-origin from Seahub; the app needs no `SharedArrayBuffer`, so **no COOP/COEP** is required | required topology documented and gateway handoff tested; deployment not verified |
 | **token leakage** | the browser holds only an opaque gateway session id; the gateway does not need a broad account token; file-server update tokens never leave Seahub | intended; live Seafile endpoint not deployed |
-| **replay** | a session id is single-document and short-lived; the local C patch routes conditional saves through the branch precondition | **not runtime verified; stock writes fail closed** |
+| **replay** | a session id is single-document and short-lived; the local C patch routes conditional saves through the branch precondition | isolated synthetic route and conditional-save runtime exercised; token expiry/replay attacks and production behavior **NOT VERIFIED**; stock writes fail closed |
 | **session fixation** | the session id is generated by the gateway with 192 bits of entropy and is not derived from anything the client sends | addressed |
 | **SSRF** | the gateway fetches the file content from Seafile, whose URL it derives itself. It never fetches a URL a client supplied. (The ONLYOFFICE callback in Seafile *does* fetch a client-supplied URL — our design deliberately does not.) | addressed, and a design win |
 | **malicious document** | the gateway treats payload bytes as opaque except for basic file-signature validation; Craft's parser processes the document | partially addressed — parser expansion/resource limits remain unverified |
 | **oversized document** | `ARTCRAFT_MAX_BYTES` (50 MB default) on both the open and the save | addressed |
 | **ZIP bomb** | gateway bounds expanded `[Content_Types].xml` reads; Craft parser has separate expansion risks | gateway bound has a synthetic test; parser limits remain **NOT VERIFIED** |
 | **path traversal** | the path comes from the session, which the gateway filled from Seafile's own answer. The static file handler resolves symlinks and refuses anything outside the static root | addressed |
-| **save forgery** | a save names a session bound to one document; local Seahub/fileserver patches check permission, file id and branch head | **NOT VERIFIED** against patched runtime |
-| **cross-user document access** | direct repo/path opening is disabled; saves require current-user authorization from the GR-015 endpoint | blocked; endpoint not built or deployed |
-| **read-only bypass** | stock server saves are disabled; local Seahub patch rechecks current write permission | blocked pending GR-015 build and runtime tests |
+| **save forgery** | a save names a session bound to one document; local Seahub/fileserver patches check permission, file id and branch head | isolated synthetic save and conflict flow exercised; adversarial forgery and production behavior **NOT VERIFIED** |
+| **cross-user document access** | direct repo/path opening is disabled; saves require current-user authorization from the GR-015 endpoint | synthetic isolated authorization checks reject read-only and revoked cached edit grants before token minting; production endpoint is not deployed |
+| **read-only bypass** | stock server saves are disabled; local Seahub patch rechecks current write permission | isolated URL-level save check rejects read-only/revoked grants; the inspected live host has no ArtCraft gateway installed, and the current gateway code fails closed against stock Seafile; live permission revocation propagation **NOT VERIFIED** |
 | **share-link permissions** | **out of scope for the MVP**: the third-party-editor hook only exists in `view_lib_file`, so a share link never reaches it. A read-only share link keeps working exactly as before | scoped out, documented |
 | **expired sessions** | 30 minutes absolute, 15 minutes idle; an expired session id gets 404 | addressed |
 | **symlink escape from the static root** | `os.path.realpath` on both the file and the root | addressed (REVIEW-02 G1) |
 | **the account token reaching the file server** | the file-server calls send no `Authorization` header | addressed (REVIEW-02 G4) |
 | **a session store flood** | Session store is capped at 256 entries with oldest-entry eviction; GR-073 also limits `/open/` to 60 requests per 60 seconds per observed TCP peer (1,024 peer entries per process) | **partially addressed** — process-local peer limits do not coordinate across workers, and proxy clients may share a bucket |
-| **the TOCTOU window on the conflict check** | stock public API has no user-bound conditional file save; GR-015 binds the opened file id to Seafile's transactional branch compare-and-update | **blocked pending build and deployment** — see `docs/reviews/GR-015/` |
+| **the TOCTOU window on the conflict check** | stock public API has no user-bound conditional file save; GR-015 binds the opened file id to Seafile's transactional branch compare-and-update | patched C handler built and exercised with a synthetic concurrent-save conflict; external-writer races, stock/Go rejection and production deployment remain **NOT VERIFIED** — see `docs/reviews/GR-015/` |
 
 ## 5. The rules the code must never break
 

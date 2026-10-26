@@ -34,6 +34,21 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-080 — security evidence and ONLYOFFICE status reconciliation
+
+`docs/SECURITY.md` now reflects the later GR-015 isolated synthetic Seahub and
+C-fileserver runtime while preserving the historical Sol FAIL on `0edbe52` and
+the remaining production/stock/Go limitations. A fresh read-only open of the
+synthetic DOCX in the non-allow-listed `OnlyOffice` library returned 404 for
+Seafile's configured ONLYOFFICE API script; no editor instance/frame appeared.
+The file was not edited or saved, and ONLYOFFICE settings/services were not
+changed. The post-change UI check remains INCONCLUSIVE / NOT VERIFIED. R1
+independent review returned PROVISIONAL PASS with no findings; project GPT
+review remains INCOMPLETE and upstream publication LOCKED.
+
+Evidence: `docs/GR-080-SECURITY-EVIDENCE-RECONCILIATION.md`,
+`docs/reviews/GR-080/`.
+
 ## GR-079 — read-only Seafile history verification
 
 Seafile Web History listed current versions after the GR-078 synthetic replay:
