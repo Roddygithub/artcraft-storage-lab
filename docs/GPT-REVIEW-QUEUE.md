@@ -1,5 +1,24 @@
 # GPT Review Queue
 
+## GR-066 — FilmCraft real synthetic Seafile roundtrip
+
+Independently review the exact candidate inventory and recorded Seafile
+open/edit/save/history/fresh-session reopen evidence. Validate that the staged
+and active static roots match all five candidate files and that the source,
+GR-023 patch, and craft-platform pins are recorded consistently. Review the
+test-only same-tab popup shim, synthetic-library-only routing, rollback
+disclosure, and ONLYOFFICE scope. Do not access services or replay the browser.
+The editor was exited by navigation rather than explicit in-app close; exact
+save-message/readback byte identity and a post-change ONLYOFFICE edit/save
+regression are NOT VERIFIED. A thumbnail request returned HTTP 500 and was
+not investigated. Project verdict must remain INCOMPLETE and upstream
+publication LOCKED.
+
+R1–R2 returned bounded PROVISIONAL PASS with no blocker/major; R1's screenshot
+caption MINOR is closed. Runtime chronology/statuses remain implementer-
+reported, not independently replayed. Evidence and reviews:
+`docs/GR-066-FILMCRAFT-REAL-SEAFILE-ROUNDTRIP.md`, `docs/reviews/GR-066/`.
+
 ## GR-065 — DesignCraft real synthetic Seafile roundtrip
 
 R1 returned a bounded PROVISIONAL PASS with no findings requiring remediation.

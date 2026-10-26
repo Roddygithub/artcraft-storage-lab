@@ -7,6 +7,26 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-066 — FilmCraft on real synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Candidate inventory and active static-root assets | Exact pinned FilmCraft candidate served | [x] Five files, sizes, SHA-256 and HTML/runtime references match staged and active roots |
+| Synthetic Seafile file-list open | Actual FilmCraft WASM loads the native project | [x] Existing synthetic library; editor assets and document GET returned 200 |
+| Visible edit and Ctrl+S | Host ACK and Seafile version are confirmed | [x] Text edit; `Saved to host`; new-version confirmation; save POST returned 200 |
+| Seafile history | Fixture setup is distinct from editor save | [x] UI showed `Added` followed by `Modified`; history screenshot omitted because account name was visible |
+| Fresh-session reopen | New editor session renders saved text | [x] Navigated away and reopened from Seafile list; text intact |
+| Edited-output download/manual upload | Not used | [x] None occurred; fixture upload was setup only |
+| Exact save-message/readback byte identity | Matching hashes | [ ] NOT VERIFIED |
+| ONLYOFFICE edit/save/version after route change | Full regression | [ ] NOT VERIFIED; no ONLYOFFICE setting/route was changed in this GR |
+| Browser popup lifecycle without test shim | Standard popup path | [ ] NOT VERIFIED; test-only popup-to-same-tab shim used |
+| In-app close before reopen | Document explicitly closed | [ ] NOT VERIFIED; first editor exited by page navigation |
+| Thumbnail route | Successful thumbnail generation | [!] HTTP 500 observed; cause not investigated |
+| Broader format compatibility and production security | General readiness | [ ] NOT VERIFIED |
+| Independent review | Separate exact evidence review | [x] R1–R2 bounded PROVISIONAL PASS; caption MINOR closed; runtime not independently replayed |
+
+Evidence: `docs/reviews/GR-066/`; reused GR-047 actual-WASM candidate without rebuild. Project GPT remains INCOMPLETE; upstream publication LOCKED.
+
 ## GR-065 — DesignCraft on real synthetic Seafile
 
 | Scenario | Expected | Result |

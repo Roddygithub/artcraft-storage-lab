@@ -1,0 +1,43 @@
+GR-066 sanitized browser observations — 2026-10-26
+
+Target: `GR-047-synthetic.fcproj` in the existing synthetic Seafile library.
+Private origin, repository identifier, account identity, and session
+capabilities are omitted.
+
+Fixture and first editor:
+- Uploaded the 3,301-byte GR-047 synthetic fixture through Seafile's file UI.
+  This was setup, not upload of edited output.
+- Clicked the fixture in the Seafile file list. Gateway POST `/open/`, GET
+  `/session/<redacted>/document`, and the FilmCraft HTML/JS/WASM/favicon
+  requests returned HTTP 200.
+- In FilmCraft, chose Graphics and Titles → New Layer → Text and replaced
+  `New Text` with `GR-066 Film`. The Program monitor showed the new text and
+  the editor displayed `Unsaved changes`.
+- Pressed Ctrl+S after leaving text-edit mode. The editor displayed
+  `Saved to host`; the host displayed `Saved — new version
+  b4c0f10a0444031fbdb6ccf82263415f0f92b42d`. Gateway POST
+  `/session/<redacted>/save` returned HTTP 200 and the editor returned to its
+  clean saved state.
+
+History and fresh reopen:
+- Seafile's library History UI showed `Added
+  "GR-047-synthetic.fcproj"` for setup followed by `Modified
+  "GR-047-synthetic.fcproj"` for the editor save. The screen displayed the
+  account name, so no History screenshot is retained.
+- Navigated away from the first editor, returned to the synthetic library,
+  and opened the fixture again. A new POST `/open/` and GET
+  `/session/<redacted>/document` returned HTTP 200.
+- The newly opened FilmCraft session displayed `GR-066 Film` in the Program
+  monitor.
+
+T3 preview did not surface the Seafile file-view popup as a controllable tab.
+A page-local `window.open` shim restricted to this fixture routed the popup
+into the same tab. The actual Seafile file-list click and gateway flow ran.
+The first editor was exited by page navigation; an explicit in-app close
+action was not recorded.
+
+No edited output download or manual upload occurred. No browser-message hash
+was retained for comparison with Seafile readback. A Seafile thumbnail request
+returned HTTP 500 during browsing; cause not investigated. Only the synthetic
+library was used. Post-change ONLYOFFICE edit/save, broader compatibility,
+production deployment, and security were not tested.

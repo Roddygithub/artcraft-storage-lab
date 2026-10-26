@@ -1,3 +1,24 @@
+## 2026-10-26 — GR-066 FilmCraft real synthetic Seafile roundtrip
+
+- Reused and verified the exact GR-047 FilmCraft candidate in the active local
+  static root; no rebuild. Added `.fcproj` only to the existing synthetic
+  library allowlist and mapped it to FilmCraft in the local gateway dispatch.
+  The Seahub extension assignment was the only settings line changed;
+  `ENABLE_ONLYOFFICE=True` remained set. A private rollback copy is outside Git.
+- Opened the synthetic FilmCraft project from the Seafile list, added visible
+  text, saved through the host route, observed a new-version confirmation and
+  `Modified` library-history entry, then reopened it in a fresh editor session
+  with the text intact. No edited-output download/manual upload occurred. The
+  first editor was exited by navigation; an in-app close was not recorded.
+- A test-only same-tab popup shim was used. Save-message/readback byte identity
+  and a post-change ONLYOFFICE edit/save regression remain unverified. A
+  thumbnail request returned HTTP 500 and was not investigated. Independent
+  R1–R2 returned bounded PROVISIONAL PASS; R1's screenshot-caption MINOR was
+  corrected. Runtime was not independently replayed. Project GPT remains
+  INCOMPLETE and upstream publication LOCKED.
+- Evidence: `docs/GR-066-FILMCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-066/`.
+
 ## 2026-10-26 — GR-065 DesignCraft real synthetic Seafile roundtrip
 
 - Reused the exact GR-045 DesignCraft WASM candidate and verified its three

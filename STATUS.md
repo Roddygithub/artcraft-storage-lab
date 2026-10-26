@@ -1,6 +1,24 @@
 # STATUS
 
-## CURRENT GR: GR-065 — DesignCraft real synthetic Seafile roundtrip
+## CURRENT GR: GR-066 — FilmCraft real synthetic Seafile roundtrip
+
+The exact GR-047 FilmCraft WASM candidate was verified against the staged and
+active static roots and reused without rebuilding. The synthetic `.fcproj`
+fixture opened from the Seafile file list, accepted a visible text edit, saved
+through the host route with a new-version confirmation, and reopened from the
+list in a fresh editor session with the edit intact. History showed the setup
+`Added` event followed by `Modified`. No edited output was downloaded or
+manually uploaded. The popup was routed to the same tab by a test-only shim;
+the first editor was exited by navigation, not an observed in-app close. Exact
+save-message/readback identity and a post-change ONLYOFFICE edit/save regression
+remain unverified. A thumbnail request returned HTTP 500 and was not
+investigated. Independent R1–R2 returned bounded PROVISIONAL PASS with no
+blocker/major; R1's screenshot-caption MINOR is closed. Runtime was not
+independently replayed. GR-066 is **GPT REVIEW PENDING**; project GPT remains
+**INCOMPLETE** and upstream publication **LOCKED**. See
+`docs/GR-066-FILMCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and `docs/reviews/GR-066/`.
+
+## PREVIOUS GR: GR-065 — DesignCraft real synthetic Seafile roundtrip
 
 The GR-045 DesignCraft WASM candidate was verified against the staged and
 active static roots, then opened from the Seafile file list in the existing

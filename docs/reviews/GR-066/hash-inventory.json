@@ -1,0 +1,45 @@
+{
+  "source_commit": "fa550ce2d07bdfee6b1d7b6835e8abc8c6913d00",
+  "transport_revision": "56c5e16d79b77751106173c13111ef4fe0a2c0ec",
+  "patch": "docs/reviews/GR-023/filmcraft-host-save-ack.patch",
+  "patch_sha256": "16158f500b2ec12f93c8fcb14867e0b452030dbb338b2d4d7fa8612850a694d4",
+  "source_cache": "/home/roddy/.cache/artcraft-filmcraft-gr021",
+  "candidate_parent": "/home/roddy/.cache/artcraft-storage-lab/gr066-filmcraft-static",
+  "active_static_root": "/home/roddy/.cache/artcraft-storage-lab/gr059-deployment/integration/static",
+  "reused_from": "GR-047 actual-WASM browser smoke; no rebuild",
+  "files": [
+    {
+      "path": "filmcraft_web.js",
+      "size_bytes": 181439,
+      "sha256": "1211b1a44d994158c133493e820385853b62a90f8511897e6d1cb97a2fec90e6"
+    },
+    {
+      "path": "filmcraft_web_bg.wasm",
+      "size_bytes": 37637092,
+      "sha256": "342d877787bb684a834fc6a6bac38eb63717c0551a1f75fbc15eb2134d56718b"
+    },
+    {
+      "path": "index.html",
+      "size_bytes": 5077,
+      "sha256": "87feed442b67fadd423ce5118b3b6c52225f714068383836401386e041f768c1"
+    },
+    {
+      "path": "favicon.png",
+      "size_bytes": 17152,
+      "sha256": "7ca8adb57a34d1f4bff8c7e976ac5fe73e69a89b4268d15b3b861c7e51c45a74"
+    },
+    {
+      "path": "audio-worklet.js",
+      "size_bytes": 1820,
+      "sha256": "e3d3272a30eafe34505e5676eb3543d7248870835a5569f314f388c89b807524"
+    }
+  ],
+  "index_references": [
+    "filmcraft_web.js",
+    "filmcraft_web_bg.wasm",
+    "favicon.png"
+  ],
+  "runtime_references": [
+    "audio-worklet.js"
+  ]
+}
