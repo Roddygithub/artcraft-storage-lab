@@ -1,0 +1,39 @@
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.49s
+     Running unittests src/lib.rs (target/debug/deps/pdfcraft_ui_egui-33faadd55703d734)
+
+running 30 tests
+test editing::content_page_tests::single_page_content_edits_map_to_their_page ... ok
+test editing::host_save_ack_tests::acknowledgement_commits_new_paragraph_text_before_running_close_callback ... ok
+test editing::host_save_ack_tests::acknowledgement_commits_new_form_typing_before_running_close_callback ... ok
+test editing::attention_tests::a_save_finishing_behind_a_newer_question_the_user_saw_asks_for_nothing ... ok
+test editing::host_save_ack_tests::acknowledgement_commits_new_text_box_before_running_close_callback ... ok
+test editing::host_save_ack_tests::closing_a_tab_releases_its_pending_snapshot ... ok
+test editing::host_save_ack_tests::failed_host_save_keeps_the_document_dirty_and_duplicate_ack_is_ignored ... ok
+test editing::host_save_ack_tests::save_callbacks_have_a_per_document_cap ... ok
+test editing::host_save_ack_tests::same_snapshot_save_requests_coalesce_and_preserve_close_callback ... ok
+test editing::revert_draft_tests::failed_revert_preserves_focused_and_queued_drafts ... ok
+test editing::host_save_ack_tests::successful_ack_clears_only_the_exact_editor_snapshot ... ok
+test editing::revert_draft_tests::control_quit_prompts_for_uncommitted_typing_and_cancel_retains_it ... ok
+test editing::revert_draft_tests::a_value_its_font_cannot_draw_is_kept_and_explained ... ok
+test editing::revert_draft_tests::text_typed_into_a_new_text_box_counts_as_unsaved_work ... ok
+test editing::tests::a_failed_flush_keeps_the_original ... ok
+test editing::tests::a_folder_at_the_staging_name_is_left_alone ... ok
+test editing::tests::apple_mail_attachment_copies_are_recognised ... ok
+test editing::tests::ordinary_paths_are_not_mail_copies ... ok
+test editing::tests::outlook_attachment_copies_are_recognised_on_either_separator_and_in_any_case ... ok
+test editing::revert_draft_tests::unsaved_flag_follows_dirty_state ... ok
+test editing::tests::save_asks_where_to_keep_an_email_attachment_and_leaves_the_temporary_copy_alone ... ok
+test editing::tests::save_dialogs_open_in_the_documents_folder ... ok
+test editing::tests::saving_a_long_name_leaves_only_the_saved_file ... ok
+test editing::tests::saving_gives_up_rather_than_reuse_a_taken_name ... ok
+test editing::tests::saving_never_creates_a_file_through_a_dangling_link_at_the_staging_name ... ok
+test editing::tests::save_commits_the_open_text_box ... ok
+test editing::tests::saving_never_writes_through_a_file_planted_at_the_staging_name ... ok
+test editing::tests::saving_never_writes_through_a_symbolic_link_at_the_staging_name ... ok
+test editing::revert_draft_tests::saving_on_close_keeps_text_typed_into_a_new_text_box ... ok
+test editing::revert_draft_tests::successful_revert_clears_focused_or_queued_drafts_only_on_its_document ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 492 filtered out; finished in 0.04s
+
+
+exit_code=0

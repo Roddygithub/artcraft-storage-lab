@@ -1,3 +1,37 @@
+# 2026-10-27 — GR-082 upstream refresh wave 1 started
+
+- Created the isolated `upstream-refresh/wave-1` worktree from committed
+  `62d8845`; the current GR-081 candidate and its uncommitted closeout remain
+  in their original worktree.
+- Verified the five active-dispatch release tags and their base-to-release
+  distances (293/175/535/1,174/77 ahead, zero behind).
+- Added a read-only GitHub stable-release scanner with bounded retries for
+  network errors, rate limits, and all HTTP 5xx responses. Eight monitor tests
+  cover retries, unknown results, and merge-base parsing. Candidate records are
+  keyed by app plus full release SHA, preserving prior and unfinished releases.
+  The weekly task prompt and scheduler update response are retained; unattended
+  execution remains NOT VERIFIED. Independent monitor R5 returned bounded
+  PROVISIONAL PASS with two LOW evidence findings; the syntax log and explicit
+  historical-candidate preservation instruction were added in response.
+  A fresh five-app scan then completed with valid merge bases and no newer
+  stable release; the earlier rate-limited partial scan was retained.
+- Built the WordCraft v0.11.0 release bundle and passed the actual-WASM
+  synthetic memory-host edit/save/version/ACK/fresh-reopen smoke. R9 hashes the
+  test source and actual served assets before/after the run. Seafile persistence
+  and replacement-refusal counts remain NOT VERIFIED.
+- Archived exact-release app patches for WordCraft, GridCraft, PdfCraft and
+  PhotoCraft; source-only VectorCraft assessment found no adapter port, and its
+  locked Rust 1.95 WASM check passes on the exact v0.17.0 commit.
+  WordCraft/GridCraft focused host tests pass; PdfCraft's locked check and 30
+  editing tests pass, including its 8 ACK tests. PhotoCraft's locked check and one
+  final-tree standalone test pass; its other final-tree host suites were
+  cancelled during cold compilation and remain NOT VERIFIED. Browser and
+  Seafile workflows remain unverified. Independent app-port R3 returned a bounded
+  PROVISIONAL PASS with one low manifest-status finding, now corrected. Pre-push
+  R3 found and R9 corrected the served-asset provenance mismatch; pre-push R4
+  returned bounded PROVISIONAL PASS for a branch-only push. No
+  route, deployment, Seafile setting or ONLYOFFICE configuration changed.
+
 # 2026-10-26 — GR-081 project GPT review remediation
 
 - Validated both identity-patched app copies with locked Rust 1.95 WASM checks;

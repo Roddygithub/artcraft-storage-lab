@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "monitor_policy": {
+    "release_channel": "latest stable release returned by GitHub /releases/latest",
+    "transient_request_retries": 2,
+    "retryable_http": "429, all 5xx, and 403 only when rate-limit headers are present",
+    "retry_after_cap_seconds": 30,
+    "unknown_means_incomplete": true,
+    "candidate_deduplication_key": "app + full release commit SHA"
+  },
+  "apps": [
+    {
+      "app": "wordcraft",
+      "repository": "storytold/wordcraft",
+      "qualified_ref": "GR-055 base",
+      "qualified_commit": "00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d"
+    },
+    {
+      "app": "gridcraft",
+      "repository": "storytold/gridcraft",
+      "qualified_ref": "GR-056 base",
+      "qualified_commit": "06920de8da609c19de7446945cfc62b844691efd"
+    },
+    {
+      "app": "pdfcraft",
+      "repository": "storytold/pdfcraft",
+      "qualified_ref": "GR-057 base",
+      "qualified_commit": "57e531ccca0047597809748b5cb4276336d6051a"
+    },
+    {
+      "app": "vectorcraft",
+      "repository": "storytold/vectorcraft",
+      "qualified_ref": "v0.14.0",
+      "qualified_commit": "ad0566943ab9741e6356bbc9b53c3cc09895068d"
+    },
+    {
+      "app": "photocraft",
+      "repository": "storytold/photocraft",
+      "qualified_ref": "GR-076 base",
+      "qualified_commit": "a02f2ee41059d3312e7ff24a5af5edcac7b6435a"
+    }
+  ]
+}

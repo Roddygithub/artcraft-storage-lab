@@ -1,0 +1,13 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.26s
+     Running unittests src/lib.rs (target/debug/deps/wordcraft_engine-44d3142e0687e4a9)
+
+running 2 tests
+test tests::host_update_only_refuses_direct_replacement_and_destination_commands ... ok
+test tests::host_initial_open_is_single_use_and_direct_save_only_queues_ui ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 997 filtered out; finished in 0.08s
+

@@ -7,6 +7,24 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-082 — upstream refresh and automatic release tracking
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Official release references | Resolve exact tags/commits and compare with qualified bases | [~] All five pins and ahead/behind counts were independently verified through official API compare results; first retained scanner run resolved WordCraft/GridCraft, then hit API rate limits on PdfCraft/VectorCraft/PhotoCraft (`unknown`). Its two retained null `merge_base` values predate the parser fix and provide no merge-base evidence |
+| Stable-release monitor behavior | Report drift without changing source pins or deployment; retry transient API failures and treat unknown results as incomplete | [x] Eight unit tests and retained syntax command/exit cover annotated tags, merge-base parsing, all HTTP 5xx, conditional 403 rate limits, numeric/date Retry-After and cap, nonretryable errors, retried body closure, bounded backoff, and failure-to-unknown; R5 bounded review findings addressed |
+| WordCraft v0.11.0 adapter | Durable identity-bound save, ACK and editor-clean behavior on refreshed base | [~] Exact-base patch; locked WASM; engine 2/2, UI 9/9; release bundle and actual-WASM memory-host edit/save/new-version/ACK/fresh-reopen pass; copied reopened editor text contains the marker. Seafile and replacement-refusal counts remain NOT VERIFIED |
+| GridCraft v0.12.1 adapter | Durable identity-bound save, ACK and editor-clean behavior on refreshed base | [~] Exact-base patch includes XLSX name/content guard; locked WASM; host engine 3/3 and UI 2/2 pass. Browser and Seafile remain NOT VERIFIED |
+| PdfCraft v0.14.0 adapter | Durable save/ACK and fresh-reopen behavior on refreshed base | [~] Exact-base patch; local transport; locked WASM and 30 `editing::` tests pass (including the 8 ACK tests). Browser and Seafile remain NOT VERIFIED |
+| VectorCraft v0.17.0 adapter | Existing page API persistence on refreshed base | [~] No adapter source port identified; locked WASM check passes. Release asset build, browser, and Seafile qualification remain NOT VERIFIED |
+| PhotoCraft v0.16.0 adapter | Bounded host save/ACK lifecycle on refreshed base | [~] Exact-base patch and locked WASM pass; one standalone confirmation test passes on final local-path tree. Engine snapshot and Web/UI suites were cancelled and remain NOT VERIFIED |
+| Independent review and promotion | Review each final candidate; promote only after project review gates | [~] App-port R3 bounded PROVISIONAL PASS; monitor R5 findings addressed. Pre-push R2 findings have responses: R9 binds the fresh-editor marker assertion to the test source and the actual served index/icon/JS/WASM files, hashed before and after. R3 served-asset finding addressed by R9; R4 bounded PROVISIONAL PASS for
+branch-only push. Seafile acceptance remains NOT VERIFIED. No route promotion/merge or upstream issue/PR/RFC |
+
+GR-082 evidence: [report](GR-082-UPSTREAM-REFRESH-WAVE-1.md),
+[evidence bundle](reviews/GR-082/README.md). The weekly task is configured but
+unattended execution is NOT VERIFIED; it does not auto-promote or deploy.
+
 ## GR-081 — project GPT review remediation
 
 | Scenario | Expected | Result |

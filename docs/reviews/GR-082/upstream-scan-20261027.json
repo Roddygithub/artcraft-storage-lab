@@ -1,0 +1,68 @@
+{
+  "results": [
+    {
+      "app": "wordcraft",
+      "drift": {
+        "ahead_by": 293,
+        "behind_by": 0,
+        "merge_base": null,
+        "status": "ahead"
+      },
+      "latest_release": {
+        "commit": "e31f2f06a5f8004ceaa88f68c00b47908e321aa4",
+        "tag": "v0.11.0",
+        "url": "https://github.com/storytold/wordcraft/releases/tag/v0.11.0"
+      },
+      "qualified_commit": "00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d",
+      "qualified_ref": "GR-055 base",
+      "repository": "storytold/wordcraft"
+    },
+    {
+      "app": "gridcraft",
+      "drift": {
+        "ahead_by": 175,
+        "behind_by": 0,
+        "merge_base": null,
+        "status": "ahead"
+      },
+      "latest_release": {
+        "commit": "f86aec12dabc744b5f75e1033f87bfe685e78481",
+        "tag": "v0.12.1",
+        "url": "https://github.com/storytold/gridcraft/releases/tag/v0.12.1"
+      },
+      "qualified_commit": "06920de8da609c19de7446945cfc62b844691efd",
+      "qualified_ref": "GR-056 base",
+      "repository": "storytold/gridcraft"
+    },
+    {
+      "app": "pdfcraft",
+      "error": "HTTPError: HTTP Error 403: rate limit exceeded",
+      "latest_release": {
+        "commit": "5a78b223871add8e3883856205cc653d741e0e94",
+        "tag": "v0.14.0",
+        "url": "https://github.com/storytold/pdfcraft/releases/tag/v0.14.0"
+      },
+      "qualified_commit": "57e531ccca0047597809748b5cb4276336d6051a",
+      "qualified_ref": "GR-057 base",
+      "repository": "storytold/pdfcraft",
+      "status": "unknown"
+    },
+    {
+      "app": "vectorcraft",
+      "error": "HTTPError: HTTP Error 403: rate limit exceeded",
+      "qualified_commit": "ad0566943ab9741e6356bbc9b53c3cc09895068d",
+      "qualified_ref": "v0.14.0",
+      "repository": "storytold/vectorcraft",
+      "status": "unknown"
+    },
+    {
+      "app": "photocraft",
+      "error": "HTTPError: HTTP Error 403: rate limit exceeded",
+      "qualified_commit": "a02f2ee41059d3312e7ff24a5af5edcac7b6435a",
+      "qualified_ref": "GR-076 base",
+      "repository": "storytold/photocraft",
+      "status": "unknown"
+    }
+  ],
+  "schema_version": 1
+}

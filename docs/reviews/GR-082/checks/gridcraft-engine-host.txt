@@ -1,0 +1,13 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.07s
+     Running unittests src/lib.rs (target/debug/deps/gridcraft_engine-3615a6af1035d35b)
+
+running 3 tests
+test tests::host_initial_open_is_single_use_and_direct_save_only_queues_ui ... ok
+test tests::host_save_ack_records_its_snapshot_without_clearing_later_edits ... ok
+test tests::host_update_only_refuses_direct_replacement_and_destination_commands ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 489 filtered out; finished in 0.01s
+

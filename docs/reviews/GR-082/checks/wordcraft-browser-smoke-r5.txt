@@ -1,0 +1,3 @@
+command=/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_wordcraft_host_roundtrip.py --static-root /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-static
+/bin/bash: line 4: /home/roddy/.local/share/mise/installs/uv/0.13.3/uv: No such file or directory
+exit_code=127

@@ -1,0 +1,12 @@
+command=/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_wordcraft_host_roundtrip.py --static-root /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-static
+Traceback (most recent call last):
+  File "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_wordcraft_host_roundtrip.py", line 204, in <module>
+    main()
+    ~~~~^^
+  File "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_wordcraft_host_roundtrip.py", line 174, in main
+    assert sum(m == {"type": "wordcraft:dirty", "dirty": False}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               for m in messages) >= 2, messages
+               ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [{'type': 'wordcraft:dirty', 'dirty': True}, {'type': 'wordcraft:save', 'dirty': None}, {'type': 'wordcraft:dirty', 'dirty': False}]
+exit_code=1

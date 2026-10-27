@@ -1,0 +1,10 @@
+command=/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_wordcraft_host_roundtrip.py --static-root /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-static
+Traceback (most recent call last):
+  File "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_wordcraft_host_roundtrip.py", line 215, in <module>
+    main()
+    ~~~~^^
+  File "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_wordcraft_host_roundtrip.py", line 199, in main
+    assert EDIT in copied
+           ^^^^^^^^^^^^^^
+AssertionError
+exit_code=1

@@ -1,0 +1,2 @@
+command=python3 -m py_compile scripts/check-artcraft-releases.py tests/test_check_artcraft_releases.py
+exit_code=0

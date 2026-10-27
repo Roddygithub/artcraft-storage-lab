@@ -1,0 +1,7 @@
+command=/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_wordcraft_host_roundtrip.py --static-root /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-static
+PASS: real WordCraft Web edit changed and serialized the DOCX
+PASS: synthetic storage acknowledged one new version
+PASS: host observed WordCraft's post-save dirty=false acknowledgement
+PASS: WordCraft reopened the saved document
+NOTE: synthetic in-memory storage; real Seafile E2E remains unverified
+exit_code=0

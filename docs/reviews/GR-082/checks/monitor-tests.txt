@@ -1,0 +1,14 @@
+Release monitor checks, 2026-10-27
+
+$ python3 -m unittest tests/test_check_artcraft_releases.py
+Ran 2 tests in 0.023s
+OK
+exit code: 0
+
+$ python3 -m py_compile scripts/check-artcraft-releases.py
+exit code: 0
+
+The recorded live scan is `../upstream-scan-20261027.json`. Its first two
+apps resolved and compared successfully; the remaining three responses hit
+GitHub's unauthenticated API rate limit and were returned as `unknown`.
+The failed scan exit is intentional and must not be interpreted as a pass.

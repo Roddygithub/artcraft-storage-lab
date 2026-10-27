@@ -1,0 +1,34 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Checking gridcraft-engine v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/engine)
+warning: constant `MAX_READ_BYTES` is never used
+   --> crates/engine/src/io.rs:609:7
+    |
+609 | const MAX_READ_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+    |       ^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `gridcraft-engine` (lib) generated 1 warning
+    Checking gridcraft-ui-egui v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/ui-egui)
+warning: variants `At` and `Unknown` are never constructed
+   --> crates/ui-egui/src/backstage.rs:424:5
+    |
+422 | enum Modified {
+    |      -------- variants in this enum
+423 |     /// When it was last changed, in seconds since 1970.
+424 |     At(f64),
+    |     ^^
+425 |     /// It can't be reached: moved, deleted, or on a drive that is away.
+426 |     Unknown,
+    |     ^^^^^^^
+    |
+    = note: `Modified` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `gridcraft-ui-egui` (lib) generated 1 warning
+    Checking gridcraft-web v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/apps/gridcraft-web)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 5.11s
+
+exit_code=0

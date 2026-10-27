@@ -1,0 +1,48 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+warning: function `open_regular` is never used
+  --> crates/plugins/src/registry.rs:67:4
+   |
+67 | fn open_regular(path: &std::path::Path) -> std::io::Result<std::fs::File> {
+   |    ^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `photocraft-plugins` (lib) generated 1 warning
+warning: constant `MAX_FOLDER_LUTS` is never used
+   --> crates/engine/src/adjust_cmds.rs:172:7
+    |
+172 | const MAX_FOLDER_LUTS: usize = 500;
+    |       ^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `MAX_FOLDER_LUT_BYTES` is never used
+   --> crates/engine/src/adjust_cmds.rs:174:7
+    |
+174 | const MAX_FOLDER_LUT_BYTES: u64 = 64 << 20;
+    |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `PAR_PIXELS` is never used
+   --> crates/engine/src/display_color.rs:110:7
+    |
+110 | const PAR_PIXELS: usize = 16 * 1024;
+    |       ^^^^^^^^^^
+
+warning: constant `MAX_SUBFOLDER_DEPTH` is never used
+    --> crates/engine/src/file_cmds.rs:1238:18
+     |
+1238 | pub(crate) const MAX_SUBFOLDER_DEPTH: usize = 32;
+     |                  ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MAX_SUBFOLDER_FILES` is never used
+    --> crates/engine/src/file_cmds.rs:1241:18
+     |
+1241 | pub(crate) const MAX_SUBFOLDER_FILES: usize = 100_000;
+     |                  ^^^^^^^^^^^^^^^^^^^
+
+warning: `photocraft-engine` (lib) generated 5 warnings
+    Finished `dev` profile [optimized + debuginfo] target(s) in 2.27s
+
+exit_code=0

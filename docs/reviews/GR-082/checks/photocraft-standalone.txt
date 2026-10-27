@@ -1,0 +1,391 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling syn v2.0.119
+   Compiling once_cell v1.21.4
+   Compiling bitflags v2.13.2
+   Compiling log v0.4.34
+   Compiling libm v0.2.16
+   Compiling bytemuck v1.25.2
+   Compiling smallvec v1.16.2
+   Compiling serde_core v1.0.229
+   Compiling crossbeam-utils v0.8.23
+   Compiling libc v0.2.189
+   Compiling pin-project-lite v0.2.17
+   Compiling rustix v1.1.5
+   Compiling num-traits v0.2.19
+   Compiling linux-raw-sys v0.12.1
+   Compiling equivalent v1.0.2
+   Compiling either v1.18.0
+   Compiling serde v1.0.229
+   Compiling tracing-core v0.1.36
+   Compiling tracing-attributes v0.1.31
+   Compiling libloading v0.8.9
+   Compiling foldhash v0.2.0
+   Compiling crossbeam-epoch v0.9.21
+   Compiling tracing v0.1.44
+   Compiling thiserror v2.0.21
+   Compiling crossbeam-deque v0.8.8
+   Compiling pkg-config v0.3.34
+   Compiling winnow v1.0.4
+   Compiling rayon-core v1.13.0
+   Compiling arrayvec v0.7.8
+   Compiling rayon v1.12.0
+   Compiling wayland-sys v0.31.11
+   Compiling dlib v0.5.3
+   Compiling simd-adler32 v0.3.10
+   Compiling zerocopy v0.8.59
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling zerocopy-derive v0.8.59
+   Compiling hashbrown v0.17.1
+   Compiling slab v0.4.12
+   Compiling indexmap v2.14.2
+   Compiling crc32fast v1.5.2
+   Compiling memchr v2.8.3
+   Compiling toml_edit v0.25.15+spec-1.1.0
+   Compiling miniz_oxide v0.9.1
+   Compiling polling v3.11.0
+   Compiling enumflags2_derive v0.7.12
+   Compiling flate2 v1.1.10
+   Compiling proc-macro-crate v3.5.0
+   Compiling zvariant_utils v4.2.0
+   Compiling wayland-backend v0.3.17
+   Compiling parking v2.2.1
+   Compiling zvariant_derive v5.15.0
+   Compiling downcast-rs v1.2.1
+   Compiling futures-core v0.3.34
+   Compiling scoped-tls v1.0.1
+   Compiling endi v1.1.1
+   Compiling quick-xml v0.41.0
+   Compiling wayland-client v0.31.15
+   Compiling fastrand v2.5.0
+   Compiling wayland-scanner v0.31.11
+   Compiling uuid v1.26.1
+   Compiling zerofrom v0.1.8
+   Compiling miniz_oxide v0.8.9
+   Compiling stable_deref_trait v1.2.1
+   Compiling siphasher v1.0.4
+   Compiling futures-io v0.3.34
+   Compiling allocator-api2 v0.2.21
+   Compiling static_assertions v1.1.0
+   Compiling hashbrown v0.16.1
+   Compiling parking_lot_core v0.9.12
+   Compiling yoke v0.8.3
+   Compiling event-listener v5.4.2
+   Compiling enumflags2 v0.7.12
+   Compiling zcheapstr v1.1.0
+   Compiling half v2.7.1
+   Compiling fdeflate v0.3.7
+   Compiling concurrent-queue v2.5.0
+   Compiling font-types v0.12.5
+   Compiling weezl v0.1.12
+   Compiling scopeguard v1.2.0
+   Compiling linebender_resource_handle v0.1.1
+   Compiling lock_api v0.4.14
+   Compiling read-fonts v0.41.0
+   Compiling zvariant v5.15.0
+   Compiling event-listener-strategy v0.5.4
+   Compiling futures-lite v2.6.1
+   Compiling syn v3.0.6
+   Compiling color_quant v1.1.0
+   Compiling zerovec v0.11.8
+   Compiling parking_lot v0.12.5
+   Compiling zbus_names v4.3.4
+   Compiling photocraft-cms v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/cms)
+   Compiling memmap2 v0.9.11
+   Compiling async-io v2.6.0
+   Compiling byteorder-lite v0.1.0
+   Compiling serde_json v1.0.151
+   Compiling photocraft-color v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/color)
+   Compiling wayland-protocols v0.32.13
+   Compiling accesskit v0.24.1
+   Compiling jxl-bitstream v1.1.0
+   Compiling photocraft-geom v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/geom)
+   Compiling errno v0.3.14
+   Compiling writeable v0.6.4
+   Compiling getrandom v0.3.4
+   Compiling raw-window-handle v0.6.2
+   Compiling unicode-width v0.2.2
+   Compiling zune-core v0.5.3
+   Compiling async-task v4.7.1
+   Compiling profiling v1.0.18
+   Compiling zune-jpeg v0.5.15
+   Compiling signal-hook-registry v1.4.8
+   Compiling photocraft-raster v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/raster)
+   Compiling async-channel v2.5.0
+   Compiling harfrust v0.12.0
+   Compiling skrifa v0.44.0
+   Compiling ahash v0.8.12
+   Compiling polycool v0.4.0
+   Compiling rustc-hash v1.1.0
+   Compiling atomic-waker v1.1.2
+   Compiling pxfm v0.1.30
+   Compiling moxcms v0.8.1
+   Compiling piper v0.2.5
+   Compiling naga-types v30.0.1
+   Compiling kurbo v0.13.1
+   Compiling async-signal v0.2.14
+   Compiling jxl-oxide-common v1.0.0
+   Compiling tinystr v0.8.4
+   Compiling zbus_xml v5.2.1
+   Compiling gif v0.14.2
+   Compiling async-lock v3.4.2
+   Compiling png v0.18.1
+   Compiling naga v30.0.1
+   Compiling jxl-grid v0.6.2
+   Compiling euclid v0.22.14
+   Compiling color v0.3.3
+   Compiling qoi v0.4.1
+   Compiling litemap v0.8.3
+   Compiling ash v0.38.0+1.3.281
+   Compiling thiserror v1.0.69
+   Compiling rustix v0.38.44
+   Compiling bit-vec v0.9.1
+   Compiling bit-set v0.10.0
+   Compiling icu_locale_core v2.3.0
+   Compiling image v0.25.10
+   Compiling peniko v0.6.1
+   Compiling guillotiere v0.7.0
+   Compiling async-process v2.5.0
+   Compiling zbus-lockstep v0.5.2
+   Compiling blocking v1.7.0
+   Compiling async-executor v1.14.0
+   Compiling codespan-reporting v0.13.1
+   Compiling potential_utf v0.1.6
+   Compiling jxl-coding v1.0.1
+   Compiling zerotrie v0.2.5
+   Compiling zbus_macros v5.19.0
+   Compiling async-broadcast v0.7.2
+   Compiling ordered-stream v0.2.0
+   Compiling jxl-threadpool v1.0.0
+   Compiling spirv v0.4.0+sdk-1.4.341.0
+   Compiling thiserror-impl v1.0.69
+   Compiling async-recursion v1.1.1
+   Compiling serde_repr v0.1.21
+   Compiling async-trait v0.1.92
+   Compiling fearless_simd v0.4.1
+   Compiling xcursor v0.3.11
+   Compiling xkeysym v0.2.1
+   Compiling hex v0.4.3
+   Compiling khronos-egl v6.0.0
+   Compiling cursor-icon v1.2.0
+   Compiling linux-raw-sys v0.4.15
+   Compiling unicode-general-category v1.1.0
+   Compiling wayland-csd-frame v0.3.0
+   Compiling zbus v5.19.0
+   Compiling wayland-cursor v0.31.14
+   Compiling vello_common v0.1.0
+   Compiling icu_provider v2.3.1
+   Compiling zbus-lockstep-macros v0.5.2
+   Compiling wgpu-types v30.0.1
+   Compiling wayland-protocols-wlr v0.3.12
+   Compiling phf_shared v0.13.1
+   Compiling wgpu-hal v30.0.1
+   Compiling emath v0.36.2
+   Compiling utf8_iter v1.0.4
+   Compiling presser v0.3.1
+   Compiling phf_generator v0.13.1
+   Compiling gpu-allocator v0.28.0
+   Compiling icu_collections v2.3.0
+   Compiling ecolor v0.36.2
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling atspi-common v0.13.0
+   Compiling calloop v0.13.0
+   Compiling vello_cpu v0.1.0
+   Compiling jxl-modular v0.11.3
+   Compiling jxl-image v0.13.0
+   Compiling photocraft-doc v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/doc)
+   Compiling slotmap v1.1.1
+   Compiling x11-dl v2.21.0
+   Compiling ordered-float v5.5.0
+   Compiling num-complex v0.4.6
+   Compiling gethostname v1.1.0
+   Compiling core_maths v0.1.1
+   Compiling smithay-client-toolkit v0.19.2
+   Compiling x11rb-protocol v0.13.2
+   Compiling quick-error v2.0.1
+   Compiling nohash-hasher v0.2.0
+   Compiling self_cell v1.3.0
+   Compiling renderdoc-sys v1.1.0
+   Compiling float-cmp v0.9.0
+   Compiling as-raw-xcb-connection v1.0.1
+   Compiling glow v0.17.0
+   Compiling unicode-segmentation v1.13.3
+   Compiling icu_properties_data v2.3.0
+   Compiling icu_locale_fallback_data v2.3.0
+   Compiling epaint v0.36.2
+   Compiling x11rb v0.13.2
+   Compiling strict-num v0.1.1
+   Compiling ttf-parser v0.25.1
+   Compiling jxl-vardct v0.11.1
+   Compiling calloop-wayland-source v0.3.0
+   Compiling phf_macros v0.13.1
+   Compiling wgpu-core v30.0.1
+   Compiling winit v0.30.13
+   Compiling itertools v0.15.0
+   Compiling roxmltree v0.20.0
+   Compiling percent-encoding v2.3.2
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling arrayref v0.3.9
+   Compiling tiny-skia-path v0.11.4
+   Compiling alloc-stdlib v0.2.4
+   Compiling icu_normalizer_data v2.3.0
+   Compiling fontconfig-parser v0.5.8
+   Compiling icu_segmenter_data v2.3.0
+   Compiling egui v0.36.2
+   Compiling pulp v0.22.3
+   Compiling phf v0.13.1
+   Compiling jxl-frame v0.13.3
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling image-webp v0.2.4
+   Compiling atspi-proxies v0.13.0
+   Compiling xkbcommon-dl v0.4.2
+   Compiling accesskit_consumer v0.36.0
+   Compiling wayland-protocols-plasma v0.3.12
+   Compiling calloop v0.14.4
+   Compiling kurbo v0.11.3
+   Compiling num-integer v0.1.47
+   Compiling raw-cpuid v11.6.0
+   Compiling fax_derive v0.2.0
+   Compiling futures-macro v0.3.34
+   Compiling smithay-client-toolkit v0.20.0
+   Compiling pulp-wasm-simd-flag v0.1.1
+   Compiling unicode-properties v0.1.4
+   Compiling dpi v0.1.2
+   Compiling unicode-bidi-mirroring v0.4.0
+   Compiling tinyvec v1.13.3
+   Compiling smol_str v0.2.2
+   Compiling futures-task v0.3.34
+   Compiling reborrow v0.5.5
+   Compiling unicode-ccc v0.4.0
+   Compiling unicode-script v0.5.8
+   Compiling bitflags v1.3.2
+   Compiling png v0.17.16
+   Compiling rustybuzz v0.20.1
+   Compiling futures-util v0.3.34
+   Compiling fontdb v0.23.0
+   Compiling fax v0.2.6
+   Compiling svgtypes v0.15.3
+   Compiling wgpu v30.0.1
+   Compiling calloop-wayland-source v0.4.1
+   Compiling accesskit_atspi_common v0.18.1
+   Compiling atspi v0.29.0
+   Compiling icu_properties v2.3.0
+   Compiling icu_locale_fallback v2.3.0
+   Compiling brotli-decompressor v5.0.3
+   Compiling jxl-color v0.11.0
+   Compiling wayland-protocols-experimental v20250721.0.1
+   Compiling wayland-protocols-misc v0.3.12
+   Compiling zune-inflate v0.2.54
+   Compiling simplecss v0.2.2
+   Compiling xmlwriter v0.1.0
+   Compiling twox-hash v2.1.4
+   Compiling lebe v0.5.3
+   Compiling parlance v0.1.0
+   Compiling zune-core v0.4.12
+   Compiling base64 v0.22.1
+   Compiling bit_field v0.10.3
+   Compiling data-url v0.3.2
+   Compiling unicode-bidi v0.3.18
+   Compiling getrandom v0.4.3
+   Compiling strength_reduce v0.2.4
+   Compiling imagesize v0.13.0
+   Compiling pico-args v0.5.0
+   Compiling unicode-vo v0.1.0
+   Compiling usvg v0.45.1
+   Compiling transpose v0.2.3
+   Compiling wasmi_ir v2.0.0
+   Compiling wasmparser v0.228.0
+   Compiling exr v1.74.2
+   Compiling zune-jpeg v0.4.21
+   Compiling fontique v0.11.1
+   Compiling ruzstd v0.9.1
+   Compiling blake3 v1.8.7
+   Compiling jxl-render v0.12.4
+   Compiling jxl-jbr v0.2.1
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_segmenter v2.3.0
+   Compiling parley_data v0.11.1
+   Compiling accesskit_unix v0.21.1
+   Compiling tiff v0.11.3
+   Compiling tiny-skia v0.11.4
+   Compiling primal-check v0.3.4
+   Compiling photocraft-text v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/text)
+   Compiling photocraft-vector v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/vector)
+   Compiling gif v0.13.3
+   Compiling craft-jpeg v0.1.0 (https://github.com/storytold/craft-libs?rev=6e7f28518dd1cb57e1624bdc269c3c14316b13ae#6e7f2851)
+   Compiling wasmi_core v2.0.0
+   Compiling rgb v0.8.53
+   Compiling anyhow v1.0.104
+   Compiling cpufeatures v0.3.1
+   Compiling web-time v1.1.0
+   Compiling constant_time_eq v0.4.2
+   Compiling jpeg-encoder v0.6.1
+   Compiling rustc-hash v2.1.3
+   Compiling type-map v0.5.1
+   Compiling photocraft-codecs v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/codecs)
+   Compiling wasmi v2.0.0
+   Compiling resvg v0.45.1
+   Compiling photocraft-compose v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/compose)
+   Compiling rustfft v6.4.1
+   Compiling accesskit_winit v0.32.2
+   Compiling parley v0.11.1
+   Compiling jxl-oxide v0.12.6
+   Compiling smithay-clipboard v0.7.3
+   Compiling arboard v3.6.1
+   Compiling photocraft-psd v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/psd)
+   Compiling serde_spanned v1.1.1
+   Compiling is-docker v0.2.0
+   Compiling wasmi_collections v2.0.0
+   Compiling lazy_static v1.5.0
+   Compiling spin v0.9.9
+   Compiling colored v2.2.0
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling is-wsl v0.4.0
+   Compiling egui-winit v0.36.2
+   Compiling tempfile v3.27.0
+   Compiling photocraft-raw v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/raw)
+   Compiling photocraft-algo v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/algo)
+   Compiling photocraft-format v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/format)
+   Compiling egui-wgpu v0.36.2
+   Compiling photocraft-affinity v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/affinity)
+   Compiling photocraft-paint v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/paint)
+   Compiling getopts v0.2.24
+   Compiling accesskit_consumer v0.35.0
+   Compiling roxmltree v0.21.1
+   Compiling enum-map-derive v0.17.0
+   Compiling craft-winprint-gdi v0.1.0 (https://github.com/storytold/winprint.rs?rev=417ac3c4d14d3da5485a99c7d5ce8f05664ec312#417ac3c4)
+   Compiling craft-docpath v0.1.0 (https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b00)
+   Compiling pollster v1.0.1
+   Compiling eframe v0.36.2
+   Compiling photocraft-io v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/io)
+   Compiling craft-print v0.1.0 (https://github.com/storytold/craft-libs?rev=3d37da389a3618ab9b76109da11416e9ca4ea719#3d37da38)
+   Compiling enum-map v2.7.3
+   Compiling kittest v0.4.0
+   Compiling dify v0.8.0
+   Compiling photocraft-ui-egui v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/ui-egui)
+   Compiling open v5.4.4
+   Compiling photocraft-plugins v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/plugins)
+   Compiling photocraft-ops v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/ops)
+   Compiling chrono v0.4.45
+   Compiling memory-stats v1.2.0
+   Compiling photocraft-ipp v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/ipp)
+   Compiling semver v1.0.28
+   Compiling photocraft-engine v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/engine)
+   Compiling photocraft-testkit v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/testkit)
+   Compiling egui_kittest v0.36.2
+   Compiling egui_extras v0.36.2
+   Compiling photocraft-gpu v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/gpu)
+   Compiling craft-ui v0.1.0 (https://github.com/storytold/craft-libs?rev=5c874d51eeb3de70e735c8ce87a59a7dedd47675#5c874d51)
+   Compiling sys-locale v0.3.2
+    Finished `test` profile [optimized + debuginfo] target(s) in 37m 13s
+     Running unittests src/lib.rs (target/debug/deps/photocraft_ui_egui-c866c86b4677bfba)
+
+running 1 test
+test file_open::tests::standalone_confirmed_write_cleans_but_unconfirmed_download_stays_dirty ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3828 filtered out; finished in 0.02s
+
+
+exit_code=0

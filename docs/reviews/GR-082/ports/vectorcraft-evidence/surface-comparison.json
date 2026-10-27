@@ -1,0 +1,50 @@
+[
+  {
+    "path": "apps/vectorcraft-web/src/api.rs",
+    "identical": true,
+    "old_sha256": "f9232385c01d7b2dcd878a941940bac578e4def69b3949c017645b40618f8bad",
+    "target_sha256": "f9232385c01d7b2dcd878a941940bac578e4def69b3949c017645b40618f8bad"
+  },
+  {
+    "path": "apps/vectorcraft-web/src/saved_files.rs",
+    "identical": true,
+    "old_sha256": "0961e0fdec7d800aeaada048903752123623554a857e5824b7234e4e8eea0fbf",
+    "target_sha256": "0961e0fdec7d800aeaada048903752123623554a857e5824b7234e4e8eea0fbf"
+  },
+  {
+    "path": "apps/vectorcraft-web/src/web.rs",
+    "identical": true,
+    "old_sha256": "db8039fa6564ba62fbcb87ea6194df05497ccb47b344bc402f76113957cdb0d6",
+    "target_sha256": "db8039fa6564ba62fbcb87ea6194df05497ccb47b344bc402f76113957cdb0d6"
+  },
+  {
+    "path": "apps/vectorcraft-web/src/main.rs",
+    "identical": true,
+    "old_sha256": "134d7f33791809997086f95b51d0308b0ee5521c4f07c331d395c946e65d0e98",
+    "target_sha256": "134d7f33791809997086f95b51d0308b0ee5521c4f07c331d395c946e65d0e98"
+  },
+  {
+    "path": "apps/vectorcraft-web/index.html",
+    "identical": true,
+    "old_sha256": "b910a86a101c9aa4807dd67956f92a8e0e0ad60b3fa94fc84bb70cbf3761115e",
+    "target_sha256": "b910a86a101c9aa4807dd67956f92a8e0e0ad60b3fa94fc84bb70cbf3761115e"
+  },
+  {
+    "path": "apps/vectorcraft-web/Trunk.toml",
+    "identical": true,
+    "old_sha256": "4d9eb5cac922ed609afb6b27859919b79076de7d15687dbd899d11c4ebdcf73b",
+    "target_sha256": "4d9eb5cac922ed609afb6b27859919b79076de7d15687dbd899d11c4ebdcf73b"
+  },
+  {
+    "path": "apps/vectorcraft-web/src/fonts.rs",
+    "identical": true,
+    "old_sha256": "e195b584cbc11723ec8840f45227e39cbcc3f3bbf7c165982680c5d5df52aea8",
+    "target_sha256": "e195b584cbc11723ec8840f45227e39cbcc3f3bbf7c165982680c5d5df52aea8"
+  },
+  {
+    "path": "crates/text/build.rs",
+    "identical": true,
+    "old_sha256": "85d0fdce0d239f268e8662168dfd6880c5b98e06712af65affc277cd38d5c63b",
+    "target_sha256": "85d0fdce0d239f268e8662168dfd6880c5b98e06712af65affc277cd38d5c63b"
+  }
+]

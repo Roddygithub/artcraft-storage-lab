@@ -1,0 +1,17 @@
+app=WordCraft
+release=v0.11.0
+source_commit=e31f2f06a5f8004ceaa88f68c00b47908e321aa4
+patch_sha256=5255bafd67ade004466218409c5d2ca320f190bbf5f08152b02b582997377e10
+rust=1.95.0
+trunk=0.22.0
+build_overlay=data-wasm-opt z -> 0
+build_overlay_index_sha256=343233454c38b06b2737bbd6be4a393f69a4f7e9b0c19ea42d65f0a5edbde280
+command=RUSTUP_TOOLCHAIN=1.95.0 trunk build --release --locked --dist /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-release
+2026-10-27T16:20:04.319195Z  INFO 🚀 Starting trunk 0.22.0
+2026-10-27T16:20:04.320796Z  INFO 📦 starting build
+2026-10-27T16:20:04.321367Z  INFO node packages []
+2026-10-27T16:20:04.321376Z  INFO ⏫ Found an update of trunk: 0.22.0 -> 0.22.1
+    Finished `release` profile [optimized] target(s) in 0.36s
+2026-10-27T16:20:16.536290Z  INFO applying new distribution
+2026-10-27T16:20:16.538159Z  INFO ✅ success
+exit_code=0

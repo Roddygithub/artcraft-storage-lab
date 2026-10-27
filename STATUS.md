@@ -1,5 +1,39 @@
 # STATUS
 
+## PARALLEL GR: GR-082 — ArtCraft upstream refresh, wave 1
+
+GR-082 is in progress on the separate `upstream-refresh/wave-1` branch and
+worktree, based on committed `62d8845`. It targets only the five currently
+dispatched apps and does not change the GR-081 candidate or active dispatcher.
+Official release refs are WordCraft v0.11.0 `e31f2f0` (293 ahead), GridCraft
+v0.12.1 `f86aec1` (175), PdfCraft v0.14.0 `5a78b22` (535), VectorCraft
+v0.17.0 `43313f9` (1,174), and PhotoCraft v0.16.0 `b1794c6` (77); all have
+zero commits behind their respective old bases.
+Four source patches are archived on the refresh branch. WordCraft's release
+bundle and actual-WASM in-memory edit/save/new-version/ACK/fresh-reopen smoke
+now pass (R9 includes before/after hashes for the actual served assets), as do its locked WASM check and focused host tests. GridCraft's locked
+WASM check and focused host tests pass. PdfCraft's locked WASM and 30
+editing tests pass (including its 8 ACK tests). PhotoCraft's locked check and one
+standalone confirmation test pass against the final local-path tree; its engine
+snapshot and Web/UI suites remain NOT VERIFIED after cold-build cancellation.
+The R3 independent evidence review was PROVISIONAL PASS within scope; its one
+low manifest-status finding has been corrected. Browser/Seafile acceptance is
+still NOT VERIFIED. Pre-push R3 found and R9 addressed a served-bundle provenance mismatch; R4 returned bounded PROVISIONAL PASS for a candidate commit and branch-only push; Seafile remains NOT VERIFIED.
+VectorCraft has no adapter source port; its exact-release locked WASM check
+passes, while release assets and runtime checks remain open. No Seafile browser
+acceptance, route promotion or deployment is claimed. The weekly stable-release task resumes this wave before scanning for
+new candidates. The scanner retries transient errors, and the ledger preserves
+each app/SHA candidate while separate pointers track current candidates. Eight
+monitor tests pass. The complete live prompt and scheduler update response are
+retained. Monitor R5 returned bounded PROVISIONAL PASS with two LOW evidence
+findings; both were corrected and local checks rerun. Unattended execution is
+**NOT VERIFIED**.
+The fresh 2026-10-27 scan completed for all five apps and found no newer stable
+release; the earlier partial scan remains preserved as historical evidence.
+WordCraft's Seafile E2E and replacement-refusal counts remain NOT VERIFIED.
+ONLYOFFICE remains untouched. Details and
+limits: `docs/GR-082-UPSTREAM-REFRESH-WAVE-1.md` and `docs/reviews/GR-082/`.
+
 ## CURRENT GR: GR-081 — project GPT review remediation
 
 The project GPT review of candidate `70fa192ed5d414daf28087315f0f77f8312e98b5`

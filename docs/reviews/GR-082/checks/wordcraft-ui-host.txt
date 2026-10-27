@@ -1,0 +1,20 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on artifact directory
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.50s
+     Running unittests src/lib.rs (target/debug/deps/wordcraft_ui_egui-c1b007fcc2168bf8)
+
+running 9 tests
+test host_identity_tests::host_save_without_transport_is_refused ... ok
+test host_identity_tests::host_save_captures_native_identity_and_stays_dirty_until_ack ... ok
+test tests::host_save_of_a_legacy_word_file_writes_a_docx ... ok
+test tests::host_save_of_an_untitled_document_is_save_as ... ok
+test tests::host_save_of_markdown_keeps_its_format_and_stays_unsaved ... ok
+test tests::a_host_save_that_fails_leaves_the_document_unsaved ... ok
+test tests::host_saves_go_back_to_the_opened_file ... ok
+test tests::host_save_as_a_copy_format_is_not_save_as ... ok
+test tests::the_host_hears_about_edits_made_while_drawing ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 846 filtered out; finished in 0.73s
+

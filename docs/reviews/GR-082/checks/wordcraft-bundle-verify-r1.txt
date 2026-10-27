@@ -1,0 +1,7 @@
+command=sha256sum --check /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/docs/reviews/GR-082/checks/wordcraft-bundle.sha256
+working_directory=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-release
+index.html: OK
+wordcraft-fa59e09a3f921e03.ico: OK
+wordcraft-web-540dde58b91c083.js: OK
+wordcraft-web-b86a16f75a974bbf_bg.wasm: OK
+exit_code=0

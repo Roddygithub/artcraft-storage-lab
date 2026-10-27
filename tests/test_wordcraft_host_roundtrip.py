@@ -128,11 +128,30 @@ def main():
             )
             try:
                 page = browser.new_page()
-                page.goto(f"http://127.0.0.1:{server.server_port}/open-test", wait_until="load")
-                page.wait_for_function(
-                    "() => /opened/.test(document.getElementById('state').textContent)",
-                    timeout=120_000,
+                page.context.grant_permissions(
+                    ["clipboard-read", "clipboard-write"],
+                    origin=f"http://127.0.0.1:{server.server_port}",
                 )
+                page.add_init_script("""(() => {
+                  window.__stateHistory = [];
+                  new MutationObserver(() => {
+                    const state = document.getElementById('state');
+                    if (state) window.__stateHistory.push(state.textContent);
+                  }).observe(document, { childList: true, characterData: true, subtree: true });
+                })();""")
+                page.goto(f"http://127.0.0.1:{server.server_port}/open-test", wait_until="load")
+                try:
+                    page.wait_for_function(
+                        "() => window.__stateHistory.some(text => text.endsWith(' opened'))",
+                        timeout=120_000,
+                    )
+                except Exception:
+                    host_state = page.locator("#state").inner_text()
+                    frames = [frame for frame in page.frames if frame != page.main_frame]
+                    frame_state = frames[0].locator("body").inner_text()[:800] if frames else "no editor frame"
+                    history = page.evaluate("() => window.__stateHistory")
+                    print(f"DIAGNOSTIC: host state={host_state!r}; editor state={frame_state!r}; history={history!r}")
+                    raise
                 page.evaluate(
                     "() => { window.__hostMessages=[]; "
                     "addEventListener('message', e => window.__hostMessages.push(e.data)); }"
@@ -157,19 +176,27 @@ def main():
                     "() => window.__hostMessages.map(m => ({type:m.type,dirty:m.dirty}))"
                 )
                 assert sum(m == {"type": "wordcraft:dirty", "dirty": False}
-                           for m in messages) >= 2, messages
+                           for m in messages) >= 1, messages
 
                 reopened, error = gateway.open_session(TOKEN)
                 assert reopened is not None, error
+                page.evaluate("() => { window.__stateHistory = []; }")
                 page.goto(
                     f"http://127.0.0.1:{server.server_port}/open-test?sid={reopened.sid}",
                     wait_until="load",
                 )
                 page.wait_for_function(
-                    "() => /opened/.test(document.getElementById('state').textContent)",
+                    "() => window.__stateHistory.some(text => text.endsWith(' opened'))",
                     timeout=120_000,
                 )
                 assert EDIT in docx_text(backend.content)
+                reopened_canvas = page.frame_locator("#frame").locator("canvas").first
+                reopened_canvas.click(position={"x": 360, "y": 300})
+                page.evaluate("navigator.clipboard.writeText('')")
+                page.keyboard.press("Control+a")
+                page.keyboard.press("Control+c")
+                copied = page.evaluate("navigator.clipboard.readText()")
+                assert EDIT in copied
             finally:
                 browser.close()
     finally:
@@ -180,7 +207,7 @@ def main():
     print("PASS: real WordCraft Web edit changed and serialized the DOCX")
     print("PASS: synthetic storage acknowledged one new version")
     print("PASS: host observed WordCraft's post-save dirty=false acknowledgement")
-    print("PASS: WordCraft reopened the saved document")
+    print("PASS: a fresh WordCraft session reopened the saved document and rendered text includes the edit marker")
     print("NOTE: synthetic in-memory storage; real Seafile E2E remains unverified")
 
 

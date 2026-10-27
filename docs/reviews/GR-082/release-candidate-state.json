@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "deduplication_key": "app + full release commit SHA",
+  "last_scan": {
+    "complete": true,
+    "path": "upstream-scan-20261027T160651Z.json",
+    "captured_at_utc": "2026-10-27T16:06:51Z",
+    "exit_code": 0,
+    "unknown_apps": []
+  },
+  "promotion": "never automatic; GPT REVIEW PASS gate remains required",
+  "unattended_execution": "NOT VERIFIED",
+  "candidate_key_format": "app + @ + full 40-character release commit SHA",
+  "candidates": {
+    "wordcraft@e31f2f06a5f8004ceaa88f68c00b47908e321aa4": {
+      "app": "wordcraft",
+      "qualified_commit": "00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d",
+      "candidate_tag": "v0.11.0",
+      "candidate_commit": "e31f2f06a5f8004ceaa88f68c00b47908e321aa4",
+      "candidate_path": "../upstream-refresh-sources/wordcraft",
+      "patch": "ports/wordcraft-v0.11.0.patch",
+      "patch_sha256": "5255bafd67ade004466218409c5d2ca320f190bbf5f08152b02b582997377e10",
+      "phase": "locked-checks-and-focused-tests-complete; release-bundle-and-memory-host-smoke-complete; synthetic-seafile-e2e-pending",
+      "bundle_manifest": "checks/wordcraft-bundle-manifest.json"
+    },
+    "gridcraft@f86aec12dabc744b5f75e1033f87bfe685e78481": {
+      "app": "gridcraft",
+      "qualified_commit": "06920de8da609c19de7446945cfc62b844691efd",
+      "candidate_tag": "v0.12.1",
+      "candidate_commit": "f86aec12dabc744b5f75e1033f87bfe685e78481",
+      "candidate_path": "../upstream-refresh-sources/gridcraft",
+      "patch": "ports/gridcraft-v0.12.1.patch",
+      "patch_sha256": "bfe4a5ee134b204242b73356376797f225ecc376889290681a38824a87ffa8f0",
+      "phase": "patch-and-focused-checks-complete; release-build-browser-seafile-pending"
+    },
+    "pdfcraft@5a78b223871add8e3883856205cc653d741e0e94": {
+      "app": "pdfcraft",
+      "qualified_commit": "57e531ccca0047597809748b5cb4276336d6051a",
+      "candidate_tag": "v0.14.0",
+      "candidate_commit": "5a78b223871add8e3883856205cc653d741e0e94",
+      "candidate_path": "../upstream-refresh-sources/pdfcraft",
+      "patch": "ports/pdfcraft-v0.14.0.patch",
+      "patch_sha256": "90a596e2b54d32f859cd01ea26525667d3cce4f6eef97656455a7a717792d6d7",
+      "phase": "patch-wasm-and-focused-editing-tests-complete; release-build-browser-seafile-pending; legacy-ack"
+    },
+    "vectorcraft@43313f9451de7ab5b909801006b8881458f2bf04": {
+      "app": "vectorcraft",
+      "qualified_commit": "ad0566943ab9741e6356bbc9b53c3cc09895068d",
+      "candidate_tag": "v0.17.0",
+      "candidate_commit": "43313f9451de7ab5b909801006b8881458f2bf04",
+      "candidate_path": "../upstream-refresh-sources/vectorcraft",
+      "patch": null,
+      "phase": "source-assessment-and-locked-wasm-check-complete; release-build-browser-seafile-pending"
+    },
+    "photocraft@b1794c6e0608ccfc887213dcf58398977c5cb75e": {
+      "app": "photocraft",
+      "qualified_commit": "a02f2ee41059d3312e7ff24a5af5edcac7b6435a",
+      "candidate_tag": "v0.16.0",
+      "candidate_commit": "b1794c6e0608ccfc887213dcf58398977c5cb75e",
+      "candidate_path": "../upstream-refresh-sources/photocraft",
+      "patch": "ports/photocraft-v0.16.0.patch",
+      "patch_sha256": "73a68d4fd0199e78963061fe6b6d1266704c202633b20ccce2d49f285dc6e089",
+      "phase": "patch-wasm-and-standalone-confirmation-complete; other-host-suites-unverified; release-build-browser-seafile-pending"
+    }
+  },
+  "current_candidate_by_app": {
+    "wordcraft": "wordcraft@e31f2f06a5f8004ceaa88f68c00b47908e321aa4",
+    "gridcraft": "gridcraft@f86aec12dabc744b5f75e1033f87bfe685e78481",
+    "pdfcraft": "pdfcraft@5a78b223871add8e3883856205cc653d741e0e94",
+    "vectorcraft": "vectorcraft@43313f9451de7ab5b909801006b8881458f2bf04",
+    "photocraft": "photocraft@b1794c6e0608ccfc887213dcf58398977c5cb75e"
+  },
+  "state_policy": "Candidate records are immutable identities; keep all prior and unfinished records. Update current_candidate_by_app only to point at the selected current candidate.",
+  "pending_unknown_apps": [],
+  "last_known_release_by_app": {
+    "wordcraft": {
+      "tag": "v0.11.0",
+      "commit": "e31f2f06a5f8004ceaa88f68c00b47908e321aa4",
+      "source": "upstream-scan-20261027T160651Z.json"
+    },
+    "gridcraft": {
+      "tag": "v0.12.1",
+      "commit": "f86aec12dabc744b5f75e1033f87bfe685e78481",
+      "source": "upstream-scan-20261027T160651Z.json"
+    },
+    "pdfcraft": {
+      "tag": "v0.14.0",
+      "commit": "5a78b223871add8e3883856205cc653d741e0e94",
+      "source": "upstream-scan-20261027T160651Z.json"
+    },
+    "vectorcraft": {
+      "tag": "v0.17.0",
+      "commit": "43313f9451de7ab5b909801006b8881458f2bf04",
+      "source": "upstream-scan-20261027T160651Z.json"
+    },
+    "photocraft": {
+      "tag": "v0.16.0",
+      "commit": "b1794c6e0608ccfc887213dcf58398977c5cb75e",
+      "source": "upstream-scan-20261027T160651Z.json"
+    }
+  },
+  "last_successful_drift_comparison_by_app": {
+    "wordcraft": {
+      "tag": "v0.11.0",
+      "commit": "e31f2f06a5f8004ceaa88f68c00b47908e321aa4",
+      "ahead_by": 293,
+      "behind_by": 0,
+      "merge_base_commit": "00bc6a4b028013b2dfb0e85e8b326aeed3ecff6d",
+      "source": "upstream-scan-20261027T160651Z.json"
+    },
+    "gridcraft": {
+      "tag": "v0.12.1",
+      "commit": "f86aec12dabc744b5f75e1033f87bfe685e78481",
+      "ahead_by": 175,
+      "behind_by": 0,
+      "merge_base_commit": "06920de8da609c19de7446945cfc62b844691efd",
+      "source": "upstream-scan-20261027T160651Z.json"
+    },
+    "pdfcraft": {
+      "tag": "v0.14.0",
+      "commit": "5a78b223871add8e3883856205cc653d741e0e94",
+      "ahead_by": 535,
+      "behind_by": 0,
+      "merge_base_commit": "57e531ccca0047597809748b5cb4276336d6051a",
+      "source": "upstream-scan-20261027T160651Z.json"
+    },
+    "vectorcraft": {
+      "tag": "v0.17.0",
+      "commit": "43313f9451de7ab5b909801006b8881458f2bf04",
+      "ahead_by": 1174,
+      "behind_by": 0,
+      "merge_base_commit": "ad0566943ab9741e6356bbc9b53c3cc09895068d",
+      "source": "upstream-scan-20261027T160651Z.json"
+    },
+    "photocraft": {
+      "tag": "v0.16.0",
+      "commit": "b1794c6e0608ccfc887213dcf58398977c5cb75e",
+      "ahead_by": 77,
+      "behind_by": 0,
+      "merge_base_commit": "a02f2ee41059d3312e7ff24a5af5edcac7b6435a",
+      "source": "upstream-scan-20261027T160651Z.json"
+    }
+  },
+  "scan_history": [
+    {
+      "complete": false,
+      "path": "upstream-scan-20261027.json",
+      "reason": "GitHub unauthenticated API rate limits left PdfCraft, VectorCraft, and PhotoCraft unknown in the retained scan."
+    }
+  ]
+}

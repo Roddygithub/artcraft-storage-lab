@@ -1,0 +1,95 @@
+{
+  "work_item": "GR-082 Wave 1 app ports",
+  "status": "IN_PROGRESS",
+  "base_lab_commit": "62d8845dc6e8512c44e8deb3bba0143051a70730",
+  "transport_snapshot": {
+    "commit": "d572f2d550278a7f4aad91a1bac650105c19812b",
+    "browser_host_sha256": "dfd3d3e2d2dde7d9a630e487ea79d6b3adf0085266d7480825900e912d0a9dda"
+  },
+  "candidates": [
+    {
+      "app": "WordCraft",
+      "tag": "v0.11.0",
+      "source_commit": "e31f2f06a5f8004ceaa88f68c00b47908e321aa4",
+      "patch": "ports/wordcraft-v0.11.0.patch",
+      "patch_sha256": "5255bafd67ade004466218409c5d2ca320f190bbf5f08152b02b582997377e10",
+      "clean_exact_base_apply": "PASS",
+      "locked_wasm_check": "PASS",
+      "focused_host_tests": {
+        "engine": "2 passed",
+        "ui": "9 passed"
+      },
+      "browser_seafile_e2e": "memory-host PASS; Seafile NOT VERIFIED",
+      "independent_review": "R3 bounded PROVISIONAL PASS",
+      "release_build": "PASS; manifest checks/wordcraft-bundle-manifest.json; wasm-opt disabled",
+      "memory_host_browser_smoke": "R9 PASS; checks/wordcraft-browser-smoke-r9.txt; reopened editor text includes marker",
+      "browser_smoke_final_evidence": "checks/wordcraft-browser-smoke-r9.txt",
+      "browser_smoke_test_source_sha256": "0a532c59da6d73baf839996c5c3fef955f21d8989e650d6a13df005f70536e09",
+      "browser_smoke_asset_hashes_bound": "4/4 actual served assets hashed before and after R9; unchanged and match bundle manifest"
+    },
+    {
+      "app": "GridCraft",
+      "tag": "v0.12.1",
+      "source_commit": "f86aec12dabc744b5f75e1033f87bfe685e78481",
+      "patch": "ports/gridcraft-v0.12.1.patch",
+      "patch_sha256": "bfe4a5ee134b204242b73356376797f225ecc376889290681a38824a87ffa8f0",
+      "clean_exact_base_apply": "PASS",
+      "locked_wasm_check": "PASS",
+      "focused_host_tests": {
+        "engine": "3 passed",
+        "ui": "2 passed"
+      },
+      "browser_seafile_e2e": "NOT VERIFIED",
+      "independent_review": "R3 bounded PROVISIONAL PASS"
+    },
+    {
+      "app": "PdfCraft",
+      "tag": "v0.14.0",
+      "source_commit": "5a78b223871add8e3883856205cc653d741e0e94",
+      "patch": "ports/pdfcraft-v0.14.0.patch",
+      "patch_sha256": "90a596e2b54d32f859cd01ea26525667d3cce4f6eef97656455a7a717792d6d7",
+      "clean_exact_base_apply": "PASS",
+      "locked_wasm_check": "PASS",
+      "focused_host_tests": {
+        "editing_group": "30 passed (includes the 8 ACK tests)"
+      },
+      "full_upstream_suite": "NOT RUN; targeted editing:: group passes 30",
+      "browser_seafile_e2e": "NOT VERIFIED",
+      "protocol": "legacy ticket ACK; not identity-aware",
+      "independent_review": "R3 bounded PROVISIONAL PASS"
+    },
+    {
+      "app": "PhotoCraft",
+      "tag": "v0.16.0",
+      "source_commit": "b1794c6e0608ccfc887213dcf58398977c5cb75e",
+      "patch": "ports/photocraft-v0.16.0.patch",
+      "patch_sha256": "73a68d4fd0199e78963061fe6b6d1266704c202633b20ccce2d49f285dc6e089",
+      "clean_exact_base_apply": "PASS",
+      "transport_checksums": "17/17 pass",
+      "locked_wasm_check": "PASS",
+      "focused_host_tests": {
+        "standalone_confirmation": "1 passed against final local-path tree",
+        "engine_snapshot": "NOT VERIFIED; cancelled during cold compilation (exit 143)",
+        "ui_host": "NOT VERIFIED; cancelled waiting for Cargo locks (exit 143)",
+        "web_host": "NOT VERIFIED; cancelled waiting for Cargo locks (exit 143)",
+        "prior_19_test_result": "historical; before local-path packaging change, not final-tree qualification"
+      },
+      "browser_seafile_e2e": "NOT VERIFIED",
+      "independent_review": "R3 bounded PROVISIONAL PASS"
+    },
+    {
+      "app": "VectorCraft",
+      "tag": "v0.17.0",
+      "source_commit": "43313f9451de7ab5b909801006b8881458f2bf04",
+      "patch": null,
+      "source_port_assessment": "No adapter source port identified",
+      "locked_wasm_check": "PASS; Rust 1.95, exact v0.17.0 base",
+      "browser_seafile_e2e": "NOT VERIFIED",
+      "report": "ports/vectorcraft-v0.17.0.md"
+    }
+  ],
+  "upstream_publication": "LOCKED: no push to ArtCraft upstream; no upstream issue/PR/RFC before GPT REVIEW PASS",
+  "project_candidate_branch_push": "Allowed after checks and independent review; no PR or merge",
+  "route_promotion": "NOT AUTHORIZED",
+  "onlyoffice_changed": false
+}

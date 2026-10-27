@@ -1,0 +1,17 @@
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.23s
+     Running unittests src/lib.rs (target/debug/deps/pdfcraft_ui_egui-33faadd55703d734)
+
+running 8 tests
+test editing::host_save_ack_tests::acknowledgement_commits_new_paragraph_text_before_running_close_callback ... ok
+test editing::host_save_ack_tests::closing_a_tab_releases_its_pending_snapshot ... ok
+test editing::host_save_ack_tests::acknowledgement_commits_new_form_typing_before_running_close_callback ... ok
+test editing::host_save_ack_tests::failed_host_save_keeps_the_document_dirty_and_duplicate_ack_is_ignored ... ok
+test editing::host_save_ack_tests::acknowledgement_commits_new_text_box_before_running_close_callback ... ok
+test editing::host_save_ack_tests::save_callbacks_have_a_per_document_cap ... ok
+test editing::host_save_ack_tests::same_snapshot_save_requests_coalesce_and_preserve_close_callback ... ok
+test editing::host_save_ack_tests::successful_ack_clears_only_the_exact_editor_snapshot ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 514 filtered out; finished in 0.08s
+
+
+exit_code=0

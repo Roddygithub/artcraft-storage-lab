@@ -1,0 +1,14 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on artifact directory
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.13s
+     Running unittests src/lib.rs (target/debug/deps/gridcraft_ui_egui-45845b3522124567)
+
+running 2 tests
+test host_identity_tests::host_save_without_transport_is_refused ... ok
+test host_identity_tests::host_save_captures_native_snapshot_and_waits_for_ack ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 174 filtered out; finished in 0.01s
+

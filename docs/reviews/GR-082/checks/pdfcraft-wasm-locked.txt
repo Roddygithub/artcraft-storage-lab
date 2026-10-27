@@ -1,0 +1,104 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+warning: method `byte_capacity` is never used
+  --> crates/render/src/pixels.rs:33:19
+   |
+12 | impl Pixels {
+   | ----------- method in this implementation
+...
+33 |     pub(crate) fn byte_capacity(&self) -> usize {
+   |                   ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `record_request` is never used
+   --> crates/render/src/raster.rs:256:8
+    |
+255 | impl AtomicRenderStats {
+    | ---------------------- method in this implementation
+256 |     fn record_request(&self, req: RenderRequest) {
+    |        ^^^^^^^^^^^^^^
+
+warning: field `stuck` is never read
+   --> crates/render/src/raster.rs:560:5
+    |
+552 | struct Shared {
+    |        ------ field in this struct
+...
+560 |     stuck: Mutex<std::collections::HashSet<RequestFailureKey>>,
+    |     ^^^^^
+
+warning: fields `results_tx`, `bytes`, and `config` are never read
+   --> crates/render/src/raster.rs:734:5
+    |
+730 | pub struct RenderPool {
+    |            ---------- fields in this struct
+...
+734 |     results_tx: Arc<WorkQueue>,
+    |     ^^^^^^^^^^
+735 |     bytes: Arc<Vec<u8>>,
+    |     ^^^^^
+736 |     config: RenderConfig,
+    |     ^^^^^^
+
+warning: `pdfcraft-render` (lib) generated 4 warnings
+warning: unused variable: `folder`
+   --> crates/ui-egui/src/files.rs:912:13
+    |
+912 |         let folder = doc.path.clone();
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_folder`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `is_mail_temp_copy` is never used
+    --> crates/ui-egui/src/editing.rs:1290:15
+     |
+1290 | pub(crate) fn is_mail_temp_copy(path: &str) -> bool {
+     |               ^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `save_dialog_folder` is never used
+    --> crates/ui-egui/src/editing.rs:1308:15
+     |
+1308 | pub(crate) fn save_dialog_folder(path: Option<&str>) -> Option<std::path::PathBuf> {
+     |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `in_document_folder` is never used
+    --> crates/ui-egui/src/editing.rs:1315:15
+     |
+1315 | pub(crate) fn in_document_folder(dialog: rfd::AsyncFileDialog, path: Option<&str>) -> rfd::AsyncFileDialog {
+     |               ^^^^^^^^^^^^^^^^^^
+
+warning: variant `Installed` is never constructed
+  --> crates/ui-egui/src/format_text_ui.rs:31:5
+   |
+21 | pub(crate) enum FontChoice {
+   |                 ---------- variant in this enum
+...
+31 |     Installed(std::path::PathBuf),
+   |     ^^^^^^^^^
+   |
+   = note: `FontChoice` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: function `unit_for_tag` is never used
+  --> crates/ui-egui/src/units.rs:71:15
+   |
+71 | pub(crate) fn unit_for_tag(tag: &str) -> Option<Unit> {
+   |               ^^^^^^^^^^^^
+
+warning: variant `Done` is never constructed
+  --> crates/ui-egui/src/updates.rs:55:5
+   |
+50 | pub(crate) enum Check {
+   |                 ----- variant in this enum
+...
+55 |     Done(Result<Release, String>),
+   |     ^^^^
+
+warning: `pdfcraft-ui-egui` (lib) generated 7 warnings (run `cargo fix --lib -p pdfcraft-ui-egui` to apply 1 suggestion)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 2.27s
+
+exit_code=0

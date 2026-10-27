@@ -1,0 +1,113 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on artifact directory
+   Compiling syn v3.0.6
+   Compiling bytemuck_derive v1.12.1
+   Compiling bytemuck v1.25.2
+   Compiling either v1.18.0
+   Compiling rayon v1.12.0
+   Compiling synstructure v0.14.0
+   Compiling serde_core v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling zerofrom-derive v0.1.8
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling tracing v0.1.44
+   Compiling yoke v0.8.3
+   Compiling smallvec v1.16.2
+   Compiling zerovec-derive v0.11.6
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling zerovec v0.11.8
+   Compiling displaydoc v0.2.7
+   Compiling jxl-bitstream v1.1.0
+   Compiling photocraft-cms v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/cms)
+   Compiling photocraft-color v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/color)
+   Compiling photocraft-geom v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/geom)
+   Compiling serde_json v1.0.151
+   Compiling photocraft-raster v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/raster)
+   Compiling jxl-oxide-common v1.0.0
+   Compiling tinystr v0.8.4
+   Compiling jxl-grid v0.6.2
+   Compiling icu_locale_core v2.3.0
+   Compiling potential_utf v0.1.6
+   Compiling jxl-coding v1.0.1
+   Compiling zerotrie v0.2.5
+   Compiling jxl-threadpool v1.0.0
+   Compiling icu_provider v2.3.1
+   Compiling thiserror-impl v2.0.21
+   Compiling icu_collections v2.3.0
+   Compiling thiserror v2.0.21
+   Compiling jxl-modular v0.11.3
+   Compiling jxl-image v0.13.0
+   Compiling num-complex v0.4.6
+   Compiling font-types v0.12.5
+   Compiling read-fonts v0.41.0
+   Compiling zerocopy v0.8.59
+   Compiling jxl-vardct v0.11.1
+   Compiling photocraft-doc v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/doc)
+   Compiling rustix v1.1.5
+   Compiling moxcms v0.8.1
+   Compiling jxl-frame v0.13.3
+   Compiling half v2.7.1
+   Compiling num-integer v0.1.47
+   Compiling qoi v0.4.1
+   Compiling linux-raw-sys v0.12.1
+   Compiling pulp v0.22.3
+   Compiling hashbrown v0.17.1
+   Compiling tiny-skia-path v0.11.4
+   Compiling image v0.25.10
+   Compiling fax v0.2.6
+   Compiling icu_locale_fallback v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling jxl-color v0.11.0
+   Compiling kurbo v0.11.3
+   Compiling linebender_resource_handle v0.1.1
+   Compiling exr v1.74.2
+   Compiling transpose v0.2.3
+   Compiling rustybuzz v0.20.1
+   Compiling fontique v0.11.1
+   Compiling svgtypes v0.15.3
+   Compiling jxl-render v0.12.4
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_segmenter v2.3.0
+   Compiling jxl-jbr v0.2.1
+   Compiling parley_data v0.11.1
+   Compiling tiff v0.11.3
+   Compiling primal-check v0.3.4
+   Compiling skrifa v0.44.0
+   Compiling harfrust v0.12.0
+   Compiling craft-jpeg v0.1.0 (https://github.com/storytold/craft-libs?rev=6e7f28518dd1cb57e1624bdc269c3c14316b13ae#6e7f2851)
+   Compiling leb128fmt v0.1.0
+   Compiling photocraft-codecs v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/codecs)
+   Compiling usvg v0.45.1
+   Compiling wasm-encoder v0.261.0
+   Compiling parley v0.11.1
+   Compiling rustfft v6.4.1
+   Compiling jxl-oxide v0.12.6
+   Compiling tiny-skia v0.11.4
+   Compiling photocraft-vector v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/vector)
+   Compiling photocraft-psd v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/psd)
+   Compiling rgb v0.8.53
+   Compiling wast v261.0.0
+   Compiling resvg v0.45.1
+   Compiling photocraft-text v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/text)
+   Compiling photocraft-compose v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/compose)
+   Compiling photocraft-raw v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/raw)
+   Compiling photocraft-algo v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/algo)
+   Compiling photocraft-format v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/format)
+   Compiling photocraft-affinity v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/affinity)
+   Compiling photocraft-paint v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/paint)
+   Compiling roxmltree v0.21.1
+   Compiling photocraft-io v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/io)
+   Compiling tempfile v3.27.0
+   Compiling photocraft-testkit v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/testkit)
+   Compiling wat v1.261.0
+   Compiling photocraft-plugins v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/plugins)
+   Compiling photocraft-ops v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/ops)
+   Compiling chrono v0.4.45
+   Compiling photocraft-engine v0.16.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/crates/engine)
+
+exit_code=143 (cancelled during cold compilation; no test result)

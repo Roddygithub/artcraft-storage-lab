@@ -1,3 +1,39 @@
+## GR-082 — ArtCraft upstream refresh, active-dispatch wave 1
+
+Separate candidate branch `upstream-refresh/wave-1`, based on committed
+`62d8845`; current GR-081 work and the active dispatcher remain unchanged. The
+five official release commits and ahead/behind distances are pinned in
+`docs/GR-082-UPSTREAM-REFRESH-WAVE-1.md`. The read-only scanner retries network
+errors, 429, all 5xx, and rate-limit 403 responses with bounded backoff; eight
+unit tests pass. Candidate records are keyed by app + full release SHA, so
+previous and unfinished candidates remain resumable. The weekly maintainer task
+is configured; unattended execution is NOT VERIFIED. Monitor R5 returned
+bounded PROVISIONAL PASS with two LOW evidence findings, now addressed in the
+response. The first retained scan completed two apps
+and hit GitHub's unauthenticated API rate limit on the other three; all five
+release comparisons have separate official API references. A fresh 2026-10-27
+scan completed all five comparisons with valid merge bases and found no newer
+stable release. Four exact-release
+source patches are archived; VectorCraft has a source-only no-port assessment
+and its exact-release locked WASM check passes.
+WordCraft v0.11.0 now has a release bundle and actual-WASM memory-host
+edit/save/version/ACK/fresh-reopen PASS; copied text from the fresh editor
+contains the marker. R9 binds the test source and actual served assets by pre/post hashes. Seafile and replacement-refusal counts remain NOT VERIFIED; final pre-push review is pending.
+GridCraft locked WASM and focused host tests pass; PdfCraft's
+locked check and 30 editing tests pass, including its 8 ACK tests. PhotoCraft's locked
+check and one final-tree standalone confirmation test pass; its engine
+snapshot and Web/UI suites remain NOT VERIFIED after cancellation. Browser and
+synthetic Seafile version/readback/fresh-reopen qualification remain open.
+R2 pre-push review findings have responses. Pre-push R3 found the R8 served-asset
+hash mismatch; R9 reran the smoke with actual served-file hashes before/after.
+R4 returned bounded PROVISIONAL PASS for a branch-only push to this repository.
+No dispatch promotion, deployment or
+ONLYOFFICE change is claimed. A reviewed candidate branch may be pushed to this
+repository; upstream issues/PRs/RFCs and release promotion remain locked pending
+project GPT REVIEW PASS. All free reviews remain PROVISIONAL.
+
+Evidence: `docs/reviews/GR-082/`.
+
 ## GR-075 — gateway request-body deadline
 
 Nonempty request bodies have a 120-second total deadline across bounded

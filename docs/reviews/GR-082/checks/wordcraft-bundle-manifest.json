@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "app": "WordCraft",
+  "release_tag": "v0.11.0",
+  "source_commit": "e31f2f06a5f8004ceaa88f68c00b47908e321aa4",
+  "adapter_patch": "ports/wordcraft-v0.11.0.patch",
+  "adapter_patch_sha256": "5255bafd67ade004466218409c5d2ca320f190bbf5f08152b02b582997377e10",
+  "build": {
+    "rust": "1.95.0",
+    "trunk": "0.22.0",
+    "command": "RUSTUP_TOOLCHAIN=1.95.0 trunk build --release --locked --dist <candidate>",
+    "wasm_opt": "disabled",
+    "index_build_overlay_sha256": "343233454c38b06b2737bbd6be4a393f69a4f7e9b0c19ea42d65f0a5edbde280"
+  },
+  "candidate_dir": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-release",
+  "files": [
+    {
+      "path": "index.html",
+      "size_bytes": 1602,
+      "sha256": "7f9e99b1bd0f6a33fbdc6067510944dbae5e19be91a04b0a586aa0950c68a798"
+    },
+    {
+      "path": "wordcraft-fa59e09a3f921e03.ico",
+      "size_bytes": 18378,
+      "sha256": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225"
+    },
+    {
+      "path": "wordcraft-web-540dde58b91c083.js",
+      "size_bytes": 168008,
+      "sha256": "cccdbdc3305d884088d22916c0d1cb111bd6aa5d3d1e39990e09ddfd02cd328d"
+    },
+    {
+      "path": "wordcraft-web-b86a16f75a974bbf_bg.wasm",
+      "size_bytes": 54506345,
+      "sha256": "62de15e62def065b59df7d4dd886c4a0530d3e27e0bbe658b64a1b2b26694ca9"
+    }
+  ],
+  "index_asset_references": [
+    "wordcraft-fa59e09a3f921e03.ico",
+    "wordcraft-web-540dde58b91c083.js",
+    "wordcraft-web-b86a16f75a974bbf_bg.wasm"
+  ],
+  "host_smoke": {
+    "command": "/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_wordcraft_host_roundtrip.py --static-root /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-static",
+    "result": "PASS; synthetic in-memory storage; fresh editor canvas copied text includes marker",
+    "evidence": "checks/wordcraft-browser-smoke-r9.txt",
+    "assertions": [
+      "synthetic DOCX marker edited and serialized",
+      "one in-memory storage version committed",
+      "durable save result and editor dirty=false acknowledgement observed",
+      "fresh session reopened and copied editor-rendered text includes marker"
+    ],
+    "test_source_sha256": "0a532c59da6d73baf839996c5c3fef955f21d8989e650d6a13df005f70536e09",
+    "asset_sha256_bound_at_run": {
+      "index.html": "7f9e99b1bd0f6a33fbdc6067510944dbae5e19be91a04b0a586aa0950c68a798",
+      "wordcraft-fa59e09a3f921e03.ico": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225",
+      "wordcraft-web-540dde58b91c083.js": "cccdbdc3305d884088d22916c0d1cb111bd6aa5d3d1e39990e09ddfd02cd328d",
+      "wordcraft-web-b86a16f75a974bbf_bg.wasm": "62de15e62def065b59df7d4dd886c4a0530d3e27e0bbe658b64a1b2b26694ca9"
+    },
+    "asset_hashes_bound_at_run": {
+      "index.html": "7f9e99b1bd0f6a33fbdc6067510944dbae5e19be91a04b0a586aa0950c68a798",
+      "wordcraft-fa59e09a3f921e03.ico": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225",
+      "wordcraft-web-540dde58b91c083.js": "cccdbdc3305d884088d22916c0d1cb111bd6aa5d3d1e39990e09ddfd02cd328d",
+      "wordcraft-web-b86a16f75a974bbf_bg.wasm": "62de15e62def065b59df7d4dd886c4a0530d3e27e0bbe658b64a1b2b26694ca9"
+    }
+  },
+  "seafile_persistence": "NOT VERIFIED",
+  "onlyoffice_changed": false,
+  "route_promoted": false,
+  "static_root": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/wordcraft-v0.11.0-static",
+  "bundle_sha256_check": "checks/wordcraft-bundle.sha256",
+  "bundle_sha256_check_result": "checks/wordcraft-bundle-verify-r1.txt"
+}
