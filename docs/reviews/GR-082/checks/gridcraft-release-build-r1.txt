@@ -1,0 +1,32 @@
+source_base=f86aec12dabc744b5f75e1033f87bfe685e78481
+source_worktree=patched GR-082 candidate; see exact patch and apply evidence in checks/gridcraft-apply.txt
+patch_sha256=bfe4a5ee134b204242b73356376797f225ecc376889290681a38824a87ffa8f0
+build_command=RUSTUP_TOOLCHAIN=1.95.0 /home/roddy/.local/bin/trunk build --release --locked --dist /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/gridcraft-v0.12.1-release
+rustc=rustc 1.95.0 (59807616e 2026-04-14)
+cargo=cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+trunk=trunk 0.22.0
+CARGO_TARGET_DIR=<unset>
+TMPDIR=<unset>
+2026-10-27T16:43:56.629436Z  INFO 🚀 Starting trunk 0.22.0
+2026-10-27T16:43:56.630038Z  INFO 📦 starting build
+2026-10-27T16:43:56.630256Z  INFO node packages []
+2026-10-27T16:43:56.630478Z  INFO ⏫ Found an update of trunk: 0.22.0 -> 0.22.1
+2026-10-27T16:43:56.690256Z ERROR ❌ error
+error from build pipeline
+
+Caused by:
+    0: error getting cargo metadata
+    1: `cargo metadata` exited with an error: mise ERROR No version is set for shim: cargo
+       Set a global default version with one of the following:
+       mise use -g rust@1.95.0
+       mise ERROR Version: 2026.10.19 linux-x64 (2026-10-24)
+       mise ERROR Run with --verbose or MISE_VERBOSE=1 for more information
+       
+2026-10-27T16:43:56.691492Z ERROR error from build pipeline
+2026-10-27T16:43:56.691500Z  INFO   1: error getting cargo metadata
+2026-10-27T16:43:56.691505Z  INFO   2: `cargo metadata` exited with an error: mise ERROR No version is set for shim: cargo
+Set a global default version with one of the following:
+mise use -g rust@1.95.0
+mise ERROR Version: 2026.10.19 linux-x64 (2026-10-24)
+mise ERROR Run with --verbose or MISE_VERBOSE=1 for more information
+

@@ -1,0 +1,51 @@
+command=/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_pdfcraft_host_roundtrip.py --candidate /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft --fixture tests/fixtures/synthetic.pdf --evidence-dir docs/reviews/GR-082/runtime/pdfcraft
+test_source_before_sha256=a2eabd429cc3104d1b3f1e68fc6dacff6063ce06f85dbdbb0480ee83d7366b37
+served_assets_before_sha256:
+64bf8ddb3ca24b0933caefe17c195952a0fd6766bf1fac336ac192bc59f5c75f  /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft/index.html
+260971c92a1e682e8b96b522cff0cff65e77e7af51951e27e78451de425d8349  /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft/pdfcraft-web-a521f568ddc50a2e.js
+96a709cdacafa3f4759bfbf2ced7adb35412fc65e07d6a4c69fca87cacceb4b3  /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft/pdfcraft-web-ab7a8668849bc2bd_bg.wasm
+127.0.0.1 - - [27/Oct/2026 18:17:25] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:17:25] "GET /index.html?host=parent HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:17:25] "GET /pdfcraft-web-ab7a8668849bc2bd_bg.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:17:25] "GET /pdfcraft-web-a521f568ddc50a2e.js HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:17:26] "GET /synthetic.pdf HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_pdfcraft_host_roundtrip.py", line 147, in <module>
+    main()
+    ~~~~^^
+  File "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_pdfcraft_host_roundtrip.py", line 107, in main
+    page.wait_for_function("() => window.__evidence.dirty.includes(true)", timeout=30_000)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/sync_api/_generated.py", line 21235, in wait_for_function
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.wait_for_function(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_sync_base.py", line 111, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_page.py", line 1158, in wait_for_function
+    return await self._main_frame.wait_for_function(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_frame.py", line 945, in wait_for_function
+    await self._channel.send("waitForFunction", self._timeout, params)
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 78, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 636, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.wait_for_function: Timeout 30000ms exceeded.
+test_exit_code=1
+test_source_after_sha256=a2eabd429cc3104d1b3f1e68fc6dacff6063ce06f85dbdbb0480ee83d7366b37
+served_assets_after_sha256:
+64bf8ddb3ca24b0933caefe17c195952a0fd6766bf1fac336ac192bc59f5c75f  /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft/index.html
+sha256sum: '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft/*.js': No such file or directory
+sha256sum: '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft/*_bg.wasm': No such file or directory

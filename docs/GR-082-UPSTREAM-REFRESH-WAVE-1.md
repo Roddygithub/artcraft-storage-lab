@@ -70,14 +70,20 @@ candidate, not a promoted route. Current bounded qualification:
 | App | Source patch / checks | Still open |
 |---|---|---|
 | WordCraft v0.11.0 | Exact-base apply, locked WASM, engine 2/2 and UI 9/9 tests, release bundle, and actual-WASM synthetic memory-host edit/save/new-version/ACK/fresh-reopen smoke pass; copied reopened-editor text contains the marker. R9 records the test-source hash and hashes of the actual served files before and after the run. | Seafile version/history/readback/fresh reopen; browser refusal counts for replacement/Save As. |
-| GridCraft v0.12.1 | Exact-base apply and local transport checksums pass; locked WASM check passes; host engine 3/3 and UI 2/2 tests pass. Final patch includes native `.xlsx` name/content admission after the first test exposed generic text-open acceptance. | Release bundle, browser behavior, and synthetic Seafile version/readback/fresh reopen. |
-| PdfCraft v0.14.0 | Ported durable ACK patch; exact-base apply and local transport checksums pass. Locked WASM and 30 `editing::` tests pass; that group includes the 8 ACK tests. | Release bundle, browser behavior, and Seafile workflow. Uses the legacy ticket protocol, not identity binding. |
+| GridCraft v0.12.1 | Exact-base apply, local transport checksums, locked WASM check, and host engine 3/3 and UI 2/2 tests pass. The optimized release bundle and actual-WASM synthetic memory-host active-cell Ctrl+S/version/ACK/fresh-reopen smoke pass; R4 records actual served-file hashes before/after. Final patch includes native `.xlsx` name/content admission after the first test exposed generic text-open acceptance. | Seafile version/history/readback/fresh reopen and browser refusal counts for replacement/Save As. |
+| PdfCraft v0.14.0 | Ported durable ACK patch; exact-base apply and local transport checksums pass. Locked WASM and 30 `editing::` tests pass; optimized release bundle and actual-WASM synthetic memory-host edit/save/ACK/fresh-iframe reopen pass, with the edited field visible in the retained capture. | Seafile workflow and replacement-refusal counts. Uses the legacy ticket protocol, not identity binding. |
 | VectorCraft v0.17.0 | No adapter source port identified in the bounded source comparison; locked Rust 1.95 WASM check passes; the page API and web capture surfaces are unchanged across the release range. | Release asset/font build, tests, browser capture/save, and Seafile version/readback/fresh reopen; engine persistence and format code changed. |
 | PhotoCraft v0.16.0 | Exact-base apply, packaged transport checksums and locked WASM check pass; one standalone confirmation test passes against final local-path tree. Earlier 19-test result predates the packaging-only local-path switch. | Engine snapshot and Web/UI host suites against final tree (cancelled/not verified); release bundle, browser/gateway identity enablement, and synthetic Seafile version/readback/fresh reopen. |
 
 The R1–R3 pre-push reviews and responses are retained in the review bundle; R3’s served-file provenance finding was addressed by R9. R4 returned bounded PROVISIONAL PASS for a commit and branch-only push to
-this repository; it does not close Seafile or project GPT gates. The R1 port review and R2 independent app-port findings are also retained. Final evidence includes retained WordCraft/GridCraft logs, PdfCraft's
-30 editing regression passes (including its 8 ACK tests), and a final-tree
+this repository; GridCraft release-evidence R1 returned one LOW queue-wording finding; R2
+verified its correction with no new findings. PdfCraft release-evidence R1's two
+LOW findings were addressed; R2 returned bounded PROVISIONAL PASS. These reviews
+do not close Seafile or project GPT gates. The complete snapshot review R1's
+duplicate-matrix finding was fixed; R2 returned bounded PROVISIONAL PASS. The
+R1 port review and R2 independent
+app-port findings are also retained. Final evidence includes retained
+WordCraft/GridCraft logs, PdfCraft's 30 editing regression passes (including its 8 ACK tests), optimized bundle and actual-WASM memory-host edit/save/ACK/fresh-reopen smoke, and a final-tree
 PhotoCraft standalone confirmation pass. PhotoCraft's engine snapshot and
 Web/UI suites were stopped during cold compilation and remain **NOT VERIFIED**;
 its earlier 19-test result is only pre-local-path historical evidence. R2's

@@ -52,7 +52,24 @@ the build directory rather than the served copy. R9 reran the smoke and hashed
 the actual served files before and after; R4 returned bounded PROVISIONAL PASS; see
 [`INDEPENDENT-PREPUSH-REVIEW-R4.md`](INDEPENDENT-PREPUSH-REVIEW-R4.md) and
 [`RESPONSE-PREPUSH-R4.md`](RESPONSE-PREPUSH-R4.md). A branch-only push to this
-repository is allowed; Seafile remains NOT VERIFIED.
+repository is allowed; Seafile remains NOT VERIFIED. The GridCraft release
+evidence R1 review and response are retained in
+[`INDEPENDENT-GRIDCRAFT-RELEASE-REVIEW-R1.md`](INDEPENDENT-GRIDCRAFT-RELEASE-REVIEW-R1.md)
+and [`RESPONSE-GRIDCRAFT-RELEASE-R1.md`](RESPONSE-GRIDCRAFT-RELEASE-R1.md).
+R2 independently rechecked the wording correction with no new findings; see
+[`INDEPENDENT-GRIDCRAFT-RELEASE-REVIEW-R2.md`](INDEPENDENT-GRIDCRAFT-RELEASE-REVIEW-R2.md)
+and [`RESPONSE-GRIDCRAFT-RELEASE-R2.md`](RESPONSE-GRIDCRAFT-RELEASE-R2.md).
+PdfCraft release evidence R1 found two LOW documentation/test-assertion issues;
+both are addressed and R2 returned bounded PROVISIONAL PASS. See
+[`INDEPENDENT-PDFCRAFT-RELEASE-REVIEW-R1.md`](INDEPENDENT-PDFCRAFT-RELEASE-REVIEW-R1.md),
+[`RESPONSE-PDFCRAFT-RELEASE-REVIEW-R1.md`](RESPONSE-PDFCRAFT-RELEASE-REVIEW-R1.md),
+[`INDEPENDENT-PDFCRAFT-RELEASE-REVIEW-R2.md`](INDEPENDENT-PDFCRAFT-RELEASE-REVIEW-R2.md),
+and [`RESPONSE-PDFCRAFT-RELEASE-REVIEW-R2.md`](RESPONSE-PDFCRAFT-RELEASE-REVIEW-R2.md).
+The complete follow-up snapshot review found one duplicate test-matrix section;
+it was consolidated, and R2 returned bounded PROVISIONAL PASS with no findings.
+See [`INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R1.md`](INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R1.md),
+[`RESPONSE-WAVE1-FINAL-SNAPSHOT-R1.md`](RESPONSE-WAVE1-FINAL-SNAPSHOT-R1.md),
+and [`INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R2.md`](INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R2.md).
 
 ## Source references
 
@@ -107,13 +124,19 @@ has a source-only no-port assessment. See
 | App | Exact-base patch | Locked WASM | Focused tests | Browser / Seafile |
 |---|---|---|---|---|
 | WordCraft v0.11.0 | PASS, packaged local transport included | PASS | Engine 2, UI 9; release bundle and actual-WASM memory-host edit/save/version/ACK/reopen pass | Seafile NOT VERIFIED |
-| GridCraft v0.12.1 | PASS, includes pre-open native-XLSX check | PASS | Engine 3 and UI 2 pass | NOT VERIFIED |
-| PdfCraft v0.14.0 | PASS, packaged local transport included | PASS | 30 `editing::` tests pass, including the 8 ACK tests | NOT VERIFIED |
+| GridCraft v0.12.1 | PASS, includes pre-open native-XLSX check | PASS | Engine 3, UI 2; release bundle and actual-WASM synthetic memory-host active-cell Save/new-version/ACK/fresh-reopen pass | Seafile NOT VERIFIED |
+| PdfCraft v0.14.0 | PASS, packaged local transport included | PASS; optimized release bundle PASS | 30 `editing::` tests pass, including the 8 ACK tests; actual-WASM synthetic memory-host edit/save/ACK/fresh-iframe reopen PASS; R4 Tesseract assertion verifies the edited form value in the fresh capture | Seafile NOT VERIFIED |
 | PhotoCraft v0.16.0 | PASS, packaged local transport included | PASS | One standalone confirmation test passes against final local-path tree; other final-tree test suites are NOT VERIFIED/cancelled | NOT VERIFIED |
 | VectorCraft v0.17.0 | No source patch identified | PASS, Rust 1.95 locked WASM check | NOT RUN | NOT VERIFIED |
 
 Patch application and transport-integrity command outputs are retained in
-[`checks/`](checks/). GR-082 app-port review R1 findings and responses are in
+[`checks/`](checks/). PdfCraft's optimized release bundle and actual-WASM
+memory-host smoke provenance are in
+[`pdfcraft-bundle-manifest.json`](checks/pdfcraft-bundle-manifest.json),
+[`pdfcraft-release-build-r1.txt`](checks/pdfcraft-release-build-r1.txt), and
+[`pdfcraft-browser-smoke-r4.txt`](checks/pdfcraft-browser-smoke-r4.txt); the
+three synthetic runtime captures and browser observations are under
+[`runtime/pdfcraft/`](runtime/pdfcraft/). GR-082 app-port review R1 findings and responses are in
 [`INDEPENDENT-APP-PORT-REVIEW-R1.md`](INDEPENDENT-APP-PORT-REVIEW-R1.md) and
 [`RESPONSE-APP-PORT-R1.md`](RESPONSE-APP-PORT-R1.md). R2 verified those
 packaging corrections but identified incomplete final build/test records and
@@ -153,9 +176,13 @@ any refreshed ArtCraft adapter.
 The four patches apply to clean indexes initialized from their exact release
 commits. WordCraft has a release bundle and bounded actual-WASM in-memory
 edit/save/version/ACK/fresh-reopen evidence, but no refreshed Seafile run or
-refusal-count evidence. GridCraft, PdfCraft and PhotoCraft still need release
-bundles and browser qualification; VectorCraft still needs a release
-asset/font build and browser capture/save. Synthetic Seafile durable
+refusal-count evidence. GridCraft now has an optimized release bundle and actual-WASM synthetic
+memory-host edit/save/version/ACK/fresh-reopen evidence; its Seafile and
+replacement-refusal gates remain open. PdfCraft now has an optimized release
+bundle and bounded actual-WASM in-memory edit/save/ACK/fresh-iframe reopen
+evidence; Seafile and replacement-refusal gates remain open. PhotoCraft still
+needs a release bundle and browser qualification; VectorCraft still needs a
+release asset/font build and browser capture/save. Synthetic Seafile durable
 version/readback/fresh reopen remains **NOT VERIFIED** for every refreshed app.
 Prior GR-055–058 and GR-076 results are historical evidence for their exact
 older source revisions only. No credentials or production data belong in this

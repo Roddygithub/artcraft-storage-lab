@@ -23,13 +23,20 @@
   PhotoCraft; source-only VectorCraft assessment found no adapter port, and its
   locked Rust 1.95 WASM check passes on the exact v0.17.0 commit.
   WordCraft/GridCraft focused host tests pass; PdfCraft's locked check and 30
-  editing tests pass, including its 8 ACK tests. PhotoCraft's locked check and one
+  editing tests pass, including its 8 ACK tests. Its optimized v0.14.0 release
+  bundle also passes an actual-WASM synthetic memory-host edit/save/ACK/fresh-
+  iframe reopen smoke; the edited form field is visible in the retained capture.
+  Seafile and replacement-refusal counts remain NOT VERIFIED. PhotoCraft's locked check and one
   final-tree standalone test pass; its other final-tree host suites were
-  cancelled during cold compilation and remain NOT VERIFIED. Browser and
-  Seafile workflows remain unverified. Independent app-port R3 returned a bounded
+  cancelled during cold compilation and remain NOT VERIFIED. Browser
+  qualification is bounded to WordCraft/GridCraft/PdfCraft memory hosts;
+  refreshed Seafile workflows remain NOT VERIFIED. Independent app-port R3 returned a bounded
   PROVISIONAL PASS with one low manifest-status finding, now corrected. Pre-push
   R3 found and R9 corrected the served-asset provenance mismatch; pre-push R4
-  returned bounded PROVISIONAL PASS for a branch-only push. No
+  returned bounded PROVISIONAL PASS for a branch-only push. GridCraft and
+  PdfCraft release-evidence R2 reviews returned bounded PROVISIONAL PASS after
+  their findings were addressed. The final snapshot review R2 is also bounded
+  PROVISIONAL PASS after its duplicate-matrix finding was corrected. No
   route, deployment, Seafile setting or ONLYOFFICE configuration changed.
 
 # 2026-10-26 — GR-081 project GPT review remediation

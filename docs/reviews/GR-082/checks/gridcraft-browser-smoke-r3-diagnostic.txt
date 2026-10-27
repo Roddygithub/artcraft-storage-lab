@@ -1,0 +1,56 @@
+command=/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_gridcraft_host_roundtrip.py --static-root /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/gridcraft-v0.12.1-static
+test_source_before_sha256=fd632d0409b4a5af172d11560b227d7a2b221f60523c955e44661d402e1affeb
+served_assets_before_sha256:
+733f5111e5dfec2d00358823639ab5e80b543d6c195714397df8b9876c2eb260  index.html
+f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07  gridcraft-45f84b7721cb79a9.ico
+767e2eb27b3d851af70c10705d5d7f9322ab8732d365fb79c26a049528e76ef5  gridcraft-web-4f5e302a4f88f942.js
+102fe5b8310a985ac70d537447a27d3a870cfe9d04df6139c856a4f2f18d79fc  gridcraft-web-d156c0a0028701fb_bg.wasm
+Traceback (most recent call last):
+  File "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_gridcraft_host_roundtrip.py", line 200, in <module>
+    main()
+    ~~~~^^
+  File "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_gridcraft_host_roundtrip.py", line 178, in main
+    page.wait_for_function(
+    ~~~~~~~~~~~~~~~~~~~~~~^
+        "count => window.__hostMessages.filter(m => m.type === 'gridcraft:opened').length > count",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        arg=prior_opened,
+        ^^^^^^^^^^^^^^^^^
+        timeout=90_000,
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/sync_api/_generated.py", line 21235, in wait_for_function
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.wait_for_function(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_sync_base.py", line 111, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_page.py", line 1158, in wait_for_function
+    return await self._main_frame.wait_for_function(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_frame.py", line 945, in wait_for_function
+    await self._channel.send("waitForFunction", self._timeout, params)
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 78, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/home/roddy/.cache/uv/archive-v0/Z-FU1ogDGB-ATWyl/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 636, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.wait_for_function: Timeout 90000ms exceeded.
+exit_code=1
+test_source_after_sha256=fd632d0409b4a5af172d11560b227d7a2b221f60523c955e44661d402e1affeb
+served_assets_after_sha256:
+733f5111e5dfec2d00358823639ab5e80b543d6c195714397df8b9876c2eb260  index.html
+f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07  gridcraft-45f84b7721cb79a9.ico
+767e2eb27b3d851af70c10705d5d7f9322ab8732d365fb79c26a049528e76ef5  gridcraft-web-4f5e302a4f88f942.js
+102fe5b8310a985ac70d537447a27d3a870cfe9d04df6139c856a4f2f18d79fc  gridcraft-web-d156c0a0028701fb_bg.wasm

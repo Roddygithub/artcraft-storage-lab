@@ -11,14 +11,21 @@ v0.17.0 `43313f9` (1,174), and PhotoCraft v0.16.0 `b1794c6` (77); all have
 zero commits behind their respective old bases.
 Four source patches are archived on the refresh branch. WordCraft's release
 bundle and actual-WASM in-memory edit/save/new-version/ACK/fresh-reopen smoke
-now pass (R9 includes before/after hashes for the actual served assets), as do its locked WASM check and focused host tests. GridCraft's locked
-WASM check and focused host tests pass. PdfCraft's locked WASM and 30
-editing tests pass (including its 8 ACK tests). PhotoCraft's locked check and one
+now pass (R9 includes before/after hashes for the actual served assets), as do its locked WASM check and focused host tests. GridCraft's optimized release bundle and actual-WASM synthetic memory-host
+active-cell Ctrl+S/version/ACK/fresh-reopen smoke now pass, as do its locked
+WASM check and focused host tests. Seafile and replacement-refusal counts remain
+NOT VERIFIED. PdfCraft's locked WASM and 30
+editing tests pass (including its 8 ACK tests); the optimized bundle also passes
+an actual-WASM synthetic memory-host edit/save/ACK/fresh-iframe reopen smoke,
+with the edited field visible in the retained capture. Seafile and
+replacement-refusal counts remain NOT VERIFIED. PhotoCraft's locked check and one
 standalone confirmation test pass against the final local-path tree; its engine
 snapshot and Web/UI suites remain NOT VERIFIED after cold-build cancellation.
 The R3 independent evidence review was PROVISIONAL PASS within scope; its one
-low manifest-status finding has been corrected. Browser/Seafile acceptance is
-still NOT VERIFIED. Pre-push R3 found and R9 addressed a served-bundle provenance mismatch; R4 returned bounded PROVISIONAL PASS for a candidate commit and branch-only push; Seafile remains NOT VERIFIED.
+low manifest-status finding has been corrected. The complete GR-082 follow-up
+snapshot review R2 is bounded PROVISIONAL PASS after consolidating its duplicate
+matrix row. Seafile acceptance is
+still NOT VERIFIED. Pre-push R3 found and R9 addressed a served-bundle provenance mismatch; R4 returned bounded PROVISIONAL PASS for a candidate commit and branch-only push. GridCraft and PdfCraft release-evidence R2 reviews are bounded PROVISIONAL PASS; Seafile remains NOT VERIFIED.
 VectorCraft has no adapter source port; its exact-release locked WASM check
 passes, while release assets and runtime checks remain open. No Seafile browser
 acceptance, route promotion or deployment is claimed. The weekly stable-release task resumes this wave before scanning for

@@ -18,16 +18,25 @@ source patches are archived; VectorCraft has a source-only no-port assessment
 and its exact-release locked WASM check passes.
 WordCraft v0.11.0 now has a release bundle and actual-WASM memory-host
 edit/save/version/ACK/fresh-reopen PASS; copied text from the fresh editor
-contains the marker. R9 binds the test source and actual served assets by pre/post hashes. Seafile and replacement-refusal counts remain NOT VERIFIED; final pre-push review is pending.
-GridCraft locked WASM and focused host tests pass; PdfCraft's
-locked check and 30 editing tests pass, including its 8 ACK tests. PhotoCraft's locked
+contains the marker. R9 binds the test source and actual served assets by pre/post hashes. Seafile and replacement-refusal counts remain NOT VERIFIED.
+GridCraft locked WASM and focused host tests, optimized release bundle, and
+actual-WASM synthetic memory-host active-cell Save/version/ACK/fresh-reopen
+smoke pass; Seafile and replacement-refusal counts remain NOT VERIFIED. PdfCraft's
+locked check and 30 editing tests pass, including its 8 ACK tests; its optimized
+v0.14.0 release bundle also passes an actual-WASM synthetic memory-host
+edit/save/ACK/fresh-iframe reopen smoke, with the edited form value visible in
+the retained capture. Seafile and replacement-refusal counts remain NOT VERIFIED.
+PhotoCraft's locked
 check and one final-tree standalone confirmation test pass; its engine
 snapshot and Web/UI suites remain NOT VERIFIED after cancellation. Browser and
-synthetic Seafile version/readback/fresh-reopen qualification remain open.
+synthetic Seafile version/readback/fresh-reopen qualification remain open for
+PhotoCraft/VectorCraft browser tests and for all refreshed Seafile routes.
 R2 pre-push review findings have responses. Pre-push R3 found the R8 served-asset
 hash mismatch; R9 reran the smoke with actual served-file hashes before/after.
-R4 returned bounded PROVISIONAL PASS for a branch-only push to this repository.
-No dispatch promotion, deployment or
+Pre-push R4 returned bounded PROVISIONAL PASS for a branch-only push. The
+separate GridCraft and PdfCraft release-evidence R2 reviews and the final
+snapshot R2 returned bounded PROVISIONAL PASS after their findings were
+addressed. No dispatch promotion, deployment or
 ONLYOFFICE change is claimed. A reviewed candidate branch may be pushed to this
 repository; upstream issues/PRs/RFCs and release promotion remain locked pending
 project GPT REVIEW PASS. All free reviews remain PROVISIONAL.

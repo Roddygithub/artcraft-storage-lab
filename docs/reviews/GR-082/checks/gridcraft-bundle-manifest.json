@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "app": "GridCraft",
+  "release_tag": "v0.12.1",
+  "source_commit": "f86aec12dabc744b5f75e1033f87bfe685e78481",
+  "adapter_patch": "ports/gridcraft-v0.12.1.patch",
+  "adapter_patch_sha256": "bfe4a5ee134b204242b73356376797f225ecc376889290681a38824a87ffa8f0",
+  "build": {
+    "rust": "1.95.0",
+    "trunk": "0.22.0",
+    "command": "RUSTUP_TOOLCHAIN=1.95.0 trunk build --release --locked --dist <candidate>",
+    "wasm_opt": "enabled; source index specifies data-wasm-opt=\"z\" and Trunk installed wasm-opt version 131; exact optimizer invocation not retained"
+  },
+  "candidate_dir": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/gridcraft-v0.12.1-release",
+  "static_root": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/gridcraft-v0.12.1-static",
+  "files": [
+    {
+      "path": "gridcraft-45f84b7721cb79a9.ico",
+      "size_bytes": 26895,
+      "sha256": "f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07"
+    },
+    {
+      "path": "gridcraft-web-4f5e302a4f88f942.js",
+      "size_bytes": 160459,
+      "sha256": "767e2eb27b3d851af70c10705d5d7f9322ab8732d365fb79c26a049528e76ef5"
+    },
+    {
+      "path": "gridcraft-web-d156c0a0028701fb_bg.wasm",
+      "size_bytes": 20444043,
+      "sha256": "102fe5b8310a985ac70d537447a27d3a870cfe9d04df6139c856a4f2f18d79fc"
+    },
+    {
+      "path": "index.html",
+      "size_bytes": 1586,
+      "sha256": "733f5111e5dfec2d00358823639ab5e80b543d6c195714397df8b9876c2eb260"
+    }
+  ],
+  "index_asset_references": [
+    "gridcraft-45f84b7721cb79a9.ico",
+    "gridcraft-web-4f5e302a4f88f942.js",
+    "gridcraft-web-d156c0a0028701fb_bg.wasm"
+  ],
+  "browser_smoke": {
+    "status": "PASS; actual-WASM synthetic memory-host edit/save/new-version/ACK/fresh-session reopen",
+    "evidence": "checks/gridcraft-browser-smoke-r4.txt",
+    "test_source_sha256": "fcdec05456b6203f4220bff50ca61b680b240944ee3ff09ddbcc5dcdb1d5277c",
+    "served_asset_sha256_before_after": {
+      "index.html": "733f5111e5dfec2d00358823639ab5e80b543d6c195714397df8b9876c2eb260",
+      "gridcraft-45f84b7721cb79a9.ico": "f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07",
+      "gridcraft-web-4f5e302a4f88f942.js": "767e2eb27b3d851af70c10705d5d7f9322ab8732d365fb79c26a049528e76ef5",
+      "gridcraft-web-d156c0a0028701fb_bg.wasm": "102fe5b8310a985ac70d537447a27d3a870cfe9d04df6139c856a4f2f18d79fc"
+    },
+    "assertions": [
+      "active-cell marker was committed through ordinary Ctrl+S",
+      "one synthetic in-memory version was created",
+      "durable save acknowledgement returned the editor to clean state",
+      "fresh GridCraft session reopened the saved workbook"
+    ]
+  },
+  "seafile_e2e": "NOT VERIFIED",
+  "onlyoffice_changed": false,
+  "route_promoted": false
+}

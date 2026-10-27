@@ -1,0 +1,542 @@
+source_base=5a78b223871add8e3883856205cc653d741e0e94
+source_worktree=patched GR-082 candidate; apply and patch digest in checks/pdfcraft-apply.txt
+patch_sha256=90a596e2b54d32f859cd01ea26525667d3cce4f6eef97656455a7a717792d6d7
+build_command=PATH=/home/roddy/.cargo/bin:/home/roddy/.local/bin:$PATH RUSTUP_TOOLCHAIN=1.95.0 trunk build --release --locked --dist /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-release --verbose
+rustc=rustc 1.95.0 (59807616e 2026-04-14)
+cargo=cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+trunk=trunk 0.22.0
+wasm_opt=data-wasm-opt="z"
+CARGO_TARGET_DIR=<unset>
+TMPDIR=<unset>
+2026-10-27T16:59:37.918214Z  INFO 🚀 Starting trunk 0.22.0
+2026-10-27T16:59:37.918288Z DEBUG update_check: Spawning update check skip=false
+2026-10-27T16:59:37.918624Z DEBUG Enforce version - actual: 0.22.0, required: *
+2026-10-27T16:59:37.918961Z DEBUG Performing update check
+2026-10-27T16:59:37.919419Z DEBUG Time since last check: 51m32s491ms436µs826ns
+2026-10-27T16:59:37.919431Z DEBUG No refresh needed
+2026-10-27T16:59:37.919435Z DEBUG Current: 0.22.0, Most recent: 0.22.1
+2026-10-27T16:59:37.919440Z  INFO ⏫ Found an update of trunk: 0.22.0 -> 0.22.1
+2026-10-27T16:59:37.919592Z  INFO 📦 starting build
+2026-10-27T16:59:37.919736Z DEBUG spawning asset pipelines
+2026-10-27T16:59:37.919745Z  INFO node packages []
+2026-10-27T16:59:39.265333Z DEBUG building pdfcraft-web
+2026-10-27T16:59:39.265365Z DEBUG cargo args args=["build", "--target=wasm32-unknown-unknown", "--manifest-path", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/apps/pdfcraft-web/Cargo.toml", "--release", "--locked"]
+   Compiling unicode-ident v1.0.26
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling cfg-if v1.0.5
+   Compiling once_cell v1.21.4
+   Compiling rustversion v1.0.23
+   Compiling wasm-bindgen-shared v0.2.129
+   Compiling serde_core v1.0.229
+   Compiling bumpalo v3.20.3
+   Compiling syn v3.0.6
+   Compiling wasm-bindgen v0.2.129
+   Compiling serde v1.0.229
+   Compiling libm v0.2.16
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling subtle v2.6.1
+   Compiling zeroize v1.9.0
+   Compiling rand_core v0.10.1
+   Compiling typenum v1.20.1
+   Compiling getrandom v0.4.3
+   Compiling hybrid-array v0.4.15
+   Compiling syn v2.0.119
+   Compiling cmov v0.5.4
+   Compiling ctutils v0.4.5
+   Compiling thiserror v2.0.21
+   Compiling const-oid v0.10.2
+   Compiling block-buffer v0.12.1
+   Compiling bitflags v2.13.2
+   Compiling simd-adler32 v0.3.10
+   Compiling crc32fast v1.5.2
+   Compiling adler2 v2.0.1
+   Compiling miniz_oxide v0.9.1
+   Compiling arrayvec v0.7.8
+   Compiling cpubits v0.1.1
+   Compiling block-padding v0.4.2
+   Compiling wasm-bindgen-macro-support v0.2.129
+   Compiling flate2 v1.1.10
+   Compiling fearless_simd v0.4.1
+   Compiling serde_derive v1.0.229
+   Compiling bytemuck_derive v1.12.1
+   Compiling thiserror-impl v2.0.21
+   Compiling bytemuck v1.25.2
+   Compiling allocator-api2 v0.2.21
+   Compiling equivalent v1.0.2
+   Compiling foldhash v0.2.0
+   Compiling hashbrown v0.17.1
+   Compiling inout v0.2.2
+   Compiling rustc-hash v2.1.3
+   Compiling smallvec v1.16.2
+   Compiling font-types v0.12.5
+   Compiling pin-project-lite v0.2.17
+   Compiling tinyvec v1.13.3
+   Compiling log v0.4.34
+   Compiling unicode-properties v0.1.4
+   Compiling unicode-bidi v0.3.18
+   Compiling unicode-normalization v0.1.25
+   Compiling futures-core v0.3.34
+   Compiling wasm-bindgen-macro v0.2.129
+   Compiling synstructure v0.14.0
+   Compiling stringprep v0.1.5
+   Compiling zerocopy v0.8.59
+   Compiling read-fonts v0.41.0
+   Compiling zerocopy-derive v0.8.59
+   Compiling crypto-common v0.2.2
+   Compiling futures-task v0.3.34
+   Compiling slab v0.4.12
+   Compiling futures-util v0.3.34
+   Compiling digest v0.11.3
+   Compiling cipher v0.5.2
+   Compiling sha2 v0.11.0
+   Compiling aes v0.9.3
+   Compiling md-5 v0.11.0
+   Compiling chrono v0.4.45
+   Compiling memchr v2.8.3
+   Compiling js-sys v0.3.106
+   Compiling zune-core v0.5.3
+   Compiling zune-jpeg v0.5.15
+   Compiling pdfcraft-crypt v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/crypt)
+   Compiling pdfcraft-filters v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/filters)
+   Compiling either v1.18.0
+   Compiling crossbeam-utils v0.8.23
+   Compiling scopeguard v1.2.0
+   Compiling pdfcraft-cos v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/cos)
+   Compiling zerofrom-derive v0.1.8
+   Compiling harfrust v0.12.0
+   Compiling skrifa v0.44.0
+   Compiling polycool v0.4.0
+   Compiling kurbo v0.13.1
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling stable_deref_trait v1.2.1
+   Compiling version_check v0.9.5
+   Compiling parking_lot_core v0.9.12
+   Compiling indexmap v2.14.2
+   Compiling hayro-ccitt v0.3.0
+   Compiling yoke v0.8.3
+   Compiling typeid v1.0.3
+   Compiling hayro-jbig2 v0.3.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/hayro-jbig2)
+   Compiling lock_api v0.4.14
+   Compiling half v2.7.1
+   Compiling hayro-jpeg2000 v0.3.5
+   Compiling siphasher v1.0.4
+   Compiling pdfcraft-fonts v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/fonts)
+   Compiling web-sys v0.3.106
+   Compiling hayro-syntax v0.7.2 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/hayro-syntax)
+   Compiling color v0.3.3
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling euclid v0.22.14
+   Compiling static_assertions v1.1.0
+   Compiling cfg_aliases v0.2.2
+   Compiling linebender_resource_handle v0.1.1
+   Compiling crossbeam-epoch v0.9.21
+   Compiling peniko v0.6.1
+   Compiling guillotiere v0.7.0
+   Compiling crypto-bigint v0.7.6
+   Compiling zerovec-derive v0.11.6
+   Compiling crossbeam-deque v0.8.8
+   Compiling fastrand v2.5.0
+   Compiling pdfcraft-model v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/model)
+   Compiling zerovec v0.11.8
+   Compiling displaydoc v0.2.7
+   Compiling semver v1.0.28
+   Compiling rayon-core v1.13.0
+   Compiling rustc_version v0.4.1
+   Compiling ff v0.14.0
+   Compiling pdfcraft-content v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/content)
+   Compiling parking_lot v0.12.5
+   Compiling der v0.8.2
+   Compiling profiling v1.0.18
+   Compiling pxfm v0.1.30
+   Compiling rayon v1.12.0
+   Compiling group v0.14.0
+   Compiling tinystr v0.8.4
+   Compiling png v0.18.1
+   Compiling signature v3.0.0
+   Compiling litemap v0.8.3
+   Compiling weezl v0.1.12
+   Compiling winnow v1.0.4
+   Compiling rten-base v0.26.0
+   Compiling base16ct v1.0.0
+   Compiling itoa v1.0.18
+   Compiling writeable v0.6.4
+   Compiling zmij v1.0.23
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling icu_locale_core v2.3.0
+   Compiling sec1 v0.8.1
+   Compiling moxcms v0.8.1
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling potential_utf v0.1.6
+   Compiling zerotrie v0.2.5
+   Compiling ahash v0.8.12
+   Compiling slotmap v1.1.1
+   Compiling itertools v0.15.0
+   Compiling hmac v0.13.0
+   Compiling fax v0.2.7
+   Compiling unicode-general-category v1.1.0
+   Compiling rustc-hash v1.1.0
+   Compiling bitflags v1.3.2
+   Compiling utf8_iter v1.0.4
+   Compiling color_quant v1.1.0
+   Compiling quick-error v2.0.1
+   Compiling icu_properties_data v2.3.0
+   Compiling gif v0.14.2
+   Compiling tiff v0.11.3
+   Compiling icu_collections v2.3.0
+   Compiling naga-types v30.0.1
+   Compiling icu_provider v2.3.1
+   Compiling elliptic-curve v0.14.1
+   Compiling primefield v0.14.0
+   Compiling vello_common v0.1.0
+   Compiling naga v30.0.1
+   Compiling phf_shared v0.14.0
+   Compiling emath v0.36.2
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling bit-vec v0.9.1
+   Compiling icu_normalizer_data v2.3.0
+   Compiling unicode-segmentation v1.13.3
+   Compiling serde_json v1.0.151
+   Compiling byteorder-lite v0.1.0
+   Compiling unicode-width v0.2.2
+   Compiling raw-window-handle v0.6.2
+   Compiling codespan-reporting v0.13.1
+   Compiling image v0.25.10
+   Compiling vello_cpu v0.1.0
+   Compiling ecolor v0.36.2
+   Compiling bit-set v0.10.0
+   Compiling alloc-stdlib v0.2.4
+   Compiling phf_generator v0.14.0
+   Compiling wnaf v0.14.1
+   Compiling rfc6979 v0.6.0
+   Compiling rten-parallel v0.26.0
+   Compiling spki v0.8.0
+   Compiling pdfcraft-annot v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/annot)
+   Compiling enumn v0.1.14
+   Compiling uuid v1.26.1
+   Compiling nohash-hasher v0.2.0
+   Compiling pastey v0.2.3
+   Compiling ryu-js v1.0.3
+   Compiling epaint_default_fonts v0.36.2
+   Compiling self_cell v1.3.0
+   Compiling roxmltree v0.20.0
+   Compiling cow-utils v0.1.3
+   Compiling fast-float2 v0.2.4
+   Compiling boa_string v0.22.0
+   Compiling boa_macros v0.22.0
+   Compiling epaint v0.36.2
+   Compiling accesskit v0.24.1
+   Compiling ecdsa v0.17.0
+   Compiling rten-tensor v0.26.0
+   Compiling icu_properties v2.3.0
+   Compiling glow v0.17.0
+   Compiling primeorder v0.14.0
+   Compiling phf_macros v0.14.0
+   Compiling brotli-decompressor v5.0.3
+   Compiling wgpu-types v30.0.1
+   Compiling flatbuffers v24.12.23
+   Compiling wgpu-hal v30.0.1
+   Compiling ron v0.12.2
+   Compiling phf_shared v0.13.1
+   Compiling base64 v0.22.1
+   Compiling utf16_iter v1.0.5
+   Compiling thin-vec v0.2.20
+   Compiling libc v0.2.189
+   Compiling write16 v1.0.0
+   Compiling heck v0.5.0
+   Compiling strum_macros v0.28.0
+   Compiling icu_normalizer v2.3.0
+   Compiling egui v0.36.2
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling boa_gc v0.22.0
+   Compiling phf v0.14.0
+   Compiling phf_generator v0.13.1
+   Compiling toml_edit v0.25.15+spec-1.1.0
+   Compiling num-integer v0.1.47
+   Compiling chacha20 v0.10.2
+   Compiling encoding_rs v0.8.42
+   Compiling rten-simd v0.26.0
+   Compiling float-cmp v0.9.0
+   Compiling strict-num v0.1.1
+   Compiling rand v0.10.3
+   Compiling num-bigint v0.5.1
+   Compiling proc-macro-crate v3.5.0
+   Compiling phf_macros v0.13.1
+   Compiling boa_interner v0.22.0
+   Compiling strum v0.28.0
+   Compiling brotli v8.0.4
+   Compiling curve25519-dalek v5.0.0
+   Compiling wgpu-core v30.0.1
+   Compiling web-time v1.1.0
+   Compiling read-fonts v0.44.0
+   Compiling event-listener v5.4.2
+   Compiling equator-macro v0.4.2
+   Compiling pin-project-internal v1.1.13
+   Compiling anyhow v1.0.104
+   Compiling arrayref v0.3.9
+   Compiling time-core v0.1.9
+   Compiling num-conv v0.2.2
+   Compiling multiversion_no_op v1.0.0
+   Compiling hayro-postscript v0.1.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/hayro-postscript)
+   Compiling litrs v1.0.0
+   Compiling parking v2.2.1
+   Compiling portable-atomic v1.15.0
+   Compiling futures-io v0.3.34
+   Compiling document-features v0.2.12
+   Compiling futures-lite v2.6.1
+   Compiling hayro-cmap v0.1.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/hayro-cmap)
+   Compiling pin-project v1.1.13
+   Compiling time-macros v0.2.32
+   Compiling tiny-skia-path v0.11.4
+   Compiling equator v0.4.2
+   Compiling event-listener-strategy v0.5.4
+   Compiling phf v0.13.1
+   Compiling boa_ast v0.22.0
+   Compiling num_cpus v1.17.0
+   Compiling wgpu-core-deps-wasm v30.0.1
+   Compiling rten-model-file v0.26.0
+   Compiling skrifa v0.47.0
+   Compiling num_enum_derive v0.7.6
+   Compiling rten-gemm v0.26.0
+   Compiling rten-vecmath v0.26.0
+   Compiling rten-shape-inference v0.26.0
+   Compiling vello_common v0.0.8 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/vello_common)
+   Compiling wgpu v30.0.1
+   Compiling concurrent-queue v2.5.0
+   Compiling wasm-bindgen-futures v0.4.79
+   Compiling regress v0.12.0
+   Compiling cbc v0.2.1
+   Compiling kurbo v0.11.3
+   Compiling dynify-macros v0.1.2
+   Compiling powerfmt v0.2.0
+   Compiling hashbrown v0.14.5
+   Compiling percent-encoding v2.3.2
+   Compiling deranged v0.5.8
+   Compiling fixedbitset v0.5.7
+   Compiling dashmap v6.2.1
+   Compiling futures-concurrency v7.7.1
+   Compiling rten v0.26.0
+   Compiling time v0.3.55
+   Compiling dynify v0.1.2
+   Compiling boa_parser v0.22.0
+   Compiling svgtypes v0.15.3
+   Compiling vello_cpu v0.0.8
+   Compiling async-channel v2.5.0
+   Compiling num_enum v0.7.6
+   Compiling hayro-interpret v0.7.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/hayro-interpret)
+   Compiling aligned-vec v0.6.4
+   Compiling idna_adapter v1.2.2
+   Compiling rten-imageproc v0.26.0
+   Compiling pdfcraft-edit v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/edit)
+   Compiling png v0.17.16
+   Compiling ed25519 v3.0.0
+   Compiling pic-scale v0.7.12
+   Compiling serde_spanned v1.1.1
+   Compiling pdfcraft-forms v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/forms)
+   Compiling crypto-primes v0.7.2
+   Compiling nom v8.0.0
+   Compiling ecb v0.2.1
+   Compiling simplecss v0.2.2
+   Compiling small_btree v0.1.0
+   Compiling keccak v0.2.2
+   Compiling intrusive-collections v0.10.3
+   Compiling weezl v0.2.1
+   Compiling imagesize v0.13.0
+   Compiling xmlwriter v0.1.0
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling tap v1.0.1
+   Compiling pico-args v0.5.0
+   Compiling rangemap v1.8.0
+   Compiling data-url v0.3.2
+   Compiling sponge-cursor v0.1.0
+   Compiling tag_ptr v0.1.0
+   Compiling oneshot v0.2.1
+   Compiling boa_engine v0.22.0
+   Compiling usvg v0.45.1
+   Compiling sha3 v0.12.0
+   Compiling lopdf v0.45.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/lopdf)
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling rsa v0.10.0-rc.18
+   Compiling hayro v0.7.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/hayro)
+   Compiling ed25519-dalek v3.0.0
+   Compiling tiny-skia v0.11.4
+   Compiling idna v1.1.0
+   Compiling ocrs v0.13.1
+   Compiling form_urlencoded v1.2.2
+   Compiling pdfcraft-xfa v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/xfa)
+   Compiling p256 v0.14.0
+   Compiling p384 v0.14.0
+   Compiling p521 v0.14.0
+   Compiling bp384 v0.14.0
+   Compiling bp256 v0.14.0
+   Compiling pbkdf2 v0.13.0
+   Compiling des v0.9.0
+   Compiling rc2 v0.9.0
+   Compiling ripemd v0.2.0
+   Compiling sha1 v0.11.0
+   Compiling type-map v0.5.1
+   Compiling rgb v0.8.53
+   Compiling enum-map-derive v0.17.0
+   Compiling craft-print v0.1.0 (https://github.com/storytold/craft-libs?rev=666c358065261a2816b376fa3bb10538dbf53040#666c3580)
+   Compiling rfd v0.17.2
+   Compiling pdfcraft-print v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/print)
+   Compiling pdfcraft-sign v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/sign)
+   Compiling enum-map v2.7.3
+   Compiling resvg v0.45.1
+   Compiling egui-wgpu v0.36.2 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/vendor/egui-wgpu)
+   Compiling pdfcraft-redact v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/redact)
+   Compiling url v2.5.8
+   Compiling pdfcraft-ocr v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/ocr)
+   Compiling pdfcraft-render v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/render)
+warning: method `byte_capacity` is never used
+  --> crates/render/src/pixels.rs:33:19
+   |
+12 | impl Pixels {
+   | ----------- method in this implementation
+...
+33 |     pub(crate) fn byte_capacity(&self) -> usize {
+   |                   ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `record_request` is never used
+   --> crates/render/src/raster.rs:256:8
+    |
+255 | impl AtomicRenderStats {
+    | ---------------------- method in this implementation
+256 |     fn record_request(&self, req: RenderRequest) {
+    |        ^^^^^^^^^^^^^^
+
+warning: field `stuck` is never read
+   --> crates/render/src/raster.rs:560:5
+    |
+552 | struct Shared {
+    |        ------ field in this struct
+...
+560 |     stuck: Mutex<std::collections::HashSet<RequestFailureKey>>,
+    |     ^^^^^
+
+warning: fields `results_tx`, `bytes`, and `config` are never read
+   --> crates/render/src/raster.rs:734:5
+    |
+730 | pub struct RenderPool {
+    |            ---------- fields in this struct
+...
+734 |     results_tx: Arc<WorkQueue>,
+    |     ^^^^^^^^^^
+735 |     bytes: Arc<Vec<u8>>,
+    |     ^^^^^
+736 |     config: RenderConfig,
+    |     ^^^^^^
+
+   Compiling pdfcraft-ui-egui v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/ui-egui)
+   Compiling pdfcraft-xfdf v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/xfdf)
+   Compiling pdfcraft-audit v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/audit)
+   Compiling pdfcraft-create v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/create)
+   Compiling egui_glow v0.36.2
+   Compiling pdfcraft-preflight v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/preflight)
+   Compiling pdfcraft-measure v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/measure)
+warning: `pdfcraft-render` (lib) generated 4 warnings
+   Compiling pdfcraft-optimize v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/optimize)
+   Compiling pdfcraft-a11y v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/a11y)
+   Compiling pdfcraft-organize v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/organize)
+   Compiling pdfcraft-export v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/export)
+   Compiling pdfcraft-geom v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/geom)
+   Compiling pdfcraft-compare v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/compare)
+   Compiling craft-docpath v0.1.0 (https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b00)
+   Compiling eframe v0.36.2
+   Compiling egui_extras v0.36.2
+   Compiling craft-ui v0.1.0 (https://github.com/storytold/craft-libs?rev=5c874d51eeb3de70e735c8ce87a59a7dedd47675#5c874d51)
+   Compiling craft-quit v0.1.0 (https://github.com/storytold/craft-libs?rev=f58bc1a3df490992d633393d0898af0588ce882c#f58bc1a3)
+   Compiling pdfcraft-platform v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/platform)
+   Compiling craft-platform v0.1.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/integration/craft-platform)
+   Compiling pdfcraft-js v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/js)
+   Compiling pdfcraft-engine v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/crates/engine)
+warning: unused variable: `folder`
+   --> crates/ui-egui/src/files.rs:912:13
+    |
+912 |         let folder = doc.path.clone();
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_folder`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `is_mail_temp_copy` is never used
+    --> crates/ui-egui/src/editing.rs:1290:15
+     |
+1290 | pub(crate) fn is_mail_temp_copy(path: &str) -> bool {
+     |               ^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `save_dialog_folder` is never used
+    --> crates/ui-egui/src/editing.rs:1308:15
+     |
+1308 | pub(crate) fn save_dialog_folder(path: Option<&str>) -> Option<std::path::PathBuf> {
+     |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `in_document_folder` is never used
+    --> crates/ui-egui/src/editing.rs:1315:15
+     |
+1315 | pub(crate) fn in_document_folder(dialog: rfd::AsyncFileDialog, path: Option<&str>) -> rfd::AsyncFileDialog {
+     |               ^^^^^^^^^^^^^^^^^^
+
+warning: variant `Installed` is never constructed
+  --> crates/ui-egui/src/format_text_ui.rs:31:5
+   |
+21 | pub(crate) enum FontChoice {
+   |                 ---------- variant in this enum
+...
+31 |     Installed(std::path::PathBuf),
+   |     ^^^^^^^^^
+   |
+   = note: `FontChoice` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: function `unit_for_tag` is never used
+  --> crates/ui-egui/src/units.rs:71:15
+   |
+71 | pub(crate) fn unit_for_tag(tag: &str) -> Option<Unit> {
+   |               ^^^^^^^^^^^^
+
+warning: variant `Done` is never constructed
+  --> crates/ui-egui/src/updates.rs:55:5
+   |
+50 | pub(crate) enum Check {
+   |                 ----- variant in this enum
+...
+55 |     Done(Result<Release, String>),
+   |     ^^^^
+
+warning: `pdfcraft-ui-egui` (lib) generated 7 warnings (run `cargo fix --lib -p pdfcraft-ui-egui` to apply 1 suggestion)
+   Compiling pdfcraft-web v0.14.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/apps/pdfcraft-web)
+    Finished `release` profile [optimized] target(s) in 13m 04s
+2026-10-27T17:12:44.193040Z DEBUG fetching cargo artifacts
+2026-10-27T17:12:45.328589Z DEBUG get_info: Getting tool app=WasmBindgen version=Some("0.2.129") offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false }
+2026-10-27T17:12:45.329874Z DEBUG get_info:find_system: failed to detect system tool: cannot find binary path app=WasmBindgen version=Some("0.2.129") offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false } app=WasmBindgen
+2026-10-27T17:12:45.332474Z DEBUG get_info: Using wasm-bindgen (0.2.129) from: /home/roddy/.cache/trunk/wasm-bindgen-0.2.129/wasm-bindgen app=WasmBindgen version=Some("0.2.129") offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false }
+2026-10-27T17:12:45.334702Z DEBUG calling wasm-bindgen for pdfcraft-web
+2026-10-27T17:12:45.334712Z DEBUG wasm-bindgen args args=["--target=web", "--out-dir=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/target/wasm-bindgen/release", "--out-name=pdfcraft-web", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/target/wasm32-unknown-unknown/release/pdfcraft-web.wasm", "--no-typescript"]
+2026-10-27T17:12:53.935105Z DEBUG copying generated wasm-bindgen artifacts
+2026-10-27T17:12:53.939010Z DEBUG processing hash for /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/target/wasm-bindgen/release/pdfcraft-web_bg.wasm
+2026-10-27T17:12:53.954856Z DEBUG processing hash for /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/target/wasm-bindgen/release/pdfcraft-web.js
+2026-10-27T17:12:53.954987Z DEBUG copying /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/target/wasm-bindgen/release/pdfcraft-web.js to /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-release/.stage/pdfcraft-web-a521f568ddc50a2e.js
+2026-10-27T17:12:53.955378Z DEBUG copying /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/target/wasm-bindgen/release/pdfcraft-web_bg.wasm to /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-release/.stage/pdfcraft-web-ab7a8668849bc2bd_bg.wasm
+2026-10-27T17:12:54.063954Z DEBUG recording SRI record - type: Sha384. name: pdfcraft-web-a521f568ddc50a2e.js, value: OutputDigest { integrity: Sha384, hash: "fJEpi1Vqg0vJ/CBD4giqtjgrYbJ8OYuq8cJdgcZUh0m4GPHazZc2XV7lgZ75h2qw" }
+2026-10-27T17:12:54.064017Z DEBUG get:get_info: Getting tool app=WasmOpt version=None offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false } app=WasmOpt version=None offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false }
+2026-10-27T17:12:54.065673Z DEBUG get:get_info:find_system: failed to detect system tool: cannot find binary path app=WasmOpt version=None offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false } app=WasmOpt version=None offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false } app=WasmOpt
+2026-10-27T17:12:54.066534Z DEBUG get:get_info: Using wasm-opt (version_131) from: /home/roddy/.cache/trunk/wasm-opt-version_131/bin/wasm-opt app=WasmOpt version=None offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false } app=WasmOpt version=None offline=false client_options=HttpClientOptions { root_certificate: None, accept_invalid_certificates: false }
+2026-10-27T17:12:54.067056Z DEBUG calling wasm-opt
+2026-10-27T17:12:54.067066Z DEBUG wasm-opt args args=["--output=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/target/wasm-opt/release/pdfcraft-web_bg.wasm", "-Oz", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-release/.stage/pdfcraft-web-ab7a8668849bc2bd_bg.wasm"]
+2026-10-27T17:16:44.391643Z DEBUG copying generated wasm-opt artifact from '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/pdfcraft/target/wasm-opt/release/pdfcraft-web_bg.wasm' to '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-release/.stage/pdfcraft-web-ab7a8668849bc2bd_bg.wasm'
+2026-10-27T17:16:44.659706Z DEBUG recording SRI record - type: Sha384. name: pdfcraft-web-ab7a8668849bc2bd_bg.wasm, value: OutputDigest { integrity: Sha384, hash: "SFu2i0YatWLpKmZbc0Mmas5JvMfXIWcwhwXu+e8lTbxgwT/HVlsmzBwEZxmVmJHa" }
+2026-10-27T17:16:44.659740Z DEBUG rust build complete
+2026-10-27T17:16:44.724311Z  INFO applying new distribution
+2026-10-27T17:16:44.724606Z  INFO ✅ success
+exit_code=0
+bundle_files_sha256:
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./.trunk-lock
+64bf8ddb3ca24b0933caefe17c195952a0fd6766bf1fac336ac192bc59f5c75f  ./index.html
+260971c92a1e682e8b96b522cff0cff65e77e7af51951e27e78451de425d8349  ./pdfcraft-web-a521f568ddc50a2e.js
+96a709cdacafa3f4759bfbf2ced7adb35412fc65e07d6a4c69fca87cacceb4b3  ./pdfcraft-web-ab7a8668849bc2bd_bg.wasm

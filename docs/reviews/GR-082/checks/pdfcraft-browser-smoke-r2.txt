@@ -1,0 +1,46 @@
+command=/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_pdfcraft_host_roundtrip.py --candidate /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft --fixture /home/roddy/artcraft-storage-lab/docs/reviews/GR-057/runtime/synthetic.pdf --evidence-dir docs/reviews/GR-082/runtime/pdfcraft
+test_source_before_sha256=a2eabd429cc3104d1b3f1e68fc6dacff6063ce06f85dbdbb0480ee83d7366b37
+served_assets_before_sha256:
+64bf8ddb3ca24b0933caefe17c195952a0fd6766bf1fac336ac192bc59f5c75f  /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft/index.html
+260971c92a1e682e8b96b522cff0cff65e77e7af51951e27e78451de425d8349  /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft/pdfcraft-web-a521f568ddc50a2e.js
+96a709cdacafa3f4759bfbf2ced7adb35412fc65e07d6a4c69fca87cacceb4b3  /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft/pdfcraft-web-ab7a8668849bc2bd_bg.wasm
+127.0.0.1 - - [27/Oct/2026 18:18:36] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:18:36] "GET /index.html?host=parent HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:18:36] "GET /pdfcraft-web-ab7a8668849bc2bd_bg.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:18:36] "GET /pdfcraft-web-a521f568ddc50a2e.js HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:18:37] "GET /synthetic.pdf HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:18:51] "GET /index.html?host=parent&fresh=1793121531252 HTTP/1.1" 200 -
+127.0.0.1 - - [27/Oct/2026 18:18:53] "GET /pdfcraft-web-a521f568ddc50a2e.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Oct/2026 18:18:53] "GET /pdfcraft-web-ab7a8668849bc2bd_bg.wasm HTTP/1.1" 200 -
+{
+  "result": "PASS",
+  "fixture_bytes": 1744,
+  "fixture_sha256": "c6f8b656e225101129aa36bd5467adc8dba16730915f19caca17f6a546d0b040",
+  "saved_bytes": 2403,
+  "saved_sha256": "d2dd3b1ac7565d30dfbffd6c1608e0adf0dc9dcb5add1ed80899b9088bb426ba",
+  "ready_count": 2,
+  "dirty_sequence": [
+    false,
+    true,
+    false,
+    false
+  ],
+  "saves": [
+    {
+      "ticket": "pdfcraft:1",
+      "name": "synthetic.pdf",
+      "length": 2403,
+      "sha256": "d2dd3b1ac7565d30dfbffd6c1608e0adf0dc9dcb5add1ed80899b9088bb426ba"
+    }
+  ],
+  "visible_edit": "GR-082 visible PDF form edit",
+  "fresh_iframe_reopen": true,
+  "console_page_errors": [],
+  "scope": "actual built PdfCraft WASM; synthetic in-memory parent ACK; no Seafile persistence"
+}
+test_exit_code=0
+test_source_after_sha256=a2eabd429cc3104d1b3f1e68fc6dacff6063ce06f85dbdbb0480ee83d7366b37
+served_assets_after_sha256:
+64bf8ddb3ca24b0933caefe17c195952a0fd6766bf1fac336ac192bc59f5c75f  /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft-v0.14.0-static/pdfcraft/index.html
+sha256sum: '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft/*.js': No such file or directory
+sha256sum: '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/pdfcraft/*_bg.wasm': No such file or directory

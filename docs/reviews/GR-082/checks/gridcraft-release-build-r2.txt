@@ -1,0 +1,211 @@
+source_base=f86aec12dabc744b5f75e1033f87bfe685e78481
+source_worktree=patched GR-082 candidate; see exact patch and apply evidence in checks/gridcraft-apply.txt
+patch_sha256=bfe4a5ee134b204242b73356376797f225ecc376889290681a38824a87ffa8f0
+build_command=PATH=/home/roddy/.cargo/bin:/home/roddy/.local/bin:$PATH RUSTUP_TOOLCHAIN=1.95.0 trunk build --release --locked --dist /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/gridcraft-v0.12.1-release
+rustc=rustc 1.95.0 (59807616e 2026-04-14)
+cargo=cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+trunk=trunk 0.22.0
+CARGO_TARGET_DIR=<unset>
+TMPDIR=<unset>
+2026-10-27T16:44:14.554752Z  INFO 🚀 Starting trunk 0.22.0
+2026-10-27T16:44:14.555093Z  INFO 📦 starting build
+2026-10-27T16:44:14.555282Z  INFO ⏫ Found an update of trunk: 0.22.0 -> 0.22.1
+2026-10-27T16:44:14.555486Z  INFO node packages []
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling cfg-if v1.0.5
+   Compiling wasm-bindgen-shared v0.2.129
+   Compiling once_cell v1.21.4
+   Compiling rustversion v1.0.23
+   Compiling libm v0.2.16
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling syn v3.0.6
+   Compiling bumpalo v3.20.3
+   Compiling wasm-bindgen v0.2.129
+   Compiling futures-core v0.3.34
+   Compiling pin-project-lite v0.2.17
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
+   Compiling futures-util v0.3.34
+   Compiling thiserror v2.0.21
+   Compiling log v0.4.34
+   Compiling foldhash v0.2.0
+   Compiling hashbrown v0.17.1
+   Compiling bitflags v2.13.2
+   Compiling version_check v0.9.5
+   Compiling arrayvec v0.7.8
+   Compiling smallvec v1.16.2
+   Compiling syn v2.0.119
+   Compiling cfg_aliases v0.2.2
+   Compiling zerocopy v0.8.61
+   Compiling equivalent v1.0.2
+   Compiling typenum v1.20.1
+   Compiling indexmap v2.14.2
+   Compiling wasm-bindgen-macro-support v0.2.129
+   Compiling hybrid-array v0.4.15
+   Compiling serde_core v1.0.229
+   Compiling parking_lot_core v0.9.12
+   Compiling thiserror-impl v2.0.21
+   Compiling bytemuck_derive v1.12.1
+   Compiling zerocopy-derive v0.8.61
+   Compiling bytemuck v1.25.2
+   Compiling simd-adler32 v0.3.10
+   Compiling memchr v2.8.3
+   Compiling scopeguard v1.2.0
+   Compiling serde v1.0.229
+   Compiling lock_api v0.4.14
+   Compiling serde_derive v1.0.229
+   Compiling crypto-common v0.2.2
+   Compiling wasm-bindgen-macro v0.2.129
+   Compiling crc32fast v1.5.2
+   Compiling parking_lot v0.12.5
+   Compiling polycool v0.4.0
+   Compiling chrono v0.4.45
+   Compiling js-sys v0.3.106
+   Compiling adler2 v2.0.1
+   Compiling rustc-hash v1.1.0
+   Compiling zmij v1.0.23
+   Compiling profiling v1.0.18
+   Compiling naga-types v30.0.1
+   Compiling kurbo v0.13.1
+   Compiling color v0.3.3
+   Compiling font-types v0.12.6
+   Compiling block-buffer v0.12.1
+   Compiling naga v30.0.1
+   Compiling slotmap v1.1.1
+   Compiling euclid v0.22.14
+   Compiling unicode-width v0.2.2
+   Compiling raw-window-handle v0.6.2
+   Compiling bit-vec v0.9.1
+   Compiling linebender_resource_handle v0.1.1
+   Compiling peniko v0.6.1
+   Compiling bit-set v0.10.0
+   Compiling guillotiere v0.7.0
+   Compiling codespan-reporting v0.13.1
+   Compiling digest v0.11.3
+   Compiling read-fonts v0.41.0
+   Compiling half v2.7.1
+   Compiling miniz_oxide v0.9.1
+   Compiling ahash v0.8.12
+   Compiling static_assertions v1.1.0
+   Compiling zlib-rs v0.6.8
+   Compiling fearless_simd v0.4.1
+   Compiling unicode-general-category v1.1.0
+   Compiling serde_json v1.0.151
+   Compiling flate2 v1.1.10
+   Compiling vello_common v0.1.0
+   Compiling web-sys v0.3.106
+   Compiling gridcraft-core v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/core)
+   Compiling aho-corasick v1.1.5
+   Compiling emath v0.36.2
+   Compiling wgpu-hal v30.0.1
+   Compiling regex-syntax v0.8.11
+   Compiling regex-automata v0.4.18
+   Compiling ecolor v0.36.2
+   Compiling gridcraft-formula v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/formula)
+   Compiling skrifa v0.44.0
+   Compiling harfrust v0.12.0
+   Compiling vello_cpu v0.1.0
+   Compiling sha2 v0.11.0
+   Compiling uuid v1.27.0
+   Compiling self_cell v1.3.0
+   Compiling nohash-hasher v0.2.0
+   Compiling unicode-segmentation v1.13.3
+   Compiling epaint_default_fonts v0.36.2
+   Compiling either v1.19.0
+   Compiling itertools v0.15.0
+   Compiling gridcraft-model v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/model)
+   Compiling epaint v0.36.2
+   Compiling wgpu-types v30.0.1
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling glow v0.17.0
+   Compiling accesskit v0.24.1
+   Compiling regex v1.13.1
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling inout v0.2.2
+   Compiling wgpu-core v30.0.1
+   Compiling pxfm v0.1.30
+   Compiling zune-core v0.5.3
+   Compiling winnow v1.0.4
+   Compiling litrs v1.0.0
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling document-features v0.2.12
+   Compiling wgpu-core-deps-wasm v30.0.1
+   Compiling zune-jpeg v0.5.15
+   Compiling zopfli v0.8.3
+   Compiling cipher v0.5.2
+   Compiling png v0.18.1
+   Compiling moxcms v0.8.1
+   Compiling egui v0.36.2
+   Compiling gridcraft-functions v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/functions)
+   Compiling gridcraft-numfmt v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/numfmt)
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling wasm-bindgen-futures v0.4.79
+   Compiling wgpu v30.0.1
+   Compiling itoa v1.0.18
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling cpubits v0.1.1
+   Compiling byteorder-lite v0.1.0
+   Compiling image v0.25.10
+   Compiling aes v0.9.3
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling gridcraft-calc v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/calc)
+   Compiling zip v3.0.0
+   Compiling sha1 v0.11.0
+   Compiling quick-xml v0.41.0
+   Compiling rustc-hash v2.1.3
+   Compiling gridcraft-xlsx v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/xlsx)
+   Compiling type-map v0.5.1
+   Compiling gridcraft-chart v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/chart)
+   Compiling gridcraft-ui-egui v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/ui-egui)
+   Compiling web-time v1.1.0
+   Compiling rfd v0.17.2
+   Compiling gridcraft-pdf v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/pdf)
+   Compiling gridcraft-engine v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/crates/engine)
+warning: constant `MAX_READ_BYTES` is never used
+   --> crates/engine/src/io.rs:609:7
+    |
+609 | const MAX_READ_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+    |       ^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling craft-ui v0.1.0 (https://github.com/storytold/craft-libs?rev=d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d#d27646a5)
+   Compiling egui-wgpu v0.36.2
+   Compiling percent-encoding v2.3.2
+   Compiling eframe v0.36.2
+   Compiling craft-platform v0.1.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/integration/craft-platform)
+warning: variants `At` and `Unknown` are never constructed
+   --> crates/ui-egui/src/backstage.rs:424:5
+    |
+422 | enum Modified {
+    |      -------- variants in this enum
+423 |     /// When it was last changed, in seconds since 1970.
+424 |     At(f64),
+    |     ^^
+425 |     /// It can't be reached: moved, deleted, or on a drive that is away.
+426 |     Unknown,
+    |     ^^^^^^^
+    |
+    = note: `Modified` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `gridcraft-engine` (lib) generated 1 warning
+warning: `gridcraft-ui-egui` (lib) generated 1 warning
+   Compiling gridcraft-web v0.12.1 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/gridcraft/apps/gridcraft-web)
+    Finished `release` profile [optimized] target(s) in 6m 16s
+2026-10-27T16:50:38.576734Z  INFO downloading wasm-opt version="version_131"
+2026-10-27T16:50:40.716543Z  INFO installing wasm-opt
+2026-10-27T16:52:52.645282Z  INFO applying new distribution
+2026-10-27T16:52:52.645777Z  INFO ✅ success
+exit_code=0
+bundle_files_sha256:
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./.trunk-lock
+f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07  ./gridcraft-45f84b7721cb79a9.ico
+767e2eb27b3d851af70c10705d5d7f9322ab8732d365fb79c26a049528e76ef5  ./gridcraft-web-4f5e302a4f88f942.js
+102fe5b8310a985ac70d537447a27d3a870cfe9d04df6139c856a4f2f18d79fc  ./gridcraft-web-d156c0a0028701fb_bg.wasm
+733f5111e5dfec2d00358823639ab5e80b543d6c195714397df8b9876c2eb260  ./index.html

@@ -4,8 +4,10 @@ Source: `https://github.com/storytold/pdfcraft.git`, official `v0.14.0`, HEAD
 `5a78b223871add8e3883856205cc653d741e0e94` (Release 0.14.0, 2026-10-25).
 Source clone was clean initially; HEAD/tag/origin remain unchanged. No commit,
 dispatch, deployment, upstream publication, Seafile or ONLYOFFICE access performed.
-Only six source-clone files changed; output is `pdfcraft.patch` beside this report.
-No independent review or GPT verdict is claimed.
+Seven non-vendored source/manifest paths changed; the patch also packages the
+shared transport snapshot under `integration/craft-platform`. Independent
+release-evidence R1/R2 are recorded in the GR-082 review bundle; no project GPT
+verdict is claimed.
 
 ## Port and provenance
 
@@ -98,14 +100,46 @@ started. Final exact output:
 The initial attempts hit cold dependency builds and shared-build lock contention.
 The final bounded native ACK test and broader UI editing regression group were
 rerun after dependencies were cached; their exact results are retained in the
-GR-082 evidence bundle. Clippy and browser/runtime checks were not run.
+GR-082 evidence bundle. Clippy was not run. At initial handoff, release-bundle
+and browser checks were outstanding; the follow-up qualification below records
+their results.
 
 After switching to the included local transport snapshot, the locked WASM check
-was rerun with `PATH=/home/roddy/.rustup/toolchains/1.95.0-x86_64-unknown-linux-gnu/bin:$PATH cargo check --locked --target wasm32-unknown-unknown -j 1 -p pdfcraft-web` and exited **0** in 8m10s. Exact release patch apply check and the local transport `SHA256SUMS` check also exited 0. The UI `editing::` regression group passes **30/30** (`checks/pdfcraft-editing-regressions.txt`); it includes the 8 host ACK tests retained separately in `checks/pdfcraft-native-host-ack.txt`, so these are 30 total tests, not 38. Broader system/browser behavior remains unverified.
+was rerun with `PATH=/home/roddy/.rustup/toolchains/1.95.0-x86_64-unknown-linux-gnu/bin:$PATH cargo check --locked --target wasm32-unknown-unknown -j 1 -p pdfcraft-web` and exited **0** in 8m10s. Exact release patch apply check and the local transport `SHA256SUMS` check also exited 0. The UI `editing::` regression group passes **30/30** (`checks/pdfcraft-editing-regressions.txt`); it includes the 8 host ACK tests retained separately in `checks/pdfcraft-native-host-ack.txt`, so these are 30 total tests, not 38. At initial handoff Seafile and release-browser checks were outstanding; the release-browser result is now recorded below, while Seafile remains NOT VERIFIED.
 
 Final patch SHA-256:
 `90a596e2b54d32f859cd01ea26525667d3cce4f6eef97656455a7a717792d6d7`.
 
 The bounded native tests and `editing::` UI regression group have recorded
-passes, but independent review and a real browser storage roundtrip remain
-outstanding; this handoff must not be counted as a GR-057/MVP PASS.
+passes. Independent release-evidence R2 is PROVISIONAL PASS; the Seafile
+durable-version/readback/fresh-reopen workflow remains outstanding. This
+handoff must not be counted as a
+GR-057/MVP PASS.
+
+## Release bundle and browser follow-up
+
+The exact v0.14.0 patched checkout was built with Rust 1.95.0 and Trunk 0.22.0
+using `trunk build --release --locked`; the retained verbose log records
+`wasm-opt` version 131 and its exact `-Oz` invocation. The build completed with
+exit 0. Bundle bytes and their hashes are in
+`../checks/pdfcraft-bundle-manifest.json`; the actual served copy was hashed
+before and after the final browser run.
+
+The R1 smoke attempt opened the 655-byte upstream fixture, which has no editable
+field at the scripted location; it failed before any save. R2/R3 used the
+existing 1,744-byte synthetic form fixture from GR-057 runtime evidence. R3
+passed against the exact served bundle: the visible form value was edited,
+PdfCraft emitted ticket `pdfcraft:1`, the in-memory parent stored 2,403 bytes
+and ACKed, and a fresh iframe reopened the saved bytes. The retained reopen
+capture visibly shows `GR-082 visible PDF form edit`; the browser reported no
+page errors. R4 repeats the workflow and automatically checks that marker in
+the fresh-editor screenshot using Tesseract 5.5.3. R4 records the final test
+source SHA-256 and all three actual served asset hashes before and after. See
+`../checks/pdfcraft-browser-smoke-r4.txt`,
+`../runtime/pdfcraft/browser-evidence.json`, and the three PNGs in that folder.
+
+This is actual release WASM in a synthetic in-memory host. It is **not Seafile**
+version/history/readback evidence, does not establish identity binding, and
+does not exercise replacement/Save As refusal counts. The legacy ticket
+protocol remains in use. Independent release-evidence R2 is PROVISIONAL PASS;
+this is not project GPT approval.

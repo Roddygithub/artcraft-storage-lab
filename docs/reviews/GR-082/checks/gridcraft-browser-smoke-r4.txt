@@ -1,0 +1,18 @@
+command=/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv run --offline --with playwright --python 3.14 -- python -u tests/test_gridcraft_host_roundtrip.py --static-root /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/gridcraft-v0.12.1-static
+test_source_before_sha256=fcdec05456b6203f4220bff50ca61b680b240944ee3ff09ddbcc5dcdb1d5277c
+served_assets_before_sha256:
+733f5111e5dfec2d00358823639ab5e80b543d6c195714397df8b9876c2eb260  index.html
+f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07  gridcraft-45f84b7721cb79a9.ico
+767e2eb27b3d851af70c10705d5d7f9322ab8732d365fb79c26a049528e76ef5  gridcraft-web-4f5e302a4f88f942.js
+102fe5b8310a985ac70d537447a27d3a870cfe9d04df6139c856a4f2f18d79fc  gridcraft-web-d156c0a0028701fb_bg.wasm
+PASS: actual GridCraft Web edit serialized the synthetic workbook
+PASS: one in-memory new version committed and durable ACK marked the editor clean
+PASS: a fresh GridCraft session reopened the saved workbook
+NOTE: synthetic in-memory storage; Seafile E2E and refused-action serializer counts remain unverified
+exit_code=0
+test_source_after_sha256=fcdec05456b6203f4220bff50ca61b680b240944ee3ff09ddbcc5dcdb1d5277c
+served_assets_after_sha256:
+733f5111e5dfec2d00358823639ab5e80b543d6c195714397df8b9876c2eb260  index.html
+f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07  gridcraft-45f84b7721cb79a9.ico
+767e2eb27b3d851af70c10705d5d7f9322ab8732d365fb79c26a049528e76ef5  gridcraft-web-4f5e302a4f88f942.js
+102fe5b8310a985ac70d537447a27d3a870cfe9d04df6139c856a4f2f18d79fc  gridcraft-web-d156c0a0028701fb_bg.wasm

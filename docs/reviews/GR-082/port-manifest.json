@@ -39,8 +39,13 @@
         "engine": "3 passed",
         "ui": "2 passed"
       },
-      "browser_seafile_e2e": "NOT VERIFIED",
-      "independent_review": "R3 bounded PROVISIONAL PASS"
+      "browser_seafile_e2e": "actual-WASM synthetic memory-host edit/save/new-version/ACK/fresh-reopen PASS; Seafile NOT VERIFIED",
+      "independent_review": "App-port R3 and release evidence R2 bounded PROVISIONAL PASS; release evidence R1 LOW wording finding closed",
+      "release_build": "PASS; checks/gridcraft-bundle-manifest.json; Trunk wasm-opt version 131 enabled by data-wasm-opt=\"z\"",
+      "memory_host_browser_smoke": "PASS; checks/gridcraft-browser-smoke-r4.txt; active cell saved through Ctrl+S",
+      "browser_smoke_final_evidence": "checks/gridcraft-browser-smoke-r4.txt",
+      "browser_smoke_test_source_sha256": "fcdec05456b6203f4220bff50ca61b680b240944ee3ff09ddbcc5dcdb1d5277c",
+      "browser_smoke_asset_hashes_bound": "4/4 actual served assets hashed before and after; unchanged and match bundle manifest"
     },
     {
       "app": "PdfCraft",
@@ -54,9 +59,14 @@
         "editing_group": "30 passed (includes the 8 ACK tests)"
       },
       "full_upstream_suite": "NOT RUN; targeted editing:: group passes 30",
-      "browser_seafile_e2e": "NOT VERIFIED",
+      "release_build": "PASS; checks/pdfcraft-bundle-manifest.json; Rust 1.95, Trunk 0.22, wasm-opt version 131 with -Oz",
+      "memory_host_browser_smoke": "R4 PASS; actual release WASM, synthetic in-memory edit/save/ticket ACK/fresh-iframe reopen; Tesseract assertion detects the edited form value in the fresh-editor screenshot",
+      "browser_smoke_final_evidence": "checks/pdfcraft-browser-smoke-r4.txt",
+      "browser_smoke_test_source_sha256": "2f93317a1f55f8f546fe10100228fb3e66b61950929110b1b187699eb39a697e",
+      "browser_smoke_asset_hashes_bound": "3/3 actual served assets hashed before and after R4; unchanged and match bundle manifest",
+      "browser_seafile_e2e": "synthetic memory-host PASS; Seafile NOT VERIFIED",
       "protocol": "legacy ticket ACK; not identity-aware",
-      "independent_review": "R3 bounded PROVISIONAL PASS"
+      "independent_review": "PdfCraft release evidence R1 LOW findings closed by R4; R2 bounded PROVISIONAL PASS"
     },
     {
       "app": "PhotoCraft",
