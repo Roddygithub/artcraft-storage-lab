@@ -9,6 +9,9 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 
 ## GR-082 — upstream refresh and automatic release tracking
 
+Wave 1 is paused on 2026-10-28 for physical transport of the laptop and
+Proxmox server. Rows below report retained evidence; no route is promoted.
+
 | Scenario | Expected | Result |
 |---|---|---|
 | Official release references | Resolve exact tags/commits and compare with qualified bases | [~] All five pins and ahead/behind counts were independently verified through official API compare results; first retained scanner run resolved WordCraft/GridCraft, then hit API rate limits on PdfCraft/VectorCraft/PhotoCraft (`unknown`). Its two retained null `merge_base` values predate the parser fix and provide no merge-base evidence |

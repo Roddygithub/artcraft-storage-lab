@@ -1,5 +1,10 @@
 ## GR-082 — ArtCraft upstream refresh, active-dispatch wave 1
 
+**PAUSED 2026-10-28 for physical transport.** The weekly task is disabled;
+see `docs/reviews/GR-082/scheduler-pause-20261028.json`. All listed app results
+remain bounded synthetic memory-host qualification; Seafile acceptance remains
+NOT VERIFIED.
+
 Separate candidate branch `upstream-refresh/wave-1`, based on committed
 `62d8845`; current GR-081 work and the active dispatcher remain unchanged. The
 five official release commits and ahead/behind distances are pinned in
@@ -7,7 +12,8 @@ five official release commits and ahead/behind distances are pinned in
 errors, 429, all 5xx, and rate-limit 403 responses with bounded backoff; eight
 unit tests pass. Candidate records are keyed by app + full release SHA, so
 previous and unfinished candidates remain resumable. The weekly maintainer task
-is configured; unattended execution is NOT VERIFIED. Monitor R5 returned
+is configured but currently paused/disabled; unattended execution is NOT
+VERIFIED. Monitor R5 returned
 bounded PROVISIONAL PASS with two LOW evidence findings, now addressed in the
 response. The first retained scan completed two apps
 and hit GitHub's unauthenticated API rate limit on the other three; all five

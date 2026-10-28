@@ -1,3 +1,17 @@
+# 2026-10-28 — GR-082 paused for transport
+
+- At the user's request, disabled the weekly GR-082 task before transporting
+  the laptop and Proxmox server. The task now has no next run; retained state is
+  in `docs/reviews/GR-082/scheduler-pause-20261028.json`.
+- Stopped Proxmox node `pve01` with `shutdown -h now`; a subsequent SSH check
+  timed out and the local 18000/18082 forwarding ports closed. The node is
+  unreachable for transport; its running containers, including Seafile, are
+  expected to have stopped as part of the host shutdown. Hardware power-off was
+  not independently observed.
+- GR-082 remains paused and incomplete. Seafile durable qualification,
+  production acceptance, ONLYOFFICE preservation, and project GPT review
+  remain **NOT VERIFIED**.
+
 # 2026-10-28 — GR-082 PhotoCraft and VectorCraft release smokes
 
 - Built the exact PhotoCraft v0.16.0 optimized release bundle. Final-tree

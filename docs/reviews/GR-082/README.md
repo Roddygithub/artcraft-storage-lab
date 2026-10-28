@@ -18,19 +18,21 @@ and ahead/behind counts from each qualified source pin. The scanner never
 changes source or pins. Transient network, rate-limit and server errors receive
 at most two retries after the first request, with bounded exponential backoff
 and `Retry-After` handling. A remaining `unknown` is an incomplete scan, never
-a no-drift result. The weekly T3 task records scans, retries unknown apps on a
-later run, resumes unfinished work before stopping, and deduplicates candidates
+a no-drift result. When enabled, the weekly T3 task records scans, retries
+unknown apps on a later run, resumes unfinished work before stopping, and deduplicates candidates
 by app plus full release commit SHA using
 [`release-candidate-state.json`](release-candidate-state.json). Each candidate
 must pass the full app gates in the GR-082 report. Automation must never
 promote the active dispatcher, deploy to Seafile, touch ONLYOFFICE, or publish
 to upstream `storytold/*` before the repository's GPT review gate.
 
-The recurring task is enabled/configured as
+The recurring task was configured as
 `scheduled-task:c297cae8-a56e-47a5-844c-bf52626b672a`, bound to this project
-thread and scheduled every 7 days. Its next run is 2026-11-03 09:17:46 UTC; it
-is configured to resume this in-progress wave before opening any new release
-candidate. The scheduler currently reports `lastRunStatus: never`; unattended
+thread and scheduled every 7 days. At the user's request to pause during
+physical transport, it was disabled on 2026-10-28; `nextRunAt` is now null and
+`lastRunStatus` remains `never`. The 2026-10-27 enabled configuration is
+historical evidence. The disabled-state confirmation is retained in
+[`scheduler-pause-20261028.json`](scheduler-pause-20261028.json). Unattended
 execution remains **NOT VERIFIED**.
 The full live prompt and update response are retained in
 [`scheduler-prompt-20261027.md`](scheduler-prompt-20261027.md) and

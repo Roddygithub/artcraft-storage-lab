@@ -2,8 +2,9 @@
 
 ## PARALLEL GR: GR-082 — ArtCraft upstream refresh, wave 1
 
-GR-082 is in progress on the separate `upstream-refresh/wave-1` branch and
-worktree, based on committed `62d8845`. It targets only the five currently
+GR-082 is paused on 2026-10-28 for physical transport of the laptop and
+Proxmox server. Its candidate is on `upstream-refresh/wave-1`, based on
+committed `62d8845`. It targets only the five currently
 dispatched apps and does not change the GR-081 candidate or active dispatcher.
 Official release refs are WordCraft v0.11.0 `e31f2f0` (293 ahead), GridCraft
 v0.12.1 `f86aec1` (175), PdfCraft v0.14.0 `5a78b22` (535), VectorCraft
@@ -34,8 +35,9 @@ R1–R3 returned bounded PROVISIONAL PASS after two R1 and one R2 LOW
 documentation findings were corrected. Final snapshot R4's duplicate-row LOW
 finding was corrected; R5 returned bounded PROVISIONAL PASS. Ctrl+S/menu-export dirty behavior,
 native host ACK, and Seafile remain NOT VERIFIED. No Seafile browser acceptance, route promotion
-or deployment is claimed. The weekly stable-release task resumes this wave before scanning for
-new candidates. The scanner retries transient errors, and the ledger preserves
+or deployment is claimed. The weekly stable-release task is paused and disabled
+until the laptop and server are transported and the project resumes. When
+re-enabled, the scanner retries transient errors, and the ledger preserves
 each app/SHA candidate while separate pointers track current candidates. Eight
 monitor tests pass. The complete live prompt and scheduler update response are
 retained. Monitor R5 returned bounded PROVISIONAL PASS with two LOW evidence

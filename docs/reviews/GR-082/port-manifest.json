@@ -1,6 +1,6 @@
 {
   "work_item": "GR-082 Wave 1 app ports",
-  "status": "IN_PROGRESS",
+  "status": "PAUSED",
   "base_lab_commit": "62d8845dc6e8512c44e8deb3bba0143051a70730",
   "transport_snapshot": {
     "commit": "d572f2d550278a7f4aad91a1bac650105c19812b",

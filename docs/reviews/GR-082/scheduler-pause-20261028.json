@@ -1,0 +1,13 @@
+{
+  "scheduled_task_id": "scheduled-task:c297cae8-a56e-47a5-844c-bf52626b672a",
+  "title": "Weekly ArtCraft upstream refresh",
+  "updated_at": "2026-10-28T08:02:52Z",
+  "enabled": false,
+  "schedule": {
+    "type": "interval",
+    "every_ms": 604800000
+  },
+  "next_run_at": null,
+  "last_run_status": "never",
+  "reason": "User requested pausing the project for physical transport of the laptop and Proxmox server."
+}

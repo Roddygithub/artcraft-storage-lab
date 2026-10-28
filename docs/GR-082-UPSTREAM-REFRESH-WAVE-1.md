@@ -1,6 +1,7 @@
 # GR-082 — ArtCraft upstream refresh, active dispatcher wave
 
-Date: 2026-10-27. Status: **IN PROGRESS**. This work is isolated on branch
+Started 2026-10-27. Status: **PAUSED 2026-10-28** for physical transport.
+This work is isolated on branch
 `upstream-refresh/wave-1`, based on committed candidate `62d8845` in a separate
 worktree. It does not change the current GR-081 candidate or its uncommitted
 closeout evidence.
@@ -116,8 +117,12 @@ all five apps with exit 0 and retained valid `merge_base_commit` values; it
 found no release change. See
 [`upstream-scan-20261027T160651Z.json`](reviews/GR-082/upstream-scan-20261027T160651Z.json).
 
-A weekly T3 maintainer is configured (7-day interval; next run 2026-11-03
-09:17:46 UTC). Its live prompt resumes incomplete work without a manual
+A weekly T3 maintainer was configured with a 7-day interval (next run would
+have been 2026-11-03 09:17:46 UTC). The user requested a project pause for
+transport, so the task was disabled on 2026-10-28; `nextRunAt` is null. The
+disabled state is retained in
+[`docs/reviews/GR-082/scheduler-pause-20261028.json`](reviews/GR-082/scheduler-pause-20261028.json).
+When re-enabled, its live prompt resumes incomplete work without a manual
 trigger, treats unknown scans as incomplete, and deduplicates candidates by
 app and full release SHA. It starts separate `upstream-refresh/` candidates
 when later release drift appears. After candidate checks and independent review
@@ -125,8 +130,9 @@ it may commit and push that reviewable branch to this project's origin; it does
 not open a PR or merge. It must not promote routes, alter Seafile or ONLYOFFICE,
 push to ArtCraft upstream repositories, open upstream issues/PRs/RFCs, or skip app tests,
 browser checks, synthetic Seafile version/readback/reopen, and independent
-review. If a gate cannot run, the task must mark it **NOT VERIFIED**. The task
-is enabled but has not yet run unattended; execution remains **NOT VERIFIED**.
+review. If a gate cannot run, the task must mark it **NOT VERIFIED**. It had
+not run unattended before the pause; unattended execution remains
+**NOT VERIFIED**.
 The complete live prompt and update response are retained in
 [`scheduler-prompt-20261027.md`](reviews/GR-082/scheduler-prompt-20261027.md)
 and
