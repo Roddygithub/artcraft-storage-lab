@@ -1,0 +1,23 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/apps/vectorcraft-web
+command=["trunk", "build", "--release", "--locked", "--dist", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/vectorcraft-v0.17.0-static/vectorcraft"]
+2026-10-27T18:05:42.002541Z  INFO 🚀 Starting trunk 0.22.0
+2026-10-27T18:05:42.002976Z  INFO 📦 starting build
+2026-10-27T18:05:42.003269Z  INFO node packages []
+2026-10-27T18:05:42.003719Z  INFO ⏫ Found an update of trunk: 0.22.0 -> 0.22.1
+warning: vectorcraft-text@0.17.0: web build won't fetch: Cairo Regular, Tajawal ExtraLight, Tajawal Light, Tajawal Regular, Tajawal Medium, Tajawal Bold, Tajawal ExtraBold, Tajawal Black, Almarai Light, Almarai Regular, Almarai Bold, Almarai ExtraBold, IBM Plex Sans Arabic Thin, IBM Plex Sans Arabic ExtraLight, IBM Plex Sans Arabic Light, IBM Plex Sans Arabic Regular, IBM Plex Sans Arabic Medium, IBM Plex Sans Arabic SemiBold, IBM Plex Sans Arabic Bold, Noto Kufi Arabic Regular, Amiri Regular, Amiri Italic, Amiri Bold, Amiri Bold Italic, Alexandria Regular, Fustat Regular, Reem Kufi Regular, Aref Ruqaa Regular, Aref Ruqaa Bold, Gulzar Regular not in CRAFT_FONTS_DIR=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft-craft-fonts (an older craft-fonts?)
+    Finished `release` profile [optimized] target(s) in 0.46s
+2026-10-27T18:21:20.418682Z  INFO spawned hook cargo command_arguments=["xtask", "web-fonts"]
+2026-10-27T18:21:20.418827Z  INFO spawning hook stage=PostBuild command=cargo
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling xtask v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/xtask)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 16.44s
+     Running `/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/target/debug/xtask web-fonts`
+warning: web build won't fetch Cairo Regular, Tajawal ExtraLight, Tajawal Light, Tajawal Regular, Tajawal Medium, Tajawal Bold, Tajawal ExtraBold, Tajawal Black, Almarai Light, Almarai Regular, Almarai Bold, Almarai ExtraBold, IBM Plex Sans Arabic Thin, IBM Plex Sans Arabic ExtraLight, IBM Plex Sans Arabic Light, IBM Plex Sans Arabic Regular, IBM Plex Sans Arabic Medium, IBM Plex Sans Arabic SemiBold, IBM Plex Sans Arabic Bold, Noto Kufi Arabic Regular, Amiri Regular, Amiri Italic, Amiri Bold, Amiri Bold Italic, Alexandria Regular, Fustat Regular, Reem Kufi Regular, Aref Ruqaa Regular, Aref Ruqaa Bold, Gulzar Regular (not in CRAFT_FONTS_DIR=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft-craft-fonts; an older craft-fonts?)
+web-fonts: copied 3 font(s) into /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/vectorcraft-v0.17.0-static/vectorcraft/.stage/fonts
+2026-10-27T18:21:37.004642Z  INFO finished hook cargo
+2026-10-27T18:21:37.004935Z  INFO applying new distribution
+2026-10-27T18:21:37.007830Z  INFO ✅ success
+
+exit=0
+elapsed_seconds=955.108

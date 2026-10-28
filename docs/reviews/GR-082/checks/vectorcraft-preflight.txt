@@ -1,0 +1,19 @@
+Implementation lane base: b538b6032ef50e013fdea67365cb626666678ad0
+Working directory: /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1
+Initial git status --short: empty; git rev-parse HEAD: base above; exit 0.
+Source git status --short: empty; git rev-parse HEAD: 43313f9451de7ab5b909801006b8881458f2bf04; exit 0.
+Read config/opencode/agents/artcraft-worker.md, GR-058 candidate test/build/inventory verifier, GR-063 report, current GR-082 VectorCraft report, source release workflow/fonts/build/page API and retained gateway. No source or gateway changes.
+
+Preflight command failures (not release-build failures):
+- rustup toolchain list through mise shim -> exit 1, "mise ERROR No version is set for shim: rustup". Resolved with PATH=/home/roddy/.cargo/bin:/home/roddy/.local/bin:$PATH and RUSTUP_TOOLCHAIN=1.95.0; exact tool versions in separate logs.
+- python3 -c 'import playwright; print(playwright.__file__)' -> exit 1, ModuleNotFoundError: No module named 'playwright'. Reuse existing offline uv Playwright environment for the documented repository workflow.
+- first python3 -u docs/reviews/GR-082/runtime/vectorcraft/run_qualification.py -> exit 1 before any subprocess: FileNotFoundError for .../upstream-refresh-wave-1/docs/docs/reviews/GR-082/checks/vectorcraft-fonts-clone.txt. Corrected ROOT parents[4] to parents[5], reran. No build or source change occurred in this failed invocation.
+- cat /home/roddy/.cargo/config.toml and /home/roddy/.config/cargo/config.toml -> exit 1, no such file. No configuration written. CARGO_TARGET_DIR and TMPDIR unset; live rustc --out-dir confirmed .../upstream-refresh-sources/vectorcraft/target/{release,wasm32-unknown-unknown/release}/deps on persistent /home (never /tmp).
+- source root rust-toolchain* search -> no match; Cargo.toml rust-version = "1.95". trunk --version -> trunk 0.22.0, exit 0.
+
+python3 -m py_compile tests/test_vectorcraft_gr082_release.py docs/reviews/GR-082/runtime/vectorcraft/run_qualification.py docs/reviews/GR-082/runtime/vectorcraft/run_smoke.py -> exit 0.
+All qualification subprocess argv/cwd, full combined output, exit and elapsed time are recorded by run_qualification.run in checks/vectorcraft-*.txt. Inspection-only rg/cat/find/ls/tail/ps/du/df commands are not qualification tests.
+
+Final checks: python3 -m py_compile app test and all four runtime runners/verifier -> exit 0 (vectorcraft-syntax.txt); git diff --check scoped to VectorCraft paths -> exit 0 (vectorcraft-diff-check.txt); git status --porcelain in source after smoke -> exit 0, empty (vectorcraft-source-after-smoke.txt); git branch --show-current -> upstream-refresh/wave-1, exit 0 (vectorcraft-worktree-branch.txt).
+Source provenance command: git archive --format=tar 43313f9451de7ab5b909801006b8881458f2bf04 -> exit 0, 11626df083757654ba4b762084d4007031f24833470d88bdef517c8b05499361; git ls-files -z -> exit 0, tracked-file hashes in vectorcraft-source-manifest.json. SHA-256 tool/font-input calculation by Python hashlib -> exit 0, vectorcraft-build-inputs.json.
+sha256sum -c docs/reviews/GR-082/checks/vectorcraft-SHA256SUMS -> exit 0, all 39 listed files OK. Exact 40-file lane inventory includes the checksum file itself; SHA256SUMS deliberately excludes itself.

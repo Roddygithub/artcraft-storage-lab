@@ -1,0 +1,5 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft
+command=["git", "status", "--porcelain"]
+
+exit=0
+elapsed_seconds=0.066

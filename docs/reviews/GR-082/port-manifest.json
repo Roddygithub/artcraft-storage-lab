@@ -80,12 +80,17 @@
       "focused_host_tests": {
         "standalone_confirmation": "1 passed against final local-path tree",
         "engine_snapshot": "NOT VERIFIED; cancelled during cold compilation (exit 143)",
-        "ui_host": "NOT VERIFIED; cancelled waiting for Cargo locks (exit 143)",
-        "web_host": "NOT VERIFIED; cancelled waiting for Cargo locks (exit 143)",
+        "ui_host": "8 passed (final-tree targeted host tests)",
+        "web_host": "6 passed (final-tree targeted host tests)",
         "prior_19_test_result": "historical; before local-path packaging change, not final-tree qualification"
       },
-      "browser_seafile_e2e": "NOT VERIFIED",
-      "independent_review": "R3 bounded PROVISIONAL PASS"
+      "browser_seafile_e2e": "memory-host PASS; Seafile version/history/readback/reopen NOT VERIFIED",
+      "independent_review": "Source-port R3 and release-smoke R1-R3 bounded PROVISIONAL PASS; final snapshot R4 LOW matrix finding corrected; R5 bounded PROVISIONAL PASS",
+      "release_build": "PASS; checks/photocraft-qualification-release.txt; optimized wasm-release; four-file hash inventory checks/photocraft-bundle-final.sha256",
+      "memory_host_browser_smoke": "PASS; actual v0.16.0 release WASM, UI layer/stroke, Ctrl+S, ticketed ACK, fresh iframe reopen; no download",
+      "browser_smoke_final_evidence": "checks/photocraft-qualification-browser-smoke-final.txt; runtime/photocraft/browser-evidence.json",
+      "browser_smoke_test_source_sha256": "77bab154891e7326c0b4139c7c677cf3498dc15e53c8da6f286f769b814f13dd",
+      "browser_smoke_asset_hashes_bound": "All 4 bundle files hashed before/after; served index/JS/WASM match inventory; optional fonts/manifest.txt returned expected 404"
     },
     {
       "app": "VectorCraft",
@@ -94,8 +99,14 @@
       "patch": null,
       "source_port_assessment": "No adapter source port identified",
       "locked_wasm_check": "PASS; Rust 1.95, exact v0.17.0 base",
-      "browser_seafile_e2e": "NOT VERIFIED",
-      "report": "ports/vectorcraft-v0.17.0.md"
+      "browser_seafile_e2e": "memory-host PASS; Seafile NOT VERIFIED",
+      "report": "ports/vectorcraft-v0.17.0.md",
+      "release_build": "PASS; checks/vectorcraft-release-build-r2.txt; Rust 1.95, Trunk 0.22, pinned fonts",
+      "memory_host_browser_smoke": "R2 PASS; actual v0.17.0 WASM/page API, capture/save/version/fresh-browser reopen; synthetic memory storage",
+      "browser_smoke_final_evidence": "checks/vectorcraft-browser-smoke-r2.txt; runtime/vectorcraft/browser-evidence.json",
+      "browser_smoke_test_source_sha256": "7e3d5f65327fd0ed8934aba89059733cbf2ec949023c4634fcfee6f3e3eea083",
+      "browser_smoke_asset_hashes_bound": "9 bundle files inventoried; actual served index/JS/WASM hashes and sizes match; no writes during run",
+      "independent_review": "Release-smoke R1-R3 bounded PROVISIONAL PASS; final snapshot R4 LOW matrix finding corrected; R5 bounded PROVISIONAL PASS"
     }
   ],
   "upstream_publication": "LOCKED: no push to ArtCraft upstream; no upstream issue/PR/RFC before GPT REVIEW PASS",

@@ -1,0 +1,6 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft-craft-fonts
+command=["git", "checkout", "--detach", "a71c20e30af613287c504f7e685ca8fad77752bc"]
+HEAD is now at a71c20e Merge pull request #27 from devius/fonts/noto-sans-georgian
+
+exit=0
+elapsed_seconds=0.425

@@ -1,0 +1,6 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft
+command=["trunk", "--version"]
+trunk 0.22.0
+
+exit=0
+elapsed_seconds=0.032

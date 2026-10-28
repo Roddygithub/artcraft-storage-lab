@@ -18,17 +18,23 @@ NOT VERIFIED. PdfCraft's locked WASM and 30
 editing tests pass (including its 8 ACK tests); the optimized bundle also passes
 an actual-WASM synthetic memory-host edit/save/ACK/fresh-iframe reopen smoke,
 with the edited field visible in the retained capture. Seafile and
-replacement-refusal counts remain NOT VERIFIED. PhotoCraft's locked check and one
-standalone confirmation test pass against the final local-path tree; its engine
-snapshot and Web/UI suites remain NOT VERIFIED after cold-build cancellation.
+replacement-refusal counts remain NOT VERIFIED. PhotoCraft's optimized release,
+final-tree Web 6/6 and UI 8/8 focused host tests, and actual-WASM memory-host
+Ctrl+S save, ticketed ACK and fresh-iframe reopen now pass. Its separate engine
+snapshot suite remains NOT VERIFIED.
 The R3 independent evidence review was PROVISIONAL PASS within scope; its one
 low manifest-status finding has been corrected. The complete GR-082 follow-up
 snapshot review R2 is bounded PROVISIONAL PASS after consolidating its duplicate
 matrix row. Seafile acceptance is
 still NOT VERIFIED. Pre-push R3 found and R9 addressed a served-bundle provenance mismatch; R4 returned bounded PROVISIONAL PASS for a candidate commit and branch-only push. GridCraft and PdfCraft release-evidence R2 reviews are bounded PROVISIONAL PASS; Seafile remains NOT VERIFIED.
-VectorCraft has no adapter source port; its exact-release locked WASM check
-passes, while release assets and runtime checks remain open. No Seafile browser
-acceptance, route promotion or deployment is claimed. The weekly stable-release task resumes this wave before scanning for
+VectorCraft has no adapter source port; its locked WASM and optimized release
+bundle pass, and actual-WASM page-API capture/save/fresh-browser reopen passed
+with synthetic memory storage. PhotoCraft/VectorCraft release-smoke reviews
+R1–R3 returned bounded PROVISIONAL PASS after two R1 and one R2 LOW
+documentation findings were corrected. Final snapshot R4's duplicate-row LOW
+finding was corrected; R5 returned bounded PROVISIONAL PASS. Ctrl+S/menu-export dirty behavior,
+native host ACK, and Seafile remain NOT VERIFIED. No Seafile browser acceptance, route promotion
+or deployment is claimed. The weekly stable-release task resumes this wave before scanning for
 new candidates. The scanner retries transient errors, and the ledger preserves
 each app/SHA candidate while separate pointers track current candidates. Eight
 monitor tests pass. The complete live prompt and scheduler update response are

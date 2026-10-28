@@ -1,0 +1,6 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources
+command=["git", "clone", "https://github.com/storytold/craft-fonts.git", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft-craft-fonts"]
+Cloning into '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft-craft-fonts'...
+
+exit=0
+elapsed_seconds=2.571

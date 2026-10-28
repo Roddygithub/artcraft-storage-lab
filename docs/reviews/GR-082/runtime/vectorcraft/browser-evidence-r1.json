@@ -1,0 +1,376 @@
+{
+  "assets_before": {
+    "fonts/5a1c559bb539583c/NotoSansThai.ttf": "5a1c559bb539583c8a1fd99d1c5b9491e5e14478c9cd2bd0970d5c3096cc9ef8",
+    "fonts/5a1c559bb539583c/OFL.txt": "2e98fd23a52d253db8612cd5942c8f2ff4111b21d2367050fdca91d8ccc374a0",
+    "fonts/63111b5b2e074dd4/NotoSansArabic.ttf": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
+    "fonts/63111b5b2e074dd4/OFL.txt": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96",
+    "fonts/dc591156f36842d3/NotoSansGeorgian.ttf": "dc591156f36842d38996c4a7a17fee9bb58e45da3e2cac7a31b7d33de700adb9",
+    "fonts/dc591156f36842d3/OFL.txt": "8c02263c5d73d40544f9ed91e30c4e947407057a3cc430d7b786189aeceff6df",
+    "index.html": "2368b429039cf4bae40078ce8812a051a3caf252335cd426e6d015267d419f51",
+    "vectorcraft-web-5bb180f07f434305_bg.wasm": "46fdcdf8440cbbb810a94f6d07686b803f32065c8d89109188fca27a5fe2346a",
+    "vectorcraft-web-cc057e46baa002c5.js": "ccc4791abdc0611799a147e8afffc8199dad29237d7877b601900e08d19a81cc"
+  },
+  "responses": [
+    {
+      "url": "http://127.0.0.1:40343/editor/",
+      "status": 200,
+      "size": 2513,
+      "sha256": "2368b429039cf4bae40078ce8812a051a3caf252335cd426e6d015267d419f51"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/vectorcraft-web-cc057e46baa002c5.js",
+      "status": 200,
+      "size": 173642,
+      "sha256": "ccc4791abdc0611799a147e8afffc8199dad29237d7877b601900e08d19a81cc"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/fonts/63111b5b2e074dd4/NotoSansArabic.ttf",
+      "status": 200,
+      "size": 844676,
+      "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/fonts/5a1c559bb539583c/NotoSansThai.ttf",
+      "status": 200,
+      "size": 218652,
+      "sha256": "5a1c559bb539583c8a1fd99d1c5b9491e5e14478c9cd2bd0970d5c3096cc9ef8"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/fonts/dc591156f36842d3/NotoSansGeorgian.ttf",
+      "status": 200,
+      "size": 231988,
+      "sha256": "dc591156f36842d38996c4a7a17fee9bb58e45da3e2cac7a31b7d33de700adb9"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/",
+      "status": 200,
+      "size": 2513,
+      "sha256": "2368b429039cf4bae40078ce8812a051a3caf252335cd426e6d015267d419f51"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/vectorcraft-web-cc057e46baa002c5.js",
+      "status": 200,
+      "size": 173642,
+      "sha256": "ccc4791abdc0611799a147e8afffc8199dad29237d7877b601900e08d19a81cc"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/fonts/63111b5b2e074dd4/NotoSansArabic.ttf",
+      "status": 200,
+      "size": 844676,
+      "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/fonts/5a1c559bb539583c/NotoSansThai.ttf",
+      "status": 200,
+      "size": 218652,
+      "sha256": "5a1c559bb539583c8a1fd99d1c5b9491e5e14478c9cd2bd0970d5c3096cc9ef8"
+    },
+    {
+      "url": "http://127.0.0.1:40343/editor/fonts/dc591156f36842d3/NotoSansGeorgian.ttf",
+      "status": 200,
+      "size": 231988,
+      "sha256": "dc591156f36842d38996c4a7a17fee9bb58e45da3e2cac7a31b7d33de700adb9"
+    }
+  ],
+  "downloads": [],
+  "saved_sha256": "fad9b3e60c2e76e29214dccdd6edfeb00b5edc9be605aaefddaed8372d3497f2",
+  "host_state": "Saved \u2014 new version synthetic-v1",
+  "ui_after_save": {
+    "activeDocument": 0,
+    "background": [],
+    "canvasRect": [
+      54,
+      72,
+      877,
+      553
+    ],
+    "documents": [
+      {
+        "dirty": false,
+        "title": "synthetic.svg"
+      }
+    ],
+    "fileDialog": null,
+    "freeTransformWidget": null,
+    "graphicsAdapter": null,
+    "nativeMenuBar": false,
+    "opening": [],
+    "perf": {
+      "fps": 0,
+      "frameMs": 10.599999999999909,
+      "renderMs": 5.999999999999773
+    },
+    "placing": [],
+    "screenMode": 0,
+    "screenSampler": false,
+    "taskBar": {
+      "pinned": false,
+      "rect": null
+    },
+    "tool": "pencil",
+    "toolOptions": {
+      "altSmooth": false,
+      "closeWithin": 15,
+      "editWithin": 12,
+      "fidelity": 1.5,
+      "fill": false,
+      "keepSelected": true
+    },
+    "ui": {
+      "about": false,
+      "action_sets": [
+        {
+          "actions": [
+            {
+              "name": "Duplicate and Offset 10 pt",
+              "steps": [
+                [
+                  "object.move",
+                  {
+                    "copy": true,
+                    "dx": 10,
+                    "dy": 10
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "Unite and Simplify",
+              "steps": [
+                [
+                  "object.pathfinder.unite",
+                  {}
+                ],
+                [
+                  "object.path.simplify",
+                  {
+                    "tolerance": 0.5
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "Center on Artboard",
+              "steps": [
+                [
+                  "object.align",
+                  {
+                    "horizontal": "center",
+                    "to": "artboard",
+                    "vertical": "center"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "Outline Text",
+              "steps": [
+                [
+                  "type.createOutlines",
+                  {}
+                ]
+              ]
+            },
+            {
+              "name": "Rotate 90\u00b0 CW",
+              "steps": [
+                [
+                  "object.rotate",
+                  {
+                    "angle": -90
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "Reflect Horizontal",
+              "steps": [
+                [
+                  "object.reflect",
+                  {
+                    "axis": "vertical"
+                  }
+                ]
+              ]
+            }
+          ],
+          "name": "Default Actions"
+        }
+      ],
+      "align_to": "selection",
+      "brightness": "MediumDark",
+      "color_guide": {
+        "amount": 50,
+        "steps": 4,
+        "variation": "tintsShades"
+      },
+      "color_guide_limit": "",
+      "color_hide_options": false,
+      "color_mode": null,
+      "control_bar": false,
+      "custom_workspaces": [],
+      "dialog": null,
+      "dock": true,
+      "dock_collapsed": false,
+      "dock_tab": "Properties",
+      "dock_width": 300,
+      "draw_mode": 0,
+      "dxf_import": null,
+      "dxf_options": null,
+      "engine_prefs": null,
+      "eps_options": null,
+      "favorite_fonts": [],
+      "flattener_preview": {
+        "highlight": "none",
+        "options": {
+          "antiAlias": true,
+          "balance": 75,
+          "clipComplexRegions": false,
+          "gradientPpi": 300,
+          "lineArtPpi": 300,
+          "preserveAlpha": false,
+          "preserveOverprints": true,
+          "strokesToOutlines": false,
+          "textToOutlines": false
+        },
+        "overprints": "preserve",
+        "preset": "Medium Resolution",
+        "showOptions": false
+      },
+      "floating_flyouts": [],
+      "floating_panels": [],
+      "flyout": null,
+      "group_tool": [
+        "selection",
+        "directSelection",
+        "magicWand",
+        "lasso",
+        "pen",
+        "curvature",
+        "type",
+        "lineSegment",
+        "rectangle",
+        "paintbrush",
+        "pencil",
+        "eraser",
+        "rotate",
+        "scale",
+        "width",
+        "freeTransform",
+        "shapeBuilder",
+        "perspectiveGrid",
+        "mesh",
+        "gradient",
+        "eyedropper",
+        "blend",
+        "dimension",
+        "symbolSprayer",
+        "columnGraph",
+        "artboard",
+        "hand",
+        "zoom"
+      ],
+      "image_trace_advanced": true,
+      "image_trace_preview": true,
+      "layers_panel": {
+        "layersOnly": false,
+        "locateSelected": false,
+        "rowSize": 26,
+        "thumbGroups": true,
+        "thumbLayers": true,
+        "thumbObjects": true
+      },
+      "library_panels": [],
+      "move_options": null,
+      "offset_path": null,
+      "open_panel": null,
+      "palette_open": false,
+      "palette_query": "",
+      "place_link": true,
+      "recent_files": [
+        "synthetic.svg"
+      ],
+      "recent_fonts": [],
+      "shortcut_overrides": {},
+      "shortcut_set": "VectorCraft Defaults",
+      "simplify": null,
+      "slot_tool": {
+        "pencil": "pencil"
+      },
+      "status": "Saved synthetic.svg with 1 note(s): SVG keeps the artwork but not everything a VectorCraft document holds (editable effects, symbols, swatches, styles): save as VectorCraft to keep it all editable",
+      "status_bar": true,
+      "svg_options": null,
+      "task_bar": true,
+      "toolbar": true,
+      "toolbar_advanced": false,
+      "toolbar_double": false,
+      "toolbar_edits": {
+        "advanced": null,
+        "basic": null
+      },
+      "toolbar_pos": null,
+      "toolbar_show": {
+        "coloring": true,
+        "draw_mode": true,
+        "fill_stroke": true,
+        "screen_mode": true
+      },
+      "view": {
+        "artboards": true,
+        "bounding_box": true,
+        "corner_widgets": true,
+        "edges": true,
+        "gradient_annotator": true,
+        "grid": false,
+        "guides": true,
+        "hidden_chars": false,
+        "live_paint_gaps": false,
+        "outline": false,
+        "pixel_preview": false,
+        "rulers": false,
+        "smart_guides": true,
+        "snap_to_glyph": false,
+        "snap_to_grid": false,
+        "snap_to_pixel": false,
+        "snap_to_point": true,
+        "templates": true,
+        "text_threads": true,
+        "trim_view": false,
+        "video_rulers": false
+      },
+      "workspace": "Essentials"
+    },
+    "view": {
+      "artboard": 0,
+      "center": {
+        "x": 100,
+        "y": 60
+      },
+      "fitted": true,
+      "rotation": 0,
+      "zoom": 4.085
+    },
+    "window": [
+      1280,
+      686
+    ]
+  },
+  "captured_files": [
+    {
+      "path": "synthetic.svg",
+      "size": 609
+    }
+  ],
+  "assets_after": {
+    "fonts/5a1c559bb539583c/NotoSansThai.ttf": "5a1c559bb539583c8a1fd99d1c5b9491e5e14478c9cd2bd0970d5c3096cc9ef8",
+    "fonts/5a1c559bb539583c/OFL.txt": "2e98fd23a52d253db8612cd5942c8f2ff4111b21d2367050fdca91d8ccc374a0",
+    "fonts/63111b5b2e074dd4/NotoSansArabic.ttf": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
+    "fonts/63111b5b2e074dd4/OFL.txt": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96",
+    "fonts/dc591156f36842d3/NotoSansGeorgian.ttf": "dc591156f36842d38996c4a7a17fee9bb58e45da3e2cac7a31b7d33de700adb9",
+    "fonts/dc591156f36842d3/OFL.txt": "8c02263c5d73d40544f9ed91e30c4e947407057a3cc430d7b786189aeceff6df",
+    "index.html": "2368b429039cf4bae40078ce8812a051a3caf252335cd426e6d015267d419f51",
+    "vectorcraft-web-5bb180f07f434305_bg.wasm": "46fdcdf8440cbbb810a94f6d07686b803f32065c8d89109188fca27a5fe2346a",
+    "vectorcraft-web-cc057e46baa002c5.js": "ccc4791abdc0611799a147e8afffc8199dad29237d7877b601900e08d19a81cc"
+  },
+  "save_count": 1
+}

@@ -1,0 +1,5 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1
+command=["python3", "-m", "py_compile", "tests/test_vectorcraft_gr082_release.py", "docs/reviews/GR-082/runtime/vectorcraft/run_qualification.py", "docs/reviews/GR-082/runtime/vectorcraft/run_release_retry.py", "docs/reviews/GR-082/runtime/vectorcraft/run_smoke.py", "docs/reviews/GR-082/runtime/vectorcraft/verify_evidence.py"]
+
+exit=0
+elapsed_seconds=0.217

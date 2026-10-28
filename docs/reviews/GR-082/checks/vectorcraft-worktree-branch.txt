@@ -1,0 +1,6 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1
+command=["git", "branch", "--show-current"]
+upstream-refresh/wave-1
+
+exit=0
+elapsed_seconds=0.010

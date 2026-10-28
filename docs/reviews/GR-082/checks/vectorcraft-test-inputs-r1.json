@@ -1,0 +1,8 @@
+{
+  "tests/test_vectorcraft_gr082_release.py": "6d424fd6efb00c60e3189f954f043057efeb1834b6cbf47e1420ded0b3595d31",
+  "tests/test_gr012_svg.py": "42119dd0c7bc25f43067b23eab27142f70b0843dde4f43ccadc1ad80a9086907",
+  "tests/fixtures/synthetic.svg": "ff75662e35837299fe34eb26e9eaf03974b49edc1c836781b82a225e63d7c760",
+  "integration/gateway/hostpage.py": "e30eea97defe9f2817614e569c0a77d5ce935a7ffaaf388165848a559cc2e688",
+  "docs/reviews/GR-082/runtime/vectorcraft/run_qualification.py": "dbb72837d42c02c9c014cec28688c1ed16f42c715367cc5e295bc4aa23425917",
+  "docs/reviews/GR-082/runtime/vectorcraft/run_smoke.py": "5b15c7820211e67327cc4c4fa3a72b19a2c62a9efa703f7802e5fe756c9b037c"
+}

@@ -1,8 +1,8 @@
 # GR-082 Wave 1 — VectorCraft source qualification
 
-Status: **PROVISIONAL; source assessment only; GPT REVIEW PENDING**. 2026-10-27.
+Status: **PROVISIONAL; exact-release synthetic memory-host smoke passed; GPT REVIEW PENDING**. 2026-10-27.
 
-**Decision: no integration code port identified. Rebuild/requalify v0.17.0 using the existing gateway page API/polling adapter. This is not a runtime qualification PASS.** No durable VectorCraft host-save patch is present in the retained integration or required to port for this release comparison.
+**Decision: no integration code port identified. Rebuild/requalify v0.17.0 using the existing gateway page API/polling adapter. The follow-up below qualifies only the synthetic memory-host page-API workflow; it is not a Seafile or release-acceptance PASS.** No durable VectorCraft host-save patch is present in the retained integration or required to port for this release comparison.
 
 ## Exact inputs and method
 
@@ -37,7 +37,7 @@ Paths below are relative to the exact target clone; focused diffs preserve both 
 | `crates/ui-egui/src/shortcuts.rs:425,585,673+`, new `keymap.rs`: craft-keymap dispatcher replaces prior shortcut handling | Exercise Ctrl+S, dialog cancellation and menu SVG export; do not infer keyboard behavior from unchanged page API. |
 | `Cargo.toml:15-24,40,60,141+`, `apps/vectorcraft-web/Cargo.toml:17`: craft-pdf/backend revisions change, craft-keymap/window dependencies added; engine workspace default fonts disabled, web explicitly requests bundled-fonts | Fresh locked WASM/release build, fonts/assets smoke and new provenance. Rust minimum stays 1.95. Release workflow still uses common actions at mutable main; preserve resolved build inputs. No compilation was run here. |
 
-## Retained evidence and required next qualification
+## Historical assessment and required wider qualification
 
 ### Follow-up locked check (2026-10-27)
 
@@ -57,4 +57,71 @@ For target qualification: build/hash inventory; run local candidate harness; the
 
 ## Scope
 
-No project worktree edits, source clone mutations, deployment, browser, Seafile, ONLYOFFICE, compile or runtime tests. Only the authorized external output directory was written. This assessment does not satisfy GR-082's independent review or release acceptance gates.
+The original source assessment above preceded this runtime follow-up. This lane changed only the VectorCraft report, checks, runtime evidence and app-specific test. No adapter/source patch was needed. No Seafile, dispatcher, ONLYOFFICE, active route, deployment, shared summary or port-manifest changes; no commit, push or upstream publication. Independent review and GPT/release/publication gates remain outstanding.
+
+
+## Exact-release runtime follow-up — 2026-10-27
+
+**PROVISIONAL: synthetic in-memory capture/save/explicit-close/fresh-reopen succeeded.**
+This uses the retained gateway `render()` and unpatched `window.vectorcraft` API.
+Storage is a process-local byte variable in a loopback-only test HTTP server;
+`synthetic-v1` is a test response, not a Seafile version. No shared adapter was invented.
+
+### Build and commands
+
+Worktree base: `b538b6032ef50e013fdea67365cb626666678ad0`, branch
+`upstream-refresh/wave-1`. Source remained clean at exact tag/commit
+`v0.17.0` / `43313f9451de7ab5b909801006b8881458f2bf04` before build,
+after the timeout, and after the successful retry (source identity/status logs).
+
+| Command / input | Exit / evidence |
+| --- | --- |
+| `python3 -u docs/reviews/GR-082/runtime/vectorcraft/run_qualification.py` | 124; full first release log [`vectorcraft-release-build-r1.txt`](../checks/vectorcraft-release-build-r1.txt). Cargo completed in 26m 50s; overall Trunk pipeline timed out at 1800.014s during post-processing. Not a successful first build. |
+| `python3 -u docs/reviews/GR-082/runtime/vectorcraft/run_release_retry.py` | 0; [`vectorcraft-release-build-r2.txt`](../checks/vectorcraft-release-build-r2.txt), 955.108s. Same release command, completed Cargo cache reused (0.46s), successful post-build font hook. |
+| Exact build argv, both attempts | `trunk build --release --locked --dist /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/vectorcraft-v0.17.0-static/vectorcraft`, cwd source `apps/vectorcraft-web`; `PATH=/home/roddy/.cargo/bin:/home/roddy/.local/bin:$PATH RUSTUP_TOOLCHAIN=1.95.0 CRAFT_FONTS_DIR=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft-craft-fonts CRAFT_FONTS_REQUIRED=1`. |
+| Toolchain | rustc 1.95.0 (`59807616e`), cargo 1.95.0 (`f2d3ce0bd`), Trunk 0.22.0; Trunk-managed wasm-bindgen 0.2.129 and wasm-opt v131 `-Oz`. Version logs and [`vectorcraft-build-inputs.json`](../checks/vectorcraft-build-inputs.json) retain binary hashes. |
+| Fonts | Source release-workflow pin `a71c20e30af613287c504f7e685ca8fad77752bc`; clone/checkout exits 0 in separate logs. Manifest SHA-256 `ba26303ae75c4469104ea9dc54f828e7769e0e0259303e15f532c80ca4ed577e`. Embedded BIZ UDPGothic Regular and copied Noto Sans Arabic/Thai/Georgian with OFL files. Exact missing optional-face warning retained in both build logs; no substitution. |
+| Rust output location | Persistent source `target/`, including release, wasm-bindgen and wasm-opt subdirectories. `CARGO_TARGET_DIR` and `TMPDIR` unset; neither overridden to `/tmp`. No active cache removed. |
+| `python3 -u docs/reviews/GR-082/runtime/vectorcraft/run_smoke.py` — original R1 | 1 in 16.404s; [`vectorcraft-browser-smoke-r1.txt`](../checks/vectorcraft-browser-smoke-r1.txt). Save/reopen assertions reached, but Chromium evicted the large WASM response from inspector cache; `Response.body` failed, so final asset-evidence assertion failed. Original test/runner retained as `test-failed-r1.py.txt` / `run-smoke-r1.py.txt`, input hashes in `vectorcraft-test-inputs-r1.json`, partial browser evidence in `browser-evidence-r1.json`. This is a failed test, not a pass. |
+| Same smoke entrypoint — corrected R2 | 0 in 16.221s; [`vectorcraft-browser-smoke-r2.txt`](../checks/vectorcraft-browser-smoke-r2.txt). Hashes exact bytes written by the isolated asset server, avoiding inspector-cache body retention; browser records response URLs/status/length. Full argv and cwd in log; uses existing offline uv Playwright/Python 3.14 environment and the documented GR-058 Chromium/SwiftShader workflow. |
+| `python3 docs/reviews/GR-082/runtime/vectorcraft/verify_evidence.py` | 0; [`vectorcraft-evidence-verify.txt`](../checks/vectorcraft-evidence-verify.txt). Verifies all bundle files, test input hashes, served bytes/sizes, before/after identity, two WASM transfers, saved SVG, one save, no downloads, and index SRI. |
+
+Preflight failures and syntax-check exits are retained in
+[`vectorcraft-preflight.txt`](../checks/vectorcraft-preflight.txt). Every build/test
+subprocess log records argv, cwd, combined output, exit and elapsed time. No Rust
+unit-test suite was run in this follow-up; the earlier locked WASM check remains
+separate evidence.
+
+### Source, test and final bundle identity
+
+All hashes below are SHA-256. [`vectorcraft-source-manifest.json`](../checks/vectorcraft-source-manifest.json)
+records every tracked source file plus `git archive --format=tar 43313f9451de7ab5b909801006b8881458f2bf04`
+(exit 0); [`vectorcraft-bundle-manifest.json`](../checks/vectorcraft-bundle-manifest.json)
+records all 9 final asset files and pinned font inputs.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| Exact source Git archive | `11626df083757654ba4b762084d4007031f24833470d88bdef517c8b05499361` |
+| Source `Cargo.lock` | `4e5da6dcba24b385663dfd2ee0b8c3ddf93385187fa354f10b7b50b248af059b` |
+| Final test `tests/test_vectorcraft_gr082_release.py` | `7e3d5f65327fd0ed8934aba89059733cbf2ec949023c4634fcfee6f3e3eea083` |
+| Bundle `index.html` (2,513 bytes) | `2368b429039cf4bae40078ce8812a051a3caf252335cd426e6d015267d419f51` |
+| `vectorcraft-web-cc057e46baa002c5.js` (173,642 bytes) | `ccc4791abdc0611799a147e8afffc8199dad29237d7877b601900e08d19a81cc` |
+| `vectorcraft-web-5bb180f07f434305_bg.wasm` (77,340,479 bytes) | `46fdcdf8440cbbb810a94f6d07686b803f32065c8d89109188fca27a5fe2346a` |
+| Captured and stored `saved.svg` (609 bytes) | `fad9b3e60c2e76e29214dccdd6edfeb00b5edc9be605aaefddaed8372d3497f2` |
+
+### Observed behavior and ceilings
+
+| Observation | Retained evidence / limit |
+| --- | --- |
+| Open synthetic SVG, select pencil, draw document-space (60,60) → (180,120), `request('app.save',{path:'synthetic.svg',svg:{}})` | Actual release WASM; test lines and [`browser-evidence.json`](../runtime/vectorcraft/browser-evidence.json). No manual download/upload. Browser download events empty. |
+| Capture → automatic polling POST → stored exact editor bytes → visible `Saved — new version synthetic-v1` | One POST only, byte equality assertion against `readFile('synthetic.svg')`; saved SVG plus `edited.png`. 2.1s additional polling creates no duplicate save. |
+| Explicit browser close, launch fresh browser, open host again, inspect geometry | `reopened-inspect.json` and `reopened.png`; expected unfilled black pencil path at x/y 60/60, width/height 120/60. Save count remains one after reopen. |
+| Actual served assets before/after | All 9 files unchanged. Server wrote matching index/JS/WASM and three startup fonts in each browser session (12 recorded asset transfers); no asset writes from the test. Hashes match bundle manifest. OFL files are manifested but not fetched by the browser. |
+| Dirty marker | In this API `app.save` run, `ui.inspect.documents` reports `dirty:false`; screenshot has no tab asterisk. This differs from GR-063's historical UI-export observation. **Ctrl+S, Save As, menu export and their dirty-asterisk behavior were NOT VERIFIED on v0.17.0.** No native host-ACK API was added or demonstrated; local clean state is not durable-host acknowledgement. |
+| Remaining API ceilings | Original basename polling only; basename-keyed 16-entry captured-file storage; no multi-file/renamed export contract, no dirty event or host-ACK binding. No shared host adapter qualification. See unchanged source API/gateway evidence above. |
+| Not exercised | Failed-save retry, concurrent-update rejection, cancellation, wrong format/mixed-case/changed basename, malicious/deep SVG, artboard/text/image/foreign-metadata regression suite. Source-assessment recommendations above remain outstanding. |
+| Publication / production gates | No Seafile, identity-binding, ONLYOFFICE regression, deployment, release-binary reproducibility, independent review or GPT acceptance claim. The source-built final WASM is 77,340,479 bytes; hosting suitability was not tested. Mutable upstream common-actions workflow was not frozen. |
+
+Changed-file inventory and hashes for this lane are retained in
+[`vectorcraft-SHA256SUMS`](../checks/vectorcraft-SHA256SUMS). Shared summary files
+and `port-manifest.json` are intentionally left for the integrating agent.

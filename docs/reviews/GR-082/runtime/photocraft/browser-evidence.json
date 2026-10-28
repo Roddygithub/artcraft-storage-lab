@@ -1,0 +1,211 @@
+{
+  "bundle": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/dist/web",
+  "bundle_hashes_before": {
+    ".trunk-lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index.html": "e0e7eab45c4340047bfa398cf41b4eaa53f7524ef35bed4b01bf3d7ccd1507ae",
+    "photocraft-web-65c2b7aa37e8ab96.js": "f04381a4f3679b0079bfc41ed1fb10c6e75b9201e9e5d2f4a06c21526a35b453",
+    "photocraft-web-890ba895b55011cd_bg.wasm": "60850f4b3c7d9f3001d0e81ae42f9d7e4308e043199f1ed9cbf6fa4794cabb44"
+  },
+  "requests": [
+    {
+      "url": "http://127.0.0.1:42023/host.html",
+      "status": 200,
+      "size": "2707"
+    },
+    {
+      "url": "http://127.0.0.1:42023/index.html?host=parent&webgl&cpu&synthetic=1",
+      "status": 200,
+      "size": "2320"
+    },
+    {
+      "url": "http://127.0.0.1:42023/photocraft-web-890ba895b55011cd_bg.wasm",
+      "status": 200,
+      "size": "26405959"
+    },
+    {
+      "url": "http://127.0.0.1:42023/photocraft-web-65c2b7aa37e8ab96.js",
+      "status": 200,
+      "size": "172527"
+    },
+    {
+      "url": "http://127.0.0.1:42023/fonts/manifest.txt",
+      "status": 404,
+      "size": "460"
+    },
+    {
+      "url": "http://127.0.0.1:42023/synthetic.pcraft",
+      "status": 200,
+      "size": "536"
+    },
+    {
+      "url": "http://127.0.0.1:42023/index.html?host=parent&webgl&cpu&synthetic=2",
+      "status": 200,
+      "size": "2320"
+    },
+    {
+      "url": "http://127.0.0.1:42023/photocraft-web-65c2b7aa37e8ab96.js",
+      "status": 200,
+      "size": "172527"
+    },
+    {
+      "url": "http://127.0.0.1:42023/photocraft-web-890ba895b55011cd_bg.wasm",
+      "status": 200,
+      "size": "26405959"
+    },
+    {
+      "url": "http://127.0.0.1:42023/fonts/manifest.txt",
+      "status": 404,
+      "size": "460"
+    }
+  ],
+  "downloads": [],
+  "initial_state": [
+    {
+      "type": "photocraft:ready",
+      "version": "0.16.0",
+      "saveIdentity": 1,
+      "generation": 1
+    },
+    {
+      "type": "photocraft:opened",
+      "openId": "synthetic-1",
+      "documentId": "82",
+      "generation": 1
+    },
+    {
+      "type": "photocraft:dirty",
+      "openId": "synthetic-1",
+      "documentId": "82",
+      "dirty": false,
+      "generation": 1
+    }
+  ],
+  "save_state": {
+    "events": [
+      {
+        "type": "photocraft:ready",
+        "version": "0.16.0",
+        "saveIdentity": 1,
+        "generation": 1
+      },
+      {
+        "type": "photocraft:opened",
+        "openId": "synthetic-1",
+        "documentId": "82",
+        "generation": 1
+      },
+      {
+        "type": "photocraft:dirty",
+        "openId": "synthetic-1",
+        "documentId": "82",
+        "dirty": false,
+        "generation": 1
+      },
+      {
+        "type": "photocraft:dirty",
+        "openId": "synthetic-1",
+        "documentId": "82",
+        "dirty": true,
+        "generation": 1
+      },
+      {
+        "type": "photocraft:save",
+        "openId": "synthetic-1",
+        "documentId": "82",
+        "intent": "save",
+        "ticket": "photocraft:bb33ade621a8188f287d9e848d37f59e:1",
+        "name": "synthetic.pcraft",
+        "generation": 1,
+        "size": 6890
+      },
+      {
+        "type": "photocraft:dirty",
+        "openId": "synthetic-1",
+        "documentId": "82",
+        "dirty": true,
+        "generation": 1
+      }
+    ],
+    "request": {
+      "openId": "synthetic-1",
+      "documentId": "82",
+      "ticket": "photocraft:bb33ade621a8188f287d9e848d37f59e:1"
+    },
+    "dirtyBeforeAck": true,
+    "savedSha256": "b5bf27c8e6325b83b15b0b27fcfc433e0ee0e8401011efa7c6b512ed327bcd46",
+    "savedBytes": 6890
+  },
+  "saved_document": {
+    "document_id": 82,
+    "size": {
+      "width": 64,
+      "height": 64
+    },
+    "layers": [
+      {
+        "id": 83,
+        "name": "Layer 1"
+      }
+    ],
+    "sha256": "b5bf27c8e6325b83b15b0b27fcfc433e0ee0e8401011efa7c6b512ed327bcd46"
+  },
+  "reopen_state": {
+    "generation": 2,
+    "events": [
+      {
+        "type": "photocraft:ready",
+        "version": "0.16.0",
+        "saveIdentity": 1,
+        "generation": 2
+      },
+      {
+        "type": "photocraft:opened",
+        "openId": "synthetic-2",
+        "documentId": "82",
+        "generation": 2
+      },
+      {
+        "type": "photocraft:dirty",
+        "openId": "synthetic-2",
+        "documentId": "82",
+        "dirty": false,
+        "generation": 2
+      }
+    ],
+    "dirty": false
+  },
+  "asset_transfers": [
+    {
+      "path": "index.html",
+      "size": 2320,
+      "sha256": "e0e7eab45c4340047bfa398cf41b4eaa53f7524ef35bed4b01bf3d7ccd1507ae"
+    },
+    {
+      "path": "photocraft-web-65c2b7aa37e8ab96.js",
+      "size": 172527,
+      "sha256": "f04381a4f3679b0079bfc41ed1fb10c6e75b9201e9e5d2f4a06c21526a35b453"
+    },
+    {
+      "path": "photocraft-web-890ba895b55011cd_bg.wasm",
+      "size": 26405959,
+      "sha256": "60850f4b3c7d9f3001d0e81ae42f9d7e4308e043199f1ed9cbf6fa4794cabb44"
+    },
+    {
+      "path": "index.html",
+      "size": 2320,
+      "sha256": "e0e7eab45c4340047bfa398cf41b4eaa53f7524ef35bed4b01bf3d7ccd1507ae"
+    },
+    {
+      "path": "photocraft-web-890ba895b55011cd_bg.wasm",
+      "size": 26405959,
+      "sha256": "60850f4b3c7d9f3001d0e81ae42f9d7e4308e043199f1ed9cbf6fa4794cabb44"
+    }
+  ],
+  "download_count": 0,
+  "bundle_hashes_after": {
+    ".trunk-lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index.html": "e0e7eab45c4340047bfa398cf41b4eaa53f7524ef35bed4b01bf3d7ccd1507ae",
+    "photocraft-web-65c2b7aa37e8ab96.js": "f04381a4f3679b0079bfc41ed1fb10c6e75b9201e9e5d2f4a06c21526a35b453",
+    "photocraft-web-890ba895b55011cd_bg.wasm": "60850f4b3c7d9f3001d0e81ae42f9d7e4308e043199f1ed9cbf6fa4794cabb44"
+  }
+}

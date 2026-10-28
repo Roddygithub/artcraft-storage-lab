@@ -65,6 +65,22 @@ both are addressed and R2 returned bounded PROVISIONAL PASS. See
 [`RESPONSE-PDFCRAFT-RELEASE-REVIEW-R1.md`](RESPONSE-PDFCRAFT-RELEASE-REVIEW-R1.md),
 [`INDEPENDENT-PDFCRAFT-RELEASE-REVIEW-R2.md`](INDEPENDENT-PDFCRAFT-RELEASE-REVIEW-R2.md),
 and [`RESPONSE-PDFCRAFT-RELEASE-REVIEW-R2.md`](RESPONSE-PDFCRAFT-RELEASE-REVIEW-R2.md).
+PhotoCraft/VectorCraft release-smoke review R1's two LOW findings were closed
+in R2; R2's LOW chronology finding was corrected and R3 returned bounded
+PROVISIONAL PASS. See
+[`INDEPENDENT-PHOTOCRAFT-VECTORCRAFT-REVIEW-R1.md`](INDEPENDENT-PHOTOCRAFT-VECTORCRAFT-REVIEW-R1.md),
+[`RESPONSE-PHOTOCRAFT-VECTORCRAFT-REVIEW-R1.md`](RESPONSE-PHOTOCRAFT-VECTORCRAFT-REVIEW-R1.md),
+[`INDEPENDENT-PHOTOCRAFT-VECTORCRAFT-REVIEW-R2.md`](INDEPENDENT-PHOTOCRAFT-VECTORCRAFT-REVIEW-R2.md),
+[`RESPONSE-PHOTOCRAFT-VECTORCRAFT-REVIEW-R2.md`](RESPONSE-PHOTOCRAFT-VECTORCRAFT-REVIEW-R2.md),
+[`INDEPENDENT-PHOTOCRAFT-VECTORCRAFT-REVIEW-R3.md`](INDEPENDENT-PHOTOCRAFT-VECTORCRAFT-REVIEW-R3.md),
+and [`RESPONSE-PHOTOCRAFT-VECTORCRAFT-REVIEW-R3.md`](RESPONSE-PHOTOCRAFT-VECTORCRAFT-REVIEW-R3.md).
+The final snapshot review R4 found one duplicate VectorCraft test-matrix row;
+the response consolidates it, and R5 returned bounded PROVISIONAL PASS. See
+[`INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R4.md`](INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R4.md)
+and [`RESPONSE-WAVE1-FINAL-SNAPSHOT-R4.md`](RESPONSE-WAVE1-FINAL-SNAPSHOT-R4.md).
+R5's report and response are in
+[`INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R5.md`](INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R5.md)
+and [`RESPONSE-WAVE1-FINAL-SNAPSHOT-R5.md`](RESPONSE-WAVE1-FINAL-SNAPSHOT-R5.md).
 The complete follow-up snapshot review found one duplicate test-matrix section;
 it was consolidated, and R2 returned bounded PROVISIONAL PASS with no findings.
 See [`INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R1.md`](INDEPENDENT-WAVE1-FINAL-SNAPSHOT-REVIEW-R1.md),
@@ -126,8 +142,8 @@ has a source-only no-port assessment. See
 | WordCraft v0.11.0 | PASS, packaged local transport included | PASS | Engine 2, UI 9; release bundle and actual-WASM memory-host edit/save/version/ACK/reopen pass | Seafile NOT VERIFIED |
 | GridCraft v0.12.1 | PASS, includes pre-open native-XLSX check | PASS | Engine 3, UI 2; release bundle and actual-WASM synthetic memory-host active-cell Save/new-version/ACK/fresh-reopen pass | Seafile NOT VERIFIED |
 | PdfCraft v0.14.0 | PASS, packaged local transport included | PASS; optimized release bundle PASS | 30 `editing::` tests pass, including the 8 ACK tests; actual-WASM synthetic memory-host edit/save/ACK/fresh-iframe reopen PASS; R4 Tesseract assertion verifies the edited form value in the fresh capture | Seafile NOT VERIFIED |
-| PhotoCraft v0.16.0 | PASS, packaged local transport included | PASS | One standalone confirmation test passes against final local-path tree; other final-tree test suites are NOT VERIFIED/cancelled | NOT VERIFIED |
-| VectorCraft v0.17.0 | No source patch identified | PASS, Rust 1.95 locked WASM check | NOT RUN | NOT VERIFIED |
+| PhotoCraft v0.16.0 | PASS, packaged local transport included | PASS | Final-tree Web 6/6 and UI 8/8 focused host tests; optimized release and actual-WASM memory-host save/ACK/fresh-iframe reopen pass | Memory-host PASS; Seafile NOT VERIFIED |
+| VectorCraft v0.17.0 | No source patch identified | PASS, Rust 1.95 locked WASM check and optimized release build | Actual-WASM page-API capture/save/fresh-browser reopen pass with synthetic memory storage | Memory-host PASS; Seafile NOT VERIFIED |
 
 Patch application and transport-integrity command outputs are retained in
 [`checks/`](checks/). PdfCraft's optimized release bundle and actual-WASM
@@ -180,10 +196,14 @@ refusal-count evidence. GridCraft now has an optimized release bundle and actual
 memory-host edit/save/version/ACK/fresh-reopen evidence; its Seafile and
 replacement-refusal gates remain open. PdfCraft now has an optimized release
 bundle and bounded actual-WASM in-memory edit/save/ACK/fresh-iframe reopen
-evidence; Seafile and replacement-refusal gates remain open. PhotoCraft still
-needs a release bundle and browser qualification; VectorCraft still needs a
-release asset/font build and browser capture/save. Synthetic Seafile durable
-version/readback/fresh reopen remains **NOT VERIFIED** for every refreshed app.
+evidence; Seafile and replacement-refusal gates remain open. PhotoCraft now has
+an optimized release bundle, focused Web/UI host passes, and actual-WASM
+memory-host save/ACK/fresh-iframe reopen evidence; its engine snapshot and
+Seafile/gateway gates remain open. VectorCraft now has an optimized bundle and
+actual-WASM page-API memory-host capture/save/fresh-browser reopen evidence;
+Ctrl+S/menu-export, native host ACK, and Seafile gates remain open. Synthetic
+Seafile durable version/readback/fresh reopen remains **NOT VERIFIED** for
+every refreshed app.
 Prior GR-055–058 and GR-076 results are historical evidence for their exact
 older source revisions only. No credentials or production data belong in this
 bundle.

@@ -1,0 +1,285 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/apps/vectorcraft-web
+command=["trunk", "build", "--release", "--locked", "--dist", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/vectorcraft-v0.17.0-static/vectorcraft"]
+2026-10-27T17:34:52.883285Z  INFO 🚀 Starting trunk 0.22.0
+2026-10-27T17:34:52.883967Z  INFO 📦 starting build
+2026-10-27T17:34:52.884115Z  INFO node packages []
+2026-10-27T17:34:52.888014Z  INFO ⏫ Found an update of trunk: 0.22.0 -> 0.22.1
+   Compiling unicode-ident v1.0.27
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling libm v0.2.16
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling bitflags v2.13.2
+   Compiling syn v3.0.9
+   Compiling syn v2.0.119
+   Compiling once_cell v1.21.4
+   Compiling thiserror v2.0.21
+   Compiling log v0.4.34
+   Compiling simd-adler32 v0.3.10
+   Compiling crc32fast v1.5.3
+   Compiling adler2 v2.0.1
+   Compiling zerocopy v0.8.63
+   Compiling miniz_oxide v0.9.1
+   Compiling foldhash v0.2.0
+   Compiling zlib-rs v0.6.8
+   Compiling hashbrown v0.17.1
+   Compiling zerocopy-derive v0.8.63
+   Compiling flate2 v1.1.10
+   Compiling version_check v0.9.5
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling fearless_simd v0.4.1
+   Compiling wasm-bindgen-shared v0.2.129
+   Compiling synstructure v0.14.0
+   Compiling bytemuck_derive v1.12.1
+   Compiling serde_derive v1.0.229
+   Compiling bytemuck v1.25.2
+   Compiling thiserror-impl v2.0.21
+   Compiling font-types v0.12.7
+   Compiling equivalent v1.0.3
+   Compiling indexmap v2.14.2
+   Compiling memchr v2.8.3
+   Compiling zune-core v0.5.3
+   Compiling zmij v1.0.23
+   Compiling zune-jpeg v0.5.15
+   Compiling zerofrom-derive v0.1.8
+   Compiling rustversion v1.0.23
+   Compiling color v0.3.3
+   Compiling smallvec v1.16.3
+   Compiling arrayvec v0.7.8
+   Compiling half v2.7.1
+   Compiling polycool v0.4.0
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling png v0.18.1
+   Compiling kurbo v0.13.1
+   Compiling euclid v0.22.14
+   Compiling weezl v0.1.12
+   Compiling pxfm v0.1.30
+   Compiling serde_json v1.0.154
+   Compiling quick-error v2.0.1
+   Compiling linebender_resource_handle v0.1.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling yoke v0.8.3
+   Compiling guillotiere v0.7.0
+   Compiling peniko v0.6.1
+   Compiling bumpalo v3.20.3
+   Compiling rustc-hash v2.1.3
+   Compiling byteorder-lite v0.1.0
+   Compiling color_quant v1.1.0
+   Compiling image-webp v0.2.4
+   Compiling gif v0.14.2
+   Compiling wasm-bindgen-macro-support v0.2.129
+   Compiling moxcms v0.8.1
+   Compiling wasm-bindgen v0.2.129
+   Compiling itoa v1.0.18
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-task v0.3.34
+   Compiling slab v0.4.12
+   Compiling futures-core v0.3.34
+   Compiling fax v0.2.7
+   Compiling unicode-general-category v1.1.0
+   Compiling tiff v0.11.3
+   Compiling futures-util v0.3.34
+   Compiling wasm-bindgen-macro v0.2.129
+   Compiling zerovec-derive v0.11.6
+   Compiling hayro-ccitt v0.3.0
+   Compiling image v0.25.10
+   Compiling zerovec v0.11.8
+   Compiling js-sys v0.3.106
+   Compiling vectorcraft-geom v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/geom)
+   Compiling displaydoc v0.2.7
+   Compiling unicode-segmentation v1.13.3
+   Compiling font-types v0.11.3
+   Compiling writeable v0.6.4
+   Compiling read-fonts v0.39.2
+   Compiling cfg_aliases v0.2.2
+   Compiling siphasher v1.0.4
+   Compiling vectorcraft-color v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/color)
+   Compiling web-sys v0.3.106
+   Compiling tinystr v0.8.4
+   Compiling chrono v0.4.45
+   Compiling float-cmp v0.9.0
+   Compiling parking_lot_core v0.9.12
+   Compiling icu_locale_fallback_data v2.3.0
+   Compiling unicode-bidi v0.3.18
+   Compiling litemap v0.8.3
+   Compiling icu_locale_core v2.3.0
+   Compiling strict-num v0.1.1
+   Compiling vectorcraft-doc v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/doc)
+   Compiling write-fonts v0.48.1
+   Compiling skrifa v0.42.1
+   Compiling potential_utf v0.1.6
+   Compiling zerotrie v0.2.5
+   Compiling read-fonts v0.44.0
+   Compiling generic-array v0.14.7
+   Compiling icu_segmenter_data v2.3.0
+   Compiling wasmparser v0.228.0
+   Compiling arrayref v0.3.9
+   Compiling scopeguard v1.2.0
+   Compiling wasmi_ir v2.0.0
+   Compiling lock_api v0.4.14
+   Compiling skrifa v0.47.0
+   Compiling icu_provider v2.3.1
+   Compiling subsetter v0.2.6
+   Compiling wasmi_core v2.0.0
+   Compiling typenum v1.20.1
+   Compiling utf8_iter v1.0.4
+   Compiling wasmi v2.0.0
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_fallback v2.3.0
+   Compiling parking_lot v0.12.5
+   Compiling linesweeper v0.5.0
+   Compiling vello_common v0.2.0
+   Compiling read-fonts v0.43.3
+   Compiling core_maths v0.1.1
+   Compiling profiling v1.0.18
+   Compiling wasmi_collections v2.0.0
+   Compiling vectorcraft-text v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/text)
+   Compiling spin v0.9.9
+warning: vectorcraft-text@0.17.0: web build won't fetch: Cairo Regular, Tajawal ExtraLight, Tajawal Light, Tajawal Regular, Tajawal Medium, Tajawal Bold, Tajawal ExtraBold, Tajawal Black, Almarai Light, Almarai Regular, Almarai Bold, Almarai ExtraBold, IBM Plex Sans Arabic Thin, IBM Plex Sans Arabic ExtraLight, IBM Plex Sans Arabic Light, IBM Plex Sans Arabic Regular, IBM Plex Sans Arabic Medium, IBM Plex Sans Arabic SemiBold, IBM Plex Sans Arabic Bold, Noto Kufi Arabic Regular, Amiri Regular, Amiri Italic, Amiri Bold, Amiri Bold Italic, Alexandria Regular, Fustat Regular, Reem Kufi Regular, Aref Ruqaa Regular, Aref Ruqaa Bold, Gulzar Regular not in CRAFT_FONTS_DIR=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft-craft-fonts (an older craft-fonts?)
+   Compiling icu_segmenter v2.3.0
+   Compiling harfrust v0.13.3
+   Compiling vello_cpu v0.2.0
+   Compiling vectorcraft-pathops v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/pathops)
+   Compiling unicode-script v0.5.8
+   Compiling vectorcraft-three-d v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/three-d)
+   Compiling vectorcraft-plugins v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/plugins)
+   Compiling read-fonts v0.41.0
+   Compiling ahash v0.8.12
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling rustc-hash v1.1.0
+   Compiling naga-types v30.0.1
+   Compiling phf_shared v0.13.1
+   Compiling alloc-stdlib v0.2.4
+   Compiling vectorcraft-effects v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/effects)
+   Compiling crypto-common v0.1.7
+   Compiling naga v30.0.1
+   Compiling vello_common v0.1.0
+   Compiling emath v0.36.2
+   Compiling slotmap v1.1.1
+   Compiling bit-vec v0.9.1
+   Compiling tinyvec v1.13.3
+   Compiling base64 v0.22.1
+   Compiling raw-window-handle v0.6.2
+   Compiling fastrand v2.5.0
+   Compiling unicode-width v0.2.2
+   Compiling phf_generator v0.13.1
+   Compiling codespan-reporting v0.13.1
+   Compiling unicode-normalization v0.1.26
+   Compiling bit-set v0.10.0
+   Compiling ecolor v0.36.2
+   Compiling vello_cpu v0.1.0
+   Compiling harfrust v0.12.0
+   Compiling skrifa v0.44.0
+   Compiling brotli-decompressor v5.0.3
+   Compiling tiny-skia-path v0.12.0
+   Compiling vectorcraft-brush v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/brush)
+   Compiling epaint_default_fonts v0.36.2
+   Compiling uuid v1.28.0
+   Compiling self_cell v1.3.0
+   Compiling static_assertions v1.1.0
+   Compiling nohash-hasher v0.2.0
+   Compiling either v1.19.0
+   Compiling unicode-properties v0.1.4
+   Compiling stringprep v0.1.5
+   Compiling itertools v0.15.0
+   Compiling epaint v0.36.2
+   Compiling wgpu-types v30.0.1
+   Compiling accesskit v0.24.1
+   Compiling brotli v8.0.4
+   Compiling phf_macros v0.13.1
+   Compiling block-buffer v0.10.4
+   Compiling wgpu-hal v30.0.1
+   Compiling hayro-jbig2 v0.3.0 (https://github.com/storytold/craft-libs?rev=2eca9b3a53a98ac52efed2a27353c6a6927ead10#2eca9b3a)
+   Compiling hayro-jpeg2000 v0.3.5
+   Compiling simplecss v0.2.2
+   Compiling pico-args v0.5.0
+   Compiling hayro-postscript v0.1.0 (https://github.com/storytold/craft-libs?rev=2eca9b3a53a98ac52efed2a27353c6a6927ead10#2eca9b3a)
+   Compiling data-url v0.3.2
+   Compiling ryu v1.0.23
+   Compiling pdf-writer v0.15.0
+   Compiling hayro-cmap v0.1.0 (https://github.com/storytold/craft-libs?rev=2eca9b3a53a98ac52efed2a27353c6a6927ead10#2eca9b3a)
+   Compiling hayro-syntax v0.7.2 (https://github.com/storytold/craft-libs?rev=2eca9b3a53a98ac52efed2a27353c6a6927ead10#2eca9b3a)
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling phf v0.13.1
+   Compiling digest v0.10.7
+   Compiling glow v0.17.0
+   Compiling egui v0.36.2
+   Compiling inout v0.1.4
+   Compiling roxmltree v0.21.1
+   Compiling xmp-writer v0.3.3
+   Compiling imagesize v0.14.0
+   Compiling krilla v0.8.2 (https://github.com/storytold/craft-libs?rev=2eca9b3a53a98ac52efed2a27353c6a6927ead10#2eca9b3a)
+   Compiling cipher v0.4.4
+   Compiling hayro-interpret v0.7.0 (https://github.com/storytold/craft-libs?rev=2eca9b3a53a98ac52efed2a27353c6a6927ead10#2eca9b3a)
+   Compiling tiny-skia-path v0.11.4
+   Compiling wgpu-core v30.0.1
+   Compiling kurbo v0.11.3
+   Compiling bitflags v1.3.2
+   Compiling litrs v1.0.1
+   Compiling twox-hash v2.1.5
+   Compiling winnow v1.0.4
+   Compiling jpeg-encoder v0.6.1
+   Compiling toml_parser v1.1.5+spec-1.1.0
+   Compiling svgtypes v0.15.3
+   Compiling ruzstd v0.9.1
+   Compiling document-features v0.2.12
+   Compiling png v0.17.16
+   Compiling craft-pdf v0.1.0 (https://github.com/storytold/craft-libs?rev=2eca9b3a53a98ac52efed2a27353c6a6927ead10#2eca9b3a)
+   Compiling wgpu-core-deps-wasm v30.0.1
+   Compiling aes v0.8.4
+   Compiling sha2 v0.10.9
+   Compiling md-5 v0.10.6
+   Compiling toml_datetime v1.1.2+spec-1.1.0
+   Compiling serde_spanned v1.1.2
+   Compiling wasm-bindgen-futures v0.4.79
+   Compiling svgtypes v0.16.1
+   Compiling wgpu v30.0.1
+   Compiling toml_writer v1.1.3+spec-1.1.0
+   Compiling xmlwriter v0.1.0
+   Compiling imagesize v0.13.0
+   Compiling imagesize v0.15.0
+   Compiling roxmltree v0.20.0
+   Compiling usvg v0.48.1
+   Compiling usvg v0.45.1
+   Compiling toml v1.1.8+spec-1.1.0
+   Compiling vectorcraft-pdf v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/pdf)
+   Compiling tiny-skia v0.11.4
+   Compiling vectorcraft-render v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/render)
+   Compiling vectorcraft-metafile v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/metafile)
+   Compiling web-time v1.1.0
+   Compiling rgb v0.8.53
+   Compiling enum-map-derive v0.17.0
+   Compiling craft-docpath v0.1.0 (https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b00)
+   Compiling vectorcraft-svg v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/svg)
+   Compiling enum-map v2.7.3
+   Compiling resvg v0.45.1
+   Compiling vectorcraft-eps v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/eps)
+   Compiling vectorcraft-ui-egui v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/ui-egui)
+   Compiling vectorcraft-affinity v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/affinity)
+   Compiling vectorcraft-cad v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/cad)
+   Compiling vectorcraft-tools v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/tools)
+   Compiling vectorcraft-format v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/format)
+   Compiling vectorcraft-trace v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/trace)
+   Compiling type-map v0.5.1
+   Compiling vectorcraft-scriptcheck v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/scriptcheck)
+   Compiling rfd v0.17.2
+   Compiling vectorcraft-engine v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/crates/engine)
+   Compiling egui-wgpu v0.36.2
+   Compiling egui_extras v0.36.2
+   Compiling craft-keymap v0.1.0 (https://github.com/storytold/craft-libs?rev=2eca9b3a53a98ac52efed2a27353c6a6927ead10#2eca9b3a)
+   Compiling craft-ui v0.1.0 (https://github.com/storytold/craft-libs?rev=5c874d51eeb3de70e735c8ce87a59a7dedd47675#5c874d51)
+   Compiling percent-encoding v2.3.2
+   Compiling eframe v0.36.2
+   Compiling vectorcraft-web v0.17.0 (/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft/apps/vectorcraft-web)
+    Finished `release` profile [optimized] target(s) in 26m 50s
+
+TIMEOUT: subprocess.run deadline exceeded
+
+exit=124
+elapsed_seconds=1800.014

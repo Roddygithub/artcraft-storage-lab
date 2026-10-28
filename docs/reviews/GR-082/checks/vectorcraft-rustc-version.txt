@@ -1,0 +1,6 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft
+command=["rustc", "--version"]
+rustc 1.95.0 (59807616e 2026-04-14)
+
+exit=0
+elapsed_seconds=0.065

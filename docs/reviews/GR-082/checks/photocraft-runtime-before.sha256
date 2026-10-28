@@ -1,0 +1,9 @@
+26db9fb70be3bbea86126e873247b7a99fa594868765a3db1e8528a77487c6a7  docs/reviews/GR-082/runtime/photocraft/bundle-inventory.py
+014becce9f36d3e7ad0a7db86ada39b9b29e5740f484f6b6ba7dcbe5f211ce0f  docs/reviews/GR-082/runtime/photocraft/host.html
+02195ea8b0f18e1a11ac42f4d6e0e927bc159bfc449a6da98f46e00ef3e947d9  docs/reviews/GR-082/runtime/photocraft/inspect-save.py
+2c8d8e66e4116d917b8c6a3bc470cceefb44d28bea895fa23445d967c2ebb676  docs/reviews/GR-082/runtime/photocraft/inventory.py
+ae8385f3399a428b5e8ef59f6d9be94cbeea436c5b6292ce1b55939732626774  docs/reviews/GR-082/runtime/photocraft/make-fixture.py
+bf93e6ca9973b231bc22b4f9c8298a0c8c09c71ef60dd56fae6557f5b6eece5c  docs/reviews/GR-082/runtime/photocraft/run-check.py
+1935fc861fc3cab0f195971a8fcad9f9edf4a1511e81b04aafc5e795952cd6a6  docs/reviews/GR-082/runtime/photocraft/serve.py
+4cbfc5ed44d02b15dc139ae6db5e2e5333d80caef8a3c0539664ac095a230973  docs/reviews/GR-082/runtime/photocraft/synthetic.pcraft
+f877a588fde4005f82972a553ccf055f035235c8317b36ed300fe4f50e360170  docs/reviews/GR-082/runtime/photocraft/verify-source.py

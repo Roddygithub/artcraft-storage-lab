@@ -1,0 +1,18 @@
+{"command": ["cargo", "--config", "profile.dev.opt-level=0", "--config", "profile.dev.package.\"*\".opt-level=0", "test", "--locked", "-j", "1", "-p", "photocraft-ui-egui", "--lib", "host_"], "cwd": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft", "started": "2026-10-27T18:18:31.154880+00:00", "env": {"PATH": "/home/roddy/.rustup/toolchains/1.95.0-x86_64-unknown-linux-gnu/bin:/home/roddy/.local/share/mise/installs/codex/0.164.0/codex-path:/home/roddy/.codex/tmp/arg0-linux/codex-arg0cGiTrT:/home/roddy/.local/share/mise/installs/codex/latest/bin:/home/roddy/.local/share/mise/installs/gh/latest/gh_2.103.2_linux_amd64/bin:/home/roddy/.local/share/mise/installs/node/26.7.0/bin:/home/roddy/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/roddy/.local/share/mise/shims:/usr/local/bin:/usr/bin:/usr/local/sbin:/home/roddy/.local/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl", "TMPDIR": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/temp/cargo-tmp", "CARGO_BUILD_JOBS": "1"}}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.18s
+     Running unittests src/lib.rs (target/debug/deps/photocraft_ui_egui-845995e6298fc0e7)
+
+running 8 tests
+test file_open::tests::host_save_dispatch_waits_for_matching_durable_ack_and_guards_bypass_routes ... ok
+test file_open::tests::pathless_host_open_uses_name_without_binding_or_recent_entry ... ok
+test host_document::tests::host_payload_boundary ... ok
+test file_open::tests::host_save_respects_modal_workspaces_and_refuses_changed_native_identity ... ok
+test file_open::tests::host_guards_cover_direct_picker_drop_duplicate_replacement_and_close_routes ... ok
+test file_open::tests::host_acknowledges_only_captured_revision_and_bounds_payloads ... ok
+test workspace_ui::tests::saved_workspaces_preserve_host_chrome_on_select_and_reset ... ok
+test workspace_ui::tests::saved_workspace_keeps_host_menu_and_rail_hidden_in_the_rendered_ui ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 3821 filtered out; finished in 44.09s
+
+
+RECORDED_EXIT=0

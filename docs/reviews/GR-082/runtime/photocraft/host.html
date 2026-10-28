@@ -1,0 +1,32 @@
+<!doctype html><meta charset="utf-8"><title>GR-082 synthetic PhotoCraft memory host</title>
+<style>body{margin:0;font:12px monospace}pre{height:130px;overflow:auto}iframe{width:100%;height:760px;border:0}</style>
+<pre id="log"></pre><div id="mount"></div>
+<script>
+// ponytail: memory-only host; durable platform save requires a separately qualified connector.
+const state=window.smoke={events:[],generation:0,dirty:null,saved:null};
+let pending;
+function show(){document.querySelector('#log').textContent=JSON.stringify(state,(k,v)=>k==='saved'?v?.byteLength:v,2)}
+function frame(bytes){pending=bytes;state.generation++;state.dirty=null;const f=document.createElement('iframe');f.src='/index.html?host=parent&webgl&cpu&synthetic='+state.generation;f.id='editor';document.querySelector('#mount').replaceChildren(f);show()}
+function send(m){document.querySelector('iframe').contentWindow.postMessage(m,location.origin)}
+addEventListener('message',async e=>{
+ if(e.origin!==location.origin||e.source!==document.querySelector('iframe')?.contentWindow)return;
+ const m=e.data;if(!m?.type?.startsWith('photocraft:'))return;
+ const event={...m,generation:state.generation};delete event.bytes;if(m.bytes)event.size=m.bytes.byteLength;
+ const last=state.events.at(-1);if(m.type==='photocraft:dirty'&&JSON.stringify(last)===JSON.stringify(event))return;state.events.push(event);
+ if(m.type==='photocraft:ready'){
+  if(m.saveIdentity!==1)throw Error('missing protocol');
+  const bytes=pending||await fetch('/synthetic.pcraft').then(r=>{if(!r.ok)throw Error('fixture fetch');return r.arrayBuffer()});
+  send({type:'photocraft:open',saveIdentity:1,mode:'update-only',openId:'synthetic-'+state.generation,name:'synthetic.pcraft',bytes});
+ }
+ if(m.type==='photocraft:dirty')state.dirty=m.dirty;
+ if(m.type==='photocraft:save'){
+  state.dirtyBeforeAck=state.dirty;state.saved=new Uint8Array(m.bytes);state.request={openId:m.openId,documentId:m.documentId,ticket:m.ticket};
+  state.savedSha256=[...new Uint8Array(await crypto.subtle.digest('SHA-256',m.bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
+ }
+ show();
+});
+window.ack=()=>{if(state.dirty!==true||!state.saved)throw Error('no dirty save');send({type:'photocraft:saveResult',...state.request,ok:true})};
+window.reopen=()=>{if(!state.events.some(e=>e.type==='photocraft:dirty'&&e.ticket===state.request.ticket&&e.dirty===false))throw Error('no ticketed ACK confirmation');frame(state.saved.slice().buffer)};
+window.result=()=>{if(state.generation!==2||state.dirty!==false||!state.events.some(e=>e.generation===2&&e.type==='photocraft:opened')||!state.dirtyBeforeAck)throw Error('incomplete smoke');return {...state,saved:undefined}};
+frame(null);
+</script>

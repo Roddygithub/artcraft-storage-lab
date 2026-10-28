@@ -1,0 +1,14 @@
+{"command": ["python3", "docs/reviews/GR-082/runtime/photocraft/verify-source.py"], "cwd": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1", "started": "2026-10-27T17:35:27.466193+00:00", "env": {"PATH": "/home/roddy/.rustup/toolchains/1.95.0-x86_64-unknown-linux-gnu/bin:/home/roddy/.local/share/mise/installs/codex/0.164.0/codex-path:/home/roddy/.codex/tmp/arg0-linux/codex-arg0cGiTrT:/home/roddy/.local/share/mise/installs/codex/latest/bin:/home/roddy/.local/share/mise/installs/gh/latest/gh_2.103.2_linux_amd64/bin:/home/roddy/.local/share/mise/installs/node/26.7.0/bin:/home/roddy/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/roddy/.local/share/mise/shims:/usr/local/bin:/usr/bin:/usr/local/sbin:/home/roddy/.local/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl", "TMPDIR": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/temp/cargo-tmp", "CARGO_BUILD_JOBS": "1"}}
+COMMAND ['git', 'read-tree', 'HEAD']
+ EXIT 0
+COMMAND ['git', 'apply', '--cached', '--check', '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/docs/reviews/GR-082/ports/photocraft-v0.16.0.patch']
+ EXIT 0
+COMMAND ['git', 'apply', '--cached', '/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/docs/reviews/GR-082/ports/photocraft-v0.16.0.patch']
+ EXIT 0
+COMMAND ['git', 'diff', '--exit-code']
+ EXIT 0
+COMMAND ['git', 'diff', '--check', 'HEAD']
+ EXIT 0
+Exact archived patch matches working tree; patch SHA256 73a68d4fd0199e78963061fe6b6d1266704c202633b20ccce2d49f285dc6e089
+
+RECORDED_EXIT=0

@@ -1,0 +1,6 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft
+command=["cargo", "--version"]
+cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+
+exit=0
+elapsed_seconds=0.032

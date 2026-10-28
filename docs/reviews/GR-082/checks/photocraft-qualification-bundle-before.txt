@@ -1,0 +1,9 @@
+{"command": ["python3", "docs/reviews/GR-082/runtime/photocraft/bundle-inventory.py", "before"], "cwd": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1", "started": "2026-10-27T18:25:59.767596+00:00", "env": {"PATH": "/home/roddy/.rustup/toolchains/1.95.0-x86_64-unknown-linux-gnu/bin:/home/roddy/.local/share/mise/installs/codex/0.164.0/codex-path:/home/roddy/.codex/tmp/arg0-linux/codex-arg0cGiTrT:/home/roddy/.local/share/mise/installs/codex/latest/bin:/home/roddy/.local/share/mise/installs/gh/latest/gh_2.103.2_linux_amd64/bin:/home/roddy/.local/share/mise/installs/node/26.7.0/bin:/home/roddy/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/roddy/.local/share/mise/shims:/usr/local/bin:/usr/bin:/usr/local/sbin:/home/roddy/.local/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl", "TMPDIR": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/temp/cargo-tmp", "CARGO_BUILD_JOBS": "1"}}
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  .trunk-lock
+e0e7eab45c4340047bfa398cf41b4eaa53f7524ef35bed4b01bf3d7ccd1507ae  index.html
+f04381a4f3679b0079bfc41ed1fb10c6e75b9201e9e5d2f4a06c21526a35b453  photocraft-web-65c2b7aa37e8ab96.js
+60850f4b3c7d9f3001d0e81ae42f9d7e4308e043199f1ed9cbf6fa4794cabb44  photocraft-web-890ba895b55011cd_bg.wasm
+
+manifest 316c2ff1e8903468857ca7d332d2f1a863efc7cedf9d12a015bb18d6765e3643
+
+RECORDED_EXIT=0

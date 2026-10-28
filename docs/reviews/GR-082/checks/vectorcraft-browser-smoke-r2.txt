@@ -1,0 +1,8 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1
+command=["/home/roddy/.local/share/mise/installs/uv/0.13.3/uv-x86_64-unknown-linux-gnu/uv", "run", "--offline", "--with", "playwright", "--python", "3.14", "--", "python", "-u", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/tests/test_vectorcraft_gr082_release.py", "--static-root", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/vectorcraft-v0.17.0-static", "--screenshot", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/docs/reviews/GR-082/runtime/vectorcraft/edited.png", "--evidence-dir", "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/docs/reviews/GR-082/runtime/vectorcraft"]
+PASS: actual staged VectorCraft host page saved 609 SVG bytes as synthetic-v1 (SHA-256 fad9b3e60c2e76e29214dccdd6edfeb00b5edc9be605aaefddaed8372d3497f2)
+PASS: stored bytes contain the pencil path and a fresh host/editor session reopens its expected geometry
+NOTE: isolated synthetic storage harness; no Seafile persistence or common host protocol claim
+
+exit=0
+elapsed_seconds=16.221

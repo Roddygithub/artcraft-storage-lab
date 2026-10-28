@@ -1,0 +1,7 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/vectorcraft
+command=["git", "rev-parse", "HEAD", "v0.17.0"]
+43313f9451de7ab5b909801006b8881458f2bf04
+43313f9451de7ab5b909801006b8881458f2bf04
+
+exit=0
+elapsed_seconds=0.004

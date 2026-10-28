@@ -1,0 +1,115 @@
+{
+  "source_commit": "43313f9451de7ab5b909801006b8881458f2bf04",
+  "bundle": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-outputs/vectorcraft-v0.17.0-static/vectorcraft",
+  "files": {
+    "fonts/5a1c559bb539583c/NotoSansThai.ttf": {
+      "size": 218652,
+      "sha256": "5a1c559bb539583c8a1fd99d1c5b9491e5e14478c9cd2bd0970d5c3096cc9ef8"
+    },
+    "fonts/5a1c559bb539583c/OFL.txt": {
+      "size": 4380,
+      "sha256": "2e98fd23a52d253db8612cd5942c8f2ff4111b21d2367050fdca91d8ccc374a0"
+    },
+    "fonts/63111b5b2e074dd4/NotoSansArabic.ttf": {
+      "size": 844676,
+      "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e"
+    },
+    "fonts/63111b5b2e074dd4/OFL.txt": {
+      "size": 4382,
+      "sha256": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96"
+    },
+    "fonts/dc591156f36842d3/NotoSansGeorgian.ttf": {
+      "size": 231988,
+      "sha256": "dc591156f36842d38996c4a7a17fee9bb58e45da3e2cac7a31b7d33de700adb9"
+    },
+    "fonts/dc591156f36842d3/OFL.txt": {
+      "size": 4384,
+      "sha256": "8c02263c5d73d40544f9ed91e30c4e947407057a3cc430d7b786189aeceff6df"
+    },
+    "index.html": {
+      "size": 2513,
+      "sha256": "2368b429039cf4bae40078ce8812a051a3caf252335cd426e6d015267d419f51"
+    },
+    "vectorcraft-web-5bb180f07f434305_bg.wasm": {
+      "size": 77340479,
+      "sha256": "46fdcdf8440cbbb810a94f6d07686b803f32065c8d89109188fca27a5fe2346a"
+    },
+    "vectorcraft-web-cc057e46baa002c5.js": {
+      "size": 173642,
+      "sha256": "ccc4791abdc0611799a147e8afffc8199dad29237d7877b601900e08d19a81cc"
+    }
+  },
+  "fonts_commit": "a71c20e30af613287c504f7e685ca8fad77752bc",
+  "font_inputs": {
+    "biz-ud-mincho/BIZUDMincho-Regular.ttf": {
+      "size": 6153932,
+      "sha256": "468ee6d9b149ca144809e03841bf18740ecf014e055a00da6ecaf1aaf4165af2"
+    },
+    "biz-ud-mincho/OFL.txt": {
+      "size": 4408,
+      "sha256": "ef0ed524b3bd012f37015e986809eed6f67905456ebfc1ebd7fcc2765282ee01"
+    },
+    "biz-ud-pgothic/BIZUDPGothic-Bold.ttf": {
+      "size": 4640596,
+      "sha256": "30eba52fc837e8b62c97d4b82e6706583149fb7294e3712dd71a655eaea80a90"
+    },
+    "biz-ud-pgothic/BIZUDPGothic-Regular.ttf": {
+      "size": 4669688,
+      "sha256": "258d7156c165f2ff774b6efee637c22c3b950de0d8a10e501137061bc8085d01"
+    },
+    "biz-ud-pgothic/OFL.txt": {
+      "size": 4408,
+      "sha256": "e753d7155d53c747d037a445e584c8ecfca6dd79846db610417e282a736b28bc"
+    },
+    "manifest.txt": {
+      "size": 2747,
+      "sha256": "ba26303ae75c4469104ea9dc54f828e7769e0e0259303e15f532c80ca4ed577e"
+    },
+    "noto-sans-arabic/NotoSansArabic.ttf": {
+      "size": 844676,
+      "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e"
+    },
+    "noto-sans-arabic/OFL.txt": {
+      "size": 4382,
+      "sha256": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96"
+    },
+    "noto-sans-cjk-sc/NotoSansCJKsc-Regular.otf": {
+      "size": 16437364,
+      "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+    },
+    "noto-sans-cjk-sc/OFL.txt": {
+      "size": 4301,
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+    },
+    "noto-sans-georgian/NotoSansGeorgian.ttf": {
+      "size": 231988,
+      "sha256": "dc591156f36842d38996c4a7a17fee9bb58e45da3e2cac7a31b7d33de700adb9"
+    },
+    "noto-sans-georgian/OFL.txt": {
+      "size": 4384,
+      "sha256": "8c02263c5d73d40544f9ed91e30c4e947407057a3cc430d7b786189aeceff6df"
+    },
+    "noto-sans-thai/NotoSansThai.ttf": {
+      "size": 218652,
+      "sha256": "5a1c559bb539583c8a1fd99d1c5b9491e5e14478c9cd2bd0970d5c3096cc9ef8"
+    },
+    "noto-sans-thai/OFL.txt": {
+      "size": 4380,
+      "sha256": "2e98fd23a52d253db8612cd5942c8f2ff4111b21d2367050fdca91d8ccc374a0"
+    },
+    "shippori-mincho/OFL.txt": {
+      "size": 4399,
+      "sha256": "41fba056279be5f45ff9a99e44b7b53897b42732f5806d8e666e0ab49ac6bd38"
+    },
+    "shippori-mincho/ShipporiMincho-Regular.ttf": {
+      "size": 8677284,
+      "sha256": "769b5269f0f9bc6534b352c0e6bd856a566e03ff788f107191c2d835863570b2"
+    }
+  },
+  "source_inputs": {
+    "Cargo.lock": "4e5da6dcba24b385663dfd2ee0b8c3ddf93385187fa354f10b7b50b248af059b",
+    "Cargo.toml": "b6a5a86e423a454ad05e0c9a54a3a3e5bf1f8df3c28a242cd38b166228f4ba10",
+    "apps/vectorcraft-web/index.html": "b910a86a101c9aa4807dd67956f92a8e0e0ad60b3fa94fc84bb70cbf3761115e",
+    ".github/workflows/release.yml": "36b3ba55dae387852008370208006595022125c9de50d19ea471306bcdfdb11a"
+  }
+}

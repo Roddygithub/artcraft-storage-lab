@@ -14,8 +14,9 @@ and hit GitHub's unauthenticated API rate limit on the other three; all five
 release comparisons have separate official API references. A fresh 2026-10-27
 scan completed all five comparisons with valid merge bases and found no newer
 stable release. Four exact-release
-source patches are archived; VectorCraft has a source-only no-port assessment
-and its exact-release locked WASM check passes.
+source patches are archived; VectorCraft has a source-only no-port assessment,
+passed locked WASM and optimized release builds, and an actual-WASM page-API
+memory-host capture/save/fresh-browser reopen smoke.
 WordCraft v0.11.0 now has a release bundle and actual-WASM memory-host
 edit/save/version/ACK/fresh-reopen PASS; copied text from the fresh editor
 contains the marker. R9 binds the test source and actual served assets by pre/post hashes. Seafile and replacement-refusal counts remain NOT VERIFIED.
@@ -26,11 +27,17 @@ locked check and 30 editing tests pass, including its 8 ACK tests; its optimized
 v0.14.0 release bundle also passes an actual-WASM synthetic memory-host
 edit/save/ACK/fresh-iframe reopen smoke, with the edited form value visible in
 the retained capture. Seafile and replacement-refusal counts remain NOT VERIFIED.
-PhotoCraft's locked
-check and one final-tree standalone confirmation test pass; its engine
-snapshot and Web/UI suites remain NOT VERIFIED after cancellation. Browser and
-synthetic Seafile version/readback/fresh-reopen qualification remain open for
-PhotoCraft/VectorCraft browser tests and for all refreshed Seafile routes.
+PhotoCraft's optimized release bundle, final-tree Web 6/6 and UI 8/8 focused
+host tests, and actual-WASM memory-host Ctrl+S save/ticketed-ACK/fresh-iframe
+reopen smoke pass; its separate engine snapshot remains NOT VERIFIED.
+PhotoCraft/VectorCraft release-smoke reviews R1–R3 returned bounded PROVISIONAL
+PASS after two R1 and one R2 LOW documentation findings were corrected.
+Final snapshot R4 found one duplicate VectorCraft matrix row; it was
+consolidated and R5 returned bounded PROVISIONAL PASS.
+VectorCraft's actual-WASM memory-host smoke also passes. Seafile
+version/history/readback/fresh-reopen qualification remains open for every
+refreshed route; VectorCraft Ctrl+S/menu-export and native host ACK behavior are
+also NOT VERIFIED.
 R2 pre-push review findings have responses. Pre-push R3 found the R8 served-asset
 hash mismatch; R9 reran the smoke with actual served-file hashes before/after.
 Pre-push R4 returned bounded PROVISIONAL PASS for a branch-only push. The

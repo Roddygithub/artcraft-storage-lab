@@ -1,0 +1,13 @@
+{"command": ["temp/gr082-protocol-tests"], "cwd": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft", "started": "2026-10-27T17:39:00.042172+00:00", "env": {"PATH": "/home/roddy/.rustup/toolchains/1.95.0-x86_64-unknown-linux-gnu/bin:/home/roddy/.local/share/mise/installs/codex/0.164.0/codex-path:/home/roddy/.codex/tmp/arg0-linux/codex-arg0cGiTrT:/home/roddy/.local/share/mise/installs/codex/latest/bin:/home/roddy/.local/share/mise/installs/gh/latest/gh_2.103.2_linux_amd64/bin:/home/roddy/.local/share/mise/installs/node/26.7.0/bin:/home/roddy/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/roddy/.local/share/mise/shims:/usr/local/bin:/usr/bin:/usr/local/sbin:/home/roddy/.local/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl", "TMPDIR": "/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-sources/photocraft/temp/cargo-tmp", "CARGO_BUILD_JOBS": "1"}}
+
+running 5 tests
+test tests::open_admission_bounds_cumulative_bytes_and_message_count ... ok
+test tests::parent_messages_require_exact_origin_and_parent_source ... ok
+test tests::pending_save_acknowledgement_is_consumed_once ... ok
+test tests::pending_saves_are_bounded ... ok
+test tests::tickets_are_opaque_strings_and_can_exceed_js_safe_integer_range ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+RECORDED_EXIT=0

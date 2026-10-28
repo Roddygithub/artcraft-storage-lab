@@ -1,3 +1,21 @@
+# 2026-10-28 — GR-082 PhotoCraft and VectorCraft release smokes
+
+- Built the exact PhotoCraft v0.16.0 optimized release bundle. Final-tree
+  focused Web 6/6 and UI 8/8 host tests pass. The actual release WASM opened a
+  synthetic native document, accepted a layer stroke, saved through Ctrl+S,
+  received a matching identity/ticket ACK, and reopened the same document ID in
+  a fresh editor iframe. The 6,890 saved bytes and bundle/served-asset hashes
+  are retained. Storage was in memory; Seafile remains NOT VERIFIED.
+- Built the exact VectorCraft v0.17.0 optimized release bundle. Its actual WASM
+  captured and saved a synthetic SVG and a fresh browser reopened its geometry
+  from isolated memory storage. Ctrl+S/menu-export behavior and native host ACK
+  remain NOT VERIFIED. Seafile remains NOT VERIFIED.
+- No app route, dispatcher, Seafile setting, or ONLYOFFICE configuration was
+  changed. PhotoCraft/VectorCraft release-smoke reviews R1–R3 returned bounded
+  PROVISIONAL PASS; two R1 and one R2 LOW documentation findings were corrected.
+  Final snapshot R4 found a duplicate VectorCraft matrix row; it was
+  consolidated and R5 returned bounded PROVISIONAL PASS.
+
 # 2026-10-27 — GR-082 upstream refresh wave 1 started
 
 - Created the isolated `upstream-refresh/wave-1` worktree from committed

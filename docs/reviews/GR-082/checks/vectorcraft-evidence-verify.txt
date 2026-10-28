@@ -1,0 +1,7 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1
+command=["python3", "docs/reviews/GR-082/runtime/vectorcraft/verify_evidence.py"]
+PASS: all 9 release assets, test inputs, served before/after hashes, two WASM transfers, SVG hash, one save, no downloads and index SRI agree
+PROVISIONAL: synthetic memory host only; no Seafile, identity binding or native host-ACK qualification
+
+exit=0
+elapsed_seconds=1.016

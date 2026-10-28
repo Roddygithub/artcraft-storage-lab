@@ -1,0 +1,3 @@
+source HEAD b1794c6e0608ccfc887213dcf58398977c5cb75e
+source manifest 994323049a72bdc16f0d1b122f19f65edca99b5f6a790b9f21aa2171aa44637c /home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1/docs/reviews/GR-082/checks/photocraft-source-before.sha256
+patch 73a68d4fd0199e78963061fe6b6d1266704c202633b20ccce2d49f285dc6e089

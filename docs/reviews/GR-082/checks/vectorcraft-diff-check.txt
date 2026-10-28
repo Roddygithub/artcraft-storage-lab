@@ -1,0 +1,5 @@
+cwd=/home/roddy/.cache/artcraft-storage-lab/upstream-refresh-wave-1
+command=["git", "diff", "--check", "--", "docs/reviews/GR-082/ports/vectorcraft-v0.17.0.md", "tests/test_vectorcraft_gr082_release.py", "docs/reviews/GR-082/runtime/vectorcraft", "docs/reviews/GR-082/checks/vectorcraft-*"]
+
+exit=0
+elapsed_seconds=0.019
