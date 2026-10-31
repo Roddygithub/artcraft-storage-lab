@@ -32,7 +32,7 @@ Seahub (view_lib_file, WOPI branch)                       bridge origin (this se
 | --- | --- | --- |
 | `UserCanWrite` | `/relay/save` | Seahub's `WOPIFilesContentsView.post` never reads `can_edit` |
 | Version precondition (`X-Expected-Version` vs CheckFileInfo `Version`) | `/relay/save` | optimistic concurrency; Seahub merges/overwrites otherwise |
-| File name unchanged, content signature matches extension | `/relay/save` | no Save-As, no PDF bytes into a `.docx` |
+| File name unchanged, content signature matches extension | `/relay/save` | no PDF bytes into a `.docx`; a Save As / Export from the editor becomes a browser download from the host page and is reported to the editor as *not* stored |
 | Lost-response reconciliation | `/relay/save` | re-read `Version` + bytes before reporting failure |
 | `WOPISrc` origin allow-list, same-origin relay calls, nonce CSP, `frame-ancestors` = Seahub | everywhere | SSRF / CSRF / clickjacking |
 

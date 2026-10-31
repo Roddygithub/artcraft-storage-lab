@@ -100,6 +100,19 @@
     });
   }
 
+  // A browser download from the host page (outside the editor's sandbox).
+  function downloadBytes(name, bytes) {
+    try {
+      var safe = name.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').slice(0, 255) || 'export';
+      var url = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+      var a = document.createElement('a');
+      a.href = url; a.download = safe; a.style.display = 'none';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+      return true;
+    } catch (e) { return false; }
+  }
+
   // ---- save
   function handleSave(d) {
     var ticket = typeof d.ticket === 'string' ? d.ticket : null;
@@ -107,12 +120,20 @@
       status(err, 'error');
       if (ticket) post('saveResult', { ticket: ticket, ok: false, error: err });
     }
-    if (!cfg.userCanWrite) return reject('read-only: Seafile does not allow you to write this file');
-    if (state.saving) return reject('a save is already in progress');
-    if (d.saveAs || (d.name && d.name !== cfg.name)) return reject('Save As is not supported here; save keeps the file name');
     var bytes = d.bytes;
     if (bytes instanceof ArrayBuffer) bytes = new Uint8Array(bytes);
     if (!(bytes instanceof Uint8Array) || bytes.byteLength === 0) return reject('editor sent no document bytes');
+    if (d.saveAs || (d.name && d.name !== cfg.name)) {
+      // Save As / Export: the Seafile file keeps its name and content; the user gets the bytes as a
+      // browser download instead (the editor would have downloaded them without a host anyway).
+      // Not acknowledged as stored: the document in Seafile is unchanged.
+      var exported = downloadBytes(String(d.name || ('export-' + cfg.name)), bytes);
+      status(exported ? 'exported ' + d.name + ' as a download; the Seafile file is unchanged' : 'export could not be downloaded', exported ? 'warn' : 'error');
+      if (ticket) post('saveResult', { ticket: ticket, ok: false, error: exported ? 'exported as a download, not saved to Seafile' : 'export failed' });
+      return;
+    }
+    if (!cfg.userCanWrite) return reject('read-only: Seafile does not allow you to write this file');
+    if (state.saving) return reject('a save is already in progress');
     if (bytes.byteLength > cfg.maxBytes) return reject('document too large');
 
     var revision = state.dirtyRevision;
