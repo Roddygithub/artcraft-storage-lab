@@ -24,6 +24,8 @@ s = s.replace("""    eframe::WebLogger::init(log::LevelFilter::Info).ok();
     let bridge = if query().contains("host=parent") { host::Bridge::new() } else { None };
     io::set_deliver(if bridge.is_some() { host::deliver } else { download });
     let bridge_for_app = bridge.clone();""")
+# the start-up future owns the bridge (it is used after the runner starts)
+s = s.replace("    wasm_bindgen_futures::spawn_local(async {\n        let Some(document)", "    wasm_bindgen_futures::spawn_local(async move {\n        let Some(document)", 1)
 s = s.replace("""                    let engine = if query().contains("empty") { Engine::default() } else { soundcraft_engine::demo::demo_engine() };
                     let player = soundcraft_playback::Player::new(Arc::new(engine.session().clone()));
                     let app = SoundApp::new(engine, Some(player), Services::default());
