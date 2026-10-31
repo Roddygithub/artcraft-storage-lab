@@ -6,7 +6,7 @@ dedicated Lima VM with Docker. Nothing here touches a production system; the VM 
 ## Run
 
 ```bash
-limactl start --name=seafile-lab --cpus=4 --memory=4 --disk=30 --tty=false template:docker
+limactl start --name=seafile-lab --cpus=4 --memory=6 --disk=30 --tty=false template:docker
 ```
 
 ```bash
@@ -34,9 +34,10 @@ Editor bundles live under `static/<editor-id>/` (gitignored) with a `static/<edi
 
 The VM has a Rust/wasm toolchain (`rustup`, `trunk`) for building patched bundles under `~/build/`
 (`docs/upstream-drafts/<app>-host-bridge/apply.py` applies a port to a shallow clone, then
-`cd apps/<app>-web && CARGO_BUILD_JOBS=2 trunk build --release`). 4 GiB of RAM is enough for one
-build at a time **with ONLYOFFICE stopped** (`docker compose stop onlyoffice`): wasm-bindgen on a
-50 MB wasm needs ~1.2 GB and was OOM-killed next to Docs. `wire-built-bundle.sh <app>` then copies
+`cd apps/<app>-web && CARGO_BUILD_JOBS=2 trunk build --release`). Give the VM 6 GiB and stop the
+whole stack during builds (`docker compose stop`): a single rustc on PhotoCraft's engine crate
+passes 2 GB and wasm-bindgen on a 50 MB wasm needs ~1.2 GB; both were OOM-killed at 4 GiB next to
+the containers. `~/build/build-all.sh` is the sequential queue used in the lab. `wire-built-bundle.sh <app>` then copies
 `dist/web` into the lab, records provenance, saves the diff under `docs/upstream-drafts/` and
 deletes the build's `target/` (each is several GB on a 30 GB disk).
 
