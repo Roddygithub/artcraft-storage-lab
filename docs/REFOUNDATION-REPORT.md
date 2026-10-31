@@ -3,7 +3,7 @@
 Date: 2026-10-31. Mandate: `Claude.md` (commit `f30d39c`). Status of this document: **draft for owner review**. Nothing in this report has been published, and no production system was touched while producing it.
 
 ```text
-REFOUNDATION_STATE=DECISION_REACHED, BRIDGE_PROTOTYPE_BUILT (fake-host tests only), REAL_SEAFILE_SLICE_NOT_RUN
+REFOUNDATION_STATE=DECISION_REACHED, BRIDGE_PROTOTYPE_BUILT, REAL_SEAFILE_SLICE_PASSED (stock Seafile CE 13.0.28 + ONLYOFFICE 9.4 + 4 upstream ArtCraft bundles, HTTP 45/45 + browser 17/17)
 DECISION=CHANGE_PRODUCT_FORM (+ REDUCE_SCOPE, + PAUSE_UNTIL_UPSTREAM_MATURITY for ArtCraft office apps)
 PRODUCTION_STATUS=UNTOUCHED (by this audit; but see §3.4 — the live instance already carries GR-015 patches)
 UPSTREAM_STATUS=LOCKED
@@ -226,8 +226,13 @@ Owner-only (production; this audit will not do them):
 
 Lab (safe, isolated, no production, no upstream):
 
-3. Stand up Seafile **CE 13** in a container (no Docker/Podman is available on the machine that produced this report — hard resource limitation, §33 of the mandate); enable the five WOPI keys with `OFFICE_WEB_APP_BASE_URL` pointing at the bridge's discovery XML (view + edit actions per extension); confirm `.svg` routes to the bridge and `.pdf` behaviour with/without the edit flag; exercise the view-only-token PutFile case (resolves U1, U2 runtime, U3, U4).
-4. Implement the stateless relay + host page — **prototype done in `bridge/` (629 LOC Python + 178 LOC JS), 20 HTTP end-to-end tests pass against a fake of Seahub's WOPI host (`tests/bridge/`)**; still to do: wire the WordCraft upstream release bundle (unpatched) and run the 12-step MVP against real Seafile; then run ONLYOFFICE on the same DOCX for comparison.
+3. **Done** (`lab/real-seafile/`, run in a dedicated Lima VM with Docker on the audit machine): stock Seafile CE **13.0.28** + ONLYOFFICE Docs **9.4.0** + the bridge, the five WOPI keys pointing at the bridge's discovery XML. `run_slice.py` passes **45/45** (`results/slice.json`). Measured on the real Seahub, not assumed:
+   - `.docx/.xlsx/.pdf/.dxf/.svg` route to the bridge; `.pptx` stays on ONLYOFFICE on the same instance (`OFFICE_WEB_APP_*` is checked before `ONLYOFFICE_*` per extension in `view_lib_file`). `.pdf` reaches the office branch only with `?edit_pdf=true` (U3/U4 resolved for 13.0).
+   - Seahub's WOPI `PutFile` **accepts a read-only token** and attributes the commit to that user — the gap the fake host reproduces is real (U2 resolved at runtime). The bridge refuses the same save with 403.
+   - Save → new Seafile version attributed to the editing user; stale/external-writer saves → 409 and no overwrite; identical bytes → no new commit; WOPI lock/unlock/conflict through Seahub; revoked/expired token → 401.
+   - Seahub 12/13 render the WOPI page as React JS literals (`actionURL`, `accessToken`) posting into `<iframe name="office_frame">`, not a server-side `<form>`; the bridge is unaffected (it only sees the POST).
+   - ONLYOFFICE Docs CE 9.4 refuses to fetch from private/compose IPs unless `ALLOW_PRIVATE_IP_ADDRESS=true`; with it, JWT command + docx→pdf conversion round-trip through Seahub pass. Relevant to the owner's `api.js` 404 investigation only as a reminder that Docs has its own network policy.
+4. **Done**: the four upstream web bundles that already ship the parent-host protocol — WordCraft v0.13.2, GridCraft v0.14.2, PdfCraft v0.16.1, CADCraft v0.15.1, fetched by SHA-256 (`static/*-PROVENANCE.txt`), **unpatched** — open from a real Seahub page in headless Chromium through the bridge host page, load the document from Seafile, and Ctrl+S produces a new Seafile version attributed to the user (`run_browser.py`, **17/17**, screenshots in `results/`). VectorCraft v0.19.0 and PhotoCraft v0.18.0 bundles carry no host protocol (grep of the wasm: no `<app>:ready`), confirming §3.1: they need an upstream change before they can be hosted, and that change is locked. One bridge bug was found only by the real browser and fixed: editor pages must send `frame-ancestors 'self' <seahub>` (the whole ancestor chain is checked), not `'self'` alone. Still to do: ONLYOFFICE on the same DOCX for a fidelity comparison; a non-headless pass on HTTPS (WebGPU, clipboard) by a human.
 5. Re-target GR-049/052 tests at the relay; add a protocol contract test for the upstream bridge messages.
 6. Rewrite `README.md`, `ROADMAP.md`, `AGENTS.md` to the new product form; archive the GR corpus under `docs/history/`.
 7. Prepare (do not publish) the ArtCraft `saveResult` RFC and a note on Seahub WOPI PutFile findings.
@@ -237,14 +242,14 @@ REFOUNDATION_STATE=DECISION_REACHED
 CURRENT_REALITY=gateway+patches architecture, 0/6 GPT PASS, live instance patched, ONLYOFFICE state unknown since 10-26
 ASSUMPTIONS_INVALIDATED=no generic write channel (WOPI exists; any extension on Seahub>=13, office/PDF only on 12.0); ONLYOFFICE CE limited (limit removed 9.4); CAS required (Seafile's own editors don't); ArtCraft mature (3–5 weeks old, alpha); cheap reviews predictive (0%)
 PRECONDITIONS=Seafile>=13 for non-office formats; bridge enforces UserCanWrite itself; WOPI_ACCESS_TOKEN_EXPIRATION set to 30 min
-INDEPENDENT_REVIEW=R1 FAIL (keystone over-stated for 12.0; permission gap; dropped guarantees) -> all findings incorporated in this revision; R2 not yet run
+INDEPENDENT_REVIEW=R1 FAIL (keystone over-stated for 12.0; permission gap; dropped guarantees) -> all findings incorporated in this revision; R2 not yet run; real-Seafile slice supersedes several R1 ASSUMPTION labels with FACTs (§7 step 3)
 ARCHITECTURE_OPTIONS_CONSIDERED=A current, B Seafile-native only, C generic WOPI editor bridge, D ArtCraft storage provider, E hook+Seahub PR, F upstream-only
 CURRENT_LEADING_ARCHITECTURE=C (+B for office formats)
 WHY=zero patches either side, public CE protocol, stateless, upgrade-resilient, keeps lab's real contributions, ArtCraft adopted only where it beats incumbents
 COMPONENTS_TO_KEEP=Seafile API knowledge, host-page save discipline, reconciliation/retry logic+tests, fixtures, bounded zip tooling, saveResult RFC draft
 COMPONENTS_TO_REMOVE=gateway sessions/capabilities/custom HTTP, Seahub+C patches (and live deployment), craft-platform fork, 13 app patches, VectorCraft polling, Nextcloud/ownCloud scope, GR review loop
-MAJOR_UNCERTAINTIES=U1–U7 above
-NEXT_EXECUTABLE_STEP=isolated Seafile CE + WOPI discovery routing proof (step 3), then WordCraft unpatched slice (step 4)
+MAJOR_UNCERTAINTIES=U1–U7 above, minus U2/U3/U4 (resolved on CE 13.0.28, §7)
+NEXT_EXECUTABLE_STEP=owner decisions (ONLYOFFICE api.js 404, GR-015 rollback, Seafile 13 upgrade); lab: steps 5–7, R2 independent review of this revision
 PRODUCTION_STATUS=UNTOUCHED
 UPSTREAM_STATUS=LOCKED
 ```

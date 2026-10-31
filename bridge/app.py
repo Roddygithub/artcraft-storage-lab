@@ -544,8 +544,10 @@ class Bridge:
             body = fh.read()
         headers = [("Content-Type", ctype)]
         if ctype.startswith("text/html"):
-            # Editor documents may only be framed by our own host page.
-            headers.append(("Content-Security-Policy", "frame-ancestors 'self'"))
+            # Editor documents are framed by our host page, which is itself framed by Seahub:
+            # frame-ancestors is checked against the whole ancestor chain, so both must be listed.
+            # (Found by the real-browser slice; 'self' alone makes Chromium refuse the editor.)
+            headers.append(("Content-Security-Policy", f"frame-ancestors 'self' {self.cfg.seahub_origin}"))
         return 200, headers, body
 
     # -- helpers ------------------------------------------------------------

@@ -129,6 +129,25 @@ services:
       - RESULTS_DIR=/results
     networks: [seafile-net]
 
+  browser:
+    image: mcr.microsoft.com/playwright/python:v1.49.0-noble
+    profiles: [test]
+    working_dir: /app
+    command: ["bash", "-c", "pip install -q --break-system-packages playwright==1.49.0 && python3 lab/real-seafile/run_browser.py"]
+    ipc: host
+    volumes:
+      - ./app:/app:ro
+      - ./results:/results
+    environment:
+      - SEAFILE_URL=http://seafile.lab
+      - BRIDGE_URL=http://bridge:8778
+      - ONLYOFFICE_URL=http://onlyoffice
+      - ONLYOFFICE_JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - RESULTS_DIR=/results
+    networks: [seafile-net]
+
 networks:
   seafile-net:
     name: seafile-net

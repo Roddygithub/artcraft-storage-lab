@@ -1,0 +1,93 @@
+{
+ "ran_at": "2026-10-31T19:24:53Z",
+ "repo_id": "e5da5cb1-043a-4336-bcbb-f61899f73bca",
+ "passed": 17,
+ "failed": 0,
+ "checks": [
+  {
+   "name": "browser_login",
+   "ok": true,
+   "detail": "http://seafile.lab/"
+  },
+  {
+   "name": "wordcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/e5da5cb1-043a-4336-bcbb-f61899f73bca/file/test.', None), ('office_frame', 'about:blank', '')]"
+  },
+  {
+   "name": "wordcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 2s"
+  },
+  {
+   "name": "wordcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': 'eed43c8427c9f1b5e3fa3ac25d9743f4b7c51bbe', 'rev_file_id': 'fd816eb10e0d9e39d1f718b12eb4eab98b648080', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.docx\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_saved_bytes_look_like_docx",
+   "ok": true,
+   "detail": "len=6570"
+  },
+  {
+   "name": "gridcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/e5da5cb1-043a-4336-bcbb-f61899f73bca/file/test.', None), ('office_frame', 'about:blank', '')]"
+  },
+  {
+   "name": "gridcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 1s"
+  },
+  {
+   "name": "gridcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': 'c9e6fd99d251a74dcac83e0b3f5799d16009ead5', 'rev_file_id': '3c21616b2960e1153e527c6b392c89403e7ab296', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.xlsx\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "gridcraft_saved_bytes_look_like_xlsx",
+   "ok": true,
+   "detail": "len=4042"
+  },
+  {
+   "name": "pdfcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/e5da5cb1-043a-4336-bcbb-f61899f73bca/file/test.', None), ('office_frame', 'about:blank', '')]"
+  },
+  {
+   "name": "pdfcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 2s"
+  },
+  {
+   "name": "pdfcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': '58260df1de88abdbdab0b8b9c67032eaaf4f12a5', 'rev_file_id': 'e0589622c0a5b9d5a263a4211a23f05d2d59c323', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.pdf\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "pdfcraft_saved_bytes_look_like_pdf",
+   "ok": true,
+   "detail": "len=507"
+  },
+  {
+   "name": "cadcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/e5da5cb1-043a-4336-bcbb-f61899f73bca/file/test.', None), ('office_frame', 'about:blank', '')]"
+  },
+  {
+   "name": "cadcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 1s"
+  },
+  {
+   "name": "cadcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': 'ece2148ea567e0ad516adea36bd6ca8aa2faae59', 'rev_file_id': 'f47adccf1ca685cbb6c48a7807a0dc6fc2cd5f0a', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.dxf\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "cadcraft_saved_bytes_look_like_dxf",
+   "ok": true,
+   "detail": "len=17432"
+  }
+ ]
+}

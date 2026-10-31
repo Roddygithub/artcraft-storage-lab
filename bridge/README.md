@@ -1,7 +1,9 @@
 # Seafile WOPI editor bridge — prototype
 
-Status: **prototype, tested only against a fake Seahub WOPI host** (`tests/bridge/fake_seahub.py`).
-Not run against a real Seafile yet. See `docs/REFOUNDATION-REPORT.md` §5 and §7.
+Status: **prototype, validated against a stock Seafile CE 13.0.28** (`lab/real-seafile/`: 45 HTTP checks +
+17 headless-browser checks with the unpatched upstream WordCraft/GridCraft/PdfCraft/CADCraft bundles), and
+unit-tested against a fake Seahub WOPI host (`tests/bridge/`, 21 tests). Not yet run on HTTPS with a human
+in a real browser. See `docs/REFOUNDATION-REPORT.md` §5 and §7.
 
 ## What it is
 
@@ -71,9 +73,17 @@ tests/bridge/fake_seahub.py   fake of seahub/wopi/views.py semantics (incl. its 
 tests/bridge/test_bridge.py   20 HTTP end-to-end tests
 ```
 
+## Real-Seafile lab
+
+`lab/real-seafile/up.sh up|configure|slice|browser|down` drives a dedicated Lima VM (Docker) with Seafile
+CE 13, ONLYOFFICE Docs, the bridge and the upstream editor bundles. Results and screenshots land in
+`lab/real-seafile/results/`. Findings that changed this code: editor pages need
+`frame-ancestors 'self' <seahub-origin>` (Chromium checks the whole ancestor chain).
+
 ## Not done
 
-* Browser test of `host.js` against a real editor bundle (needs Playwright + a bundle).
-* Real Seafile CE 13 run (needs Docker/Podman; see report §7 step 3).
-* draw.io / SVG-edit adapters (host.js currently speaks the ArtCraft parent protocol only).
+* Human pass on HTTPS in a real (non-headless) browser: WebGPU, clipboard, fonts, dirty-state UX.
+* draw.io / SVG-edit adapters (host.js currently speaks the ArtCraft parent protocol only); VectorCraft and
+  PhotoCraft have no host protocol upstream yet.
 * Aggregated discovery XML for running Collabora alongside (report U3).
+* `lang_dict`/locale, `PostMessageOrigin`, `CloseUrl` niceties from CheckFileInfo are read but unused.

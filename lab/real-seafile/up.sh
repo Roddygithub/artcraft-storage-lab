@@ -49,6 +49,15 @@ case "$cmd" in
     vm "cd $REMOTE && docker compose --profile test run --rm slice"
     vm "cat $REMOTE/results/slice.json" > "$HERE/lab/real-seafile/results/slice.json" 2>/dev/null || true
     ;;
+  browser)
+    sync_files
+    vm "cd $REMOTE && docker compose --profile test run --rm browser"
+    mkdir -p "$HERE/lab/real-seafile/results"
+    remote_abs="$(vm 'echo $HOME')/seafile-lab"
+    for f in $(vm "cd $REMOTE/results && ls browser.json browser-console.log *.png 2>/dev/null"); do
+      limactl copy "$VM:$remote_abs/results/$f" "$HERE/lab/real-seafile/results/$f" || true
+    done
+    ;;
   logs) vm "cd $REMOTE && docker compose logs --tail=100 ${2:-}" ;;
   down) vm "cd $REMOTE && docker compose --profile test down" ;;
   *) echo "unknown command $cmd" >&2; exit 2 ;;

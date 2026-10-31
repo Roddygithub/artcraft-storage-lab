@@ -85,7 +85,7 @@ class BridgeTestCase(unittest.TestCase):
                 "wordcraft": {"app": "wordcraft", "url": "/editors/wordcraft/index.html?host=parent", "extensions": ["docx"], "label": "WordCraft"},
                 "vectorcraft": {"app": "vectorcraft", "url": "/editors/vectorcraft/index.html?host=parent", "extensions": ["svg"]},
             },
-            static_dir=None,
+            static_dir=cls._static_dir(),
             max_bytes=1024 * 1024,
             urlopen=urlopen,
         )
@@ -94,7 +94,21 @@ class BridgeTestCase(unittest.TestCase):
         cls.thread.start()
 
     @classmethod
+    def _static_dir(cls):
+        import tempfile
+        d = tempfile.mkdtemp(prefix="bridge-static-")
+        os.makedirs(os.path.join(d, "wordcraft"))
+        with open(os.path.join(d, "wordcraft", "index.html"), "w") as fh:
+            fh.write("<!doctype html><title>stub</title>")
+        with open(os.path.join(d, "wordcraft", "app.wasm"), "wb") as fh:
+            fh.write(b"\0asm")
+        cls._static = d
+        return d
+
+    @classmethod
     def tearDownClass(cls):
+        import shutil
+        shutil.rmtree(cls._static, ignore_errors=True)
         cls.server.shutdown()
         cls.server.server_close()
         cls.seahub.stop()
@@ -326,6 +340,19 @@ class BridgeTestCase(unittest.TestCase):
         self.assertEqual(s, 400)
 
     # -- misc ----------------------------------------------------------------
+
+    def test_editor_page_may_be_framed_by_host_and_seahub(self):
+        # The editor iframe sits inside the host page, which sits inside Seahub. frame-ancestors is
+        # evaluated against every ancestor, so 'self' alone breaks in a real browser (lab finding).
+        st, h, body = _Http.call(f"{self.bridge_origin}/editors/wordcraft/index.html")
+        self.assertEqual(st, 200)
+        self.assertEqual(h.get("Content-Security-Policy"), f"frame-ancestors 'self' {self.seahub.origin}")
+        st, h, _ = _Http.call(f"{self.bridge_origin}/editors/wordcraft/app.wasm")
+        self.assertEqual(st, 200)
+        self.assertEqual(h.get("Content-Type"), "application/wasm")
+        self.assertNotIn("Content-Security-Policy", h)
+        st, _, _ = _Http.call(f"{self.bridge_origin}/editors/%2e%2e/host.html")
+        self.assertIn(st, (400, 404))
 
     def test_host_js_is_served_and_speaks_upstream_protocol(self):
         status, headers, body = _Http.call(f"{self.bridge_origin}/host.js")
