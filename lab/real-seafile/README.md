@@ -32,9 +32,13 @@ Editor bundles live under `static/<editor-id>/` (gitignored) with a `static/<edi
 (tag, SHA-256, and whether the lab changed anything). `editors.json` maps extensions to editors;
 `seahub_settings.extra.py` is the managed block `configure` writes.
 
-The VM has a Rust/wasm toolchain (`rustup`, `trunk`) for building patched bundles under `~/build/`;
-4 GiB of RAM is enough for one `trunk build --release` with `CARGO_BUILD_JOBS=2` while ONLYOFFICE
-is stopped.
+The VM has a Rust/wasm toolchain (`rustup`, `trunk`) for building patched bundles under `~/build/`
+(`docs/upstream-drafts/<app>-host-bridge/apply.py` applies a port to a shallow clone, then
+`cd apps/<app>-web && CARGO_BUILD_JOBS=2 trunk build --release`). 4 GiB of RAM is enough for one
+build at a time **with ONLYOFFICE stopped** (`docker compose stop onlyoffice`): wasm-bindgen on a
+50 MB wasm needs ~1.2 GB and was OOM-killed next to Docs. `wire-built-bundle.sh <app>` then copies
+`dist/web` into the lab, records provenance, saves the diff under `docs/upstream-drafts/` and
+deletes the build's `target/` (each is several GB on a 30 GB disk).
 
 ## Human checklist (HTTPS, desktop browser) — not yet run
 

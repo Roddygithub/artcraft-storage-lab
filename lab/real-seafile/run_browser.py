@@ -99,7 +99,7 @@ def main():
 
         # Apps with no hand-writable format and no page API: let the standalone app save a new
         # document as a browser download, and use those bytes as the Seafile fixture.
-        for editor, fname, ext in (("soundcraft", "test.scraft", "scraft"),):
+        for editor, fname, ext in (("soundcraft", "test.scraft", "scraft"), ("designcraft", "test.designcraft", "designcraft")):
             if not os.path.isdir(os.path.join(STATIC, editor)):
                 continue
             try:

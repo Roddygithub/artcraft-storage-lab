@@ -8,5 +8,6 @@
   "figcraft": {"app": "figcraft", "label": "FigCraft v0.13.1 (upstream + lab page-API shim)", "extensions": ["figcraft", "fig"], "url": "/editors/figcraft/index.html?host=parent"},
   "soundcraft": {"app": "soundcraft", "label": "SoundCraft v0.15.0 (upstream + lab host.rs port, built in the lab VM)", "extensions": ["scraft", "scraftz"], "url": "/editors/soundcraft/index.html?host=parent"},
   "photocraft": {"app": "photocraft", "label": "PhotoCraft v0.18.0 (upstream + lab host.rs port, built in the lab VM)", "extensions": ["pcraft", "png", "webp"], "url": "/editors/photocraft/index.html?host=parent"},
+  "designcraft": {"app": "designcraft", "label": "DesignCraft v0.15.2 (upstream + lab host.rs port, built in the lab VM)", "extensions": ["designcraft"], "url": "/editors/designcraft/index.html?host=parent"},
   "svgstub": {"app": "vectorcraft", "label": "Stub editor (lab)", "extensions": ["drawio"], "url": "/editors/stub/index.html?host=parent"}
 }
