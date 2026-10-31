@@ -10,7 +10,7 @@ budget = int(sys.argv[2]) if len(sys.argv) > 2 else 120
 BRIDGE = os.environ["BRIDGE_URL"].rstrip("/")
 with sync_playwright() as p:
     b = p.chromium.launch(args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--enable-webgl", "--disable-dev-shm-usage"])
-    page = b.new_page(viewport={"width": 1200, "height": 800})
+    page = b.new_context(viewport={"width": 1200, "height": 800}, bypass_csp=True).new_page()
     t0 = time.time()
     page.on("request", lambda r: print(f"[{time.time()-t0:5.1f}s] REQ  {r.method} {r.url[-90:]}", flush=True))
     page.on("requestfailed", lambda r: print(f"[{time.time()-t0:5.1f}s] FAIL {r.url[-90:]} {r.failure}", flush=True))

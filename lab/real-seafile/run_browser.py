@@ -130,7 +130,7 @@ def main():
         # API on the standalone editor page, then upload it to Seafile and run the host flow on it.
         try:
             fig = fixctx.new_page()
-            fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html", wait_until="commit", timeout=60000)
+            fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html?control", wait_until="commit", timeout=60000)   # ?control: opt-in page API
             # function form: the editor page's CSP forbids eval, which a string expression would use
             fig.wait_for_function("() => typeof window.figcraft === 'object'", timeout=120000)
             fig.wait_for_function("() => window.figcraft.commands().then(() => true).catch(() => false)", timeout=120000)
