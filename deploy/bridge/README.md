@@ -36,6 +36,13 @@ bridge  ──▶ https://seafile.example.org/api2/wopi/files/…  (CheckFileInf
 `UserCanWrite` on save, version precondition (409 on a concurrent change, nothing overwritten),
 file name and content signature, reconciliation after a lost response, WOPI locks. See `bridge/README.md`.
 
+## Smoke-tested
+
+The image builds from this Dockerfile (python:3.12-slim, no dependencies) and, started on the
+lab's Docker network with the lab's bundles mounted at `/editors`, answers `/healthz`, serves a
+discovery XML with a view and an edit action per mapped extension, and serves the editor pages
+(2026-10-31, lab VM).
+
 ## Validated against
 
 Stock Seafile CE 13.0.28 and ONLYOFFICE Docs 9.4 with WordCraft, GridCraft, PdfCraft, CADCraft
