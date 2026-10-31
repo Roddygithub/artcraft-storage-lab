@@ -23,17 +23,13 @@ class _ThreadedServer(socketserver.ThreadingMixIn, WSGIServer):
     allow_reuse_address = True
 
 
-from .app import Bridge, Config, load_editors
+from .app import Bridge
+from .settings import config_from_env
 
 
 def main() -> int:
     try:
-        cfg = Config(
-            public_url=os.environ["BRIDGE_PUBLIC_URL"],
-            seahub_origin=os.environ["BRIDGE_SEAHUB_ORIGIN"],
-            editors=load_editors(os.environ.get("BRIDGE_EDITORS", "bridge/editors.example.json")),
-            static_dir=os.environ.get("BRIDGE_STATIC_DIR") or None,
-        )
+        cfg = config_from_env()
     except (KeyError, ValueError, OSError) as exc:
         print(f"configuration error: {exc}", file=sys.stderr)
         return 2

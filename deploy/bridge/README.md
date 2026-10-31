@@ -7,7 +7,7 @@ no editor patch, no SeaDrive, no desktop app.
 ```text
 browser ──▶ https://seafile.example.org  (Seahub: file page posts a WOPI token to the bridge)
 browser ──▶ https://craft.example.org    (bridge: host page + editor bundle + /relay/* → Seahub WOPI)
-bridge  ──▶ https://seafile.example.org/api2/wopi/files/…  (CheckFileInfo / GetFile / PutFile / Lock)
+bridge  ──▶ https://seafile.example.org/api2/wopi/files/<id>  (Seahub 13: /api2/…; CheckFileInfo / GetFile / PutFile / Lock)
 ```
 
 ## Steps
@@ -31,10 +31,13 @@ bridge  ──▶ https://seafile.example.org/api2/wopi/files/…  (CheckFileInf
   `frame-ancestors <BRIDGE_SEAHUB_ORIGIN>` on the host page and `'self' <BRIDGE_SEAHUB_ORIGIN>` on
   editor pages; `BRIDGE_SEAHUB_ORIGIN` must be exactly the origin users type (scheme + host [+ port]).
 
-## What the bridge enforces (Seahub's WOPI host does not)
+## What the bridge guarantees
 
-`UserCanWrite` on save, version precondition (409 on a concurrent change, nothing overwritten),
-file name and content signature, reconciliation after a lost response, WOPI locks. See `bridge/README.md`.
+A save through the bridge is either verified in Seafile (read back after PutFile) or reported as
+failed; a read-only user cannot save through the bridge; a concurrent change is a 409, never an
+overwrite; Save As / Export becomes a download. Seahub's own `PutFile` stays writable to anyone
+holding a token (Seahub does not check `can_edit`), which the bridge cannot change — see
+`bridge/README.md` and `docs/upstream-drafts/seahub-wopi-putfile-note.md`.
 
 ## Smoke-tested
 

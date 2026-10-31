@@ -6,6 +6,7 @@ Run:  python3 tests/bridge/test_bridge.py
 from __future__ import annotations
 
 import io
+import hashlib
 import json
 import os
 import sys
@@ -22,13 +23,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from bridge.app import Bridge, Config, TransportError, content_matches_extension  # noqa: E402
+from bridge.app import Bridge, Config, _urlopen_no_redirect, TransportError, content_matches_extension  # noqa: E402
 from fake_seahub import FakeSeahub  # noqa: E402
 
 
 class _Quiet(WSGIRequestHandler):
     def log_message(self, *a):
         pass
+
+
+def _zip(parts: dict) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        for name, data in parts.items():
+            z.writestr(name, data)
+    return buf.getvalue()
 
 
 def _docx(text: bytes = b"hello") -> bytes:
@@ -66,7 +75,7 @@ class BridgeTestCase(unittest.TestCase):
         cls.seahub = FakeSeahub()
         cls.seahub.start()
         cls.lost_once = {"armed": False}
-        real_urlopen = urllib.request.urlopen
+        real_urlopen = _urlopen_no_redirect  # the bridge's own opener: no redirect following
 
         def urlopen(req, timeout=None):
             # Simulate a lost response on PutFile: the write reaches Seahub, the reply is lost.
@@ -99,7 +108,7 @@ class BridgeTestCase(unittest.TestCase):
         d = tempfile.mkdtemp(prefix="bridge-static-")
         os.makedirs(os.path.join(d, "wordcraft"))
         with open(os.path.join(d, "wordcraft", "index.html"), "w") as fh:
-            fh.write("<!doctype html><title>stub</title>")
+            fh.write('<!doctype html><title>stub</title><script type="module">import init from "./app.js"; await init();</script>')
         with open(os.path.join(d, "wordcraft", "app.wasm"), "wb") as fh:
             fh.write(b"\0asm")
         cls._static = d
@@ -116,7 +125,7 @@ class BridgeTestCase(unittest.TestCase):
     # -- helpers -------------------------------------------------------------
 
     def _file(self, name="report.docx", content=None, can_edit=True, user="alice"):
-        fid = f"repo1_{name}_{id(self)}_{len(self.seahub.files)}"
+        fid = hashlib.sha1(f"repo1_{name}_{id(self)}_{len(self.seahub.files)}".encode()).hexdigest()  # Seafile file ids are 40 hex chars
         self.seahub.add_file(fid, name, content if content is not None else _docx())
         token = self.seahub.mint_token(fid, user, can_edit)
         return fid, token, self.seahub.wopi_src(fid)
@@ -346,13 +355,109 @@ class BridgeTestCase(unittest.TestCase):
         # evaluated against every ancestor, so 'self' alone breaks in a real browser (lab finding).
         st, h, body = _Http.call(f"{self.bridge_origin}/editors/wordcraft/index.html")
         self.assertEqual(st, 200)
-        self.assertEqual(h.get("Content-Security-Policy"), f"frame-ancestors 'self' {self.seahub.origin}")
+        csp = h.get("Content-Security-Policy", "")
+        self.assertIn(f"frame-ancestors 'self' {self.seahub.origin}", csp)
+        self.assertIn("connect-src 'self'", csp)          # a buggy or hostile bundle cannot beacon the token out
+        self.assertIn("'wasm-unsafe-eval'", csp)
+        self.assertIn("'sha256-", csp)                    # the inline bootstrap script is allowed by hash only
+        self.assertEqual(h.get("Cache-Control"), "no-cache")
+        self.assertTrue(h.get("ETag"))
+        st2, h2, body2 = _Http.call(f"{self.bridge_origin}/editors/wordcraft/index.html", headers={"If-None-Match": h["ETag"]})
+        self.assertEqual((st2, body2), (304, b""))
         st, h, _ = _Http.call(f"{self.bridge_origin}/editors/wordcraft/app.wasm")
         self.assertEqual(st, 200)
         self.assertEqual(h.get("Content-Type"), "application/wasm")
         self.assertNotIn("Content-Security-Policy", h)
         st, _, _ = _Http.call(f"{self.bridge_origin}/editors/%2e%2e/host.html")
         self.assertIn(st, (400, 404))
+
+    def test_hashed_assets_are_immutable_and_streamed_with_head_support(self):
+        with open(os.path.join(self._static, "wordcraft", "wordcraft-web-0123456789abcdef_bg.wasm"), "wb") as fh:
+            fh.write(b"\0asm" + b"x" * 200000)
+        st, h, body = _Http.call(f"{self.bridge_origin}/editors/wordcraft/wordcraft-web-0123456789abcdef_bg.wasm")
+        self.assertEqual((st, len(body)), (200, 200004))
+        self.assertEqual(h.get("Cache-Control"), "public, max-age=31536000, immutable")
+        self.assertEqual(h.get("Content-Type"), "application/wasm")
+        st, h, body = _Http.call(f"{self.bridge_origin}/editors/wordcraft/wordcraft-web-0123456789abcdef_bg.wasm", method="HEAD")
+        self.assertEqual((st, body, h.get("Content-Length")), (200, b"", "200004"))
+        st, _, _ = _Http.call(f"{self.bridge_origin}/editors/wordcraft/app.wasm")   # not content-hashed: revalidated
+        self.assertEqual(st, 200)
+
+    def test_save_without_expected_version_is_400(self):
+        fid, token, src = self._file()
+        status, _, body = self._relay("save", token, src, headers={"Content-Type": "application/octet-stream"}, body=_docx(b"v2"))
+        self.assertEqual(status, 400, body)
+        self.assertIn(b"X-Expected-Version", body)
+
+    def test_retry_after_lost_answer_is_idempotent_even_with_the_old_version(self):
+        fid, token, src = self._file()
+        v1 = self.seahub.files[fid]["version"]
+        self.lost_once["armed"] = True
+        status, _, body = self._save(token, src, _docx(b"v2"), v1)
+        self.assertEqual(status, 200, body)              # the write landed; reconciled by reading back
+        self.assertTrue(json.loads(body)["reconciled"])
+        # The client never saw that answer and retries with the version it opened at.
+        status, _, body = self._save(token, src, _docx(b"v2"), v1)
+        self.assertEqual(status, 200, body)
+        self.assertTrue(json.loads(body)["reconciled"])
+        self.assertEqual(self.seahub.files[fid]["commits"], 2)
+
+    def test_putfile_5xx_after_commit_is_reconciled_to_200(self):
+        fid, token, src = self._file()
+        v1 = self.seahub.files[fid]["version"]
+        self.seahub.fail_put_once = True
+        status, _, body = self._save(token, src, _docx(b"v2"), v1)
+        self.assertEqual(status, 200, body)
+        self.assertTrue(json.loads(body)["reconciled"])
+        self.assertEqual(self.seahub.files[fid]["content"], _docx(b"v2"))
+
+    def test_redirect_from_seafile_is_refused_not_followed(self):
+        fid, token, src = self._file()
+        v1 = self.seahub.files[fid]["version"]
+        self.seahub.redirect_once = True
+        status, _, body = self._save(token, src, _docx(b"v2"), v1)
+        self.assertEqual(status, 502, body)
+        self.assertIn(b"redirect", body)
+        self.assertEqual(self.seahub.files[fid]["version"], v1)   # nothing written, nothing re-sent as GET
+
+    def test_acknowledged_but_not_stored_is_502(self):
+        fid, token, src = self._file()
+        v1 = self.seahub.files[fid]["version"]
+        self.seahub.drop_put_once = True
+        status, _, body = self._save(token, src, _docx(b"v2"), v1)
+        self.assertEqual(status, 502, body)
+        self.assertIn(b"did not store", body)
+
+    def test_edit_refuses_a_forged_top_level_post(self):
+        fid, token, src = self._file()
+        form = urllib.parse.urlencode({"access_token": token, "access_token_ttl": "0"}).encode()
+        url = f"{self.bridge_origin}/edit/wordcraft?WOPISrc={urllib.parse.quote(src, safe='')}"
+        st, _, body = _Http.call(url, method="POST", body=form, headers={"Content-Type": "application/x-www-form-urlencoded", "Origin": "https://evil.example"})
+        self.assertEqual(st, 403, body)
+        st, _, body = _Http.call(url, method="POST", body=form, headers={"Content-Type": "application/x-www-form-urlencoded", "Sec-Fetch-Dest": "document"})
+        self.assertEqual(st, 403, body)
+        st, _, _ = _Http.call(url, method="POST", body=form, headers={"Content-Type": "application/x-www-form-urlencoded", "Origin": self.seahub.origin, "Sec-Fetch-Dest": "iframe"})
+        self.assertEqual(st, 200)
+
+    def test_wopisrc_must_be_a_wopi_file_endpoint(self):
+        fid, token, src = self._file()
+        for bad in (f"{self.seahub.origin}/accounts/logout/", f"{self.seahub.origin}/api/v2.1/wopi/files/../../admin/", f"{self.seahub.origin}/api/v2.1/wopi/files/{fid}/contents"):
+            status, _, body = self._relay("info", token, bad)
+            self.assertEqual(status, 400, (bad, body))
+
+    def test_signature_table_additions(self):
+        from bridge.app import content_matches_extension as m
+        self.assertTrue(m("dxf", b"0\r\nSECTION\r\n2\r\nHEADER"))
+        self.assertTrue(m("dxf", b"  0\nSECTION\n"))
+        self.assertFalse(m("dxf", b"%PDF-1.4"))
+        self.assertTrue(m("webp", b"RIFF\x10\0\0\0WEBPVP8 "))
+        self.assertFalse(m("webp", b"\x89PNG\r\n\x1a\n"))
+        self.assertTrue(m("svg", b"\xef\xbb\xbf<?xml version='1.0'?><svg/>"))      # BOM
+        self.assertTrue(m("svg", b"<!--" + b"x" * 5000 + b"--><svg/>"))           # late <svg>
+        self.assertTrue(m("pdf", b"\0%PDF-1.7"))                                  # leading junk byte
+        xlsx = _zip({"[Content_Types].xml": b"<Types/>", "xl/workbook.xml": b"<w/>"})
+        self.assertFalse(m("docx", xlsx))                                          # xlsx bytes are not a docx
+        self.assertTrue(m("xlsx", xlsx))
 
     def test_host_js_is_served_and_speaks_upstream_protocol(self):
         status, headers, body = _Http.call(f"{self.bridge_origin}/host.js")

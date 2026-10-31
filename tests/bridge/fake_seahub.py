@@ -38,6 +38,10 @@ class FakeSeahub:
         self.tokens = {}     # token -> dict(file_id, user, can_edit, expires)
         self.locks = {}      # file_id -> lock id
         self.put_log = []    # (file_id, user, len)
+        # Fault injection for the bridge's save verification (each is consumed by one PutFile):
+        self.redirect_once = False   # answer 302 before writing (a misconfigured proxy / http->https)
+        self.fail_put_once = False   # write, then answer 500 (proxy died after the commit)
+        self.drop_put_once = False   # answer 200 without writing (a lying upstream)
         self.lock = threading.Lock()
         self._server = None
         self._thread = None
@@ -178,7 +182,16 @@ class FakeSeahub:
             # Seahub: no can_edit check, no lock check, no version check.
             n = int(environ.get("CONTENT_LENGTH") or 0)
             data = environ["wsgi.input"].read(n)
+            if self.redirect_once:
+                self.redirect_once = False
+                return _respond(start_response, 302, b"", extra=[("Location", f"{self.origin}{path}?access_token=x")])
+            if self.drop_put_once:
+                self.drop_put_once = False
+                return _respond(start_response, 200, b"")
             self._write(file_id, data, rec["user"])
+            if self.fail_put_once:
+                self.fail_put_once = False
+                return _respond(start_response, 500, b"proxy error after commit")
             with self.lock:
                 self.put_log.append((file_id, rec["user"], len(data)))
                 mtime = self.files[file_id]["mtime"]
@@ -193,7 +206,7 @@ def _obj_id(content: bytes) -> str:
 
 
 def _respond(start_response, status, body, ctype="text/plain", extra=None):
-    reason = {200: "OK", 401: "Unauthorized", 404: "Not Found", 405: "Method Not Allowed", 409: "Conflict", 501: "Not Implemented"}.get(status, "Status")
+    reason = {200: "OK", 302: "Found", 401: "Unauthorized", 404: "Not Found", 405: "Method Not Allowed", 409: "Conflict", 500: "Internal Server Error", 501: "Not Implemented"}.get(status, "Status")
     headers = [("Content-Type", ctype), ("Content-Length", str(len(body)))] + list(extra or [])
     start_response(f"{status} {reason}", headers)
     return [body]

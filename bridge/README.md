@@ -2,7 +2,7 @@
 
 Status: **prototype, validated against a stock Seafile CE 13.0.28** (`lab/real-seafile/`: 45 HTTP checks +
 21 headless-browser checks with the unpatched upstream WordCraft/GridCraft/PdfCraft/CADCraft bundles and VectorCraft through a page-API shim), and
-unit-tested against a fake Seahub WOPI host (`tests/bridge/`, 21 tests). Not yet run on HTTPS with a human
+unit-tested against a fake Seahub WOPI host (`tests/bridge/`, 30 tests, with fault injection: lost answer, 5xx after commit, redirect, acknowledged-but-not-stored). Not yet run on HTTPS with a human
 in a real browser. See `docs/REFOUNDATION-REPORT.md` §5 and §7.
 
 ## What it is
@@ -26,17 +26,30 @@ Seahub (view_lib_file, WOPI branch)                       bridge origin (this se
 * **No server-side state.** The WOPI access token Seahub posts into the iframe stays in the
   host page's memory and travels in request headers to the same-origin relay.
 
-## What the bridge enforces that Seahub's PutFile does not
+## What the bridge enforces on its own save path
+
+Seahub's `PutFile` accepts any valid token, read-only or not, with no lock and no version check
+(measured on CE 13.0.28). The bridge does not and cannot close that gap: the token Seahub mints is
+posted into the user's own browser, and a user who extracts it can call Seahub directly. What the
+bridge guarantees is narrower and honest: **a save that goes through the bridge is either verified
+in Seafile or reported as failed.**
 
 | Check | Where | Why |
 | --- | --- | --- |
-| `UserCanWrite` | `/relay/save` | Seahub's `WOPIFilesContentsView.post` never reads `can_edit` |
-| Version precondition (`X-Expected-Version` vs CheckFileInfo `Version`) | `/relay/save` | optimistic concurrency; Seahub merges/overwrites otherwise |
+| `UserCanWrite` | `/relay/save` | the bridge's editors never write for a read-only user (Seahub itself would) |
+| `X-Expected-Version` required and equal to CheckFileInfo `Version` | `/relay/save` | optimistic concurrency; a mismatch is 409 unless the stored bytes already equal the document (a retry) |
+| Read-back verification after PutFile | `/relay/save` | 200 only when Seafile now holds exactly these bytes; "acknowledged but not stored" is 502, a foreign version landing right after is 409 |
+| Reconciliation on lost answer, 5xx or redirect | `/relay/save` | PutFile is never retried blindly; redirects are refused (urllib would turn PutFile into a GET) |
 | File name unchanged, content signature matches extension | `/relay/save` | no PDF bytes into a `.docx`; a Save As / Export from the editor becomes a browser download from the host page and is reported to the editor as *not* stored |
-| Lost-response reconciliation | `/relay/save` | re-read `Version` + bytes before reporting failure |
-| `WOPISrc` origin allow-list, same-origin relay calls, nonce CSP, `frame-ancestors` = Seahub | everywhere | SSRF / CSRF / clickjacking |
+| `WOPISrc` must be a Seahub WOPI file endpoint on the configured origin; relay calls same-origin with a custom header; nonce CSP on the host page; full CSP on editor pages (`connect-src 'self'`); `frame-ancestors` = Seahub | everywhere | SSRF / CSRF / token exfiltration / clickjacking |
+| A refused save keeps the page dirty; an expired token downloads the document instead of losing it | `host.js` | the editor may believe it saved; the host page does not |
 
-Identical bytes are a fileserver no-op, so retrying a save is idempotent without receipts.
+WOPI locks are taken and refreshed for other WOPI clients' benefit; Seahub ignores them on PutFile,
+so they are advisory. The residual race is the PutFile round-trip (upload + commit), not
+milliseconds; a writer landing inside it is detected by the read-back and reported as 409.
+
+The bridge → Seahub hop carries the token in the query string (that is WOPI); keep it on TLS or an
+internal network and scrub query strings from Seahub's access logs.
 
 ## Seahub configuration (target, Seahub ≥ 13 for non-office extensions)
 
@@ -77,7 +90,7 @@ bridge/static/host.html  host page template (nonce CSP)
 bridge/static/host.js    editor protocol, save discipline, locks
 bridge/editors.example.json
 tests/bridge/fake_seahub.py   fake of seahub/wopi/views.py semantics (incl. its missing can_edit check)
-tests/bridge/test_bridge.py   20 HTTP end-to-end tests
+tests/bridge/test_bridge.py   30 HTTP end-to-end tests
 ```
 
 ## Real-Seafile lab

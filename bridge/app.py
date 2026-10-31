@@ -17,8 +17,11 @@ precondition, content signature) is enforced here before forwarding.
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import html
+import http.client
+import stat
 import json
 import os
 import re
@@ -36,6 +39,26 @@ __all__ = ["Config", "Bridge", "UpstreamError", "TransportError", "load_editors"
 _ALLOWED_LOCK_OPS = ("LOCK", "UNLOCK", "REFRESH_LOCK", "GET_LOCK")
 _EXT_RE = re.compile(r"^[a-z0-9]{1,16}$")
 _EDITOR_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,31}$")
+# Seahub's WOPI file endpoints: /api2/wopi/files/<id> (13.x) or /api/v2.1/wopi/files/<id>.
+_WOPI_PATH_RE = re.compile(r"^/api(?:2|/v2\.1)/wopi/files/[0-9a-f]{32,64}$")
+# Trunk/wasm-bindgen content-hashed asset names: app-<16 hex>.js, app-<16 hex>_bg.wasm, fonts/<hex>/...
+_HASHED_ASSET_RE = re.compile(r"(?:[-_][0-9a-f]{16}(?:_bg)?\.(?:js|wasm|ico)|/[0-9a-f]{16}/)")
+_INLINE_SCRIPT_RE = re.compile(r"<script(?![^>]*\bsrc\s*=)[^>]*>(.*?)</script>", re.S | re.I)
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Never follow a redirect: urllib would turn PutFile into a GET and report success."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise urllib.error.HTTPError(req.full_url, code, f"redirect to {newurl} refused", headers, fp)
+
+
+_OPENER = urllib.request.build_opener(_NoRedirect())
+
+
+def _urlopen_no_redirect(req, timeout=None):
+    return _OPENER.open(req, timeout=timeout)
+
 
 
 # --------------------------------------------------------------------------- #
@@ -66,7 +89,7 @@ class Config:
     max_bytes: int = 256 * 1024 * 1024
     timeout: float = 30.0
     lock_refresh_seconds: int = 600
-    urlopen: Callable = urllib.request.urlopen
+    urlopen: Callable = _urlopen_no_redirect
     """Injectable for tests (lost-response simulation)."""
 
     extension_editor: Dict[str, str] = field(init=False)
@@ -83,8 +106,8 @@ class Config:
                     raise ValueError(f"editor {editor_id}: missing {key!r}")
             if not spec["url"].startswith("/"):
                 raise ValueError(f"editor {editor_id}: url must be same-origin (start with '/')")
+            spec["extensions"] = [str(e).lower() for e in spec["extensions"]]
             for ext in spec["extensions"]:
-                ext = ext.lower()
                 if not _EXT_RE.match(ext):
                     raise ValueError(f"editor {editor_id}: bad extension {ext!r}")
                 if ext in self.extension_editor:
@@ -140,6 +163,8 @@ class WopiClient:
         parts = urllib.parse.urlsplit(src)
         if parts.query or parts.fragment:
             raise ValueError("WOPISrc must not carry a query string")
+        if not _WOPI_PATH_RE.match(parts.path):
+            raise ValueError("WOPISrc is not a Seahub WOPI file endpoint")
         return src
 
     @staticmethod
@@ -171,7 +196,7 @@ class WopiClient:
                 return resp.status, dict(resp.headers), resp.read()
         except urllib.error.HTTPError as exc:
             raise UpstreamError(exc.code, exc.read() or b"", dict(exc.headers or {})) from exc
-        except (urllib.error.URLError, ConnectionError, TimeoutError, OSError) as exc:
+        except (urllib.error.URLError, ConnectionError, TimeoutError, OSError, http.client.HTTPException) as exc:
             raise TransportError(str(exc)) from exc
 
     # -- WOPI operations ----------------------------------------------------
@@ -191,7 +216,7 @@ class WopiClient:
         return body
 
     def put_file(self, src: str, token: str, data: bytes) -> dict:
-        _, _, body = self._request(
+        status, _, body = self._request(
             src,
             token,
             method="POST",
@@ -199,6 +224,9 @@ class WopiClient:
             headers={"X-WOPI-Override": "PUT"},
             body=data,
         )
+        if status != 200:
+            # 2xx other than 200 is not a WOPI PutFile success; the stored state is verified anyway.
+            raise UpstreamError(status, body)
         try:
             return json.loads(body.decode("utf-8")) if body else {}
         except (UnicodeDecodeError, json.JSONDecodeError):
@@ -233,7 +261,22 @@ def _header(headers: dict, name: str) -> str:
 # --------------------------------------------------------------------------- #
 
 
+SIGNATURE_KNOWN = frozenset({"docx", "xlsx", "pptx", "odt", "ods", "odp", "pdf", "svg", "png", "jpg", "jpeg", "webp", "dxf", "drawio"})
+_OOXML_PART = {"docx": "word/", "xlsx": "xl/", "pptx": "ppt/"}
+
+
+def _text_head(data: bytes, n: int = 65536) -> bytes:
+    head = data[:n]
+    for bom in (b"\xef\xbb\xbf", b"\xff\xfe", b"\xfe\xff"):
+        if head.startswith(bom):
+            head = head[len(bom):]
+            break
+    return head.lstrip()
+
+
 def content_matches_extension(ext: str, data: bytes) -> bool:
+    """A cheap check that the bytes are the kind of file the name says. Unknown extensions pass:
+    the table is in SIGNATURE_KNOWN so a deployment can see which mappings are unguarded."""
     ext = ext.lower()
     if ext in ("docx", "xlsx", "pptx", "odt", "ods", "odp"):
         if not data.startswith(b"PK\x03\x04"):
@@ -243,22 +286,25 @@ def content_matches_extension(ext: str, data: bytes) -> bool:
                 names = set(zf.namelist())
         except zipfile.BadZipFile:
             return False
-        if ext in ("docx", "xlsx", "pptx"):
-            return "[Content_Types].xml" in names
+        if ext in _OOXML_PART:
+            return "[Content_Types].xml" in names and any(n.startswith(_OOXML_PART[ext]) for n in names)
         return "mimetype" in names
     if ext == "pdf":
-        return data.lstrip()[:5] == b"%PDF-"
+        return b"%PDF-" in data[:1024]
     if ext == "svg":
-        head = data[:4096].lstrip()
+        head = _text_head(data)
         return head.startswith(b"<") and b"<svg" in head
     if ext == "png":
         return data.startswith(b"\x89PNG\r\n\x1a\n")
     if ext in ("jpg", "jpeg"):
         return data.startswith(b"\xff\xd8\xff")
+    if ext == "webp":
+        return data[:4] == b"RIFF" and data[8:12] == b"WEBP"
+    if ext == "dxf":
+        head = _text_head(data, 256)
+        return head.startswith(b"AutoCAD Binary DXF") or bool(re.match(rb"0\s*\r?\n\s*SECTION", head))
     if ext == "drawio":
-        head = data[:4096].lstrip()
-        return head.startswith(b"<")
-    # Unknown extension: no signature knowledge, accept.
+        return _text_head(data).startswith(b"<")
     return True
 
 
@@ -277,6 +323,7 @@ class _HTTPError(Exception):
 
 _STATUS_TEXT = {
     200: "OK",
+    304: "Not Modified",
     400: "Bad Request",
     401: "Unauthorized",
     403: "Forbidden",
@@ -315,14 +362,25 @@ class Bridge:
             status, headers, body = self._map_upstream(exc)
         except TransportError:
             status, headers, body = 504, [("Content-Type", "application/json")], b'{"error":"seafile unreachable"}'
-        headers = list(headers) + [
-            ("Content-Length", str(len(body))),
-            ("X-Content-Type-Options", "nosniff"),
-            ("Referrer-Policy", "no-referrer"),
-            ("Cache-Control", "no-store"),
-        ]
+        headers = list(headers)
+        names = {k.lower() for k, _ in headers}
+        if "cache-control" not in names:
+            headers.append(("Cache-Control", "no-store"))   # pages and relay answers carry a token or a document
+        headers += [("X-Content-Type-Options", "nosniff"), ("Referrer-Policy", "no-referrer")]
+        head_only = environ.get("REQUEST_METHOD", "GET").upper() == "HEAD"
+        if hasattr(body, "read"):
+            # A static file streamed from disk (editor bundles are tens of MB; never load them whole).
+            size = os.fstat(body.fileno()).st_size
+            headers.append(("Content-Length", str(size)))
+            start_response(f"{status} {_STATUS_TEXT.get(status, 'Status')}", headers)
+            if head_only:
+                body.close()
+                return [b""]
+            wrapper = environ.get("wsgi.file_wrapper")
+            return wrapper(body, 64 * 1024) if wrapper else _FileIter(body)
+        headers.append(("Content-Length", str(len(body))))
         start_response(f"{status} {_STATUS_TEXT.get(status, 'Status')}", headers)
-        return [body]
+        return [b"" if head_only else body]
 
     @staticmethod
     def _map_upstream(exc: UpstreamError):
@@ -330,7 +388,10 @@ class Bridge:
             return 401, [("Content-Type", "application/json")], b'{"error":"access token rejected by seafile (expired or revoked)"}'
         if exc.status == 409:
             return 409, [("Content-Type", "application/json")], b'{"error":"seafile reported a conflict"}'
-        return 502, [("Content-Type", "application/json")], json.dumps({"error": f"seafile returned {exc.status}"}).encode()
+        if 300 <= exc.status < 400:
+            return 502, [("Content-Type", "application/json")], b'{"error":"seafile answered with a redirect; check BRIDGE_SEAHUB_ORIGIN (scheme and host must be the final ones)"}'
+        # No upstream status in the body: it would be an oracle for whatever path the caller named.
+        return 502, [("Content-Type", "application/json")], b'{"error":"seafile did not accept the request"}'
 
     # -- routing ------------------------------------------------------------
 
@@ -342,8 +403,10 @@ class Bridge:
             return 200, [("Content-Type", "text/plain")], b"ok\n"
         if path == "/wopi/discovery.xml" and method == "GET":
             return 200, [("Content-Type", "application/xml; charset=utf-8")], self.discovery_xml().encode()
-        if path == "/host.js" and method == "GET":
-            return 200, [("Content-Type", "application/javascript; charset=utf-8"), ("ETag", self._host_js_etag)], self._host_js
+        if path == "/host.js" and method in ("GET", "HEAD"):
+            if _etag_matches(environ, self._host_js_etag):
+                return 304, [("ETag", self._host_js_etag), ("Cache-Control", "no-cache")], b""
+            return 200, [("Content-Type", "application/javascript; charset=utf-8"), ("ETag", self._host_js_etag), ("Cache-Control", "no-cache")], self._host_js
         if path.startswith("/edit/"):
             if method != "POST":
                 raise _HTTPError(405, "the editor entry point expects Seahub's form POST")
@@ -352,8 +415,8 @@ class Bridge:
             if method != "POST":
                 raise _HTTPError(405, "relay endpoints are POST only")
             return self._handle_relay(environ, path[len("/relay/"):])
-        if path.startswith("/editors/") and method == "GET":
-            return self._handle_static(path[len("/editors/"):])
+        if path.startswith("/editors/") and method in ("GET", "HEAD"):
+            return self._handle_static(environ, path[len("/editors/"):])
         raise _HTTPError(404, "not found")
 
     # -- discovery ----------------------------------------------------------
@@ -384,6 +447,15 @@ class Bridge:
         spec = self.cfg.editors.get(editor_id)
         if spec is None:
             raise _HTTPError(404, "unknown editor")
+        # Seahub posts the token from its own origin into an <iframe>. A top-level POST from
+        # another site (editor-CSRF: the victim typing into the attacker's file) is refused when
+        # the browser says where the request came from.
+        origin = environ.get("HTTP_ORIGIN", "")
+        if origin and origin.rstrip("/").lower() != self.cfg.seahub_origin.lower():
+            raise _HTTPError(403, "the editor entry point only accepts Seahub's form POST")
+        dest = environ.get("HTTP_SEC_FETCH_DEST", "")
+        if dest and dest != "iframe":
+            raise _HTTPError(403, "the editor entry point only accepts an iframe form POST")
 
         query = urllib.parse.parse_qs(environ.get("QUERY_STRING", ""), keep_blank_values=False)
         src = (query.get("WOPISrc") or [""])[0]
@@ -426,11 +498,8 @@ class Bridge:
             "maxBytes": self.cfg.max_bytes,
             "closeUrl": self.cfg.seahub_origin,
         }
-        page = (
-            self._host_html.replace("{{NONCE}}", nonce)
-            .replace("{{TITLE}}", html.escape(name))
-            .replace("{{CONFIG_JSON}}", json.dumps(config).replace("<", "\\u003c"))
-        )
+        fills = {"{{NONCE}}": nonce, "{{TITLE}}": html.escape(name), "{{CONFIG_JSON}}": json.dumps(config).replace("<", "\\u003c")}
+        page = re.sub(r"\{\{(NONCE|TITLE|CONFIG_JSON)\}\}", lambda m: fills[m.group(0)], self._host_html)
         csp = (
             "default-src 'none'; "
             f"script-src 'nonce-{nonce}'; "
@@ -489,6 +558,8 @@ class Bridge:
     def _relay_save(self, environ, src: str, token: str):
         expected = environ.get("HTTP_X_EXPECTED_VERSION", "")
         claimed_name = urllib.parse.unquote(environ.get("HTTP_X_FILE_NAME", ""))
+        if not expected:
+            raise _HTTPError(400, "X-Expected-Version is required (the version the document was opened at)")
         data = self._read_body(environ)
         if not data:
             raise _HTTPError(400, "empty document body refused")
@@ -497,7 +568,8 @@ class Bridge:
         name = str(info.get("BaseFileName", ""))
         ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
 
-        # 1. Seahub's PutFile does not enforce this; we do.
+        # 1. Seahub's PutFile does not enforce this on the bridge path; we do. (It stays writable
+        #    to anyone holding the token directly -- see README.)
         if not info.get("UserCanWrite", False):
             raise _HTTPError(403, "you do not have write permission on this file")
         # 2. No Save-As / rename through the save channel.
@@ -506,49 +578,91 @@ class Bridge:
         # 3. Content signature must match the extension (no PDF bytes into a .docx).
         if not content_matches_extension(ext, data):
             raise _HTTPError(415, f"document bytes are not a valid .{ext}")
-        # 4. Optimistic concurrency: the version we opened must still be current.
+        # 4. Optimistic concurrency: the version we opened must still be current -- unless what is
+        #    stored already *is* this document (a retry after a lost answer): then the save is done.
         current = str(info.get("Version", ""))
-        if expected and current != expected:
+        if current != expected:
+            if self.wopi.get_file(src, token) == data:
+                return self._json(200, {"version": current, "reconciled": True, "verified": True, "lastModified": info.get("LastModifiedTime", "")})
             raise _HTTPError(409, "the file changed in Seafile since it was opened", {"current": current, "expected": expected})
 
         try:
             self.wopi.put_file(src, token, data)
-        except TransportError:
-            # Lost response: the write may or may not have landed.
+        except (TransportError, UpstreamError) as exc:
+            if isinstance(exc, UpstreamError) and exc.status in (401, 403, 404):
+                raise  # the token is bad; nothing to reconcile
+            # Lost or failed answer (timeout, proxy 5xx, redirect): the write may still have landed.
             after = self.wopi.check_file_info(src, token)
+            if self.wopi.get_file(src, token) == data:
+                return self._json(200, {"version": str(after.get("Version", "")), "reconciled": True, "verified": True, "lastModified": after.get("LastModifiedTime", "")})
             if str(after.get("Version", "")) == current:
-                raise  # nothing landed; the client may retry (identical bytes are idempotent)
-            stored = self.wopi.get_file(src, token)
-            if stored != data:
-                raise _HTTPError(409, "a different version landed while saving", {"current": str(after.get("Version", ""))})
-            return self._json(200, {"version": str(after.get("Version", "")), "reconciled": True, "lastModified": after.get("LastModifiedTime", "")})
+                raise  # nothing landed; the client may retry with the same expected version
+            raise _HTTPError(409, "a different version landed while saving", {"current": str(after.get("Version", ""))})
 
+        # 5. Trust nothing about the answer: read back what Seafile holds now.
         after = self.wopi.check_file_info(src, token)
-        return self._json(200, {"version": str(after.get("Version", "")), "reconciled": False, "lastModified": after.get("LastModifiedTime", "")})
+        after_version = str(after.get("Version", ""))
+        if self.wopi.get_file(src, token) != data:
+            if after_version == current:
+                raise _HTTPError(502, "seafile acknowledged the save but did not store it")
+            raise _HTTPError(409, "another version landed right after the save; reopen the file", {"current": after_version})
+        return self._json(200, {"version": after_version, "reconciled": False, "verified": True, "lastModified": after.get("LastModifiedTime", "")})
 
     # -- static editor bundles ---------------------------------------------
 
-    def _handle_static(self, rel: str):
+    def _handle_static(self, environ, rel: str):
         if not self.cfg.static_dir:
             raise _HTTPError(404, "static serving disabled")
+        if "\x00" in rel:
+            raise _HTTPError(404, "not found")
         root = os.path.realpath(self.cfg.static_dir)
         target = os.path.realpath(os.path.join(root, rel))
         if not (target == root or target.startswith(root + os.sep)):
             raise _HTTPError(404, "not found")
         if os.path.isdir(target):
             target = os.path.join(target, "index.html")
-        if not os.path.isfile(target):
+        try:
+            st = os.stat(target)
+        except OSError:
+            raise _HTTPError(404, "not found")
+        if not stat.S_ISREG(st.st_mode):
             raise _HTTPError(404, "not found")
         ctype = _guess_type(target)
-        with open(target, "rb") as fh:
-            body = fh.read()
-        headers = [("Content-Type", ctype)]
         if ctype.startswith("text/html"):
-            # Editor documents are framed by our host page, which is itself framed by Seahub:
-            # frame-ancestors is checked against the whole ancestor chain, so both must be listed.
-            # (Found by the real-browser slice; 'self' alone makes Chromium refuse the editor.)
-            headers.append(("Content-Security-Policy", f"frame-ancestors 'self' {self.cfg.seahub_origin}"))
-        return 200, headers, body
+            with open(target, "rb") as fh:
+                body = fh.read()
+            etag = '"' + hashlib.sha256(body).hexdigest()[:32] + '"'
+            headers = [("ETag", etag), ("Cache-Control", "no-cache"), ("Content-Type", ctype), ("Content-Security-Policy", self._editor_csp(body))]
+            if _etag_matches(environ, etag):
+                return 304, headers, b""
+            return 200, headers, body
+        # Hashed assets (app-<hash>.js, app-<hash>_bg.wasm, fonts/<hash>/) never change under their
+        # name; everything else (host-shim.js, manifests) is revalidated.
+        etag = '"%x-%x"' % (st.st_size, int(st.st_mtime))
+        if _HASHED_ASSET_RE.search("/" + rel):
+            cache = "public, max-age=31536000, immutable"
+        else:
+            cache = "no-cache"
+        headers = [("ETag", etag), ("Cache-Control", cache), ("Content-Type", ctype)]
+        if _etag_matches(environ, etag):
+            return 304, headers, b""
+        return 200, headers, open(target, "rb")
+
+    def _editor_csp(self, page: bytes) -> str:
+        """The editor page is a same-origin iframe of the host page: it can read the host DOM, so the
+        real control is what it may load and where it may send. Inline module scripts (Trunk's
+        bootstrap) are allowed by hash, everything else must be same-origin; no network beyond it."""
+        hashes = " ".join(
+            "'sha256-" + base64.b64encode(hashlib.sha256(m.group(1).encode("utf-8")).digest()).decode() + "'"
+            for m in _INLINE_SCRIPT_RE.finditer(page.decode("utf-8", "replace"))
+        )
+        return (
+            "default-src 'none'; "
+            f"script-src 'self' 'wasm-unsafe-eval'{(' ' + hashes) if hashes else ''}; "
+            + "connect-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; "
+            "font-src 'self' data:; worker-src 'self' blob:; media-src 'self' blob: data:; "
+            f"frame-ancestors 'self' {self.cfg.seahub_origin}; base-uri 'none'; form-action 'none'"
+        )
 
     # -- helpers ------------------------------------------------------------
 
@@ -597,6 +711,29 @@ class Bridge:
     @staticmethod
     def _json(status: int, payload: dict):
         return status, [("Content-Type", "application/json")], json.dumps(payload).encode()
+
+
+def _etag_matches(environ, etag: str) -> bool:
+    inm = environ.get("HTTP_IF_NONE_MATCH", "")
+    return bool(inm) and etag in [t.strip() for t in inm.split(",")]
+
+
+class _FileIter:
+    def __init__(self, fh, chunk=64 * 1024):
+        self.fh, self.chunk = fh, chunk
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        data = self.fh.read(self.chunk)
+        if not data:
+            self.fh.close()
+            raise StopIteration
+        return data
+
+    def close(self):
+        self.fh.close()
 
 
 def _public_info(info: dict) -> dict:

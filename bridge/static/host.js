@@ -28,7 +28,9 @@
     dirtyRevision: 0,
     saving: false,
     lockId: null,
-    opened: false
+    opened: false,
+    failedSave: false,
+    lastBytes: null
   };
 
   nameEl.textContent = cfg.name;
@@ -113,10 +115,26 @@
     } catch (e) { return false; }
   }
 
+  // ---- token lifetime (Seahub posts access_token_ttl = expiry, ms since the epoch)
+  function tokenExpired() { return cfg.tokenTtl > 0 && Date.now() >= cfg.tokenTtl; }
+  if (cfg.tokenTtl > 0) {
+    var warnAt = cfg.tokenTtl - 5 * 60 * 1000;
+    setTimeout(function () {
+      if (!tokenExpired()) status('your Seafile session for this file ends in 5 minutes; save now, then reopen the file', 'warn');
+    }, Math.max(0, warnAt - Date.now()));
+    setTimeout(function () {
+      status(state.dirty ? 'session expired: the next save downloads your document instead of writing to Seafile' : 'session expired; reopen the file from Seafile to keep editing', state.dirty ? 'error' : 'warn');
+    }, Math.max(0, cfg.tokenTtl - Date.now()));
+  }
+  window.addEventListener('pageshow', function (e) { if (e.persisted && cfg.userCanWrite && !state.lockId) takeLock(); });
+
   // ---- save
   function handleSave(d) {
     var ticket = typeof d.ticket === 'string' ? d.ticket : null;
     function reject(err) {
+      // A refused save means the editor's content is NOT in Seafile: the page stays dirty (unload
+      // guard) whatever the editor believes, until a later save succeeds.
+      state.dirty = true; state.dirtyRevision++; state.failedSave = true;
       status(err, 'error');
       if (ticket) post('saveResult', { ticket: ticket, ok: false, error: err });
     }
@@ -136,7 +154,12 @@
     if (state.saving) return reject('a save is already in progress');
     if (bytes.byteLength > cfg.maxBytes) return reject('document too large');
 
+    if (tokenExpired()) {
+      downloadBytes(cfg.name, bytes);
+      return reject('your Seafile session for this file expired; your document was downloaded instead. Reopen the file from Seafile and open the download');
+    }
     var revision = state.dirtyRevision;
+    state.lastBytes = bytes;
     state.saving = true;
     status('saving…');
     relay('save', {
@@ -144,11 +167,13 @@
       'X-Expected-Version': state.version || '',
       'X-File-Name': encodeURIComponent(cfg.name)
     }, bytes).then(function (r) {
-      return r.json().then(function (j) { return { status: r.status, body: j }; });
+      // A proxy may answer with HTML (504 page): never let a non-JSON body look like a crash.
+      return r.text().then(function (t) { var j; try { j = JSON.parse(t); } catch (e) { j = { error: 'HTTP ' + r.status + ' from the proxy' }; } return { status: r.status, body: j }; });
     }).then(function (res) {
       state.saving = false;
       if (res.status === 200) {
         state.version = res.body.version;
+        state.failedSave = false;
         if (state.dirtyRevision === revision) state.dirty = false;
         status(res.body.reconciled ? 'saved (reconciled after a lost response)' : 'saved to Seafile', 'ok');
         if (ticket) post('saveResult', { ticket: ticket, ok: true, version: res.body.version });
@@ -157,7 +182,10 @@
       if (res.status === 409) {
         return reject('conflict: the file changed in Seafile since you opened it. Reopen it to see the current version; your edits stay in the editor.');
       }
-      if (res.status === 401) return reject('your Seafile session for this file expired; reopen the file from Seafile');
+      if (res.status === 401) {
+        downloadBytes(cfg.name, bytes);
+        return reject('your Seafile session for this file expired; your document was downloaded instead. Reopen the file from Seafile and open the download');
+      }
       reject(res.body.error || ('save failed: HTTP ' + res.status));
     }).catch(function (e) {
       state.saving = false;
