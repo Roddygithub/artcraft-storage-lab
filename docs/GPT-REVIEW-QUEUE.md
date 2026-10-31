@@ -1,5 +1,10 @@
 ## GR-075 — gateway request-body deadline
 
+> **2026-10-31 — superseded.** The GR series below describes the gateway + Seahub/fileserver patch
+> architecture that `docs/REFOUNDATION-REPORT.md` retired. Current state: `README.md`, `ROADMAP.md`,
+> `lab/real-seafile/results/`. This file is kept as history and is no longer updated.
+
+
 Nonempty request bodies have a 120-second total deadline across bounded
 `read1` calls. A loopback slow-drip test confirms 408/close and preservation of
 `/dirty` state. R3 returned bounded PROVISIONAL PASS with one matrix minor,

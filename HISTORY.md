@@ -1,5 +1,10 @@
 # 2026-10-26 — GR-080 security evidence reconciliation
 
+> **2026-10-31 — superseded.** The GR series below describes the gateway + Seahub/fileserver patch
+> architecture that `docs/REFOUNDATION-REPORT.md` retired. Current state: `README.md`, `ROADMAP.md`,
+> `lab/real-seafile/results/`. This file is kept as history and is no longer updated.
+
+
 - Updated `docs/SECURITY.md` to distinguish the historical GPT FAIL candidate
   from later GR-015 isolated synthetic build/runtime evidence and its remaining
   deployment limits.

@@ -1,5 +1,10 @@
 # GPT Handoff
 
+> **2026-10-31 — superseded.** The GR series below describes the gateway + Seahub/fileserver patch
+> architecture that `docs/REFOUNDATION-REPORT.md` retired. Current state: `README.md`, `ROADMAP.md`,
+> `lab/real-seafile/results/`. This file is kept as history and is no longer updated.
+
+
 A single document that lets a GPT session take over this project **without
 trusting the summaries produced by the free models**.
 
