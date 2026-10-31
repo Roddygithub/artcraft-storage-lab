@@ -16,7 +16,8 @@ Seahub WOPI host ◀──(CheckFileInfo/GetFile/PutFile/Lock, token in headers)
 ```
 
 Status: **prototype, validated on a stock Seafile CE 13.0.28** in an isolated VM — HTTP slice
-45/45, browser slice 21/21 (`lab/real-seafile/results/`). Not yet deployed anywhere real. Nothing
+48/48, browser slice 45/46 (`lab/real-seafile/results/`); independent review R2 of the bridge
+incorporated (30 fake-host tests). Not yet deployed anywhere real. Nothing
 published upstream.
 
 ## What works today
@@ -28,7 +29,15 @@ published upstream.
 | `.pdf` (`?edit_pdf=true`) | PdfCraft 0.16.1 | upstream bundle, its own bridge |
 | `.dxf` | CADCraft 0.15.1 | upstream bundle, its own `host.rs` |
 | `.svg` | VectorCraft 0.19.0 | upstream bundle + a one-line page-API shim (`lab/real-seafile/static/host-shim.js`) |
-| `.pptx`, the rest of Office | ONLYOFFICE | unchanged; Seahub picks per extension |
+| `.pptx` / `.deckcraft` | DeckCraft 0.13.1 | upstream source + the lab's `host.rs` port (`docs/upstream-drafts/`), built in the lab |
+| `.png` / `.psd` / `.pcraft` | PhotoCraft 0.18.0 | same, with a dirty signal |
+| `.designcraft` | DesignCraft 0.15.2 | same |
+| `.scraft` / `.scraftz` | SoundCraft 0.15.0 | same |
+| ODF and the rest of Office | ONLYOFFICE | unchanged; Seahub picks per extension |
+
+A foreign format opened in a Craft app (a `.pptx` in DeckCraft, a `.png` in PhotoCraft) is saved by
+the app in its own format; the host page hands that over as a download and leaves the Seafile
+file untouched. In-place saves are verified by reading the file back from Seafile.
 
 Per-app coverage of all 13 Craft apps: report §7, step 4. Ports for the others:
 `docs/upstream-drafts/host-bridge-ports.md`.

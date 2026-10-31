@@ -3,7 +3,7 @@
 Date: 2026-10-31. Mandate: `Claude.md` (commit `f30d39c`). Status of this document: **draft for owner review**. Nothing in this report has been published, and no production system was touched while producing it.
 
 ```text
-REFOUNDATION_STATE=DECISION_REACHED, BRIDGE_PROTOTYPE_BUILT, REAL_SEAFILE_SLICE_PASSED (stock Seafile CE 13.0.28 + ONLYOFFICE 9.4; 4 upstream ArtCraft bundles unpatched + VectorCraft via page-API shim; HTTP 45/45 + browser 21/21), DEPLOY_KIT_WRITTEN (deploy/bridge/)
+REFOUNDATION_STATE=DECISION_REACHED, BRIDGE_PROTOTYPE_BUILT, REAL_SEAFILE_SLICE_PASSED (stock Seafile CE 13.0.28 + ONLYOFFICE 9.4; 4 upstream bundles unpatched + VectorCraft via shim + 4 locally ported bundles; HTTP 48/48 + browser 45/46), DEPLOY_KIT_WRITTEN (deploy/bridge/)
 DECISION=CHANGE_PRODUCT_FORM (+ REDUCE_SCOPE, + PAUSE_UNTIL_UPSTREAM_MATURITY for ArtCraft office apps)
 PRODUCTION_STATUS=UNTOUCHED (by this audit; but see §3.4 — the live instance already carries GR-015 patches)
 UPSTREAM_STATUS=LOCKED
@@ -234,7 +234,7 @@ Lab (safe, isolated, no production, no upstream):
    - ONLYOFFICE Docs CE 9.4 refuses to fetch from private/compose IPs unless `ALLOW_PRIVATE_IP_ADDRESS=true`; with it, JWT command + docx→pdf conversion round-trip through Seahub pass. Relevant to the owner's `api.js` 404 investigation only as a reminder that Docs has its own network policy.
 4. **Done**: the four upstream web bundles that already ship the parent-host protocol — WordCraft v0.13.2, GridCraft v0.14.2, PdfCraft v0.16.1, CADCraft v0.15.1, fetched by SHA-256 (`static/*-PROVENANCE.txt`), **unpatched** — open from a real Seahub page in headless Chromium through the bridge host page, load the document from Seafile, and Ctrl+S produces a new Seafile version attributed to the user (`run_browser.py`, screenshots in `results/`). One bridge bug was found only by the real browser and fixed: editor pages must send `frame-ancestors 'self' <seahub>` (the whole ancestor chain is checked). A second: a single-threaded server blocks an editor's own scripts behind its 84 MB wasm; the bridge is threaded now.
 
-   Coverage of the 13 applications after this step (**browser slice 21/21**):
+   Coverage of the 13 applications after this step (**HTTP slice 48/48, browser slice 45/46**):
 
    | App | Upstream web bundle | Host protocol | In the lab | Evidence |
    | --- | --- | --- | --- | --- |
@@ -243,9 +243,12 @@ Lab (safe, isolated, no production, no upstream):
    | PdfCraft 0.16.1 | yes | upstream bridge | pdf (`?edit_pdf=true`), unpatched | same |
    | CADCraft 0.15.1 | yes | upstream `host.rs` | dxf, unpatched | same |
    | VectorCraft 0.19.0 | yes | none; page API `window.vectorcraft` | svg via `static/host-shim.js` (one `<script>` line in index.html, no Rust change) | open+save through real Seahub |
-   | FigCraft 0.13.1 | yes | none; page API `window.figcraft` | wired with the same shim; no fixture file yet | not exercised |
-   | DeckCraft 0.13.1 | yes | none | local `host.rs` port prepared (`docs/upstream-drafts/deckcraft-host-bridge/`), being built in the lab VM | pending |
-   | PhotoCraft 0.18.0, DesignCraft 0.15.2, SoundCraft 0.15.0, FilmCraft 0.15.0, LightCraft 0.16.0, EffectCraft 0.19.0 | yes | none | not wired; the lab's older GR patches (GR-021…036, 076) are the starting point for the same port | — |
+   | FigCraft 0.13.1 | yes | none; page API `window.figcraft` | wired with the same shim | fixture generation times out; not yet exercised |
+   | DeckCraft 0.13.1 | yes | **port** (`docs/upstream-drafts/deckcraft-host-bridge/`, built in the lab VM) | pptx, deckcraft | opens pptx from Seahub; Save yields `test.deckcraft` (native) → export download; `.deckcraft` saves verified |
+   | SoundCraft 0.15.0 | yes | **port** (`soundcraft-host-bridge/`) | scraft, scraftz | same shape; `.scraftz` verified |
+   | PhotoCraft 0.18.0 | yes | **port** (`photocraft-host-bridge/`, with dirty signal) | pcraft, psd, png, webp | opens png; Save yields `test.psd` → export download; `.psd` verified |
+   | DesignCraft 0.15.2 | yes | **port** (`designcraft-host-bridge/`) | designcraft | open + save → new Seafile version |
+   | FilmCraft 0.15.0, LightCraft 0.16.0, EffectCraft 0.19.0 | yes | none | not wired | multi-file OPFS projects, no single document file; export-only is the realistic scope (`host-bridge-ports.md`) |
 
    **Independent review R2 of the bridge** (separate context, 2026-10-31): PASS_WITH_FIXES. Its HIGH findings — a 3xx or non-200 PutFile answer was reported as a save (urllib follows redirects and turns PutFile into a GET), a refused save left the host page "clean" so the tab could close without a prompt, a save whose answer was lost could never be retried (409 forever), and the README claimed `UserCanWrite`/locks as an authorization boundary — are fixed: redirects refused, every save read back and compared before 200, reconciliation on lost answer/5xx/redirect and on a stale expected version when the stored bytes already match, `X-Expected-Version` mandatory, refused saves keep the page dirty, expired tokens download the document instead of losing it, full CSP (`connect-src 'self'`, inline bootstrap by hash) on editor pages, `WOPISrc` restricted to the WOPI file endpoint, forged top-level `/edit` POSTs refused, per-route caching with ETag/304 and streamed bundles. What the bridge cannot fix and the READMEs now say plainly: Seahub's `PutFile` remains writable to anyone holding a token (U2), and the race window is the PutFile round-trip, not milliseconds.
 
