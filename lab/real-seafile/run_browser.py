@@ -70,6 +70,7 @@ def main():
         "test.svg": ("vectorcraft", rs.SVG_V1, ""),          # page-API shim, not an upstream bridge
     }
     ids = {name: rs.upload(admin, repo_id, name, content) for name, (_, content, _) in fixtures.items()}
+    figcraft_fixture = None
 
     with sync_playwright() as p:
         browser = p.chromium.launch(args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist",
@@ -87,6 +88,36 @@ def main():
         page.click("button[type=submit], input[type=submit]")
         page.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
         check("browser_login", "/accounts/login" not in page.url, page.url)
+
+        # FigCraft has no file format we can write by hand: let the app make one through its page
+        # API on the standalone editor page, then upload it to Seafile and run the host flow on it.
+        try:
+            fig = ctx.new_page()
+            fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html", wait_until="commit", timeout=60000)
+            fig.wait_for_function("typeof window.figcraft === 'object'", timeout=120000)
+            fig.wait_for_function("window.figcraft.commands().then(() => true).catch(() => false)", timeout=120000)
+            made = fig.evaluate("""async () => {
+                const f = window.figcraft;
+                f.captureDownloads(true);
+                try { await f.execute('node.create', {kind: 'frame', name: 'Home'}); } catch (e) {}
+                const r = await f.execute('file.save', {path: 'test.figcraft'});
+                if (r && r.pending) { try { await f.request('ui.dialog.confirm', {}); } catch (e) {} }
+                for (let i = 0; i < 40; i++) {
+                    const files = f.files() || [];
+                    const hit = files.find(x => String(x.path).endsWith('test.figcraft'));
+                    if (hit) { const b = f.readFile('test.figcraft'); return Array.from(b); }
+                    await new Promise(r => setTimeout(r, 250));
+                }
+                return null;
+            }""")
+            fig.close()
+            if made:
+                figcraft_fixture = bytes(made)
+                ids["test.figcraft"] = rs.upload(admin, repo_id, "test.figcraft", figcraft_fixture)
+                fixtures["test.figcraft"] = ("figcraft", figcraft_fixture, "")
+            check("figcraft_fixture_made_by_the_app", bool(made), f"{len(made) if made else 0} bytes")
+        except Exception as e:  # noqa: BLE001
+            check("figcraft_fixture_made_by_the_app", False, str(e)[:300])
 
         for name, (editor, content, query) in fixtures.items():
             app = editor

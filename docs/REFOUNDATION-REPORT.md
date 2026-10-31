@@ -3,7 +3,7 @@
 Date: 2026-10-31. Mandate: `Claude.md` (commit `f30d39c`). Status of this document: **draft for owner review**. Nothing in this report has been published, and no production system was touched while producing it.
 
 ```text
-REFOUNDATION_STATE=DECISION_REACHED, BRIDGE_PROTOTYPE_BUILT, REAL_SEAFILE_SLICE_PASSED (stock Seafile CE 13.0.28 + ONLYOFFICE 9.4 + 4 upstream ArtCraft bundles, HTTP 45/45 + browser 17/17)
+REFOUNDATION_STATE=DECISION_REACHED, BRIDGE_PROTOTYPE_BUILT, REAL_SEAFILE_SLICE_PASSED (stock Seafile CE 13.0.28 + ONLYOFFICE 9.4; 4 upstream ArtCraft bundles unpatched + VectorCraft via page-API shim; HTTP 45/45 + browser 21/21), DEPLOY_KIT_WRITTEN (deploy/bridge/)
 DECISION=CHANGE_PRODUCT_FORM (+ REDUCE_SCOPE, + PAUSE_UNTIL_UPSTREAM_MATURITY for ArtCraft office apps)
 PRODUCTION_STATUS=UNTOUCHED (by this audit; but see §3.4 — the live instance already carries GR-015 patches)
 UPSTREAM_STATUS=LOCKED
@@ -232,7 +232,22 @@ Lab (safe, isolated, no production, no upstream):
    - Save → new Seafile version attributed to the editing user; stale/external-writer saves → 409 and no overwrite; identical bytes → no new commit; WOPI lock/unlock/conflict through Seahub; revoked/expired token → 401.
    - Seahub 12/13 render the WOPI page as React JS literals (`actionURL`, `accessToken`) posting into `<iframe name="office_frame">`, not a server-side `<form>`; the bridge is unaffected (it only sees the POST).
    - ONLYOFFICE Docs CE 9.4 refuses to fetch from private/compose IPs unless `ALLOW_PRIVATE_IP_ADDRESS=true`; with it, JWT command + docx→pdf conversion round-trip through Seahub pass. Relevant to the owner's `api.js` 404 investigation only as a reminder that Docs has its own network policy.
-4. **Done**: the four upstream web bundles that already ship the parent-host protocol — WordCraft v0.13.2, GridCraft v0.14.2, PdfCraft v0.16.1, CADCraft v0.15.1, fetched by SHA-256 (`static/*-PROVENANCE.txt`), **unpatched** — open from a real Seahub page in headless Chromium through the bridge host page, load the document from Seafile, and Ctrl+S produces a new Seafile version attributed to the user (`run_browser.py`, **17/17**, screenshots in `results/`). VectorCraft v0.19.0 and PhotoCraft v0.18.0 bundles carry no host protocol (grep of the wasm: no `<app>:ready`), confirming §3.1: they need an upstream change before they can be hosted, and that change is locked. One bridge bug was found only by the real browser and fixed: editor pages must send `frame-ancestors 'self' <seahub>` (the whole ancestor chain is checked), not `'self'` alone. Still to do: ONLYOFFICE on the same DOCX for a fidelity comparison; a non-headless pass on HTTPS (WebGPU, clipboard) by a human.
+4. **Done**: the four upstream web bundles that already ship the parent-host protocol — WordCraft v0.13.2, GridCraft v0.14.2, PdfCraft v0.16.1, CADCraft v0.15.1, fetched by SHA-256 (`static/*-PROVENANCE.txt`), **unpatched** — open from a real Seahub page in headless Chromium through the bridge host page, load the document from Seafile, and Ctrl+S produces a new Seafile version attributed to the user (`run_browser.py`, screenshots in `results/`). One bridge bug was found only by the real browser and fixed: editor pages must send `frame-ancestors 'self' <seahub>` (the whole ancestor chain is checked). A second: a single-threaded server blocks an editor's own scripts behind its 84 MB wasm; the bridge is threaded now.
+
+   Coverage of the 13 applications after this step (**browser slice 21/21**):
+
+   | App | Upstream web bundle | Host protocol | In the lab | Evidence |
+   | --- | --- | --- | --- | --- |
+   | WordCraft 0.13.2 | yes | upstream `host.rs` | docx, unpatched | open+save through real Seahub |
+   | GridCraft 0.14.2 | yes | upstream `host.rs` | xlsx, unpatched | same |
+   | PdfCraft 0.16.1 | yes | upstream bridge | pdf (`?edit_pdf=true`), unpatched | same |
+   | CADCraft 0.15.1 | yes | upstream `host.rs` | dxf, unpatched | same |
+   | VectorCraft 0.19.0 | yes | none; page API `window.vectorcraft` | svg via `static/host-shim.js` (one `<script>` line in index.html, no Rust change) | open+save through real Seahub |
+   | FigCraft 0.13.1 | yes | none; page API `window.figcraft` | wired with the same shim; no fixture file yet | not exercised |
+   | DeckCraft 0.13.1 | yes | none | local `host.rs` port prepared (`docs/upstream-drafts/deckcraft-host-bridge/`), being built in the lab VM | pending |
+   | PhotoCraft 0.18.0, DesignCraft 0.15.2, SoundCraft 0.15.0, FilmCraft 0.15.0, LightCraft 0.16.0, EffectCraft 0.19.0 | yes | none | not wired; the lab's older GR patches (GR-021…036, 076) are the starting point for the same port | — |
+
+   The shim is a lab adapter: it drives the app through the control protocol the capabilities audit (§2.5) said not to use as *the* host contract. It is honest about that in its header, it needs no app change, and it is what makes an unpatched VectorCraft usable now; the upstream `host.rs` stays the proposal. Still to do: ONLYOFFICE on the same DOCX for a fidelity comparison; a non-headless pass on HTTPS (WebGPU, clipboard) by a human.
 5. Re-target GR-049/052 tests at the relay; add a protocol contract test for the upstream bridge messages.
 6. Rewrite `README.md`, `ROADMAP.md`, `AGENTS.md` to the new product form; archive the GR corpus under `docs/history/`.
 7. Prepare (do not publish) the ArtCraft `saveResult` RFC and a note on Seahub WOPI PutFile findings.

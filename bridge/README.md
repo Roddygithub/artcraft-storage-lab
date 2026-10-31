@@ -1,7 +1,7 @@
 # Seafile WOPI editor bridge — prototype
 
 Status: **prototype, validated against a stock Seafile CE 13.0.28** (`lab/real-seafile/`: 45 HTTP checks +
-17 headless-browser checks with the unpatched upstream WordCraft/GridCraft/PdfCraft/CADCraft bundles), and
+21 headless-browser checks with the unpatched upstream WordCraft/GridCraft/PdfCraft/CADCraft bundles and VectorCraft through a page-API shim), and
 unit-tested against a fake Seahub WOPI host (`tests/bridge/`, 21 tests). Not yet run on HTTPS with a human
 in a real browser. See `docs/REFOUNDATION-REPORT.md` §5 and §7.
 
@@ -50,6 +50,13 @@ WOPI_ACCESS_TOKEN_EXPIRATION = 30 * 60                       # default is 12 h; 
 ```
 
 On Seahub 12.0 the WOPI branch is only reached for office/PDF file types (see the report §2.1).
+
+## Serving
+
+`python -m bridge` runs a threaded stdlib server (one thread per request: a browser streaming an
+80 MB editor bundle must not block the relay calls of other tabs). For production put a reverse
+proxy in front for TLS and compression (`deploy/bridge/`), or run `bridge.app:Bridge` under any WSGI
+server. The bridge keeps no state between requests, so several workers are fine.
 
 ## Run locally
 
