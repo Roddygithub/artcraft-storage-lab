@@ -61,11 +61,8 @@ impl Bridge {
         let bridge = self.clone();
         services.write = Some(Box::new(move |name: &str, bytes: &[u8]| bridge.post_save(name, bytes)));
         let bridge = self.clone();
-        services.download = Some(Box::new(move |name: &str, bytes: &[u8]| {
-            if let Err(e) = bridge.post_save(name, bytes) {
-                log::error!("couldn't hand {name} to the host page: {e}");
-            }
-        }));
+        // DesignCraft's `download` returns the result (DeckCraft's does not).
+        services.download = Some(Box::new(move |name: &str, bytes: &[u8]| bridge.post_save(name, bytes)));
     }
 
     pub fn post_ready(&self) {
