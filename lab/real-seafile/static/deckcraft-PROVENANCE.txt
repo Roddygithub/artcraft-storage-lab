@@ -1,0 +1,4 @@
+repository: storytold/deckcraft
+built_from: a3fbf02 (v0.13.1, shallow clone of main)
+asset: built in the lab VM with trunk build --release (not an upstream release asset)
+patched: yes -- host bridge port, see docs/upstream-drafts/deckcraft-host-bridge/ (deckcraft-host-bridge.diff); nothing else changed

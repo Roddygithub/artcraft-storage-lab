@@ -6,8 +6,8 @@ owner explicitly approves it. Until then it is documentation of what we would pr
 
 | Draft | Target | What it is | State |
 | --- | --- | --- | --- |
-| `deckcraft-host-bridge/` | storytold/deckcraft | `apps/deckcraft-web/src/host.rs` + shell changes: the same `?host=parent` bridge WordCraft, GridCraft, PdfCraft and CADCraft already ship | compiles? see README there |
-| `soundcraft-host-bridge/` | storytold/soundcraft | same bridge for SoundCraft, through the engine's delivery hook | compiles? see README there |
+| `deckcraft-host-bridge/` | storytold/deckcraft | `apps/deckcraft-web/src/host.rs` + shell changes: the same `?host=parent` bridge WordCraft, GridCraft, PdfCraft and CADCraft already ship | **builds** (v0.13.1, `deckcraft-host-bridge.diff`); lab run pending |
+| `soundcraft-host-bridge/` | storytold/soundcraft | same bridge for SoundCraft, through the engine's delivery hook | **builds** (v0.15.0, `soundcraft-host-bridge.diff`); lab run pending |
 | `photocraft-host-bridge/` | storytold/photocraft | same bridge for PhotoCraft, with a dirty signal | compiles? see README there |
 | `designcraft-host-bridge/` | storytold/designcraft | same bridge for DesignCraft | compiles? see README there |
 | `seahub-wopi-putfile-note.md` | haiwen/seahub | measured on Seahub 13.0.28: `PutFile` ignores `can_edit`; no version precondition | note, no code |

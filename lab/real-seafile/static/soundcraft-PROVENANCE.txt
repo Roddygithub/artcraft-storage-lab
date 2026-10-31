@@ -1,0 +1,4 @@
+repository: storytold/soundcraft
+built_from: 444a716 (v0.15.0, shallow clone of main)
+asset: built in the lab VM with trunk build --release (not an upstream release asset)
+patched: yes -- host bridge port, see docs/upstream-drafts/soundcraft-host-bridge/ (soundcraft-host-bridge.diff); nothing else changed

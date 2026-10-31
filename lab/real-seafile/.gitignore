@@ -7,3 +7,5 @@ static/vectorcraft/
 static/figcraft/
 results/*.html
 .env
+static/deckcraft/
+static/soundcraft/
