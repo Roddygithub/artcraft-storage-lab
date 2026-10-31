@@ -1,8 +1,8 @@
 {
- "ran_at": "2026-10-31T21:08:17Z",
- "repo_id": "4cffb296-2986-4103-9f17-a81125d7446a",
- "passed": 45,
- "failed": 1,
+ "ran_at": "2026-10-31T21:37:40Z",
+ "repo_id": "115945cd-30af-46d5-ac2e-17632ba5f559",
+ "passed": 50,
+ "failed": 0,
  "checks": [
   {
    "name": "browser_login",
@@ -21,23 +21,23 @@
   },
   {
    "name": "figcraft_fixture_made_by_the_app",
-   "ok": false,
-   "detail": "Page.wait_for_function: Timeout 120000ms exceeded."
+   "ok": true,
+   "detail": "Untitled.figcraft 396 bytes"
   },
   {
    "name": "wordcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "wordcraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 2s"
+   "detail": "status='ready' after 1s"
   },
   {
    "name": "wordcraft_save_creates_seafile_version_by_user",
    "ok": true,
-   "detail": "history 1->2 top={'id': '46a046d1b6133e33af7cae96f1b7e81698e1abd7', 'rev_file_id': '949f1b86ae438c14284df78183b4dd77de959768', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.docx\"'} status='saved to Seafile'"
+   "detail": "history 1->2 top={'id': 'a7209314d744b8b6e988d3182ceeab3a1267f46e', 'rev_file_id': 'b4fce34058b44334d97ace195f8c1d34eb2ba687', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.docx\"'} status='saved to Seafile'"
   },
   {
    "name": "wordcraft_saved_docx_bytes_look_right",
@@ -47,17 +47,17 @@
   {
    "name": "gridcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "gridcraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 2s"
+   "detail": "status='ready' after 1s"
   },
   {
    "name": "gridcraft_save_creates_seafile_version_by_user",
    "ok": true,
-   "detail": "history 1->2 top={'id': '2998f7cc00d2e2fc7e722f84fc146bbb931c280d', 'rev_file_id': '3c21616b2960e1153e527c6b392c89403e7ab296', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.xlsx\"'} status='saved to Seafile'"
+   "detail": "history 1->2 top={'id': 'a98d2b58d50845e820e6182f5a0619e9813ae391', 'rev_file_id': '3c21616b2960e1153e527c6b392c89403e7ab296', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.xlsx\"'} status='saved to Seafile'"
   },
   {
    "name": "gridcraft_saved_xlsx_bytes_look_right",
@@ -67,17 +67,17 @@
   {
    "name": "pdfcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "pdfcraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 2s"
+   "detail": "status='ready' after 1s"
   },
   {
    "name": "pdfcraft_save_creates_seafile_version_by_user",
    "ok": true,
-   "detail": "history 1->2 top={'id': 'd3cea11ffa7c7f8067ca08d8142a22975b9e4077', 'rev_file_id': 'e0589622c0a5b9d5a263a4211a23f05d2d59c323', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.pdf\"'} status='saved to Seafile'"
+   "detail": "history 1->2 top={'id': '7d37e91a6cc4fd2013cc5992425234f34613c5ae', 'rev_file_id': 'e0589622c0a5b9d5a263a4211a23f05d2d59c323', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.pdf\"'} status='saved to Seafile'"
   },
   {
    "name": "pdfcraft_saved_pdf_bytes_look_right",
@@ -87,17 +87,17 @@
   {
    "name": "cadcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "cadcraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 2s"
+   "detail": "status='ready' after 1s"
   },
   {
    "name": "cadcraft_save_creates_seafile_version_by_user",
    "ok": true,
-   "detail": "history 1->2 top={'id': 'c66b9b60408d28fd104d0fa27bdef28d35face9e', 'rev_file_id': 'f47adccf1ca685cbb6c48a7807a0dc6fc2cd5f0a', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.dxf\"'} status='saved to Seafile'"
+   "detail": "history 1->2 top={'id': '3e4319bae10de9d79f81c5914812bce5352122e9', 'rev_file_id': 'f47adccf1ca685cbb6c48a7807a0dc6fc2cd5f0a', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.dxf\"'} status='saved to Seafile'"
   },
   {
    "name": "cadcraft_saved_dxf_bytes_look_right",
@@ -107,17 +107,17 @@
   {
    "name": "vectorcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "vectorcraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 4s"
+   "detail": "status='ready' after 2s"
   },
   {
    "name": "vectorcraft_save_creates_seafile_version_by_user",
    "ok": true,
-   "detail": "history 1->2 top={'id': '2d94fff9428f1b22424a5415d57a5667f75abd55', 'rev_file_id': 'f5095f46445768579b1aac80ec29b9289d031342', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.svg\"'} status='saved to Seafile'"
+   "detail": "history 1->2 top={'id': '6d268b37aa5dbbd009db0365dac9fcd75563ec49', 'rev_file_id': 'f5095f46445768579b1aac80ec29b9289d031342', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.svg\"'} status='saved to Seafile'"
   },
   {
    "name": "vectorcraft_saved_svg_bytes_look_right",
@@ -127,12 +127,12 @@
   {
    "name": "deckcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "deckcraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 2s"
+   "detail": "status='ready' after 1s"
   },
   {
    "name": "deckcraft_save_as_native_format_is_exported_as_download",
@@ -142,12 +142,12 @@
   {
    "name": "photocraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "photocraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 3s"
+   "detail": "status='ready' after 2s"
   },
   {
    "name": "photocraft_save_as_native_format_is_exported_as_download",
@@ -157,7 +157,7 @@
   {
    "name": "soundcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "soundcraft_editor_ready_and_document_opened",
@@ -172,17 +172,17 @@
   {
    "name": "designcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "designcraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 2s"
+   "detail": "status='ready' after 1s"
   },
   {
    "name": "designcraft_save_creates_seafile_version_by_user",
    "ok": true,
-   "detail": "history 1->2 top={'id': '4ba05da741926699964f169a908a52bc5c7308d7', 'rev_file_id': 'b93f067f6b6096713aea45e1474bea5d0f5721fb', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.designcraft\"'} status='saved to Seafile'"
+   "detail": "history 1->2 top={'id': '7f69e5a77451c6f2d60dff2b647661f7901b2148', 'rev_file_id': 'b93f067f6b6096713aea45e1474bea5d0f5721fb', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.designcraft\"'} status='saved to Seafile'"
   },
   {
    "name": "designcraft_saved_designcraft_bytes_look_right",
@@ -190,9 +190,29 @@
    "detail": "len=2519"
   },
   {
+   "name": "figcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
+  },
+  {
+   "name": "figcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 1s"
+  },
+  {
+   "name": "figcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': '55657a1cb5f8f8974d6a4eeb8b4dc3c8e29cc2a6', 'rev_file_id': 'fdae2aeecb6eb00f5a67b423d36565eb9058acd1', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.figcraft\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "figcraft_saved_figcraft_bytes_look_right",
+   "ok": true,
+   "detail": "len=391"
+  },
+  {
    "name": "deckcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "deckcraft_editor_ready_and_document_opened",
@@ -207,12 +227,12 @@
   {
    "name": "photocraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "photocraft_editor_ready_and_document_opened",
    "ok": true,
-   "detail": "status='ready' after 6s"
+   "detail": "status='ready' after 2s"
   },
   {
    "name": "photocraft_native_save_verified_idempotent",
@@ -222,7 +242,7 @@
   {
    "name": "soundcraft_host_frame_from_seahub",
    "ok": true,
-   "detail": "frames=[('', 'http://seafile.lab/lib/4cffb296-2986-4103-9f17-a81125d7446a/file/test.', None), ('office_frame', 'about:blank', '')]"
+   "detail": "frames=[('', 'http://seafile.lab/lib/115945cd-30af-46d5-ac2e-17632ba5f559/file/test.', None), ('office_frame', 'about:blank', '')]"
   },
   {
    "name": "soundcraft_editor_ready_and_document_opened",

@@ -11,7 +11,7 @@ under `docs/reviews/` and `integration/` as evidence.
 | Decision: zero-patch WOPI editor bridge, ONLYOFFICE kept for office | report §5 |
 | Bridge prototype + fake-host tests | `bridge/`, `tests/bridge/` (21) |
 | Real Seafile CE 13.0.28 + ONLYOFFICE 9.4 lab, HTTP slice | `lab/real-seafile/results/slice.json` (45/45) |
-| Real browser path: 4 unpatched upstream bundles, VectorCraft via shim, DeckCraft/SoundCraft/PhotoCraft/DesignCraft via local ports built in the lab | `results/browser.json` (45/46), screenshots |
+| Real browser path: 4 unpatched upstream bundles, VectorCraft via shim, DeckCraft/SoundCraft/PhotoCraft/DesignCraft via local ports built in the lab | `results/browser.json` (50/50), screenshots |
 | Independent review R2 of the bridge, all HIGH/MEDIUM fixed | report §7, `tests/bridge/` (30) |
 | Deployment kit | `deploy/bridge/` |
 | Upstream drafts (unpublished) | `docs/upstream-drafts/` |
@@ -21,7 +21,7 @@ under `docs/reviews/` and `integration/` as evidence.
 | # | Step | Done when |
 | --- | --- | --- |
 | 1 | ~~DeckCraft, SoundCraft, PhotoCraft, DesignCraft ports~~ done | diffs under `docs/upstream-drafts/`, lab 45/46 |
-| 2 | FigCraft through the shim | browser slice makes a fixture with the app and round-trips it |
+| 2 | ~~FigCraft through the shim~~ done | lab 50/50 |
 | 3 | A real edit before Save in the browser slice (today the native second pass re-saves identical bytes) | each editor produces a new Seafile version from a typed change |
 | 4 | Media apps (FilmCraft, EffectCraft, LightCraft) as export-only (`saveAs: true`) | decision recorded; at most one proof |
 | 5 | Human pass on HTTPS in a desktop browser (WebGPU, clipboard, fonts, unload guard) | checklist in `lab/real-seafile/README.md`, run by the owner |

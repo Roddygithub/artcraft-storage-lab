@@ -16,7 +16,7 @@ Seahub WOPI host ◀──(CheckFileInfo/GetFile/PutFile/Lock, token in headers)
 ```
 
 Status: **prototype, validated on a stock Seafile CE 13.0.28** in an isolated VM — HTTP slice
-48/48, browser slice 45/46 (`lab/real-seafile/results/`); independent review R2 of the bridge
+48/48, browser slice 50/50 (`lab/real-seafile/results/`); independent review R2 of the bridge
 incorporated (30 fake-host tests). Not yet deployed anywhere real. Nothing
 published upstream.
 
@@ -29,6 +29,7 @@ published upstream.
 | `.pdf` (`?edit_pdf=true`) | PdfCraft 0.16.1 | upstream bundle, its own bridge |
 | `.dxf` | CADCraft 0.15.1 | upstream bundle, its own `host.rs` |
 | `.svg` | VectorCraft 0.19.0 | upstream bundle + a one-line page-API shim (`lab/real-seafile/static/host-shim.js`) |
+| `.figcraft` | FigCraft 0.13.1 | upstream bundle + the same shim (`?control` enables its page API) |
 | `.pptx` / `.deckcraft` | DeckCraft 0.13.1 | upstream source + the lab's `host.rs` port (`docs/upstream-drafts/`), built in the lab |
 | `.png` / `.psd` / `.pcraft` | PhotoCraft 0.18.0 | same, with a dirty signal |
 | `.designcraft` | DesignCraft 0.15.2 | same |

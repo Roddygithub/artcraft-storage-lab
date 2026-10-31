@@ -72,8 +72,9 @@
   // Save = write the opened file under its own name, as the desktop app does. The app's own Ctrl/Cmd+S
   // on a document that arrived as bytes opens a Save As panel (new name, native format), which the
   // host would refuse; so the shortcut is taken here and turned into `file.save {path}`.
+  var pathSaveUnsupported = false;   // FigCraft web: "no file system in the browser" -- its own Save shortcut then runs
   window.addEventListener('keydown', function (e) {
-    if (!ready || !openedName) return;
+    if (!ready || !openedName || pathSaveUnsupported) return;
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key === 's' || e.key === 'S')) {
       e.preventDefault(); e.stopPropagation();
       saveInPlace();
@@ -83,7 +84,20 @@
   function saveInPlace() {
     if (saving || typeof api.execute !== 'function') return;
     saving = true;
-    api.execute('file.save', { path: openedName }).then(function (r) {
+    // With a path the app writes the file directly (VectorCraft). An app whose web build refuses
+    // paths ("no file system in the browser": FigCraft) saves through its download path instead,
+    // which captureDownloads keeps under the opened name.
+    api.execute('file.save', { path: openedName }).catch(function (err) {
+      if (/no file system/i.test(String(err && err.message || err))) {
+        // The app's own Save (download path, captured by captureDownloads) is the only way: replay
+        // the shortcut through the control channel and accept the name/format dialog if one opens.
+        pathSaveUnsupported = true;
+        return api.request('ui.key', { key: 's', cmd: true }).then(function () {
+          return new Promise(function (res) { setTimeout(res, 600); });
+        }).then(function () { return api.request('ui.dialog.confirm', {}).catch(function () {}); });
+      }
+      return api.execute('file.save', {});
+    }).then(function (r) {
       if (r && r.pending) return api.request('ui.dialog.confirm', {});   // e.g. SVG Options: accept defaults
     }).catch(function (err) {
       post('failed', { error: 'save: ' + (err && err.message || err) });

@@ -138,22 +138,29 @@ def main():
                 const f = window.figcraft;
                 f.captureDownloads(true);
                 try { await f.execute('node.create', {kind: 'frame', name: 'Home'}); } catch (e) {}
-                const r = await f.execute('file.save', {path: 'test.figcraft'});
-                if (r && r.pending) { try { await f.request('ui.dialog.confirm', {}); } catch (e) {} }
+                // FigCraft's web build refuses a path ("no file system in the browser"): a plain
+                // Save goes through the download path, which captureDownloads keeps.
+                // ...and a path-less Save wants a path first: use the app's own shortcut through the
+                // control channel, then accept the name/format dialog.
+                try { await f.execute('file.save', {path: 'test.figcraft'}); } catch (e) {
+                    try { await f.request('ui.key', {key: 's', cmd: true}); } catch (e2) {}
+                    await new Promise(r => setTimeout(r, 800));
+                    try { await f.request('ui.dialog.confirm', {}); } catch (e3) {}
+                }
                 for (let i = 0; i < 40; i++) {
                     const files = f.files() || [];
-                    const hit = files.find(x => String(x.path).endsWith('test.figcraft'));
-                    if (hit) { const b = f.readFile('test.figcraft'); return Array.from(b); }
+                    if (files.length) { const name = String(files[files.length - 1].path); const b = f.readFile(name); return {name, bytes: Array.from(b)}; }
                     await new Promise(r => setTimeout(r, 250));
                 }
                 return null;
             }""")
             fig.close()
             if made:
-                figcraft_fixture = bytes(made)
-                ids["test.figcraft"] = rs.upload(admin, repo_id, "test.figcraft", figcraft_fixture)
-                fixtures["test.figcraft"] = ("figcraft", figcraft_fixture, "")
-            check("figcraft_fixture_made_by_the_app", bool(made), f"{len(made) if made else 0} bytes")
+                figcraft_fixture = bytes(made["bytes"])
+                fname = "test." + (made["name"].rsplit(".", 1)[-1] if "." in made["name"] else "figcraft")
+                ids[fname] = rs.upload(admin, repo_id, fname, figcraft_fixture)
+                fixtures[fname] = ("figcraft", figcraft_fixture, "")
+            check("figcraft_fixture_made_by_the_app", bool(made), f"{made['name'] if made else ''} {len(made['bytes']) if made else 0} bytes")
         except Exception as e:  # noqa: BLE001
             check("figcraft_fixture_made_by_the_app", False, str(e)[:300])
 
