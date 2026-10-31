@@ -68,6 +68,7 @@ def main():
         "test.pdf": ("pdfcraft", rs.MINIMAL_PDF, "?edit_pdf=true"),
         "test.dxf": ("cadcraft", rs.MINIMAL_DXF, ""),
         "test.svg": ("vectorcraft", rs.SVG_V1, ""),          # page-API shim, not an upstream bridge
+        "test.pptx": ("deckcraft", rs.minimal_pptx(), ""),    # lab host.rs port, built from upstream source
     }
     ids = {name: rs.upload(admin, repo_id, name, content) for name, (_, content, _) in fixtures.items()}
     figcraft_fixture = None

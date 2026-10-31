@@ -1,9 +1,10 @@
 {
-  "wordcraft":   {"app": "wordcraft",   "label": "WordCraft v0.13.2 (upstream, unpatched)",   "extensions": ["docx"], "url": "/editors/wordcraft/index.html?host=parent"},
-  "gridcraft":   {"app": "gridcraft",   "label": "GridCraft v0.14.2 (upstream, unpatched)",   "extensions": ["xlsx"], "url": "/editors/gridcraft/index.html?host=parent"},
-  "pdfcraft":    {"app": "pdfcraft",    "label": "PdfCraft v0.16.1 (upstream, unpatched)",    "extensions": ["pdf"],  "url": "/editors/pdfcraft/index.html?host=parent"},
-  "cadcraft":    {"app": "cadcraft",    "label": "CADCraft v0.15.1 (upstream, unpatched)",    "extensions": ["dxf"],  "url": "/editors/cadcraft/index.html?host=parent"},
+  "wordcraft": {"app": "wordcraft", "label": "WordCraft v0.13.2 (upstream, unpatched)", "extensions": ["docx"], "url": "/editors/wordcraft/index.html?host=parent"},
+  "gridcraft": {"app": "gridcraft", "label": "GridCraft v0.14.2 (upstream, unpatched)", "extensions": ["xlsx"], "url": "/editors/gridcraft/index.html?host=parent"},
+  "pdfcraft": {"app": "pdfcraft", "label": "PdfCraft v0.16.1 (upstream, unpatched)", "extensions": ["pdf"], "url": "/editors/pdfcraft/index.html?host=parent"},
+  "cadcraft": {"app": "cadcraft", "label": "CADCraft v0.15.1 (upstream, unpatched)", "extensions": ["dxf"], "url": "/editors/cadcraft/index.html?host=parent"},
+  "deckcraft": {"app": "deckcraft", "label": "DeckCraft v0.13.1 (upstream + lab host.rs port, built in the lab VM)", "extensions": ["pptx", "deckcraft"], "url": "/editors/deckcraft/index.html?host=parent"},
   "vectorcraft": {"app": "vectorcraft", "label": "VectorCraft v0.19.0 (upstream + lab page-API shim)", "extensions": ["svg", "vectorcraft"], "url": "/editors/vectorcraft/index.html?host=parent"},
-  "figcraft":    {"app": "figcraft",    "label": "FigCraft v0.13.1 (upstream + lab page-API shim)",    "extensions": ["figcraft", "fig"], "url": "/editors/figcraft/index.html?host=parent"},
-  "svgstub":     {"app": "vectorcraft", "label": "Stub editor (lab)", "extensions": ["drawio"], "url": "/editors/stub/index.html?host=parent"}
+  "figcraft": {"app": "figcraft", "label": "FigCraft v0.13.1 (upstream + lab page-API shim)", "extensions": ["figcraft", "fig"], "url": "/editors/figcraft/index.html?host=parent"},
+  "svgstub": {"app": "vectorcraft", "label": "Stub editor (lab)", "extensions": ["drawio"], "url": "/editors/stub/index.html?host=parent"}
 }

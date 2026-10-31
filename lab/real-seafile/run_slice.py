@@ -301,6 +301,17 @@ MINIMAL_PDF = (b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<<
 MINIMAL_DXF = b"0\nSECTION\n2\nENTITIES\n0\nLINE\n8\n0\n10\n0\n20\n0\n11\n10\n21\n10\n0\nENDSEC\n0\nEOF\n"
 
 
+def minimal_odt() -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr(zipfile.ZipInfo("mimetype"), "application/vnd.oasis.opendocument.text", compress_type=zipfile.ZIP_STORED)
+        z.writestr("content.xml", '<?xml version="1.0" encoding="UTF-8"?><office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" '
+                   'xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" office:version="1.2"><office:body><office:text><text:p>hello</text:p></office:text></office:body></office:document-content>')
+        z.writestr("META-INF/manifest.xml", '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">'
+                   '<manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/><manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/></manifest:manifest>')
+    return buf.getvalue()
+
+
 def minimal_pptx() -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
@@ -363,6 +374,7 @@ def main() -> int:
     pdf_id = upload(admin, repo_id, "test.pdf", MINIMAL_PDF)
     dxf_id = upload(admin, repo_id, "test.dxf", MINIMAL_DXF)
     pptx_id = upload(admin, repo_id, "test.pptx", minimal_pptx())
+    odt_id = upload(admin, repo_id, "test.odt", minimal_odt())
 
     # second user, read-only share
     reader = "reader@lab.test"
@@ -406,11 +418,16 @@ def main() -> int:
     check("seahub_dxf_routes_to_wopi_cadcraft", st == 200 and form_dxf is not None and form_dxf["action"].startswith(BRIDGE + "/edit/cadcraft"),
           (form_dxf or {}).get("action", "")[:120])
     st, page_pptx = file_page(sess, repo_id, "test.pptx")
-    check("seahub_pptx_routes_to_onlyoffice", st == 200 and "api/documents/api.js" in page_pptx and parse_wopi_form(page_pptx) is None,
-          "apijs referenced" if "api/documents/api.js" in page_pptx else "no api.js reference")
+    form_pptx = parse_wopi_form(page_pptx)
+    check("seahub_pptx_routes_to_wopi_deckcraft", st == 200 and form_pptx is not None and form_pptx["action"].startswith(BRIDGE + "/edit/deckcraft"),
+          (form_pptx or {}).get("action", "")[:120])
+    st, page_odt = file_page(sess, repo_id, "test.odt")
+    check("seahub_odt_routes_to_onlyoffice", st == 200 and "api/documents/api.js" in page_odt and parse_wopi_form(page_odt) is None,
+          "apijs referenced" if "api/documents/api.js" in page_odt else "no api.js reference")
     # every ArtCraft editor opens through the bridge with the right bundle
     for label, form, editor, fid in (("docx", form_docx, "wordcraft", docx_id), ("xlsx", form_xlsx, "gridcraft", xlsx_id),
-                                     ("pdf", form_pdf, "pdfcraft", pdf_id), ("dxf", form_dxf, "cadcraft", dxf_id)):
+                                     ("pdf", form_pdf, "pdfcraft", pdf_id), ("dxf", form_dxf, "cadcraft", dxf_id),
+                                     ("pptx", form_pptx, "deckcraft", pptx_id)):
         if not form:
             check(f"bridge_open_{label}", False, "no WOPI form")
             continue

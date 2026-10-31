@@ -6,8 +6,16 @@ if "mod host;" not in s:
     s = s.replace('#[cfg(target_arch = "wasm32")]\nmod web;', '#[cfg(target_arch = "wasm32")]\nmod host;\n#[cfg(target_arch = "wasm32")]\nmod web;')
     s = s.replace("//! URL query flags: `?webgl`", "//! URL query flags: `?host=parent` turns on the parent-page bridge (`host.rs`); `?webgl`")
     m.write_text(s)
+c = root / "apps/deckcraft-web/Cargo.toml"
+cs = c.read_text()
+if '"MessageEvent"' not in cs:
+    cs = cs.replace('"CssStyleDeclaration"]', '"CssStyleDeclaration", "MessageEvent"]')
+    c.write_text(cs)
 w = root / "apps/deckcraft-web/src/web.rs"
 s = w.read_text()
+if "use crate::host;" in s:
+    print("web.rs already patched; nothing to do")
+    sys.exit(0)
 s = s.replace("use deckcraft_ui_egui::{Inbox, InboxEvent, InboxFile, Services, SlideApp};",
               "use deckcraft_ui_egui::{Inbox, InboxEvent, InboxFile, Services, SlideApp};\n\nuse crate::host;")
 s = s.replace("""        let result = eframe::WebRunner::new()
@@ -86,5 +94,6 @@ s = s.replace("""    fn logic(&mut self, ctx: &egui::Context, _frame: &mut efram
         self.app.logic(ctx);
     }""")
 w.write_text(s)
+print(("ok   " if '"MessageEvent"' in c.read_text() else "MISS ") + "web-sys MessageEvent feature")
 for needle in ("use crate::host;", "host::Bridge::new()", "b.connect(", "host: bridge_for_app", "b.post_ready()", "begin_external_file(\"drop\")"):
     print(("ok   " if needle in s else "MISS ") + needle)
