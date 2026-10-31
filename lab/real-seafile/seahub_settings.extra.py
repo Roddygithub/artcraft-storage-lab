@@ -11,8 +11,8 @@ ONLYOFFICE_JWT_SECRET = '__ONLYOFFICE_JWT_SECRET__'
 
 ENABLE_OFFICE_WEB_APP = True
 OFFICE_WEB_APP_BASE_URL = 'http://bridge:8778/wopi/discovery.xml'
-OFFICE_WEB_APP_FILE_EXTENSION = ('docx', 'xlsx', 'pdf', 'dxf', 'svg', 'drawio')
+OFFICE_WEB_APP_FILE_EXTENSION = ('docx', 'xlsx', 'pdf', 'dxf', 'svg', 'vectorcraft', 'figcraft', 'fig', 'drawio')
 ENABLE_OFFICE_WEB_APP_EDIT = True
-OFFICE_WEB_APP_EDIT_FILE_EXTENSION = ('docx', 'xlsx', 'pdf', 'dxf', 'svg', 'drawio')
+OFFICE_WEB_APP_EDIT_FILE_EXTENSION = ('docx', 'xlsx', 'pdf', 'dxf', 'svg', 'vectorcraft', 'figcraft', 'fig', 'drawio')
 WOPI_ACCESS_TOKEN_EXPIRATION = 30 * 60
 # <<< artcraft-lab

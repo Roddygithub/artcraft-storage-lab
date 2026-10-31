@@ -382,7 +382,7 @@ def main() -> int:
     sess = seahub_login(ADMIN, ADMIN_PW)
     st, page_svg = file_page(sess, repo_id, "test.svg")
     form_svg = parse_wopi_form(page_svg)
-    check("seahub_svg_routes_to_wopi", st == 200 and form_svg is not None and form_svg["action"].startswith(BRIDGE + "/edit/svgstub"),
+    check("seahub_svg_routes_to_wopi", st == 200 and form_svg is not None and form_svg["action"].startswith(BRIDGE + "/edit/vectorcraft"),
           f"version={seafile_version} action={(form_svg or {}).get('action', '')[:120]}")
     st, page_docx = file_page(sess, repo_id, "test.docx")
     form_docx = parse_wopi_form(page_docx)
@@ -488,6 +488,7 @@ def main() -> int:
     form_r = parse_wopi_form(page_r)
     check("seahub_readonly_gets_wopi_view_form", st == 200 and form_r is not None, (form_r or {}).get("action", "")[:120])
     if form_r:
+        form_r["action"] = form_r["action"]  # vectorcraft editor; the host page is the same for every editor
         st, hdrs, _, rcfg = bridge_open(form_r)
         check("bridge_readonly_open", st == 200 and rcfg and rcfg.get("userCanWrite") is False, f"status={st} canWrite={(rcfg or {}).get('userCanWrite')}")
         cur, _ = download(admin, repo_id, "test.svg")

@@ -1,0 +1,5 @@
+repository: storytold/vectorcraft
+release_tag: v0.19.0
+asset: vectorcraft-web-0.19.0.zip
+sha256: d9c7a2695d15f83a268b1be3be94592db4beb04326825e174cb5e3cb239c64d6
+patched: index.html only -- one <script src="../host-shim.js"> line added by the lab (no Rust change); see static/host-shim.js

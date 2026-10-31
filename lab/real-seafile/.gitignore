@@ -3,5 +3,7 @@ static/wordcraft/
 static/gridcraft/
 static/pdfcraft/
 static/cadcraft/
+static/vectorcraft/
+static/figcraft/
 results/*.html
 .env

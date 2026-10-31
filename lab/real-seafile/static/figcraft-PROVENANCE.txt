@@ -1,0 +1,5 @@
+repository: storytold/figcraft
+release_tag: v0.13.1
+asset: figcraft-web-0.13.1.zip
+sha256: fc2cb8d8fa6b8c3846514f064fc18a5acd3a228609a5cf7332b9f6555057999c
+patched: index.html only -- one <script src="../host-shim.js"> line added by the lab (no Rust change); see static/host-shim.js

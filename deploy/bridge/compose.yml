@@ -1,0 +1,26 @@
+# Run the bridge next to an existing Seafile (no change to Seafile itself beyond seahub_settings.py).
+# 1. Put the editor bundles under ./editors/<editor-id>/ (see fetch-editors.sh) and edit ./editors.json.
+# 2. Set BRIDGE_PUBLIC_URL to the HTTPS origin your reverse proxy gives this service,
+#    and BRIDGE_SEAHUB_ORIGIN to your Seafile origin (scheme + host, no path).
+# 3. Point your proxy at :8778 (nginx snippet in nginx.conf.example) and add seahub_settings.example.py
+#    to seahub_settings.py, then restart Seahub.
+services:
+  bridge:
+    build:
+      context: ../..
+      dockerfile: deploy/bridge/Dockerfile
+    image: craft-bridge:local
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8778:8778"
+    volumes:
+      - ./editors.json:/config/editors.json:ro
+      - ./editors:/editors:ro
+    environment:
+      - BRIDGE_PUBLIC_URL=${BRIDGE_PUBLIC_URL:?e.g. https://craft.example.org}
+      - BRIDGE_SEAHUB_ORIGIN=${BRIDGE_SEAHUB_ORIGIN:?e.g. https://seafile.example.org}
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8778/healthz', timeout=3).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

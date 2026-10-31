@@ -67,6 +67,7 @@ def main():
         "test.xlsx": ("gridcraft", rs.minimal_xlsx(), ""),
         "test.pdf": ("pdfcraft", rs.MINIMAL_PDF, "?edit_pdf=true"),
         "test.dxf": ("cadcraft", rs.MINIMAL_DXF, ""),
+        "test.svg": ("vectorcraft", rs.SVG_V1, ""),          # page-API shim, not an upstream bridge
     }
     ids = {name: rs.upload(admin, repo_id, name, content) for name, (_, content, _) in fixtures.items()}
 
@@ -125,6 +126,10 @@ def main():
             time.sleep(3)
             if status() and "sav" not in status().lower():
                 page.keyboard.press("Meta+s")
+                time.sleep(2)
+            if status() and "sav" not in status().lower():
+                page.screenshot(path=os.path.join(RESULTS, f"{editor}-after-ctrl-s.png"))
+                page.keyboard.press("Enter")       # a save-options dialog, if the app opened one
             end = time.time() + 60
             saved = False
             while time.time() < end:

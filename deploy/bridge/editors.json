@@ -1,0 +1,6 @@
+{
+  "wordcraft": {"app": "wordcraft", "label": "WordCraft", "extensions": ["docx"], "url": "/editors/wordcraft/index.html?host=parent"},
+  "gridcraft": {"app": "gridcraft", "label": "GridCraft", "extensions": ["xlsx"], "url": "/editors/gridcraft/index.html?host=parent"},
+  "pdfcraft":  {"app": "pdfcraft",  "label": "PdfCraft",  "extensions": ["pdf"],  "url": "/editors/pdfcraft/index.html?host=parent"},
+  "cadcraft":  {"app": "cadcraft",  "label": "CADCraft",  "extensions": ["dxf"],  "url": "/editors/cadcraft/index.html?host=parent"}
+}
