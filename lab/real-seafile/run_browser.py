@@ -69,6 +69,7 @@ def main():
         "test.dxf": ("cadcraft", rs.MINIMAL_DXF, ""),
         "test.svg": ("vectorcraft", rs.SVG_V1, ""),          # page-API shim, not an upstream bridge
         "test.pptx": ("deckcraft", rs.minimal_pptx(), ""),    # lab host.rs port, built from upstream source
+        "test.png": ("photocraft", rs.MINIMAL_PNG, ""),       # lab host.rs port, built from upstream source
     }
     STATIC = "/app/lab/real-seafile/static"
     # Editors whose bundle is not in the lab (not built yet) are skipped, not failed.
