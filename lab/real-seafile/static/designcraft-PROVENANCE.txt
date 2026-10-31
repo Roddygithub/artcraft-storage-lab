@@ -1,0 +1,4 @@
+repository: storytold/designcraft
+built_from: ea214dd (v0.15.2, shallow clone of main)
+asset: built in the lab VM with trunk build --release (not an upstream release asset)
+patched: yes -- host bridge port, see docs/upstream-drafts/designcraft-host-bridge/ (designcraft-host-bridge.diff); nothing else changed

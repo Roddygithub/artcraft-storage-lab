@@ -9,3 +9,4 @@ results/*.html
 .env
 static/deckcraft/
 static/soundcraft/
+static/designcraft/
