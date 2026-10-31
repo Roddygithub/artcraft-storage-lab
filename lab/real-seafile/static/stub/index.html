@@ -1,0 +1,13 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>stub editor</title>
+<p>Stub editor: stands in for an ArtCraft bundle in the real-Seafile slice. Speaks the parent protocol.</p>
+<script>
+  const app = 'vectorcraft';
+  window.addEventListener('message', (e) => {
+    if (e.source !== window.parent) return;
+    const m = e.data || {};
+    if (m.type === app + ':open') { window.__doc = m.payload; }
+  });
+  window.parent.postMessage({ type: app + ':ready' }, location.origin);
+</script>

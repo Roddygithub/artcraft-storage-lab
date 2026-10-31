@@ -1,0 +1,5 @@
+repository: storytold/gridcraft
+release_tag: v0.14.2
+asset: gridcraft-web-0.14.2.zip
+sha256: f6675cfe26f89f07cb9d9ff23a5ae0a946088eef6e22c93ac1141f0279f741f8
+patched: no (upstream bundle as released)

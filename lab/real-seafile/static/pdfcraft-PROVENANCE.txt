@@ -1,0 +1,5 @@
+repository: storytold/pdfcraft
+release_tag: v0.16.1
+asset: pdfcraft-web-0.16.1.zip
+sha256: 00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf
+patched: no (upstream bundle as released)

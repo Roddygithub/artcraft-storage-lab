@@ -1,0 +1,7 @@
+repository: storytold/wordcraft
+release_tag: v0.13.2
+asset: wordcraft-web-0.13.2.zip
+sha256: b6c9c8d3a730495189ba0c213fe64313f317be8fc0611ac1ff8cdd6a4b20880c
+published: 2026-10-31T03:56:34Z
+patched: no (upstream bundle as released)
+fetch: python3 -I scripts/craft_web_zip.py download <url> <zip>; extract; copy to lab/real-seafile/static/wordcraft/
