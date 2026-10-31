@@ -1,70 +1,42 @@
 # ROADMAP
 
-Phases are sequential. A phase is not "done" until its artifact exists, its
-independent free review passed, and its evidence bundle is committed.
+Reset on 2026-10-31 by the re-foundation (`docs/REFOUNDATION-REPORT.md`). The previous 14-phase
+plan (gateway + Seahub/fileserver patches + per-app engine patches) is retired; its artifacts stay
+under `docs/reviews/` and `integration/` as evidence.
 
-| # | Phase | Artifact | Exit criterion |
-| --- | --- | --- | --- |
-| 0 | OpenCode routing & bootstrap | `docs/AI-ROUTING.md`, agent defs | all 5 agents smoke-tested with the exact expected model |
-| 1 | Seafile / ONLYOFFICE integration research | `docs/SEAFILE-ONLYOFFICE-RESEARCH.md` | the editor contract Seafile expects is written down with code evidence |
-| 2 | Seafile integration points | `docs/SEAFILE-INTEGRATION-POINTS.md` | the best insertion point is chosen and justified, incl. "can we avoid a permanent fork?" |
-| 3 | ArtCraft Web capability matrix | `docs/ARTCRAFT-WEB-CAPABILITIES.md` | all 13 apps have a verified Web/WASM/host-bridge verdict |
-| 4 | Common Craft Host Contract | `docs/HOST-CONTRACT.md` | a reusable host contract exists (or the decision to not have one is justified) |
-| 5 | First technical Craft Web proof | `integration/`, `prototypes/` | a real Craft Web editor opens a Seafile file and saves it back |
-| 6 | **WordCraft DOCX MVP** | `docs/reviews/GR-006/` | the 12-step MVP checklist is **VERIFIED END-TO-END** on synthetic files |
-| 7 | Save / conflicts / security | `docs/SAVE-PROTOCOL.md`, `docs/CONFLICTS.md`, `docs/SECURITY.md` | save never lies, concurrent edits never silently overwrite, security reviewed |
-| 8 | GridCraft | `docs/reviews/GR-010/` | `.xlsx` round-trips through GridCraft Web into a Seafile version |
-| 9 | DeckCraft | `docs/reviews/GR-011/` | `.pptx` round-trips through DeckCraft Web into a Seafile version |
-| 10 | PdfCraft / VectorCraft | `docs/reviews/GR-012/` | the integration is proven **not** reserved to Office formats |
-| 11 | Packaging / deployment | `docs/DEPLOYMENT.md` | a 100 % self-hosted, free/OSS deployment path is designed |
-| 12 | ArtCraft RFC / patches | `docs/RFC-DRAFT.md` | an upstream-ready RFC and the smallest justified patch are prepared (not published) |
-| 13 | GPT review | `docs/GPT-HANDOFF.md` | the project is fully handed over to GPT for an independent review |
-| 14 | Upstream contribution | — | **only after `GPT REVIEW PASS`** |
+## Done
 
-## Explicitly excluded phases
+| What | Evidence |
+| --- | --- |
+| Decision: zero-patch WOPI editor bridge, ONLYOFFICE kept for office | report §5 |
+| Bridge prototype + fake-host tests | `bridge/`, `tests/bridge/` (21) |
+| Real Seafile CE 13.0.28 + ONLYOFFICE 9.4 lab, HTTP slice | `lab/real-seafile/results/slice.json` (45/45) |
+| Real browser path with 4 unpatched upstream bundles + VectorCraft via shim | `results/browser.json` (21/21), screenshots |
+| Deployment kit | `deploy/bridge/` |
+| Upstream drafts (unpublished) | `docs/upstream-drafts/` |
 
-* SeaDrive-based workflow. Not a phase, not a milestone.
-* WebDAV client. Only studied if the research proves it is a useful brick.
-* DriveCraft.
-* Re-implementing Seafile.
-* 13 independent per-app Seafile plugins.
+## Next (lab, no production, no upstream)
 
-## MVP definition (the only definition that counts)
-
-1. The user is in Seafile Web.
-2. They click a synthetic DOCX.
-3. WordCraft Web opens it — no manual download.
-4. The document is loaded.
-5. The user modifies the document.
-6. They save from WordCraft.
-7. No manual upload is needed.
-8. Seafile records a new version.
-9. The editor genuinely confirms the save.
-10. The document is closed.
-11. It is reopened from Seafile.
-12. The modification is present.
-
-**VERIFIED END-TO-END.** Not a mock, not a download, not a manual upload.
-
-## Phase dependency notes
-
-* Phase 6 depends on Phase 5 choosing a Craft whose web/host bridge is mature
-  enough. If no Craft qualifies, Phase 5's conclusion is "we must build the web
-  host ourselves" — that is a valid, documented outcome.
-* Phase 4 must not block Phase 6: a single-Craft, single-file contract is
-  acceptable for the MVP as long as the shape is compatible with a common one.
-
-## Target beyond the first Seafile MVP
-
-The initial phases prove the shared editor boundary through Seafile. The product
-target then extends the same contract and dispatcher in two directions:
-
-| Expansion | Planned work | Current status |
+| # | Step | Done when |
 | --- | --- | --- |
-| All ArtCraft Web apps | Add or adapt each app's web bridge and durable save acknowledgement according to `docs/ARTCRAFT-WEB-CAPABILITIES.md`; do not assume one patch fits every engine | not complete; only a subset has host bridges |
-| Nextcloud | Add a platform adapter for its web entry point, authorization, file identity, versioning, and save API, reusing the Craft contract | not implemented or verified |
-| ownCloud | Add a platform adapter for its web entry point, authorization, file identity, versioning, and save API, reusing the Craft contract | not implemented or verified |
+| 1 | DeckCraft `host.rs` port built and exercised in the lab (`.pptx`) | browser slice passes for DeckCraft with the patched bundle, patch under `docs/upstream-drafts/` |
+| 2 | FigCraft through the shim | browser slice makes a fixture with the app and round-trips it |
+| 3 | PhotoCraft, DesignCraft, SoundCraft ports (rebase the lab's GR patches on upstream heads) | same criterion as 1, one app at a time |
+| 4 | Media apps (FilmCraft, EffectCraft, LightCraft) as export-only (`saveAs: true`) | decision recorded; at most one proof |
+| 5 | Human pass on HTTPS in a desktop browser (WebGPU, clipboard, fonts, unload guard) | checklist in `lab/real-seafile/README.md`, run by the owner |
+| 6 | ONLYOFFICE vs WordCraft fidelity comparison on the same DOCX corpus | table in the report |
+| 7 | Second independent review (R2) of the report and the bridge | findings incorporated |
+| 8 | Candidate freeze → forensic review → project-level GPT gate | PASS |
 
-The goal remains one platform-neutral Craft contract and one extension
-dispatcher. Provider-specific APIs stay inside their adapters; host work is not
-duplicated in each ArtCraft app.
+## Owner-only
+
+* Diagnose the ONLYOFFICE `api.js` 404 on the live instance.
+* Roll back the GR-015 Seahub/`seaf-server` patches on the live instance (rollback archive recorded).
+* Upgrade the live Seafile to 13 (the bridge needs Seahub ≥ 13 for non-office extensions).
+* After the gate: approve (or not) each item in `docs/upstream-drafts/`.
+
+## Out of scope
+
+SeaDrive workflows. WebDAV clients. Nextcloud/ownCloud adapters (dropped by the report: WOPI
+already exists there; the bridge is reusable as is). Re-implementing Seafile. Thirteen per-app
+Seafile plugins.

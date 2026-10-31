@@ -4,9 +4,10 @@ Instructions for AI agents (and humans) working in this repository.
 
 ## Mission
 
-Produce a rigorous, evidence-based answer to: **how do ArtCraft web editors plug
-into a self-hosted file platform (Seafile first) so that "open → edit → save →
-new version" works in the browser, with no manual download and no manual upload?**
+Make "open → edit → save → new version" work in the browser between Seafile Web and the Craft
+web editors, with no patch to either side. The architecture is the stateless WOPI editor bridge
+(`bridge/`), chosen by `docs/REFOUNDATION-REPORT.md`; the previous gateway + patches design under
+`integration/` is legacy and is not extended.
 
 ## Non-negotiable rules
 
@@ -24,8 +25,10 @@ new version" works in the browser, with no manual download and no manual upload?
    as evidence that the web integration works.
 5. **No premature generalization.** A generic host contract is a goal, but the
    Seafile MVP comes first. Generalize only what is demonstrably common.
-6. **One connector, not N plugins.** Prefer a single Seafile integration layer
-   with a file-type dispatcher over one plugin per Craft app.
+6. **No Seafile patch, no editor patch.** Configuration on the Seafile side
+   (`seahub_settings.py`), upstream release bundles on the editor side. A lab
+   shim in `lab/real-seafile/static/` is acceptable as a stopgap and must say so
+   in the bundle's `PROVENANCE.txt`.
 7. **Upstream hard gate.** Do **not** open issues, PRs or RFCs in `storytold/*`,
    Seafile, or Seafile docs before `GPT REVIEW PASS`. Preparing the artifacts in
    this repository is allowed.
@@ -45,35 +48,26 @@ new version" works in the browser, with no manual download and no manual upload?
     generated target caches, never a directory that an active Cargo process is
     using.
 
-## Agent routing
+## Process
 
-Use the `subagent` tool with the agent that matches the task. Never ask the human
-which model to use. The definitions live in [`config/opencode/agents/`](config/opencode/agents/)
-and are installed into `~/.config/opencode/agents/` by
-`scripts/install-agents.sh`.
+* Change the bridge → run `python3 tests/bridge/test_bridge.py` (fake Seahub host).
+* Change anything a real Seafile could see differently → run the lab
+  (`lab/real-seafile/up.sh slice`, then `browser`) and commit `results/`.
+* An editor bundle enters the lab only through `scripts/craft_web_zip.py` or
+  `deploy/bridge/fetch-editors.sh`, with its SHA-256 in a `PROVENANCE.txt`.
+* Anything meant for upstream goes to `docs/upstream-drafts/` and stays there
+  until the gate passes and the owner approves.
+* Implementation and review are different contexts. The reviewer never wrote
+  the code it reviews.
+* Push small, coherent commits to the public repository regularly; `main` is
+  the integration branch.
 
-| Task | Agent |
-| --- | --- |
-| deep research, architecture, contracts | `artcraft-architect` |
-| independent review (code, security, licensing) | `artcraft-reviewer` |
-| bounded implementation, tests, scripts, docs | `artcraft-worker` |
-| optional extra coding capacity | `artcraft-deepseek-worker` |
+## Definition of done for a change
 
-`artcraft-deepseek-worker` is never on the critical path. On timeout or provider
-failure: abandon the task, note it in `docs/AI-ROUTING.md`, reroute.
-
-The reviewer must not have written the code it reviews. An auto-review is never an
-independent review.
-
-## Definition of done for a work item (GR-XXX)
-
-1. Artifact written under `docs/`.
-2. Evidence bundle under `docs/reviews/GR-XXX/`.
-3. Independent free review performed and recorded, findings remediated.
-4. Test matrix updated (`docs/TEST-MATRIX.md`).
-5. `STATUS.md`, `HISTORY.md`, `docs/GPT-REVIEW-QUEUE.md` updated.
-6. Small, coherent commit(s), pushed to the public repository.
-7. Status set to `GPT REVIEW PENDING`.
+1. Code or document written, with the smallest runnable check that proves it.
+2. Lab evidence updated when runtime behaviour changed.
+3. Report (`docs/REFOUNDATION-REPORT.md` §7) or ROADMAP updated when the plan changed.
+4. Committed and pushed.
 
 ## Commit style
 
