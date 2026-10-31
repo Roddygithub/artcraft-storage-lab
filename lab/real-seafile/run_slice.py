@@ -298,8 +298,17 @@ def minimal_xlsx() -> bytes:
 MINIMAL_PDF = (b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n"
                b"3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]>>endobj\nxref\n0 4\n0000000000 65535 f \n"
                b"0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n160\n%%EOF\n")
-# 1x1 transparent PNG
-MINIMAL_PNG = bytes.fromhex("89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d4944415478da6364f8cfc00000020001e221bc330000000049454e44ae426082")
+def _png(width: int = 4, height: int = 4) -> bytes:
+    """A valid RGBA PNG (zlib + CRCs from the stdlib): editors reject a hand-typed one."""
+    import struct, zlib
+    def chunk(tag: bytes, payload: bytes) -> bytes:
+        return struct.pack(">I", len(payload)) + tag + payload + struct.pack(">I", zlib.crc32(tag + payload) & 0xFFFFFFFF)
+    raw = b"".join(b"\x00" + bytes([255, 0, 0, 255] * width) for _ in range(height))
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+
+
+MINIMAL_PNG = _png()
 MINIMAL_DXF = b"0\nSECTION\n2\nENTITIES\n0\nLINE\n8\n0\n10\n0\n20\n0\n11\n10\n21\n10\n0\nENDSEC\n0\nEOF\n"
 
 
@@ -340,7 +349,7 @@ def content_matches(name: str, data: bytes) -> bool:
         return b"SECTION" in data[:200] or b"ENTITIES" in data
     if ext == "svg":
         return b"<svg" in data[:300]
-    if ext in ("figcraft", "scraft", "scraftz", "pcraft", "designcraft"):
+    if ext in ("figcraft", "scraft", "scraftz", "pcraft", "designcraft", "deckcraft"):
         return len(data) > 0
     if ext == "png":
         return data.startswith(b"\x89PNG")

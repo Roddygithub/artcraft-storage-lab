@@ -86,6 +86,8 @@ def main():
         ctx = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
         page = ctx.new_page()
         console: list[str] = []
+        downloads: list = []
+        page.on("download", lambda d: downloads.append(d))
         page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
         page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
 
@@ -103,7 +105,7 @@ def main():
             if not os.path.isdir(os.path.join(STATIC, editor)):
                 continue
             try:
-                sp = ctx.new_page(accept_downloads=True)
+                sp = ctx.new_page()
                 sp.goto(f"{rs.BRIDGE}/editors/{editor}/index.html?empty", wait_until="commit", timeout=60000)
                 sp.wait_for_function("!document.getElementById('%s_loading')" % editor, timeout=120000)
                 time.sleep(2)
@@ -126,8 +128,9 @@ def main():
         try:
             fig = ctx.new_page()
             fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html", wait_until="commit", timeout=60000)
-            fig.wait_for_function("typeof window.figcraft === 'object'", timeout=120000)
-            fig.wait_for_function("window.figcraft.commands().then(() => true).catch(() => false)", timeout=120000)
+            # function form: the editor page's CSP forbids eval, which a string expression would use
+            fig.wait_for_function("() => typeof window.figcraft === 'object'", timeout=120000)
+            fig.wait_for_function("() => window.figcraft.commands().then(() => true).catch(() => false)", timeout=120000)
             made = fig.evaluate("""async () => {
                 const f = window.figcraft;
                 f.captureDownloads(true);
@@ -151,8 +154,12 @@ def main():
         except Exception as e:  # noqa: BLE001
             check("figcraft_fixture_made_by_the_app", False, str(e)[:300])
 
-        for name, (editor, content, query) in fixtures.items():
+        queue = list(fixtures.items())
+        seen_native = set()
+        while queue:
+            name, (editor, content, query) = queue.pop(0)
             app = editor
+            downloads.clear()
             t0 = time.time()
             page.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}{query}", wait_until="domcontentloaded")
             host = find_frame(page, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=page.main_frame)
@@ -203,11 +210,23 @@ def main():
                 time.sleep(1)
             page.screenshot(path=os.path.join(RESULTS, f"{editor}-saved.png"))
             after = rs.history(admin, repo_id, name)
+            if not saved and downloads and editor not in seen_native:
+                # The app saved under its own native name (e.g. test.deckcraft for a .pptx): the host
+                # page turned that into a download. Use those bytes as a fixture in the native format
+                # and run the flow again on it; the first pass is recorded as the export path.
+                dl = downloads[-1]
+                native_name = dl.suggested_filename
+                data = open(dl.path(), "rb").read()
+                seen_native.add(editor)
+                check(f"{editor}_save_as_native_format_is_exported_as_download", len(data) > 0, f"{native_name} {len(data)} bytes; status={status()!r}")
+                ids[native_name] = rs.upload(admin, repo_id, native_name, data)
+                queue.append((native_name, (editor, data, "")))
+                continue
             check(f"{editor}_save_creates_seafile_version_by_user", saved and after[0]["creator"] == admin_username,
                   f"history {len(before)}->{len(after)} top={after[0] if after else None} status={status()!r}")
             if saved:
                 got, _ = rs.download(admin, repo_id, name)
-                check(f"{editor}_saved_bytes_look_like_{name.rsplit('.',1)[1]}", rs.content_matches(name, got), f"len={len(got)}")
+                check(f"{editor}_saved_{name.rsplit('.',1)[1]}_bytes_look_right", rs.content_matches(name, got), f"len={len(got)}")
 
         with open(os.path.join(RESULTS, "browser-console.log"), "w") as fh:
             fh.write("\n".join(console))

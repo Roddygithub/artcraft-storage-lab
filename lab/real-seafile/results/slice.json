@@ -1,8 +1,8 @@
 {
  "seafile_version": "13.0.28",
- "repo_id": "283a86d2-9170-4d78-a8f2-42ddb7cc28d6",
- "ran_at": "2026-10-31T19:10:01Z",
- "passed": 45,
+ "repo_id": "aa0b41fa-cc4e-42ce-bda5-11aba6d3e09a",
+ "ran_at": "2026-10-31T20:46:59Z",
+ "passed": 48,
  "failed": 0,
  "checks": [
   {
@@ -38,17 +38,17 @@
   {
    "name": "seahub_svg_routes_to_wopi",
    "ok": true,
-   "detail": "version=13.0.28 action=http://bridge:8778/edit/svgstub?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fedbaf3e3a855c0682b2391bd220c71c"
+   "detail": "version=13.0.28 action=http://bridge:8778/edit/vectorcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F583ba96bf72174940b9a124e005"
   },
   {
    "name": "seahub_docx_routes_to_wopi_wordcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/wordcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F625dfd946b3705c4f04ebfbcd7148"
+   "detail": "http://bridge:8778/edit/wordcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fa57f4c42f4f8b14b216fcafba3f67"
   },
   {
    "name": "seahub_xlsx_routes_to_wopi_gridcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/gridcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F5e46d2ea80500ae9360daf7a49759"
+   "detail": "http://bridge:8778/edit/gridcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F2cd7ab3e6fba246d3520121bbba49"
   },
   {
    "name": "seahub_pdf_default_is_viewer_not_wopi",
@@ -58,15 +58,20 @@
   {
    "name": "seahub_pdf_edit_pdf_routes_to_wopi_pdfcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/pdfcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F382f0e59973d16477b80ed1358f45f"
+   "detail": "http://bridge:8778/edit/pdfcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F724ddfac172212678b71f3c62e2170"
   },
   {
    "name": "seahub_dxf_routes_to_wopi_cadcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/cadcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fefa235fcbef32760afb916351f9100"
+   "detail": "http://bridge:8778/edit/cadcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fc0bb1a658c0d775e66cc49dc6091b2"
   },
   {
-   "name": "seahub_pptx_routes_to_onlyoffice",
+   "name": "seahub_pptx_routes_to_wopi_deckcraft",
+   "ok": true,
+   "detail": "http://bridge:8778/edit/deckcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fe4dc49207f64b28d220c7dc465901"
+  },
+  {
+   "name": "seahub_odt_routes_to_onlyoffice",
    "ok": true,
    "detail": "apijs referenced"
   },
@@ -111,14 +116,24 @@
    "detail": "status=200 len=1621"
   },
   {
+   "name": "bridge_open_pptx_deckcraft",
+   "ok": true,
+   "detail": "status=200 editorUrl=/editors/deckcraft/index.html?host=parent version_ok=True"
+  },
+  {
+   "name": "bridge_serves_deckcraft_bundle",
+   "ok": true,
+   "detail": "status=200 len=1794"
+  },
+  {
    "name": "discovery_form_token_not_in_url",
    "ok": true,
-   "detail": "http://bridge:8778/edit/svgstub?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fedbaf3e3a855c0682b2391bd220c71c"
+   "detail": "http://bridge:8778/edit/vectorcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F583ba96bf72174940b9a124e005"
   },
   {
    "name": "discovery_wopisrc_is_seahub",
    "ok": true,
-   "detail": "http://seafile.lab/api2/wopi/files/edbaf3e3a855c0682b2391bd220c71c296370ebb"
+   "detail": "http://seafile.lab/api2/wopi/files/583ba96bf72174940b9a124e005c4501596934b8"
   },
   {
    "name": "bridge_open_host_page",
@@ -128,7 +143,7 @@
   {
    "name": "bridge_host_page_frame_ancestors_seahub",
    "ok": true,
-   "detail": "default-src 'none'; script-src 'nonce-CthNNUCrMmTtJXQ1OMi-Ub6t'; style-src 'nonce-CthNNUCrMmTtJXQ1OMi-Ub6t'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; frame-ancestors http://seafile."
+   "detail": "default-src 'none'; script-src 'nonce-2zV96_G9u-FOblk1OCUa8B9n'; style-src 'nonce-2zV96_G9u-FOblk1OCUa8B9n'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; frame-ancestors http://seafile."
   },
   {
    "name": "bridge_version_is_seafile_obj_id",
@@ -143,7 +158,7 @@
   {
    "name": "relay_save_ok",
    "ok": true,
-   "detail": "status=200 body=b'{\"version\": \"acc4a4f72382667f70aa81f2ce9886ba64a06d43\", \"reconciled\": false, \"lastModified\": \"2026-10-31T19:09:59.000000Z\"}'"
+   "detail": "status=200 body=b'{\"version\": \"acc4a4f72382667f70aa81f2ce9886ba64a06d43\", \"reconciled\": false, \"verified\": true, \"lastModified\": \"2026-10-31T20:46:57.000000Z\"}'"
   },
   {
    "name": "seafile_has_new_bytes",
@@ -153,7 +168,7 @@
   {
    "name": "history_two_versions_attributed_to_admin",
    "ok": true,
-   "detail": "[{\"id\": \"29f7ee49437eeb3931c91ea3622919390ccb643e\", \"rev_file_id\": \"acc4a4f72382667f70aa81f2ce9886ba64a06d43\", \"creator\": \"admin@lab.test\", \"desc\": \"Modified \\\"test.svg\\\"\"}, {\"id\": \"fbf044c934c14f31a0668255502e8307bde17ca7\", \"rev_file_id\": \"1bcf5d2eea6c00f8fc75dedfe58becca47e25e3e\", \"creator\": \"admin@lab.test\", \"desc\": \"Added \\\"test.svg\\\".\"}]"
+   "detail": "[{\"id\": \"2ddac4ef0a95429889f1862f1a072aa4a1560230\", \"rev_file_id\": \"acc4a4f72382667f70aa81f2ce9886ba64a06d43\", \"creator\": \"admin@lab.test\", \"desc\": \"Modified \\\"test.svg\\\"\"}, {\"id\": \"c00cedb4b2aee0a53609e22afb3ecb58e0723c8e\", \"rev_file_id\": \"1bcf5d2eea6c00f8fc75dedfe58becca47e25e3e\", \"creator\": \"admin@lab.test\", \"desc\": \"Added \\\"test.svg\\\".\"}]"
   },
   {
    "name": "relay_stale_version_409_no_overwrite",
@@ -168,7 +183,7 @@
   {
    "name": "relay_identical_bytes_idempotent",
    "ok": true,
-   "detail": "status=200 history 3->3 body=b'{\"version\": \"a1dd1759eb1a56eee701c6bdccc6af59d7a1cf76\", \"reconciled\": false, \"lastModified\": \"2026-10-31T19:09:59.000000'"
+   "detail": "status=200 history 3->3 body=b'{\"version\": \"a1dd1759eb1a56eee701c6bdccc6af59d7a1cf76\", \"reconciled\": false, \"verified\": true, \"lastModified\": \"2026-10-'"
   },
   {
    "name": "relay_rename_refused_400",
@@ -198,7 +213,7 @@
   {
    "name": "seahub_readonly_gets_wopi_view_form",
    "ok": true,
-   "detail": "http://bridge:8778/edit/svgstub?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fedbaf3e3a855c0682b2391bd220c71c"
+   "detail": "http://bridge:8778/edit/vectorcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F583ba96bf72174940b9a124e005"
   },
   {
    "name": "bridge_readonly_open",
@@ -228,7 +243,7 @@
   {
    "name": "onlyoffice_fetches_from_seahub_and_converts",
    "ok": true,
-   "detail": "{\"fileUrl\": \"http://onlyoffice/cache/files/data/conv_510e486f747a4bfdbfb9dfaf611bae2e_513/output.pdf/test.pdf?md5=jW916Rsl118uygEBGKMzcw&expires=1793474702&filename=test.pdf\", \"fileType\": \"pdf\", \"perc"
+   "detail": "{\"fileUrl\": \"http://onlyoffice/cache/files/data/conv_97f6a617a007499daf44bd4cd105449e_513/output.pdf/test.pdf?md5=eNdG2jrf6jc9xhz_mESD1A&expires=1793480520&filename=test.pdf\", \"fileType\": \"pdf\", \"perc"
   }
  ]
 }
