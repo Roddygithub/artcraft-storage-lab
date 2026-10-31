@@ -351,6 +351,9 @@ def content_matches(name: str, data: bytes) -> bool:
         return b"<svg" in data[:300]
     if ext in ("figcraft", "scraft", "scraftz", "pcraft", "designcraft", "deckcraft"):
         return len(data) > 0
+    if ext == "psd":
+        return data.startswith(b"8BPS")
+        return len(data) > 0
     if ext == "png":
         return data.startswith(b"\x89PNG")
     return True

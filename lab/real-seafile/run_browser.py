@@ -84,6 +84,9 @@ def main():
         browser = p.chromium.launch(args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist",
                                           "--enable-webgl", "--disable-dev-shm-usage"])
         ctx = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+        # Standalone editor pages used only to make fixtures: Playwright's evaluate needs eval, which
+        # the editor-page CSP forbids. The real host flow below keeps the CSP (that is part of the test).
+        fixctx = browser.new_context(viewport={"width": 1200, "height": 800}, bypass_csp=True)
         page = ctx.new_page()
         console: list[str] = []
         downloads: list = []
@@ -105,7 +108,7 @@ def main():
             if not os.path.isdir(os.path.join(STATIC, editor)):
                 continue
             try:
-                sp = ctx.new_page()
+                sp = fixctx.new_page()
                 sp.goto(f"{rs.BRIDGE}/editors/{editor}/index.html?empty", wait_until="commit", timeout=60000)
                 sp.wait_for_function("!document.getElementById('%s_loading')" % editor, timeout=120000)
                 time.sleep(2)
@@ -126,7 +129,7 @@ def main():
         # FigCraft has no file format we can write by hand: let the app make one through its page
         # API on the standalone editor page, then upload it to Seafile and run the host flow on it.
         try:
-            fig = ctx.new_page()
+            fig = fixctx.new_page()
             fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html", wait_until="commit", timeout=60000)
             # function form: the editor page's CSP forbids eval, which a string expression would use
             fig.wait_for_function("() => typeof window.figcraft === 'object'", timeout=120000)
@@ -221,6 +224,12 @@ def main():
                 check(f"{editor}_save_as_native_format_is_exported_as_download", len(data) > 0, f"{native_name} {len(data)} bytes; status={status()!r}")
                 ids[native_name] = rs.upload(admin, repo_id, native_name, data)
                 queue.append((native_name, (editor, data, "")))
+                continue
+            if not saved and editor in seen_native and "saved to seafile" in (status() or "").lower():
+                # Native-format second pass: the app re-serialised the file it had just produced, so the
+                # bytes are identical and Seafile records no new version. The bridge verified them.
+                got, _ = rs.download(admin, repo_id, name)
+                check(f"{editor}_native_save_verified_idempotent", got == content, f"history {len(before)}->{len(after)} status={status()!r}")
                 continue
             check(f"{editor}_save_creates_seafile_version_by_user", saved and after[0]["creator"] == admin_username,
                   f"history {len(before)}->{len(after)} top={after[0] if after else None} status={status()!r}")
