@@ -70,6 +70,12 @@ def main():
         "test.svg": ("vectorcraft", rs.SVG_V1, ""),          # page-API shim, not an upstream bridge
         "test.pptx": ("deckcraft", rs.minimal_pptx(), ""),    # lab host.rs port, built from upstream source
     }
+    STATIC = "/app/lab/real-seafile/static"
+    # Editors whose bundle is not in the lab (not built yet) are skipped, not failed.
+    for name in list(fixtures):
+        if not os.path.isdir(os.path.join(STATIC, fixtures[name][0])):
+            print(f"skip {name}: no bundle for {fixtures[name][0]}", flush=True)
+            del fixtures[name]
     ids = {name: rs.upload(admin, repo_id, name, content) for name, (_, content, _) in fixtures.items()}
     figcraft_fixture = None
 
@@ -89,6 +95,30 @@ def main():
         page.click("button[type=submit], input[type=submit]")
         page.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
         check("browser_login", "/accounts/login" not in page.url, page.url)
+
+        # Apps with no hand-writable format and no page API: let the standalone app save a new
+        # document as a browser download, and use those bytes as the Seafile fixture.
+        for editor, fname, ext in (("soundcraft", "test.scraft", "scraft"),):
+            if not os.path.isdir(os.path.join(STATIC, editor)):
+                continue
+            try:
+                sp = ctx.new_page(accept_downloads=True)
+                sp.goto(f"{rs.BRIDGE}/editors/{editor}/index.html?empty", wait_until="commit", timeout=60000)
+                sp.wait_for_function("!document.getElementById('%s_loading')" % editor, timeout=120000)
+                time.sleep(2)
+                sp.mouse.click(600, 400)
+                with sp.expect_download(timeout=30000) as dl:
+                    sp.keyboard.press("Control+s")
+                    time.sleep(2)
+                    sp.keyboard.press("Enter")   # a name/format dialog, if the app shows one
+                path = dl.value.path()
+                data = open(path, "rb").read()
+                sp.close()
+                ids[fname] = rs.upload(admin, repo_id, fname, data)
+                fixtures[fname] = (editor, data, "")
+                check(f"{editor}_fixture_downloaded_from_the_app", len(data) > 0, f"{dl.value.suggested_filename} {len(data)} bytes")
+            except Exception as e:  # noqa: BLE001
+                check(f"{editor}_fixture_downloaded_from_the_app", False, str(e)[:300])
 
         # FigCraft has no file format we can write by hand: let the app make one through its page
         # API on the standalone editor page, then upload it to Seafile and run the host flow on it.

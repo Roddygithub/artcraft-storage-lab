@@ -338,7 +338,7 @@ def content_matches(name: str, data: bytes) -> bool:
         return b"SECTION" in data[:200] or b"ENTITIES" in data
     if ext == "svg":
         return b"<svg" in data[:300]
-    if ext == "figcraft":
+    if ext in ("figcraft", "scraft", "scraftz"):
         return len(data) > 0
     return True
 
