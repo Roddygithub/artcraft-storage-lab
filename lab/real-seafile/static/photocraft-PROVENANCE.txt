@@ -1,0 +1,4 @@
+repository: storytold/photocraft
+built_from: 799e129 (v0.18.0, shallow clone of main)
+asset: built in the lab VM with trunk build --release (not an upstream release asset)
+patched: yes -- host bridge port, see docs/upstream-drafts/photocraft-host-bridge/ (photocraft-host-bridge.diff); nothing else changed
