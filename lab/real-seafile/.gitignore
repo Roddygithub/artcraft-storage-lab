@@ -1,0 +1,7 @@
+# upstream bundles are fetched, not versioned
+static/wordcraft/
+static/gridcraft/
+static/pdfcraft/
+static/cadcraft/
+results/*.html
+.env

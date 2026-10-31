@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>{{TITLE}}</title>
+<style nonce="{{NONCE}}">
+  html, body { margin: 0; height: 100%; background: #1e1e1e; color: #ddd; font: 13px system-ui, sans-serif; }
+  #bar { display: flex; align-items: center; gap: 12px; height: 32px; padding: 0 12px; background: #2b2b2b; border-bottom: 1px solid #444; }
+  #bar .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #bar .status { flex: 1; text-align: right; opacity: .85; }
+  #bar .status[data-kind="error"] { color: #ff8080; }
+  #bar .status[data-kind="warn"] { color: #ffd37a; }
+  #bar .status[data-kind="ok"] { color: #8fe28f; }
+  #bar .ro { background: #665200; color: #ffe9a6; padding: 2px 6px; border-radius: 3px; }
+  #frame { display: block; width: 100%; height: calc(100% - 33px); border: 0; background: #fff; }
+</style>
+</head>
+<body>
+<div id="bar">
+  <span class="name" id="name"></span>
+  <span class="ro" id="ro" hidden>read-only</span>
+  <span class="status" id="status" data-kind="info">loading…</span>
+</div>
+<iframe id="frame" title="editor" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"></iframe>
+<script type="application/json" id="bridge-config" nonce="{{NONCE}}">{{CONFIG_JSON}}</script>
+<script nonce="{{NONCE}}" src="/host.js"></script>
+</body>
+</html>

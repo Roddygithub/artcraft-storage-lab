@@ -1,0 +1,20 @@
+{
+  "wordcraft": {
+    "label": "WordCraft",
+    "app": "wordcraft",
+    "url": "/editors/wordcraft/index.html?host=parent",
+    "extensions": ["docx"]
+  },
+  "gridcraft": {
+    "label": "GridCraft",
+    "app": "gridcraft",
+    "url": "/editors/gridcraft/index.html?host=parent",
+    "extensions": ["xlsx"]
+  },
+  "pdfcraft": {
+    "label": "PdfCraft",
+    "app": "pdfcraft",
+    "url": "/editors/pdfcraft/index.html?host=parent",
+    "extensions": ["pdf"]
+  }
+}
