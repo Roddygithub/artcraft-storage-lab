@@ -1,3 +1,47 @@
+# READ THIS FIRST — state on 2026-10-31 (the mandate below has been executed)
+
+The first-principles re-foundation this file asks for is **done**. Do not redo it. Pick up here:
+
+1. **Decision and evidence**: `docs/REFOUNDATION-REPORT.md` (§5 decision, §7 what was done and
+   measured, final status block). Architecture: a stateless **WOPI editor bridge** (`bridge/`) on
+   top of Seahub's existing WOPI host; no Seafile patch, no editor patch; ONLYOFFICE kept for the
+   formats it handles. The old gateway + Seahub/fileserver patches under `integration/` are
+   **legacy** (evidence only, do not extend).
+2. **What works, measured on stock Seafile CE 13.0.28 in an isolated lab**: 10 of the 13 Craft apps
+   round-trip (open from Seafile Web → edit → save → new Seafile version): HTTP slice 48/48,
+   browser slice 50/50, `lab/real-seafile/results/`. Per-app table: report §7 step 4. The three
+   media apps (FilmCraft, EffectCraft, LightCraft) are out of scope by design
+   (`docs/upstream-drafts/host-bridge-ports.md`).
+3. **Where things are**: `README.md` (what works per file type), `ROADMAP.md` (done / next /
+   owner-only), `AGENTS.md` (rules and process), `deploy/bridge/` (run it next to a real Seafile),
+   `lab/real-seafile/` (rebuild the lab: README there; the lab VM used so far lived on another
+   machine and is **not** part of this repository — recreate it with `up.sh`), `docs/upstream-drafts/`
+   (what we would propose to Seahub and storytold — **not published**).
+4. **Next steps, in order** (`ROADMAP.md`):
+   - Owner, on the live server: diagnose the ONLYOFFICE `api.js` 404; roll back the GR-015
+     Seahub/`seaf-server` patches (rollback archive recorded in `docs/reviews/GR-015/`); upgrade
+     Seafile to 13 (the bridge needs Seahub ≥ 13 for non-office extensions); deploy the bridge from
+     `deploy/bridge/` behind TLS; run the human checklist in `lab/real-seafile/README.md`.
+   - Lab: a real typed edit before Save in the browser slice; ONLYOFFICE vs WordCraft fidelity
+     comparison; a third independent review of the current revision; then candidate freeze and the
+     project-level GPT gate (§34 below).
+   - Only after the gate **and** the owner's explicit yes: open the drafts upstream.
+5. **Rules that still bind** (unchanged below): production is never touched without the owner's
+   explicit authorization; `UPSTREAM_STATUS=LOCKED` until the gate passes and the owner approves;
+   no secrets in Git; implementation and review are different contexts.
+
+Status line to carry forward:
+
+```text
+REFOUNDATION_STATE=DECISION_REACHED, BRIDGE_VALIDATED_IN_LAB (10/13 apps), DEPLOY_KIT_READY, R2_REVIEW_INCORPORATED
+PRODUCTION_STATUS=UNTOUCHED
+UPSTREAM_STATUS=LOCKED
+```
+
+---
+
+# Original mandate (executed; kept for the rules and the rationale)
+
 # ARTCRAFT STORAGE LAB — TOTAL RE-FOUNDATION / FIRST-PRINCIPLES MANDATE
 
 You are taking over an existing engineering project:
