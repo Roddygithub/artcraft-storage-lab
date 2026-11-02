@@ -94,6 +94,114 @@ def main():
         page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
         page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
 
+        def attach(page):
+            page.on("download", lambda d: downloads.append(d))
+            page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
+            page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
+            return page
+
+        def wordcraft_real_edit_flow(page, name, content, box, status, before):
+            """ROADMAP step 3, WordCraft DOCX slice: type a real change into the editor (trusted
+            input through the browser input pipeline, no byte injection, no helper upload), Save
+            through the bridge, then close this editor and reopen the file from Seafile in a
+            fresh browser session and assert the specific marker text survived. All follow-ups
+            (history, download, the reopened editor's own fetch) go through the Seafile API or
+            the editor's own open path."""
+            marker = "browsertyped" + os.urandom(5).hex()   # alphanumeric: no autocorrect damage
+            phrase = f" The typed marker is {marker}. "
+
+            # -- a real typed edit before Save ------------------------------------
+            page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 60 + (box["height"] - 60) / 2)
+            time.sleep(1)
+            page.keyboard.press("Control+End")           # caret to the end of the document
+            def dirty():
+                return "unsaved" in (status() or "").lower()
+            end = time.time() + 15
+            while time.time() < end and not dirty():
+                time.sleep(0.5)
+            if not dirty():
+                # some keyboard layouts/builds swallow char-by-char typing: IME-style insert,
+                # still real editor input, never a file replacement
+                page.keyboard.insert_text(phrase)
+                end = time.time() + 15
+                while time.time() < end and not dirty():
+                    time.sleep(0.5)
+            check("wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes", dirty(),
+                  f"marker={marker} status={status()!r}")
+            page.screenshot(path=os.path.join(RESULTS, "wordcraft-typed.png"))
+
+            # -- Save (editor keeps focus; Ctrl+S inside the editor frame) ---------
+            page.keyboard.press("Control+s")
+            end = time.time() + 60
+            confirmed = False
+            while time.time() < end:
+                if "saved to seafile" in (status() or "").lower():
+                    confirmed = True
+                    break
+                time.sleep(1)
+            check("wordcraft_save_confirmed_by_host_page", confirmed, f"status={status()!r}")
+            after = before
+            end = time.time() + 60
+            while time.time() < end:
+                after = rs.history(admin, repo_id, name)
+                if len(after) > len(before):
+                    break
+                time.sleep(1)
+            check("wordcraft_save_creates_seafile_version_by_user",
+                  len(after) > len(before) and after[0]["creator"] == admin_username,
+                  f"history {len(before)}->{len(after)} top={after[0] if after else None} status={status()!r}")
+
+            # -- Seafile now holds the specific new text ---------------------------
+            got, _ = rs.download(admin, repo_id, name)
+            check("wordcraft_saved_docx_contains_the_typed_marker",
+                  marker.lower() in rs.docx_text(got).lower(),
+                  f"marker={marker} len={len(got)} bytes_identical_to_original={got == content}")
+            check("wordcraft_save_is_not_identical_bytes", got != content, f"{len(content)} -> {len(got)} bytes")
+            check("wordcraft_saved_docx_bytes_look_right", rs.content_matches(name, got), f"len={len(got)}")
+            page.screenshot(path=os.path.join(RESULTS, "wordcraft-saved.png"))
+
+            # -- close the old editor, reopen from Seafile in a fresh session ------
+            page.close()
+            page = attach(ctx.new_page())
+            reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            p2 = reopen.new_page()
+            relay_file: list = []          # the reopened host page's own /relay/file fetches
+            def on_response(r):
+                if r.url.endswith("/relay/file"):
+                    try:
+                        relay_file.append((r.status, r.body()))
+                    except Exception:  # noqa: BLE001
+                        pass
+            p2.on("response", on_response)
+            p2.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
+            p2.fill("input[name=login]", rs.ADMIN)
+            p2.fill("input[name=password]", rs.ADMIN_PW)
+            p2.click("button[type=submit], input[type=submit]")
+            p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
+            check("wordcraft_reopen_fresh_seafile_session", "/accounts/login" not in p2.url, p2.url)
+            p2.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}", wait_until="domcontentloaded")
+            host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
+            check("wordcraft_reopen_host_frame_from_seahub", host2 is not None, f"frames={frames_dump(p2)}")
+            body = None
+            end = time.time() + 180
+            while time.time() < end and body is None:
+                for st_, b in relay_file:
+                    if st_ == 200 and b:
+                        body = b
+                        break
+                time.sleep(1)
+            p2.screenshot(path=os.path.join(RESULTS, "wordcraft-reopened.png"))
+            check("wordcraft_reopen_editor_ready_and_document_opened", body is not None,
+                  f"relay/file responses={len(relay_file)} after {time.time()-t0:.0f}s")
+            # semantic reopen: the specific new text, fetched by the reopened editor itself
+            check("wordcraft_reopen_shows_the_typed_marker",
+                  body is not None and marker.lower() in rs.docx_text(body).lower(),
+                  f"marker={marker} len={len(body) if body else 0}")
+            check("wordcraft_reopen_bytes_identical_to_the_saved_version", body is not None and body == got,
+                  f"len={len(body) if body else 0} vs saved {len(got)}")
+            reopen.close()
+            return page
+
         # login
         page.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
         page.fill("input[name=login]", rs.ADMIN)
@@ -199,6 +307,10 @@ def main():
             if not opened or box is None:
                 continue
             before = rs.history(admin, repo_id, name)
+            if editor == "wordcraft":
+                # ROADMAP step 3 slice: real typed edit before Save + fresh-session reopen
+                page = wordcraft_real_edit_flow(page, name, content, box, status, before)
+                continue
             # focus the editor canvas (below the host bar) and ask it to save
             page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 60 + (box["height"] - 60) / 2)
             time.sleep(1)
