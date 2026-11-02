@@ -66,6 +66,14 @@ class Fixture:
                     self.send_header("Content-Length", str(len(body)))
                     self.end_headers()
                     self.wfile.write(body)
+                elif self.path.startswith("/library/") or self.path.startswith("/lib/"):
+                    body = (b'<a href="/lib/fixture/file/same.docx">same.docx</a>'
+                            b'<a target="_blank" href="/lib/fixture/file/popup.docx">popup.docx</a>')
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
                 elif self.path == "/":
                     page = b"<div>ready</div><script>setTimeout(function(){fetch('/relay/file').catch(function(){});},%d);</script>" % DELAY_MS
                     self.send_response(200)
@@ -174,6 +182,15 @@ def main():
         new_body = run_browser.wait_for_saved_response(page, relay_file, timeout=10)
         check("production_wait_finds_the_starved_response", new_body == saved, f"len={len(new_body) if new_body else 0}")
         page.close()
+        fx.stop()
+        fx = Fixture(plan=[]).start()
+        context = browser.new_context()
+        page = context.new_page()
+        same = run_browser.open_from_seafile_list(page, fx.url, "fixture", "same.docx")
+        check("file_list_click_supports_same_tab", same is page and same.url.endswith("/file/same.docx"))
+        popup = run_browser.open_from_seafile_list(page, fx.url, "fixture", "popup.docx")
+        check("file_list_click_supports_new_tab", popup is not page and popup.url.endswith("/file/popup.docx"))
+        context.close()
         fx.stop()
         browser.close()
 

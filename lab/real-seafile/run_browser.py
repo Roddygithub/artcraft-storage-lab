@@ -66,6 +66,23 @@ def wait_for_saved_response(page, captured, timeout=180):
     return None
 
 
+def open_from_seafile_list(page, base, repo_id, name, timeout=30):
+    """Click the actual file-list link; Seahub may open it here or in a new tab."""
+    page.goto(f"{base.rstrip('/')}/library/{repo_id}/", wait_until="domcontentloaded")
+    previous_pages = set(page.context.pages)
+    previous_url = page.url
+    page.get_by_role("link", name=name, exact=True).click(timeout=timeout * 1000)
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        opened = [p for p in page.context.pages if p not in previous_pages]
+        target = opened[-1] if opened else page
+        if opened or page.url != previous_url:
+            target.wait_for_load_state("domcontentloaded", timeout=timeout * 1000)
+            return target
+        page.wait_for_timeout(50)
+    raise TimeoutError("file-list click did not open an editor page")
+
+
 def frames_dump(page):
     return [(f.name, f.url[:70], (f.parent_frame.name if f.parent_frame else None)) for f in page.frames]
 
@@ -200,6 +217,7 @@ def main():
             page.close()
             page = attach(ctx.new_page())
             reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            reopen.on("page", attach)
             p2 = reopen.new_page()
             relay_file: list = []          # the reopened host page's own /relay/file fetches
             save2_bodies: list = []        # the reopened editor's own Ctrl+S save payloads
@@ -217,15 +235,16 @@ def main():
                             save2_bodies.append(b)
                     except Exception:  # noqa: BLE001
                         pass
-            p2.on("response", on_response)
-            p2.on("request", on_open_req)
+            reopen.on("response", on_response)
+            reopen.on("request", on_open_req)
             p2.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
             p2.fill("input[name=login]", rs.ADMIN)
             p2.fill("input[name=password]", rs.ADMIN_PW)
             p2.click("button[type=submit], input[type=submit]")
             p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
             check("wordcraft_reopen_fresh_seafile_session", "/accounts/login" not in p2.url, p2.url)
-            p2.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}", wait_until="domcontentloaded")
+            p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
+            check("wordcraft_reopened_from_seafile_file_list", True)
             host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
             check("wordcraft_reopen_host_frame_from_seahub", host2 is not None, f"frames={frames_dump(p2)}")
             def status2():
@@ -305,6 +324,7 @@ def main():
             check("wordcraft_reopen_editor_holds_the_second_typed_marker",
                   bool(save2_bodies) and marker2.lower() in rs.docx_text(save2_bodies[0]).lower(),
                   f"captured={len(save2_bodies)} marker={marker2}")
+            check("wordcraft_saves_did_not_download", not downloads, f"downloads={len(downloads)}")
             reopen.close()
             return page
 
@@ -342,41 +362,45 @@ def main():
 
         # FigCraft has no file format we can write by hand: let the app make one through its page
         # API on the standalone editor page, then upload it to Seafile and run the host flow on it.
-        try:
-            fig = fixctx.new_page()
-            fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html?control", wait_until="commit", timeout=60000)   # ?control: opt-in page API
-            # function form: the editor page's CSP forbids eval, which a string expression would use
-            fig.wait_for_function("() => typeof window.figcraft === 'object'", timeout=120000)
-            fig.wait_for_function("() => window.figcraft.commands().then(() => true).catch(() => false)", timeout=120000)
-            made = fig.evaluate("""async () => {
-                const f = window.figcraft;
-                f.captureDownloads(true);
-                try { await f.execute('node.create', {kind: 'frame', name: 'Home'}); } catch (e) {}
-                // FigCraft's web build refuses a path ("no file system in the browser"): a plain
-                // Save goes through the download path, which captureDownloads keeps.
-                // ...and a path-less Save wants a path first: use the app's own shortcut through the
-                // control channel, then accept the name/format dialog.
-                try { await f.execute('file.save', {path: 'test.figcraft'}); } catch (e) {
-                    try { await f.request('ui.key', {key: 's', cmd: true}); } catch (e2) {}
-                    await new Promise(r => setTimeout(r, 800));
-                    try { await f.request('ui.dialog.confirm', {}); } catch (e3) {}
-                }
-                for (let i = 0; i < 40; i++) {
-                    const files = f.files() || [];
-                    if (files.length) { const name = String(files[files.length - 1].path); const b = f.readFile(name); return {name, bytes: Array.from(b)}; }
-                    await new Promise(r => setTimeout(r, 250));
-                }
-                return null;
-            }""")
-            fig.close()
-            if made:
-                figcraft_fixture = bytes(made["bytes"])
-                fname = "test." + (made["name"].rsplit(".", 1)[-1] if "." in made["name"] else "figcraft")
-                ids[fname] = rs.upload(admin, repo_id, fname, figcraft_fixture)
-                fixtures[fname] = ("figcraft", figcraft_fixture, "")
-            check("figcraft_fixture_made_by_the_app", bool(made), f"{made['name'] if made else ''} {len(made['bytes']) if made else 0} bytes")
-        except Exception as e:  # noqa: BLE001
-            check("figcraft_fixture_made_by_the_app", False, str(e)[:300])
+        if os.path.isdir(os.path.join(STATIC, "figcraft")):
+            try:
+                fig = fixctx.new_page()
+                fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html?control", wait_until="commit", timeout=60000)   # ?control: opt-in page API
+                # function form: the editor page's CSP forbids eval, which a string expression would use
+                fig.wait_for_function("() => typeof window.figcraft === 'object'", timeout=120000)
+                fig.wait_for_function("() => window.figcraft.commands().then(() => true).catch(() => false)", timeout=120000)
+                made = fig.evaluate("""async () => {
+                    const f = window.figcraft;
+                    f.captureDownloads(true);
+                    try { await f.execute('node.create', {kind: 'frame', name: 'Home'}); } catch (e) {}
+                    // FigCraft's web build refuses a path ("no file system in the browser"): a plain
+                    // Save goes through the download path, which captureDownloads keeps.
+                    // ...and a path-less Save wants a path first: use the app's own shortcut through the
+                    // control channel, then accept the name/format dialog.
+                    try { await f.execute('file.save', {path: 'test.figcraft'}); } catch (e) {
+                        try { await f.request('ui.key', {key: 's', cmd: true}); } catch (e2) {}
+                        await new Promise(r => setTimeout(r, 800));
+                        try { await f.request('ui.dialog.confirm', {}); } catch (e3) {}
+                    }
+                    for (let i = 0; i < 40; i++) {
+                        const files = f.files() || [];
+                        if (files.length) { const name = String(files[files.length - 1].path); const b = f.readFile(name); return {name, bytes: Array.from(b)}; }
+                        await new Promise(r => setTimeout(r, 250));
+                    }
+                    return null;
+                }""")
+                fig.close()
+                if made:
+                    figcraft_fixture = bytes(made["bytes"])
+                    fname = "test." + (made["name"].rsplit(".", 1)[-1] if "." in made["name"] else "figcraft")
+                    ids[fname] = rs.upload(admin, repo_id, fname, figcraft_fixture)
+                    fixtures[fname] = ("figcraft", figcraft_fixture, "")
+                check("figcraft_fixture_made_by_the_app", bool(made), f"{made['name'] if made else ''} {len(made['bytes']) if made else 0} bytes")
+            except Exception as e:  # noqa: BLE001
+                check("figcraft_fixture_made_by_the_app", False, str(e)[:300])
+
+        else:
+            print("skip FigCraft fixture: no bundle for figcraft", flush=True)
 
         queue = list(fixtures.items())
         seen_native = set()
@@ -385,7 +409,14 @@ def main():
             app = editor
             downloads.clear()
             t0 = time.time()
-            page.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}{query}", wait_until="domcontentloaded")
+            if editor == "wordcraft":
+                original = page
+                page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
+                if page is not original:
+                    attach(page)
+                check("wordcraft_opened_from_seafile_file_list", True)
+            else:
+                page.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}{query}", wait_until="domcontentloaded")
             host = find_frame(page, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=page.main_frame)
             check(f"{editor}_host_frame_from_seahub", host is not None, f"frames={frames_dump(page)}")
             if host is None:
