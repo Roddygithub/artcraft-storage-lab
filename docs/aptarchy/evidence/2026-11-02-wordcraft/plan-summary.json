@@ -1,0 +1,136 @@
+{
+  "plan_id": "plan-4f938657073b",
+  "lane": "gpt-subscription-review",
+  "model": "gpt-6.1-sol",
+  "coverage": {
+    "ok": true
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "Continue candidate c045b04ff23233108802dd88f7e69ebcb8c15cd5 from aptarchy/artcraft-wordcraft-real-edit-20261102 and preserve its useful existing changes."
+    },
+    {
+      "id": "R2",
+      "text": "Preserve the stateless WOPI bridge."
+    },
+    {
+      "id": "R3",
+      "text": "First fix the reopened-response wait in lab/real-seafile/run_browser.py so time.sleep no longer starves synchronous Playwright callbacks."
+    },
+    {
+      "id": "R4",
+      "text": "Add a focused delayed-response regression using real Playwright when locally available."
+    },
+    {
+      "id": "R5",
+      "text": "Second correct the task report to list lab/real-seafile/up.sh slice and lab/real-seafile/up.sh browser as separate NOT RUN commands."
+    },
+    {
+      "id": "R6",
+      "text": "Inspect and document final requirement coverage."
+    },
+    {
+      "id": "R7",
+      "text": "Maintain real editor typing before saving and after reopening; do not substitute byte injection or helper uploads for editor interaction."
+    },
+    {
+      "id": "R8",
+      "text": "Maintain full marker checks in editor save payloads and saved content, including both markers after reopening."
+    },
+    {
+      "id": "R9",
+      "text": "Maintain editor/host save confirmation for both saves."
+    },
+    {
+      "id": "R10",
+      "text": "Maintain storage version creation, editing-user attribution, content validation, and saved-versus-reopened byte checks."
+    },
+    {
+      "id": "R11",
+      "text": "Maintain old editor closure and reopening through Seafile in a fresh browser session."
+    },
+    {
+      "id": "R12",
+      "text": "Reuse existing helpers and keep implementation scope WordCraft-only."
+    },
+    {
+      "id": "R13",
+      "text": "Treat the runtime lab as unavailable; do not access live services, the Docker daemon, Proxmox, or production."
+    },
+    {
+      "id": "R14",
+      "text": "Do not install infrastructure or change permissions."
+    },
+    {
+      "id": "R15",
+      "text": "Do not change ONLYOFFICE configuration."
+    },
+    {
+      "id": "R16",
+      "text": "Run bridge tests and meaningful focused local checks during implementation."
+    },
+    {
+      "id": "R17",
+      "text": "Do not use historical runtime results as evidence for this candidate."
+    },
+    {
+      "id": "R18",
+      "text": "Preserve the failed Aptarchy attempt and document new local validation honestly."
+    },
+    {
+      "id": "R19",
+      "text": "Do not publish upstream, merge or push to main, or promote project GPT status."
+    },
+    {
+      "id": "R20",
+      "text": "Return a grounded, read-only plan containing exactly two bounded sequential slices, each self-contained and independently verifiable; implementation and review use separate task branches and exact commits."
+    }
+  ],
+  "slices": [
+    {
+      "title": "Fix WordCraft reopen callback dispatch and add a delayed-response regression",
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R7",
+        "R8",
+        "R9",
+        "R10",
+        "R11",
+        "R12",
+        "R13",
+        "R14",
+        "R15",
+        "R16",
+        "R18",
+        "R19"
+      ]
+    },
+    {
+      "title": "Correct runtime evidence and audit final requirement coverage",
+      "covers": [
+        "R1",
+        "R2",
+        "R5",
+        "R6",
+        "R7",
+        "R8",
+        "R9",
+        "R10",
+        "R11",
+        "R12",
+        "R13",
+        "R14",
+        "R15",
+        "R16",
+        "R17",
+        "R18",
+        "R19",
+        "R20"
+      ]
+    }
+  ]
+}

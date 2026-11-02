@@ -219,6 +219,13 @@ Keep "implementation ≠ independent review". Replace the GR loop with: unit/pro
 
 ## 7. Next executable steps
 
+2026-11-02 follow-up: the Aptarchy WordCraft pilot plus parent corrections passed a fresh
+isolated Seafile 13.0.28 run: HTTP 48/48, browser 23/23, including genuine typed changes,
+file-list clicks, version creation, explicit old-page closure and semantic fresh-session
+reopen. [Retained scope and evidence](../lab/real-seafile/results/2026-11-02-wordcraft-pilot/README.md).
+Other apps below retain their historical coverage; this does not repeat their browser runs.
+
+
 Owner-only (production; this audit will not do them):
 
 1. Diagnose/restore the ONLYOFFICE `api.js` 404 on the live instance (likely `ONLYOFFICE_APIJS_URL` or Nginx Proxy Manager routing after the 10-26 Seahub restart). Office editing for the user depends on this, not on ArtCraft.

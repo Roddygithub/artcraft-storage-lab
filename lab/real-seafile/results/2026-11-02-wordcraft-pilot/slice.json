@@ -1,0 +1,202 @@
+{
+  "seafile_version": "13.0.28",
+  "ran_at": "2026-11-02T22:37:58Z",
+  "passed": 48,
+  "failed": 0,
+  "raw_private_sha256": "8389a9baf2966a3504135e2666655eebdd4d3589f235d85279c4c904fe740b30",
+  "sanitization": "Synthetic repository ID and all free-form details omitted; names and booleans unchanged.",
+  "checks": [
+    {
+      "name": "seafile_up",
+      "ok": true
+    },
+    {
+      "name": "bridge_up",
+      "ok": true
+    },
+    {
+      "name": "onlyoffice_up",
+      "ok": true
+    },
+    {
+      "name": "seahub_server_info",
+      "ok": true
+    },
+    {
+      "name": "reader_user_ready",
+      "ok": true
+    },
+    {
+      "name": "reader_share_readonly",
+      "ok": true
+    },
+    {
+      "name": "seahub_svg_routes_to_wopi",
+      "ok": true
+    },
+    {
+      "name": "seahub_docx_routes_to_wopi_wordcraft",
+      "ok": true
+    },
+    {
+      "name": "seahub_xlsx_routes_to_wopi_gridcraft",
+      "ok": true
+    },
+    {
+      "name": "seahub_pdf_default_is_viewer_not_wopi",
+      "ok": true
+    },
+    {
+      "name": "seahub_pdf_edit_pdf_routes_to_wopi_pdfcraft",
+      "ok": true
+    },
+    {
+      "name": "seahub_dxf_routes_to_wopi_cadcraft",
+      "ok": true
+    },
+    {
+      "name": "seahub_pptx_routes_to_wopi_deckcraft",
+      "ok": true
+    },
+    {
+      "name": "seahub_odt_routes_to_onlyoffice",
+      "ok": true
+    },
+    {
+      "name": "bridge_open_docx_wordcraft",
+      "ok": true
+    },
+    {
+      "name": "bridge_serves_wordcraft_bundle",
+      "ok": true
+    },
+    {
+      "name": "bridge_open_xlsx_gridcraft",
+      "ok": true
+    },
+    {
+      "name": "bridge_serves_gridcraft_bundle",
+      "ok": true
+    },
+    {
+      "name": "bridge_open_pdf_pdfcraft",
+      "ok": true
+    },
+    {
+      "name": "bridge_serves_pdfcraft_bundle",
+      "ok": true
+    },
+    {
+      "name": "bridge_open_dxf_cadcraft",
+      "ok": true
+    },
+    {
+      "name": "bridge_serves_cadcraft_bundle",
+      "ok": true
+    },
+    {
+      "name": "bridge_open_pptx_deckcraft",
+      "ok": true
+    },
+    {
+      "name": "bridge_serves_deckcraft_bundle",
+      "ok": true
+    },
+    {
+      "name": "discovery_form_token_not_in_url",
+      "ok": true
+    },
+    {
+      "name": "discovery_wopisrc_is_seahub",
+      "ok": true
+    },
+    {
+      "name": "bridge_open_host_page",
+      "ok": true
+    },
+    {
+      "name": "bridge_host_page_frame_ancestors_seahub",
+      "ok": true
+    },
+    {
+      "name": "bridge_version_is_seafile_obj_id",
+      "ok": true
+    },
+    {
+      "name": "relay_file_returns_bytes",
+      "ok": true
+    },
+    {
+      "name": "relay_save_ok",
+      "ok": true
+    },
+    {
+      "name": "seafile_has_new_bytes",
+      "ok": true
+    },
+    {
+      "name": "history_two_versions_attributed_to_admin",
+      "ok": true
+    },
+    {
+      "name": "relay_stale_version_409_no_overwrite",
+      "ok": true
+    },
+    {
+      "name": "relay_external_change_409_no_overwrite",
+      "ok": true
+    },
+    {
+      "name": "relay_identical_bytes_idempotent",
+      "ok": true
+    },
+    {
+      "name": "relay_rename_refused_400",
+      "ok": true
+    },
+    {
+      "name": "relay_wrong_signature_415",
+      "ok": true
+    },
+    {
+      "name": "relay_lock_seahub_ok",
+      "ok": true
+    },
+    {
+      "name": "relay_lock_conflict_409",
+      "ok": true
+    },
+    {
+      "name": "relay_unlock_ok",
+      "ok": true
+    },
+    {
+      "name": "seahub_readonly_gets_wopi_view_form",
+      "ok": true
+    },
+    {
+      "name": "bridge_readonly_open",
+      "ok": true
+    },
+    {
+      "name": "bridge_readonly_save_refused_403",
+      "ok": true
+    },
+    {
+      "name": "seahub_putfile_ignores_can_edit",
+      "ok": true
+    },
+    {
+      "name": "onlyoffice_apijs_200",
+      "ok": true
+    },
+    {
+      "name": "onlyoffice_jwt_command_ok",
+      "ok": true
+    },
+    {
+      "name": "onlyoffice_fetches_from_seahub_and_converts",
+      "ok": true
+    }
+  ]
+}

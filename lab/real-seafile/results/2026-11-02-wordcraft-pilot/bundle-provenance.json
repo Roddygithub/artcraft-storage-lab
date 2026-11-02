@@ -1,0 +1,27 @@
+[
+  {
+    "file": "cadcraft-PROVENANCE.txt",
+    "sha256": "d7af7777fb2c09420926883f1245ac9d10d87da5603eae051edf1a72c3ea3b45",
+    "content": "repository: storytold/cadcraft\nrelease_tag: v0.15.1\nasset: cadcraft-web-0.15.1.zip\nsha256: 4d8acce3209082699078aa868ef79fedd4437ba0d18014a0f031d118a0abceb8\npatched: no (upstream bundle as released)\nimport: scripts/craft_web_zip.py download + extract\ncoverage: HTTP static asset checks only; no browser workflow claim\n"
+  },
+  {
+    "file": "deckcraft-PROVENANCE.txt",
+    "sha256": "b6f4c4311f81fed08d1a3531fbcfb41ec8565d83cfd612f7a0935a6c0c7483c7",
+    "content": "repository: storytold/deckcraft\nrelease_tag: v0.13.1\nasset: deckcraft-web-0.13.1.zip\nsha256: 12a678c7b5b8d45ff247d9e090d850532410d7638da342c858758aae9ff4b9ce\npatched: no (upstream bundle as released)\nimport: scripts/craft_web_zip.py download + extract\ncoverage: HTTP static asset checks only; no browser workflow claim\n"
+  },
+  {
+    "file": "gridcraft-PROVENANCE.txt",
+    "sha256": "4b5f88cf4750067fb1cfc115d3d6ebd6ce96453ef7b58ed07ae8894e8420fb5d",
+    "content": "repository: storytold/gridcraft\nrelease_tag: v0.14.2\nasset: gridcraft-web-0.14.2.zip\nsha256: f6675cfe26f89f07cb9d9ff23a5ae0a946088eef6e22c93ac1141f0279f741f8\npatched: no (upstream bundle as released)\nimport: scripts/craft_web_zip.py download + extract\ncoverage: HTTP static asset checks only; no browser workflow claim\n"
+  },
+  {
+    "file": "pdfcraft-PROVENANCE.txt",
+    "sha256": "d741089e663297db35988dc0bef22da3026f7956a8946844a8ee66d4fdf06c1c",
+    "content": "repository: storytold/pdfcraft\nrelease_tag: v0.16.1\nasset: pdfcraft-web-0.16.1.zip\nsha256: 00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf\npatched: no (upstream bundle as released)\nimport: scripts/craft_web_zip.py download + extract\ncoverage: HTTP static asset checks only; no browser workflow claim\n"
+  },
+  {
+    "file": "wordcraft-PROVENANCE.txt",
+    "sha256": "18828f3ec7711483be828332784e18137222d5397abc447f07a9b64bd26d5caf",
+    "content": "repository: storytold/wordcraft\nrelease_tag: v0.13.2\nasset: wordcraft-web-0.13.2.zip\nsha256: b6c9c8d3a730495189ba0c213fe64313f317be8fc0611ac1ff8cdd6a4b20880c\npatched: no (upstream bundle as released)\nimport: scripts/craft_web_zip.py download + extract\n"
+  }
+]
