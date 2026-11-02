@@ -1,0 +1,11 @@
+{
+  "lab/real-seafile/run_slice.py": "bb5de1e8cc8e45474b6b17e7e16e0a4f0832b2cd25a3a05174f59838a1665400",
+  "lab/real-seafile/run_browser.py": "793f54802c3b33a1e2624942488065d50af84f2358d88e1e71f4f04a44c0b056",
+  "bridge/__init__.py": "f6a60a4b505fe189487196780db1830dab39f02bba6de157f8670de8f7c693d5",
+  "bridge/__main__.py": "e8555e96ee38cc883ebefff06894cfb72e1e08411de7ec47fc25a6bbfefe5af3",
+  "bridge/app.py": "07cd457401fc59ce9c8be464b0ea6f030027c80cd1e337e51be77481e308f34d",
+  "bridge/settings.py": "fe6f1fbdb2386638d4928f288e47cb3324802c7a54b69fab283cf893a36e8d19",
+  "bridge/wsgi.py": "6f3e9599b029a01b22e7d780e91ac2288c5ceaa8ac4bf8ec30c6dfbdb1531b2a",
+  "bridge/static/host.html": "2e5a9a4764299a261da57786ded0aff439f1180fde1b33bc0be2361a39b21ea8",
+  "bridge/static/host.js": "92c9e98ed4abd0190851be670a032f2672fd5d07c4fe8c2daa411c2e032df6f3"
+}

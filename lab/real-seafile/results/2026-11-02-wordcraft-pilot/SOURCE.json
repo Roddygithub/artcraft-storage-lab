@@ -1,0 +1,25 @@
+{
+  "source_commit": "e53fe097c7a3d1d8f854e4f74fc0fdca707ca66a",
+  "source_implementation": "00957cef10c31a1fc9f88acfa70116516fd2eea3",
+  "runtime": "rootless Podman; isolated lab only",
+  "limits_mib": {
+    "db": 384,
+    "redis": 96,
+    "seafile": 1280,
+    "onlyoffice": 1280,
+    "bridge": 96,
+    "browser": 896,
+    "slice": 256
+  },
+  "published_ports": [
+    18800,
+    18810,
+    18878
+  ],
+  "runtime_overrides": [
+    "unique container/network names; loopback ports; bounded memory/CPU; restart=no",
+    "DeckCraft label reflects unpatched release, HTTP-only coverage",
+    "browser container static-directory view contains WordCraft only; bridge serves five verified release bundles"
+  ],
+  "browser_source_commit": "e21c0b30e2d9b001bca5da17f561649de8114afd"
+}

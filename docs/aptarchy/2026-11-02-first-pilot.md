@@ -1,5 +1,10 @@
 # First Aptarchy pilot — code-stage assessment
 
+> Historical code-stage assessment at `e53fe09`. A subsequent parent-operated isolated replay
+> passed HTTP 48/48 and WordCraft browser 23/23 after the reviewed file-list/test-selection
+> correction `e21c0b3`. See the [runtime evidence](../../lab/real-seafile/results/2026-11-02-wordcraft-pilot/README.md).
+> Earlier NOT RUN statements below describe the original handoff, not this later replay.
+
 **Outcome: useful code produced, autonomous completion not achieved.** This is the first
 bounded WordCraft slice of ROADMAP step 3, not a completed Seafile MVP or an overall project
 verdict. Real editor/Seafile execution remains **NOT RUN**. Project GPT: **INCOMPLETE**;

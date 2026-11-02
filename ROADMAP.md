@@ -22,7 +22,7 @@ under `docs/reviews/` and `integration/` as evidence.
 | --- | --- | --- |
 | 1 | ~~DeckCraft, SoundCraft, PhotoCraft, DesignCraft ports~~ done | diffs under `docs/upstream-drafts/`, lab 45/46 |
 | 2 | ~~FigCraft through the shim~~ done | lab 50/50 |
-| 3 | A real edit before Save in the browser slice (today the native second pass re-saves identical bytes) | WordCraft DOCX slice coded in `lab/real-seafile/run_browser.py` (typed change before Save + fresh-session reopen) — **NOT RUN** (lab VM unavailable, `docs/aptarchy/2026-11-02-wordcraft-browser-edit-slice.md`); other editors pending |
+| 3 | A real edit before Save in the browser slice (today the native second pass re-saves identical bytes) | WordCraft DOCX passed fresh isolated replay: real file-list clicks, typed edits, two versions, confirmation, old-editor closure and semantic reopen; HTTP 48/48, browser 23/23 ([evidence](lab/real-seafile/results/2026-11-02-wordcraft-pilot/README.md)). Parent completed runtime/test corrections; other editors pending |
 | 4 | Media apps (FilmCraft, EffectCraft, LightCraft) as export-only (`saveAs: true`) | decision recorded; at most one proof |
 | 5 | Human pass on HTTPS in a desktop browser (WebGPU, clipboard, fonts, unload guard) | checklist in `lab/real-seafile/README.md`, run by the owner |
 | 6 | ONLYOFFICE vs WordCraft fidelity comparison on the same DOCX corpus | table in the report |

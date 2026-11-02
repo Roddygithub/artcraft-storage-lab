@@ -1,5 +1,10 @@
 # WordCraft typed-edit browser slice — code-stage evidence
 
+> Historical code-stage assessment at `e53fe09`. A subsequent parent-operated isolated replay
+> passed HTTP 48/48 and WordCraft browser 23/23 after the reviewed file-list/test-selection
+> correction `e21c0b3`. See the [runtime evidence](../../lab/real-seafile/results/2026-11-02-wordcraft-pilot/README.md).
+> Earlier NOT RUN statements below describe the original handoff, not this later replay.
+
 Source implementation: `00957cef10c31a1fc9f88acfa70116516fd2eea3`, following the retained
 failed candidate `c045b04ff23233108802dd88f7e69ebcb8c15cd5`; lab base `5b576de`.
 This follow-up changes documentation only. Real Seafile replay remains **NOT RUN**.
