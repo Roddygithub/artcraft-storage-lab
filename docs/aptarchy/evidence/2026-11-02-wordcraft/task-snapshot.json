@@ -1,0 +1,223 @@
+{
+  "source_commit": "00957cef10c31a1fc9f88acfa70116516fd2eea3",
+  "integration_mode": "none",
+  "tasks": [
+    {
+      "slug": "artcraft-wordcraft-real-edit-20261102",
+      "state": "failed",
+      "attempt": 2,
+      "dispatches": [
+        {
+          "role": "implementer",
+          "lane": "free-glm-writer",
+          "model": "opencode/glm-5.3-flash-free",
+          "phase": "finished",
+          "stopReason": "cancelled",
+          "usage": {
+            "known": false
+          }
+        },
+        {
+          "role": "implementer",
+          "lane": "free-glm-writer",
+          "model": "opencode/glm-5.3-flash-free",
+          "phase": "finished",
+          "stopReason": "end_turn",
+          "usage": {
+            "known": false
+          }
+        },
+        {
+          "role": "reviewer",
+          "lane": "gpt-subscription-review",
+          "model": "gpt-6.1-sol",
+          "phase": "failed",
+          "stopReason": null,
+          "usage": null
+        },
+        {
+          "role": "reviewer",
+          "lane": "gpt-subscription-review",
+          "model": "gpt-6.1-sol",
+          "phase": "finished",
+          "stopReason": "end_turn",
+          "usage": {
+            "inputTokens": 333935,
+            "outputTokens": 2093,
+            "known": true
+          }
+        },
+        {
+          "role": "remediator",
+          "lane": "free-glm-writer",
+          "model": "opencode/glm-5.3-flash-free",
+          "phase": "finished",
+          "stopReason": "end_turn",
+          "usage": {
+            "known": false
+          }
+        },
+        {
+          "role": "reviewer",
+          "lane": "gpt-subscription-review",
+          "model": "gpt-6.1-sol",
+          "phase": "finished",
+          "stopReason": "end_turn",
+          "usage": {
+            "inputTokens": 89922,
+            "outputTokens": 2674,
+            "known": true
+          }
+        },
+        {
+          "role": "remediator",
+          "lane": "free-glm-writer",
+          "model": "opencode/glm-5.3-flash-free",
+          "phase": "finished",
+          "stopReason": "end_turn",
+          "usage": {
+            "known": false
+          }
+        },
+        {
+          "role": "reviewer",
+          "lane": "gpt-subscription-review",
+          "model": "gpt-6.1-sol",
+          "phase": "finished",
+          "stopReason": "end_turn",
+          "usage": {
+            "inputTokens": 779068,
+            "outputTokens": 3718,
+            "known": true
+          }
+        }
+      ],
+      "candidates": [
+        "7556f58516158d6c8331790f310fd9ffbdb4cce2",
+        "bcbba626b9a489086d85fb42ed4c74842a6ca2b4",
+        "c045b04ff23233108802dd88f7e69ebcb8c15cd5"
+      ],
+      "checks": [
+        {
+          "checkName": "bridge",
+          "outcome": "pass"
+        },
+        {
+          "checkName": "whitespace",
+          "outcome": "pass"
+        }
+      ],
+      "reviews": [
+        {
+          "verdict": "fail",
+          "lineage": "gpt",
+          "blockers": 0,
+          "majors": 1,
+          "minors": 1
+        }
+      ]
+    },
+    {
+      "slug": "artcraft-wordcraft-callback-20261102",
+      "state": "integrated",
+      "attempt": 0,
+      "dispatches": [
+        {
+          "role": "implementer",
+          "lane": "free-glm-writer",
+          "model": "opencode/glm-5.3-flash-free",
+          "phase": "finished",
+          "stopReason": "end_turn",
+          "usage": {
+            "known": false
+          }
+        },
+        {
+          "role": "reviewer",
+          "lane": "gpt-subscription-review",
+          "model": "gpt-6.1-sol",
+          "phase": "finished",
+          "stopReason": "end_turn",
+          "usage": {
+            "inputTokens": 91841,
+            "outputTokens": 1029,
+            "known": true
+          }
+        }
+      ],
+      "candidates": [
+        "00957cef10c31a1fc9f88acfa70116516fd2eea3"
+      ],
+      "checks": [
+        {
+          "checkName": "bridge",
+          "outcome": "pass"
+        },
+        {
+          "checkName": "whitespace",
+          "outcome": "pass"
+        }
+      ],
+      "reviews": [
+        {
+          "verdict": "pass",
+          "lineage": "gpt",
+          "blockers": 0,
+          "majors": 0,
+          "minors": 0
+        }
+      ]
+    },
+    {
+      "slug": "artcraft-wordcraft-coverage-20261102",
+      "state": "blocked",
+      "attempt": 0,
+      "dispatches": [
+        {
+          "role": "implementer",
+          "lane": "free-glm-writer",
+          "model": "opencode/glm-5.3-flash-free",
+          "phase": "failed",
+          "stopReason": null,
+          "usage": null
+        },
+        {
+          "role": "implementer",
+          "lane": "free-deepseek-writer",
+          "model": "opencode/deepseek-v4.1-flash-free",
+          "phase": "failed",
+          "stopReason": null,
+          "usage": null
+        },
+        {
+          "role": "implementer",
+          "lane": "free-deepseek-writer",
+          "model": "opencode/deepseek-v4.1-flash-free",
+          "phase": "failed",
+          "stopReason": null,
+          "usage": null
+        },
+        {
+          "role": "implementer",
+          "lane": "free-deepseek-writer",
+          "model": "opencode/deepseek-v4.1-flash-free",
+          "phase": "failed",
+          "stopReason": null,
+          "usage": null
+        },
+        {
+          "role": "implementer",
+          "lane": "free-deepseek-writer",
+          "model": "opencode/deepseek-v4.1-flash-free",
+          "phase": "failed",
+          "stopReason": null,
+          "usage": null
+        }
+      ],
+      "candidates": [],
+      "checks": [],
+      "reviews": []
+    }
+  ],
+  "snapshot_note": "Latest task states/review summaries only; integration_mode none means integrated state retained a branch, not a main merge."
+}

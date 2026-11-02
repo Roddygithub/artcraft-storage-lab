@@ -1,0 +1,156 @@
+{
+  "initial": {
+    "mode": "manual",
+    "lanes": [
+      {
+        "id": "free-glm-writer",
+        "model": "opencode/glm-5.3-flash-free",
+        "tier": "free",
+        "capabilities": [
+          "implementer",
+          "remediator"
+        ],
+        "budget": {
+          "dispatchesPerDay": 6
+        }
+      },
+      {
+        "id": "free-deepseek-writer",
+        "model": "opencode/deepseek-v4.1-flash-free",
+        "tier": "free",
+        "capabilities": [
+          "implementer",
+          "remediator"
+        ],
+        "budget": {
+          "dispatchesPerDay": 4
+        }
+      },
+      {
+        "id": "gpt-subscription-review",
+        "model": "gpt-6.1-sol",
+        "tier": "subscription",
+        "capabilities": [
+          "reviewer"
+        ],
+        "budget": {
+          "dispatchesPerDay": 6
+        }
+      }
+    ],
+    "profile": {
+      "allowedTiers": [
+        "free",
+        "subscription"
+      ],
+      "maxRemediations": 2,
+      "roles": {
+        "implementer": {
+          "prefer": [
+            "free-glm-writer",
+            "free-deepseek-writer"
+          ]
+        },
+        "remediator": {
+          "prefer": [
+            "free-glm-writer",
+            "free-deepseek-writer"
+          ]
+        },
+        "reviewer": {
+          "prefer": [
+            "gpt-subscription-review"
+          ],
+          "distinctLineageFrom": [
+            "implementer",
+            "remediator"
+          ]
+        }
+      },
+      "integrate": {
+        "mode": "none",
+        "push": false
+      }
+    }
+  },
+  "followup": {
+    "mode": "manual",
+    "lanes": [
+      {
+        "id": "free-glm-writer",
+        "model": "opencode/glm-5.3-flash-free",
+        "tier": "free",
+        "capabilities": [
+          "implementer",
+          "remediator"
+        ],
+        "budget": {
+          "dispatchesPerDay": 6
+        }
+      },
+      {
+        "id": "free-deepseek-writer",
+        "model": "opencode/deepseek-v4.1-flash-free",
+        "tier": "free",
+        "capabilities": [
+          "implementer",
+          "remediator"
+        ],
+        "budget": {
+          "dispatchesPerDay": 4
+        }
+      },
+      {
+        "id": "gpt-subscription-review",
+        "model": "gpt-6.1-sol",
+        "tier": "subscription",
+        "capabilities": [
+          "reviewer",
+          "planner"
+        ],
+        "budget": {
+          "dispatchesPerDay": 8
+        }
+      }
+    ],
+    "profile": {
+      "allowedTiers": [
+        "free",
+        "subscription"
+      ],
+      "maxRemediations": 2,
+      "roles": {
+        "planner": {
+          "prefer": [
+            "gpt-subscription-review"
+          ]
+        },
+        "implementer": {
+          "prefer": [
+            "free-glm-writer",
+            "free-deepseek-writer"
+          ]
+        },
+        "remediator": {
+          "prefer": [
+            "free-glm-writer",
+            "free-deepseek-writer"
+          ]
+        },
+        "reviewer": {
+          "prefer": [
+            "gpt-subscription-review"
+          ],
+          "distinctLineageFrom": [
+            "implementer",
+            "remediator"
+          ]
+        }
+      },
+      "integrate": {
+        "mode": "none",
+        "push": false
+      }
+    }
+  }
+}

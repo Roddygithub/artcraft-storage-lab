@@ -1,54 +1,81 @@
-# Task evidence — WordCraft DOCX typed edit before Save (browser slice)
+# WordCraft typed-edit browser slice — code-stage evidence
 
-Task: first bounded slice of `ROADMAP.md` step 3 (WordCraft DOCX only; other editors stay on
-their existing paths). Branch `aptarchy/artcraft-wordcraft-real-edit-20261102`, based on
-`5b576de`. Candidate = the last commit of this task (exact SHA recorded by the task lane).
-No push; upstream LOCKED; project GPT REVIEW: INCOMPLETE.
+Source implementation: `00957cef10c31a1fc9f88acfa70116516fd2eea3`, following the retained
+failed candidate `c045b04ff23233108802dd88f7e69ebcb8c15cd5`; lab base `5b576de`.
+This follow-up changes documentation only. Real Seafile replay remains **NOT RUN**.
+Project GPT status: **INCOMPLETE**. Upstream: **LOCKED**.
 
-## What changed
+## Changes and local evidence
 
-| File | Change |
+| Location | Change / evidence |
 | --- | --- |
-| `lab/real-seafile/run_slice.py` | `docx_text(data)` helper: all `w:t` runs of `word/document.xml` (stdlib only, tolerant of bad zips) |
-| `lab/real-seafile/run_browser.py` | WordCraft branch: real typed change before Save (inserted first, unconditionally), then close the old editor, reopen from Seafile in a fresh browser session and require editor-level behaviour there. Checks: `wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes`, `wordcraft_save_request_carries_the_typed_marker` (the editor's own `/relay/save` payload, captured on the request), `wordcraft_save_confirmed_by_host_page`, `wordcraft_save_creates_seafile_version_by_user`, `wordcraft_saved_docx_contains_the_typed_marker`, `wordcraft_save_is_not_identical_bytes`, `wordcraft_saved_docx_bytes_look_right`, `wordcraft_reopen_fresh_seafile_session`, `wordcraft_reopen_host_frame_from_seahub`, `wordcraft_reopen_editor_ready_and_document_opened`, `wordcraft_reopen_bytes_identical_to_the_saved_version`, `wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes`, `wordcraft_reopen_save_confirmed_by_host_page`, `wordcraft_reopen_second_save_creates_seafile_version_by_user`, `wordcraft_reopen_seafile_holds_both_markers`, `wordcraft_reopen_editor_holds_the_original_marker`, `wordcraft_reopen_editor_holds_the_second_typed_marker` |
+| `lab/real-seafile/run_slice.py:298` | Stdlib `docx_text` extracts document text for marker assertions. |
+| `lab/real-seafile/run_browser.py:118` | WordCraft-only flow types a fresh marker, saves through the editor, checks the emitted payload, stored content and attributed new version, closes the old page and opens a fresh Seafile context. |
+| `lab/real-seafile/run_browser.py:240` | Reopen uses the production `wait_for_saved_response` helper; it pumps sync Playwright callbacks and accepts only nonempty HTTP-200 captured bytes. |
+| `lab/real-seafile/run_browser.py:246` | Reopened editor must accept a second typed marker, save again and emit both full markers; storage must retain both. These assertions are coded, not proven against Seafile here. |
+| `tests/test_wordcraft_reopen_wait.py` | Real Chromium with a disposable loopback HTTP fixture invokes that exact helper. Delayed response succeeds; empty/error captures time out; the former sleep-only loop demonstrably starves callbacks. It loads no Craft editor. |
+| `ROADMAP.md` step 3 | WordCraft coded, runtime NOT RUN; other editors pending. |
 
-Reopen semantics: merely receiving bytes (`/relay/file`) is not enough. In the fresh session the
-reopened editor must accept a second interactive typed marker (dirty + `saved to Seafile` again)
-and re-serialize on its own Ctrl+S a payload containing the original marker (it parsed and holds
-the saved content) and the newly typed marker (it rendered and accepted the edit); Seafile then
-must hold both markers and show a further version by the editing user. Screenshots are artifacts
-only; every assertion is bound to captured bytes, host-page status, or Seafile records.
-| `ROADMAP.md` | step 3 row updated to "coded, NOT RUN" (nothing runtime-level is claimed) |
+Fresh checks on the unchanged source above: bridge **30/30**, Chromium regression **6 assertions
+passed**, syntax compilation passed. The browser regression used cached Python **3.13.16** and
+Playwright **1.64.1** via `uv run --offline --with playwright`; system `python3` alone lacks the
+Playwright module. Exact commands and output: [local-checks.txt](evidence/2026-11-02-wordcraft/local-checks.txt).
+No new package download was required for this rerun.
 
-The bridge, Seahub, and the ONLYOFFICE integration are untouched. No bytes are injected and no
-helper uploads anything: the change is typed into the editor (Playwright trusted keys, with a
-single IME-style `insert_text` fallback typed into the same focused editor), Save is Ctrl+S
-inside the editor, and assertions read Seafile history/API plus the reopened editor's own
-`/relay/file` fetch. All other editors keep the previous generic flow.
+The cumulative change preserves editor interaction, both host save confirmations, full marker
+checks, stored version/user checks, old-page closure and fresh-context reopen. No edited output
+is injected or uploaded by a helper. The bridge and other editors' generic path are unchanged.
+A successful local wait regression does not prove the real editor accepts the typed change.
 
-## Scope guard
+## Runtime commands are separate — both NOT RUN
 
-WordCraft DOCX only, per the bounded task. Reusable piece: `docx_text()` is stdlib-only and
-environment-free (plain helper over bytes), so later editor slices can reuse it.
-
-## Checks run on this machine now
-
-| Check | Result |
+| Command | Coverage / remaining prerequisite |
 | --- | --- |
-| `python3 -m py_compile lab/real-seafile/run_slice.py lab/real-seafile/run_browser.py` | OK |
-| Focused helper check: `docx_text(minimal_docx('hello world'))` contains `hello world`; not-a-zip and broken-zip return `''` | OK (output in commit history) |
-| `python3 tests/bridge/test_bridge.py` | OK, 30/30 (bridge untouched) |
+| `lab/real-seafile/up.sh slice` | HTTP/WOPI/storage and ONLYOFFICE assertions in `run_slice.py`. NOT RUN for this implementation: the isolated Seafile lab must be available. |
+| `lab/real-seafile/up.sh browser` | Actual editor open/edit/save/version/reopen in `run_browser.py`. NOT RUN for this implementation: requires the isolated stack and provenance-checked editor bundle. It does not run `slice`. |
 
-## NOT RUN — real-Seafile / browser runtime
+The separate `slice)` and `browser)` arms in `lab/real-seafile/up.sh` invoke separate Compose
+services. Local execution was unavailable (no Lima and Docker permission denied); provisioning
+or accessing a live instance was excluded from the bounded pilot. Historical
+`lab/real-seafile/results/{slice,browser}.json` predates this implementation and is not its runtime
+evidence. Those files were not changed. ONLYOFFICE preservation is not re-proven by this pilot.
 
-| Check | Prerequisite missing |
+## Planning and review history
+
+Aptarchy plan `plan-4f938657073b` covered 20 requirements in two slices. The first task failed
+its final GPT review (one major, one minor) after two remediations. The callback follow-up
+`artcraft-wordcraft-callback-20261102` obtained a zero-finding GPT task review at `00957cef10`;
+its reviewer reported static diff inspection only, with filesystem tools unavailable and no
+independent test execution. This is a limited task review, not project approval.
+
+The second task `artcraft-wordcraft-coverage-20261102` remained blocked after one GLM and four
+DeepSeek failures exhausted its configured writer budgets. The parent completed this
+**documentation-only slice manually in a separate worktree**. It did not change the failed or
+blocked task into an Aptarchy success. A sanitized [task snapshot](evidence/2026-11-02-wordcraft/task-snapshot.json)
+retains the outcomes; the full private ledger/logs remain outside Git. The final independent review must identify the exact documentation commit; its outcome is
+recorded separately in the handoff/PR.
+
+## Coverage of the follow-up plan
+
+| Requirement | Final location / observation |
 | --- | --- |
-| `lab/real-seafile/up.sh browser` (the new WordCraft typed-edit + reopen checks; also re-proves `up.sh slice`, including the ONLYOFFICE checks) | Lima (`limactl`) is not installed and Docker permission is denied on this machine; the compose stack (Seafile, bridge, Chromium) cannot start. Run on the usual lab VM: `up.sh up`, `up.sh configure`, `up.sh slice`, `up.sh browser` (`lab/real-seafile/README.md`). |
-
-Historical `lab/real-seafile/results/{slice,browser}.json` (2026-10-31) predate this change and
-are NOT evidence for this candidate; nothing was fabricated or reused.
-
-## Gate status unchanged
-
-Project GPT REVIEW: INCOMPLETE. `UPSTREAM_STATUS=LOCKED`. This task review is not the project
-gate; production untouched.
+| R1 preserve candidate | Source `00957cef10` descends from retained `c045b04`; documentation-only follow-up. |
+| R2 bridge architecture | No `bridge/` diff; local fake-host tests 30/30. |
+| R3 callback dispatch | Production wait helper and its call in `run_browser.py`. |
+| R4 delayed response | Existing real Chromium regression, six assertions passed. |
+| R5 distinct runtime commands | Two explicit NOT RUN rows above; `up.sh` arms inspected. |
+| R6 coverage audit | This table; cumulative changed-file list inspected. |
+| R7 interactive typing | `wordcraft_real_edit_flow`, initial and reopened typing; runtime NOT RUN. |
+| R8 full markers | Save-payload and storage assertions for both markers; runtime NOT RUN. |
+| R9 save confirmations | Both host-status assertions preserved; runtime NOT RUN. |
+| R10 version/content/user | Both history checks, stored DOCX and reopen-byte checks; runtime NOT RUN. |
+| R11 close/fresh session | `page.close`, new browser context and Seafile login preserved; runtime NOT RUN. |
+| R12 bounded reuse | Existing DOCX helper and WordCraft branch; no other editor changes. |
+| R13 no live services | Only loopback fake-host/fixture checks executed in this follow-up. |
+| R14 no infrastructure changes | Cached offline test environment; no VM, permission or service changes. |
+| R15 ONLYOFFICE untouched | No configuration changes; actual regression NOT RUN. |
+| R16 local checks | Exact output in `local-checks.txt`. |
+| R17 historical limits | Historical runtime results explicitly excluded and unchanged. |
+| R18 preserve failure | Original failed and second blocked tasks retained in sanitized snapshot. |
+| R19 gates | No upstream publication, main integration or project GPT promotion. |
+| R20 two-slice plan | Planner completed two slices; first accepted, second manually completed; exact-commit final review is separate. |

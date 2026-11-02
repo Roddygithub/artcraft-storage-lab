@@ -1,0 +1,81 @@
+Source implementation: 00957cef10c31a1fc9f88acfa70116516fd2eea3
+Documentation follow-up: source files unchanged from this implementation.
+
+$ python3 tests/bridge/test_bridge.py
+test_acknowledged_but_not_stored_is_502 (__main__.BridgeTestCase.test_acknowledged_but_not_stored_is_502) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 502: 'Bad Gateway'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_config_rejects_duplicate_extensions_and_foreign_editor_urls (__main__.BridgeTestCase.test_config_rejects_duplicate_extensions_and_foreign_editor_urls) ... ok
+test_discovery_matches_seahub_parser_contract (__main__.BridgeTestCase.test_discovery_matches_seahub_parser_contract) ... ok
+test_edit_refuses_a_forged_top_level_post (__main__.BridgeTestCase.test_edit_refuses_a_forged_top_level_post) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 403: 'Forbidden'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_editor_page_may_be_framed_by_host_and_seahub (__main__.BridgeTestCase.test_editor_page_may_be_framed_by_host_and_seahub) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 304: 'Not Modified'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+/usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 404: 'Not Found'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_hashed_assets_are_immutable_and_streamed_with_head_support (__main__.BridgeTestCase.test_hashed_assets_are_immutable_and_streamed_with_head_support) ... ok
+test_host_js_is_served_and_speaks_upstream_protocol (__main__.BridgeTestCase.test_host_js_is_served_and_speaks_upstream_protocol) ... ok
+test_lock_roundtrip_and_conflict (__main__.BridgeTestCase.test_lock_roundtrip_and_conflict) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 409: 'Conflict'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+/usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 400: 'Bad Request'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_open_refuses_foreign_wopisrc (__main__.BridgeTestCase.test_open_refuses_foreign_wopisrc) ... ok
+test_open_refuses_wrong_editor_for_extension (__main__.BridgeTestCase.test_open_refuses_wrong_editor_for_extension) ... ok
+test_open_renders_host_page_with_csp_and_no_token_in_urls (__main__.BridgeTestCase.test_open_renders_host_page_with_csp_and_no_token_in_urls) ... ok
+test_open_requires_form_post (__main__.BridgeTestCase.test_open_requires_form_post) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 405: 'Method Not Allowed'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_open_with_unknown_token_is_401 (__main__.BridgeTestCase.test_open_with_unknown_token_is_401) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 401: 'Unauthorized'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_putfile_5xx_after_commit_is_reconciled_to_200 (__main__.BridgeTestCase.test_putfile_5xx_after_commit_is_reconciled_to_200) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 500: 'Internal Server Error'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_redirect_from_seafile_is_refused_not_followed (__main__.BridgeTestCase.test_redirect_from_seafile_is_refused_not_followed) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 302: 'redirect to http://127.0.0.1:33399/api/v2.1/wopi/files/ad9f5a56a4fbe704db140e1bd342a93d6332b135/contents?access_token=x refused'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_relay_info_and_file (__main__.BridgeTestCase.test_relay_info_and_file) ... ok
+test_relay_requires_bridge_header_and_same_origin (__main__.BridgeTestCase.test_relay_requires_bridge_header_and_same_origin) ... ok
+test_retry_after_lost_answer_is_idempotent_even_with_the_old_version (__main__.BridgeTestCase.test_retry_after_lost_answer_is_idempotent_even_with_the_old_version) ... ok
+test_save_creates_new_version_attributed_to_user (__main__.BridgeTestCase.test_save_creates_new_version_attributed_to_user) ... ok
+test_save_detects_external_change_and_does_not_overwrite (__main__.BridgeTestCase.test_save_detects_external_change_and_does_not_overwrite) ... ok
+test_save_is_idempotent_on_identical_bytes (__main__.BridgeTestCase.test_save_is_idempotent_on_identical_bytes) ... ok
+test_save_reconciles_lost_response (__main__.BridgeTestCase.test_save_reconciles_lost_response) ... ok
+test_save_refuses_rename_and_wrong_signature (__main__.BridgeTestCase.test_save_refuses_rename_and_wrong_signature) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 415: 'Unsupported Media Type'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_save_too_large_is_413 (__main__.BridgeTestCase.test_save_too_large_is_413) ... /usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 413: 'Payload Too Large'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_save_with_read_only_token_is_refused_by_bridge_not_seahub (__main__.BridgeTestCase.test_save_with_read_only_token_is_refused_by_bridge_not_seahub) ... ok
+test_save_with_revoked_token_is_401 (__main__.BridgeTestCase.test_save_with_revoked_token_is_401) ... ok
+test_save_without_expected_version_is_400 (__main__.BridgeTestCase.test_save_without_expected_version_is_400) ... ok
+test_signature_guard_table (__main__.BridgeTestCase.test_signature_guard_table) ... ok
+test_signature_table_additions (__main__.BridgeTestCase.test_signature_table_additions) ... ok
+test_wopisrc_must_be_a_wopi_file_endpoint (__main__.BridgeTestCase.test_wopisrc_must_be_a_wopi_file_endpoint) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 1.133s
+
+OK
+
+$ uv run --offline --with playwright -- python tests/test_wordcraft_reopen_wait.py
+PASS wait_returns_bytes_captured_after_the_wait_began  -- got 887 of 887 bytes after 3s
+PASS returned_bytes_are_the_document_fixture  -- status=200 responses=1
+PASS wait_times_out_without_a_qualifying_response  -- responses=[(200, 0), (500, 4)]
+PASS delayed_success_fails_with_the_former_sleep_only_wait  -- after 4s no callbacks were dispatched; responses=0
+PASS former_wait_starved_a_response_the_browser_received  -- captured=[(200, 887)]
+PASS production_wait_finds_the_starved_response  -- len=887
+
+0 failed
+
+Browser regression interpreter: Python 3.13.16; Playwright 1.64.1.
+$ python3 -m py_compile lab/real-seafile/run_slice.py lab/real-seafile/run_browser.py tests/test_wordcraft_reopen_wait.py
+exit 0
+
+NOT RUN: lab/real-seafile/up.sh slice
+NOT RUN: lab/real-seafile/up.sh browser
+No Seafile, editor bundle, Docker, Proxmox, production or ONLYOFFICE service was accessed by these checks.
