@@ -104,24 +104,29 @@ def main():
             """ROADMAP step 3, WordCraft DOCX slice: type a real change into the editor (trusted
             input through the browser input pipeline, no byte injection, no helper upload), Save
             through the bridge, then close this editor and reopen the file from Seafile in a
-            fresh browser session and assert the specific marker text survived. All follow-ups
-            (history, download, the reopened editor's own fetch) go through the Seafile API or
-            the editor's own open path."""
+            fresh browser session; there the reopened editor must parse, display and re-save the
+            saved content and accept a second typed interactive edit. Every capture follows the
+            editor's own save/open paths (relay request bodies, Seafile history/API); markers
+            are only ever typed into the focused editor."""
             marker = "browsertyped" + os.urandom(5).hex()   # alphanumeric: no autocorrect damage
+            marker2 = "browserreopened" + os.urandom(5).hex()
             phrase = f" The typed marker is {marker}. "
+            phrase2 = f" Reopened here, typed again: {marker2}. "
 
-            # -- a real typed edit before Save ------------------------------------
+            # -- a real typed edit before Save: the marker is always INSERTED FIRST, and only
+            #    then is the dirty state checked (an already-dirty editor cannot skip it) ----
             page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 60 + (box["height"] - 60) / 2)
             time.sleep(1)
             page.keyboard.press("Control+End")           # caret to the end of the document
+            page.keyboard.type(phrase, delay=30)
             def dirty():
                 return "unsaved" in (status() or "").lower()
             end = time.time() + 15
             while time.time() < end and not dirty():
                 time.sleep(0.5)
             if not dirty():
-                # some keyboard layouts/builds swallow char-by-char typing: IME-style insert,
-                # still real editor input, never a file replacement
+                # some builds swallow char-by-char typing: IME-style insert into the same
+                # focused editor (still real input, never a file replacement)
                 page.keyboard.insert_text(phrase)
                 end = time.time() + 15
                 while time.time() < end and not dirty():
@@ -130,7 +135,19 @@ def main():
                   f"marker={marker} status={status()!r}")
             page.screenshot(path=os.path.join(RESULTS, "wordcraft-typed.png"))
 
-            # -- Save (editor keeps focus; Ctrl+S inside the editor frame) ---------
+            # -- Save (editor keeps focus; Ctrl+S inside the editor frame). The editor's own
+            #    save payload is captured off the relay request the host page sends for it,
+            #    so the marker is verified at the editor boundary before anything else. ---
+            save_bodies: list = []
+            def on_save_req(r):
+                if r.method == "POST" and r.url.endswith("/relay/save"):
+                    try:
+                        b = r.post_data_buffer
+                        if b:
+                            save_bodies.append(b)
+                    except Exception:  # noqa: BLE001
+                        pass
+            page.on("request", on_save_req)
             page.keyboard.press("Control+s")
             end = time.time() + 60
             confirmed = False
@@ -139,6 +156,10 @@ def main():
                     confirmed = True
                     break
                 time.sleep(1)
+            check("wordcraft_save_request_carries_the_typed_marker",
+                  bool(save_bodies) and marker.lower() in rs.docx_text(save_bodies[0]).lower(),
+                  f"captured={len(save_bodies)} marker={marker}")
+            page.remove_listener("request", on_save_req)
             check("wordcraft_save_confirmed_by_host_page", confirmed, f"status={status()!r}")
             after = before
             end = time.time() + 60
@@ -160,19 +181,29 @@ def main():
             check("wordcraft_saved_docx_bytes_look_right", rs.content_matches(name, got), f"len={len(got)}")
             page.screenshot(path=os.path.join(RESULTS, "wordcraft-saved.png"))
 
-            # -- close the old editor, reopen from Seafile in a fresh session ------
+            # -- close the old editor, reopen from Seafile in a fresh session ---------
             page.close()
             page = attach(ctx.new_page())
             reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
             p2 = reopen.new_page()
             relay_file: list = []          # the reopened host page's own /relay/file fetches
+            save2_bodies: list = []        # the reopened editor's own Ctrl+S save payloads
             def on_response(r):
                 if r.url.endswith("/relay/file"):
                     try:
                         relay_file.append((r.status, r.body()))
                     except Exception:  # noqa: BLE001
                         pass
+            def on_open_req(r):
+                if r.method == "POST" and r.url.endswith("/relay/save"):
+                    try:
+                        b = r.post_data_buffer
+                        if b:
+                            save2_bodies.append(b)
+                    except Exception:  # noqa: BLE001
+                        pass
             p2.on("response", on_response)
+            p2.on("request", on_open_req)
             p2.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
             p2.fill("input[name=login]", rs.ADMIN)
             p2.fill("input[name=password]", rs.ADMIN_PW)
@@ -182,6 +213,13 @@ def main():
             p2.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}", wait_until="domcontentloaded")
             host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
             check("wordcraft_reopen_host_frame_from_seahub", host2 is not None, f"frames={frames_dump(p2)}")
+            def status2():
+                if host2 is None:
+                    return ""
+                try:
+                    return host2.evaluate("document.getElementById('status') ? document.getElementById('status').textContent : document.body.innerText.slice(0,200)")
+                except Exception as e:  # noqa: BLE001
+                    return f"<{e}>"
             body = None
             end = time.time() + 180
             while time.time() < end and body is None:
@@ -193,12 +231,72 @@ def main():
             p2.screenshot(path=os.path.join(RESULTS, "wordcraft-reopened.png"))
             check("wordcraft_reopen_editor_ready_and_document_opened", body is not None,
                   f"relay/file responses={len(relay_file)} after {time.time()-t0:.0f}s")
-            # semantic reopen: the specific new text, fetched by the reopened editor itself
-            check("wordcraft_reopen_shows_the_typed_marker",
-                  body is not None and marker.lower() in rs.docx_text(body).lower(),
-                  f"marker={marker} len={len(body) if body else 0}")
+            # the bytes the editor received on its own open path are the saved version
             check("wordcraft_reopen_bytes_identical_to_the_saved_version", body is not None and body == got,
                   f"len={len(body) if body else 0} vs saved {len(got)}")
+
+            # Receiving bytes is not enough: the reopened editor must parse, display and
+            # accept an interactive edit of what it loaded, and save it again. Type marker2
+            # (inserted exactly once, first) and save again in the SAME reopened session.
+            box2 = p2.locator("#office-frame").bounding_box()
+            ok2 = False
+            if host2 is not None and body is not None and box2 is not None:
+                p2.mouse.click(box2["x"] + box2["width"] / 2, box2["y"] + 60 + (box2["height"] - 60) / 2)
+                time.sleep(1)
+                p2.keyboard.press("Control+End")
+                p2.keyboard.type(phrase2, delay=30)
+                def dirty2():
+                    return "unsaved" in (status2() or "").lower()
+                end = time.time() + 20
+                while time.time() < end and not dirty2():
+                    time.sleep(0.5)
+                if not dirty2():
+                    p2.keyboard.insert_text(phrase2)
+                    end = time.time() + 15
+                    while time.time() < end and not dirty2():
+                        time.sleep(0.5)
+                check("wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes", dirty2(),
+                      f"marker={marker2} status={status2()!r}")
+                p2.keyboard.press("Control+s")
+                end = time.time() + 60
+                while time.time() < end:
+                    if "saved to seafile" in (status2() or "").lower():
+                        ok2 = True
+                        break
+                    time.sleep(1)
+                check("wordcraft_reopen_save_confirmed_by_host_page", ok2, f"status={status2()!r}")
+                before2 = len(after)          # history after the first save
+                after2 = after
+                end = time.time() + 60
+                while time.time() < end and ok2:
+                    after2 = rs.history(admin, repo_id, name)
+                    if len(after2) > before2:
+                        break
+                    time.sleep(1)
+                check("wordcraft_reopen_second_save_creates_seafile_version_by_user",
+                      ok2 and len(after2) > before2 and after2[0]["creator"] == admin_username,
+                      f"history {before2}->{len(after2)} top={after2[0] if after2 else None} status={status2()!r}")
+                got2, _ = rs.download(admin, repo_id, name)
+                check("wordcraft_reopen_seafile_holds_both_markers",
+                      marker.lower() in rs.docx_text(got2).lower() and marker2.lower() in rs.docx_text(got2).lower(),
+                      f"marker={marker2} len={len(got2)}")
+            else:
+                check("wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes", False,
+                      f"no editor/box/open bytes: host={host2 is not None} opened={body is not None} box={box2 is not None}")
+                check("wordcraft_reopen_save_confirmed_by_host_page", False, "no editor flow at reopen")
+                check("wordcraft_reopen_second_save_creates_seafile_version_by_user", False, "no editor flow at reopen")
+                check("wordcraft_reopen_seafile_holds_both_markers", False, "no editor flow at reopen")
+            p2.screenshot(path=os.path.join(RESULTS, "wordcraft-reopened-saved.png"))
+            # semantic reopen, judged by the reopened editor's own behaviour: what it
+            # re-serializes on Ctrl+S still contains the ORIGINAL typed marker (it parsed and
+            # holds the saved content, not just the received bytes) and, separately, the
+            # marker typed AFTER reopening (it rendered and accepted an interactive edit).
+            check("wordcraft_reopen_editor_holds_the_original_marker",
+                  bool(save2_bodies) and marker.lower() in rs.docx_text(save2_bodies[0]).lower(),
+                  f"captured={len(save2_bodies)} marker={marker}")
+            check("wordcraft_reopen_editor_holds_the_second_typed_marker",
+                  bool(save2_bodies) and marker2.lower() in rs.docx_text(save2_bodies[0]).lower(),
+                  f"captured={len(save2_bodies)} marker={marker2}")
             reopen.close()
             return page
 

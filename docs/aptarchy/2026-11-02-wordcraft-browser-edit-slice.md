@@ -10,7 +10,14 @@ No push; upstream LOCKED; project GPT REVIEW: INCOMPLETE.
 | File | Change |
 | --- | --- |
 | `lab/real-seafile/run_slice.py` | `docx_text(data)` helper: all `w:t` runs of `word/document.xml` (stdlib only, tolerant of bad zips) |
-| `lab/real-seafile/run_browser.py` | WordCraft branch: real typed change before Save, then close the old editor, reopen from Seafile in a fresh browser session; new checks `wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes`, `wordcraft_save_confirmed_by_host_page`, `wordcraft_save_creates_seafile_version_by_user`, `wordcraft_saved_docx_contains_the_typed_marker`, `wordcraft_save_is_not_identical_bytes`, `wordcraft_saved_docx_bytes_look_right`, `wordcraft_reopen_fresh_seafile_session`, `wordcraft_reopen_host_frame_from_seahub`, `wordcraft_reopen_editor_ready_and_document_opened`, `wordcraft_reopen_shows_the_typed_marker`, `wordcraft_reopen_bytes_identical_to_the_saved_version` |
+| `lab/real-seafile/run_browser.py` | WordCraft branch: real typed change before Save (inserted first, unconditionally), then close the old editor, reopen from Seafile in a fresh browser session and require editor-level behaviour there. Checks: `wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes`, `wordcraft_save_request_carries_the_typed_marker` (the editor's own `/relay/save` payload, captured on the request), `wordcraft_save_confirmed_by_host_page`, `wordcraft_save_creates_seafile_version_by_user`, `wordcraft_saved_docx_contains_the_typed_marker`, `wordcraft_save_is_not_identical_bytes`, `wordcraft_saved_docx_bytes_look_right`, `wordcraft_reopen_fresh_seafile_session`, `wordcraft_reopen_host_frame_from_seahub`, `wordcraft_reopen_editor_ready_and_document_opened`, `wordcraft_reopen_bytes_identical_to_the_saved_version`, `wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes`, `wordcraft_reopen_save_confirmed_by_host_page`, `wordcraft_reopen_second_save_creates_seafile_version_by_user`, `wordcraft_reopen_seafile_holds_both_markers`, `wordcraft_reopen_editor_holds_the_original_marker`, `wordcraft_reopen_editor_holds_the_second_typed_marker` |
+
+Reopen semantics: merely receiving bytes (`/relay/file`) is not enough. In the fresh session the
+reopened editor must accept a second interactive typed marker (dirty + `saved to Seafile` again)
+and re-serialize on its own Ctrl+S a payload containing the original marker (it parsed and holds
+the saved content) and the newly typed marker (it rendered and accepted the edit); Seafile then
+must hold both markers and show a further version by the editing user. Screenshots are artifacts
+only; every assertion is bound to captured bytes, host-page status, or Seafile records.
 | `ROADMAP.md` | step 3 row updated to "coded, NOT RUN" (nothing runtime-level is claimed) |
 
 The bridge, Seahub, and the ONLYOFFICE integration are untouched. No bytes are injected and no
