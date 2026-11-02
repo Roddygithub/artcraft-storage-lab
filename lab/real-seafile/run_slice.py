@@ -295,6 +295,23 @@ def minimal_xlsx() -> bytes:
     return buf.getvalue()
 
 
+def docx_text(data: bytes) -> str:
+    """Every text run (w:t) of word/document.xml in a .docx, concatenated; "" if absent.
+    The re-authored document may split one typed sentence across runs, and each run may
+    live in its own <w:t>, so this joins them all back into one string."""
+    import xml.etree.ElementTree as ET
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            xml_bytes = z.read("word/document.xml")
+    except (zipfile.BadZipFile, KeyError):
+        return ""
+    try:
+        root = ET.fromstring(xml_bytes)
+    except ET.ParseError:
+        return ""
+    return "".join(el.text or "" for el in root.iter() if el.tag.split('}')[-1] == "t")
+
+
 MINIMAL_PDF = (b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n"
                b"3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]>>endobj\nxref\n0 4\n0000000000 65535 f \n"
                b"0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n160\n%%EOF\n")
