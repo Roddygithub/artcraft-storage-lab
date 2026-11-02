@@ -51,6 +51,21 @@ def find_frame(page, prefix, timeout=60, name=None, parent=None):
     return None
 
 
+def wait_for_saved_response(page, captured, timeout=180):
+    """Bounded wait for the first successful (HTTP 200, nonempty) /relay/file capture on
+    `captured` while pumping Playwright's synchronous event callbacks: sync Playwright only
+    dispatches response callbacks inside Playwright calls, so a sleep-only loop over the
+    Python list would starve them and never see a response that arrives while Python sleeps.
+    Returns the captured body, or None on timeout."""
+    end = time.time() + timeout
+    while time.time() < end:
+        for st, b in list(captured):
+            if st == 200 and b:
+                return b
+        page.wait_for_timeout(1000)
+    return None
+
+
 def frames_dump(page):
     return [(f.name, f.url[:70], (f.parent_frame.name if f.parent_frame else None)) for f in page.frames]
 
@@ -220,14 +235,7 @@ def main():
                     return host2.evaluate("document.getElementById('status') ? document.getElementById('status').textContent : document.body.innerText.slice(0,200)")
                 except Exception as e:  # noqa: BLE001
                     return f"<{e}>"
-            body = None
-            end = time.time() + 180
-            while time.time() < end and body is None:
-                for st_, b in relay_file:
-                    if st_ == 200 and b:
-                        body = b
-                        break
-                time.sleep(1)
+            body = wait_for_saved_response(p2, relay_file, 180)
             p2.screenshot(path=os.path.join(RESULTS, "wordcraft-reopened.png"))
             check("wordcraft_reopen_editor_ready_and_document_opened", body is not None,
                   f"relay/file responses={len(relay_file)} after {time.time()-t0:.0f}s")
