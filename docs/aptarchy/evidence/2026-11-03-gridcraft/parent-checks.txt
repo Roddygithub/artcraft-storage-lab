@@ -23,3 +23,11 @@ git diff --check: exit 0.
 lab/real-seafile/up.sh slice: NOT RUN for this candidate.
 lab/real-seafile/up.sh browser: NOT RUN for this candidate.
 The loopback fixtures load neither a Craft editor bundle nor a Seafile server.
+
+Follow-up tested implementation: a9eb3afc95ae5b92337f84a51f9e13e1fa75471d
+Independent review of 28bac12 closed the two original findings and found one minor:
+the helper rejected the bridge's reconciled-save success status. The follow-up accepts
+both exact successful statuses and adds a delayed reconciled-save fixture case.
+uv run --offline --with playwright -- python tests/test_wordcraft_reopen_wait.py
+23 PASS; 0 failed; exit 0; same Python 3.13.16 / Playwright 1.64.1 environment.
+git diff --check: exit 0. Bridge/parser implementation unchanged since 9fe910f checks.

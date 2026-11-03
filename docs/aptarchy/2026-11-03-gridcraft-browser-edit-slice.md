@@ -80,6 +80,15 @@ Both original code and this correction use the completed Aptarchy fixes merged i
 (`fdeffa15b5aec46e3f4925092d120b74f200135e`). No PAYG was authorized. Independent review of the
 final corrected candidate is required before the isolated runtime replay.
 
+The independent review of `28bac12dfb0f03bbd6a34f47de2bd226d0d2757c` closed both original
+findings and found one further minor: the save helper did not recognize the bridge's
+`saved (reconciled after a lost response)` success message. Follow-up source
+`a9eb3afc95ae5b92337f84a51f9e13e1fa75471d` accepts both exact bridge success statuses.
+The same offline Chromium command then passed **23/23** checks, including the delayed
+reconciled-save case; `git diff --check` also passed. The bridge and XLSX parser were unchanged
+since their successful checks above. This remains local helper evidence; real Seafile is
+still NOT RUN for this candidate.
+
 ## Honest runtime limits
 
 A local, loopback-only check cannot prove that: the real GridCraft bundle accepts a mouse/keyboard
