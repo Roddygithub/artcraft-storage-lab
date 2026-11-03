@@ -7,6 +7,25 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-081 — DeckCraft native edit on synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| DeckCraft-generated native fixture | Setup file exists before editing | [x] Editor-generated `.deckcraft`; setup upload precedes the browser edit |
+| Seafile file-list open and real title edit | Visible change in DeckCraft canvas | [x] Trusted keyboard edit; localized title change detected in stable canvas frames |
+| First host save and version | Host confirms save; Seafile creates user-attributed version | [x] Native save payload contains marker; history 1→2; readback contains edit; native bytes changed |
+| Fresh-session reopen | New Seafile context reads and renders the saved file | [x] Closed old page; new context reopened from file list; relay bytes equal Seafile readback; marker visible |
+| Second edit/save/readback | Another version retains both markers | [x] History 2→3; both markers read back; bytes differ from first save |
+| Edited-output download | Save occurs through bridge | [x] Zero downloads in both editor-save flows; fixture download/upload was setup only |
+| Browser assertions | All DeckCraft checks pass | [x] 26/26; sanitized summary and screenshots in `docs/reviews/GR-081/` |
+| Browser font/layout fidelity | Fonts render as intended | [ ] NOT VERIFIED; container displayed Arial/Inter substitution warning |
+| Foreign `.pptx`, other browsers, production and ONLYOFFICE regression | Broader compatibility/deployment | [ ] NOT VERIFIED |
+| Independent exact-evidence review | Separate review of current code and retained evidence | [x] R1–R3 bounded PROVISIONAL PASS; queue-banner and R1-record wording findings corrected; R3 found no further finding |
+
+GR-081 was direct parent work, not Aptarchy completion. The prior HTTP 48/48
+slice was not rerun; bridge source was unchanged. Project GPT remains INCOMPLETE
+and upstream publication LOCKED.
+
 ## GR-080 — security evidence and ONLYOFFICE status reconciliation
 
 | Scenario | Expected | Result |

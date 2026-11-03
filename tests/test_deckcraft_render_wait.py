@@ -73,12 +73,25 @@ def main():
     assert run_browser.deckcraft_canvas_has_document_visuals(host_opened)
     assert run_browser.deckcraft_canvas_matches_reference(host_opened, reference)
 
-    changed_image = Image.open(BytesIO(host_opened)).convert("RGB").resize(
-        (1350, 815), Image.Resampling.BILINEAR)
-    ImageDraw.Draw(changed_image).text((740, 430), "decktyped123", fill="black")
-    changed_buffer = BytesIO()
-    changed_image.save(changed_buffer, format="PNG")
-    changed = changed_buffer.getvalue()
+    edited_image = reference_image.copy()
+    draw = ImageDraw.Draw(edited_image)
+    width, height = edited_image.size
+    # Simulate an edit that changes the rendered title enough to fail the old unedited-image gate.
+    for index in range(8):
+        y = int(height * (0.37 + index * 0.034))
+        draw.rectangle((int(width * 0.45), y, int(width * 0.72), y + int(height * 0.018)),
+                       fill=(255, 0, 0))
+    edited_buffer = BytesIO()
+    edited_image.save(edited_buffer, format="PNG")
+    edited = edited_buffer.getvalue()
+
+    small_edit_image = reference_image.copy()
+    width, height = small_edit_image.size
+    x, y = int(width * 0.50), int(height * 0.48)
+    ImageDraw.Draw(small_edit_image).rectangle((x, y, x + 30, y + 20), fill=(0, 0, 0))
+    small_edit_buffer = BytesIO()
+    small_edit_image.save(small_edit_buffer, format="PNG")
+    small_edit = small_edit_buffer.getvalue()
 
     blank_image = reference_image.copy()
     width, height = blank_image.size
@@ -91,13 +104,31 @@ def main():
     assert run_browser.deckcraft_canvas_has_document_visuals(reference)
     assert not run_browser.deckcraft_canvas_has_document_visuals(blank)
     assert run_browser.deckcraft_canvas_matches_reference(reference, reference)
-    assert run_browser.deckcraft_canvas_matches_reference(changed, reference)
+    # The visible edit must fail the old unedited-fixture comparison and pass the edit gate.
+    assert not run_browser.deckcraft_canvas_matches_reference(edited, reference)
+    assert run_browser.deckcraft_canvas_shows_title_edit(edited, reference)
+    assert not run_browser.deckcraft_canvas_shows_title_edit(reference, reference)
+    assert run_browser.deckcraft_canvas_matches_reference(edited, edited)
     assert not run_browser.deckcraft_canvas_matches_reference(blank, reference)
     assert not run_browser.deckcraft_canvas_matches_reference(blank, blank)
+    assert run_browser.wait_for_deckcraft_render(FakeHost([reference] * 4), None, timeout=0.02) is None
+    # A small title edit still matches the old tolerant comparator, so the sensitive gate must
+    # independently reject losing it in either the saved page or the fresh session.
+    assert run_browser.deckcraft_canvas_matches_reference(small_edit, reference)
+    assert run_browser.deckcraft_canvas_shows_title_edit(small_edit, reference)
+    assert run_browser.wait_for_deckcraft_title_edit(FakeHost([reference] * 20), reference, timeout=0.02) is None
+    assert run_browser.wait_for_deckcraft_title_edit(FakeHost([reference] * 20), reference, timeout=0.02) is None
+    assert run_browser.wait_for_deckcraft_title_edit(FakeHost([small_edit] * 4), reference, timeout=2) == small_edit
+    assert run_browser.wait_for_deckcraft_title_edit(FakeHost([small_edit] * 4), reference, timeout=2) == small_edit
 
     host = FakeHost([reference] * 4, loaded=[False] * 6 + [True] * 4)
     assert run_browser.wait_for_deckcraft_render(host, reference, timeout=2) == reference
     assert host.evaluations == 10 and host.canvas.calls == 4
+
+    visible_edit = FakeHost([edited] * 4)
+    assert run_browser.wait_for_deckcraft_title_edit(visible_edit, reference, timeout=2) == edited
+    saved = FakeHost([edited] * 4)
+    assert run_browser.wait_for_deckcraft_render(saved, edited, timeout=2) == edited
 
     not_opened = FakeHost([b"stable-but-not-opened"] * 20, loaded=False)
     assert run_browser.wait_for_deckcraft_render(not_opened, reference, timeout=0.02) is None
@@ -105,9 +136,9 @@ def main():
 
     blank_canvas = FakeHost([blank] * 12)
     assert run_browser.wait_for_deckcraft_render(blank_canvas, reference, timeout=0.02) is None
-    reopened = FakeHost([changed] * 4)
-    assert run_browser.wait_for_deckcraft_render(reopened, reference, timeout=2) == changed
-    print("DeckCraft document-render wait checks: 7/7 passed")
+    reopened = FakeHost([edited] * 4)
+    assert run_browser.wait_for_deckcraft_render(reopened, edited, timeout=2) == edited
+    print("DeckCraft document-render wait checks: 26/26 passed")
 
 
 if __name__ == "__main__":

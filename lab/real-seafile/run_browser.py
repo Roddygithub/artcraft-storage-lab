@@ -159,8 +159,47 @@ def deckcraft_canvas_matches_reference(image, reference):
         return False
 
 
-def wait_for_deckcraft_render(host, reference_canvas, timeout=90):
-    """Wait for host readiness, stable frames, and a slide matching the native fixture."""
+def deckcraft_canvas_title_edit_metrics(image, original):
+    """Measure changed pixels in the title area and elsewhere against a same-session frame."""
+    if not deckcraft_canvas_has_document_visuals(image) or not deckcraft_canvas_has_document_visuals(original):
+        return None
+    try:
+        with Image.open(BytesIO(image)) as current, Image.open(BytesIO(original)) as before:
+            current = current.convert("RGB")
+            before = before.convert("RGB")
+            if current.size != before.size:
+                return None
+            width, height = current.size
+            # Downsample enough to ignore antialias noise while retaining the visible title change.
+            size = (480, max(1, round(480 * height / width)))
+            current = current.resize(size, Image.Resampling.BILINEAR)
+            before = before.resize(size, Image.Resampling.BILINEAR)
+            diff = ImageChops.difference(current, before).convert("L")
+            w, h = size
+            x0, x1 = int(w * 0.32), int(w * 0.84)
+            y0, y1 = int(h * 0.34), int(h * 0.68)
+            title_diff = diff.crop((x0, y0, x1, y1))
+            title_changed = sum(value >= 40 for value in title_diff.getdata())
+            outside = (
+                diff.crop((0, 0, w, y0)), diff.crop((0, y1, w, h)),
+                diff.crop((0, y0, x0, y1)), diff.crop((x1, y0, w, y1)),
+            )
+            outside_changed = sum(sum(value >= 40 for value in region.getdata()) for region in outside)
+            outside_pixels = w * h - (x1 - x0) * (y1 - y0)
+            title_pixels = (x1 - x0) * (y1 - y0)
+            return title_changed / title_pixels, outside_changed / outside_pixels
+    except (OSError, ValueError, ZeroDivisionError):
+        return None
+
+
+def deckcraft_canvas_shows_title_edit(image, original):
+    """Require pixel changes in the editable title area while the rest of the slide stays put."""
+    metrics = deckcraft_canvas_title_edit_metrics(image, original)
+    return metrics is not None and metrics[0] >= 0.0005 and metrics[1] <= 0.03
+
+
+def _wait_for_deckcraft_canvas(host, timeout, matches):
+    """Wait for a ready DeckCraft document and four stable canvas frames accepted by matches."""
     end = time.monotonic() + timeout
     previous = None
     stable_frames = 0
@@ -180,7 +219,7 @@ def wait_for_deckcraft_render(host, reference_canvas, timeout=90):
             }""")
             if loaded:
                 image = host.frame_locator("#frame").locator("#deckcraft_canvas").screenshot(timeout=5000)
-                if deckcraft_canvas_matches_reference(image, reference_canvas):
+                if matches(image):
                     stable_frames = stable_frames + 1 if image == previous else 1
                     previous = image
                 else:
@@ -196,6 +235,24 @@ def wait_for_deckcraft_render(host, reference_canvas, timeout=90):
             stable_frames = 0
         host.wait_for_timeout(350)
     return None
+
+
+def wait_for_deckcraft_render(host, reference_canvas, timeout=90):
+    """Wait for a stable canvas matching a known DeckCraft document image."""
+    if not reference_canvas:
+        return None
+    return _wait_for_deckcraft_canvas(
+        host, timeout, lambda image: deckcraft_canvas_matches_reference(image, reference_canvas)
+    )
+
+
+def wait_for_deckcraft_title_edit(host, original_canvas, timeout=90):
+    """Wait until the title changes visually and the rest of the native slide is stable."""
+    if not original_canvas:
+        return None
+    return _wait_for_deckcraft_canvas(
+        host, timeout, lambda image: deckcraft_canvas_shows_title_edit(image, original_canvas)
+    )
 
 
 def stable_deckcraft_canvas(page, timeout=90):
@@ -674,13 +731,19 @@ def main():
                 p.wait_for_timeout(500)
 
             host1 = find_frame(page, rs.BRIDGE + "/edit/", 5, name="office_frame", parent=page.main_frame)
-            rendered1 = host1 is not None and deckcraft_reference_canvas is not None and \
-                wait_for_deckcraft_render(host1, deckcraft_reference_canvas) is not None
-            check("deckcraft_document_rendered_before_first_edit", rendered1)
-            if not rendered1:
+            original_canvas = wait_for_deckcraft_render(host1, deckcraft_reference_canvas) \
+                if host1 is not None and deckcraft_reference_canvas is not None else None
+            check("deckcraft_document_rendered_before_first_edit", original_canvas is not None)
+            if original_canvas is None:
                 return page
             type_into_title(page, box, marker)
             page.screenshot(path=os.path.join(RESULTS, "deckcraft-typed.png"))
+            edited_canvas = wait_for_deckcraft_title_edit(host1, original_canvas)
+            edit_metrics = deckcraft_canvas_title_edit_metrics(edited_canvas, original_canvas) \
+                if edited_canvas is not None else None
+            check("deckcraft_title_edit_is_visible_in_rendered_canvas", edit_metrics is not None and
+                  edit_metrics[0] >= 0.0005 and edit_metrics[1] <= 0.03,
+                  f"title pixels changed={edit_metrics[0]:.3%}, elsewhere={edit_metrics[1]:.3%}" if edit_metrics else "no localized title change")
             payload, confirmed = save_and_capture(page, status, timeout=120)
             check("deckcraft_save_request_contains_the_typed_marker",
                   payload is not None and contains(payload, marker),
@@ -710,8 +773,12 @@ def main():
             check("deckcraft_saved_native_document_is_readable", bool(got_text),
                   f"text_fields={len(got_text)}")
             page.screenshot(path=os.path.join(RESULTS, "deckcraft-saved.png"))
-            saved_canvas = wait_for_deckcraft_render(host1, deckcraft_reference_canvas)
-            check("deckcraft_saved_canvas_render_is_stable", saved_canvas is not None)
+            # The saved canvas must still show the localized edit relative to the original frame;
+            # ordinary reference similarity alone can accept a reverted, unedited title.
+            saved_canvas = wait_for_deckcraft_title_edit(host1, original_canvas)
+            saved_matches_typed = saved_canvas is not None and edited_canvas is not None and \
+                deckcraft_canvas_matches_reference(saved_canvas, edited_canvas)
+            check("deckcraft_saved_canvas_retains_the_visible_title_edit", saved_matches_typed)
             check("deckcraft_native_save_did_not_download", not downloads, f"downloads={len(downloads)}")
 
             page.close()
@@ -760,8 +827,9 @@ def main():
                     return f"<{exc}>"
 
             reopened = wait_for_saved_response(p2, relay_file, 180)
-            rendered2 = host2 is not None and saved_canvas is not None and deckcraft_reference_canvas is not None and \
-                wait_for_deckcraft_render(host2, deckcraft_reference_canvas) is not None
+            reopened_canvas = wait_for_deckcraft_title_edit(host2, original_canvas) if host2 is not None else None
+            rendered2 = reopened_canvas is not None and saved_canvas is not None and \
+                deckcraft_canvas_matches_reference(reopened_canvas, saved_canvas)
             p2.screenshot(path=os.path.join(RESULTS, "deckcraft-reopened.png"))
             check("deckcraft_fresh_session_loaded_the_saved_bytes",
                   reopened is not None and reopened == got and contains(reopened, marker) and rendered2,

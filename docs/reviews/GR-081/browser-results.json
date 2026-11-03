@@ -1,0 +1,245 @@
+{
+  "candidate_base_commit": "fce28f23682f00844418bdde97523d0cf25fb935",
+  "candidate_diff_sha256": "6484634af87678bda8bcb17957402813d6d9f76414283917386deb14b1a69fac",
+  "run_time_utc": "2026-11-03T15:57:15Z",
+  "scope": "one native DeckCraft document in a fresh synthetic Seafile repository; browser workflow only",
+  "browser_exit_code": 0,
+  "assertions": {
+    "passed": 26,
+    "failed": 0,
+    "total": 26
+  },
+  "checks": [
+    {
+      "name": "browser_login",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_native_setup_fixture_generated_by_editor",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_native_setup_fixture_uploaded_before_editor_save",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_opened_native_document_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_document_rendered_before_first_edit",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_title_edit_is_visible_in_rendered_canvas",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_request_contains_the_typed_marker",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_request_retains_the_fixture_slide_title",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_seafile_readback_contains_the_typed_marker",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_changes_native_document_bytes",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_saved_native_document_is_readable",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_saved_canvas_retains_the_visible_title_edit",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_native_save_did_not_download",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_fresh_session_logged_into_seafile",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_reopened_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_fresh_session_loaded_the_saved_bytes",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_reopened_editor_save_contains_both_markers",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_reopened_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_reopened_save_creates_another_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_seafile_retains_both_typed_markers",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_second_save_changes_native_bytes",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_native_edits_did_not_download",
+      "passed": true
+    }
+  ],
+  "private_raw_result_sha256": "74bc1471984a98ee7c2f512c982f9aec17cf6f92f54b55de286424a97e4c1e43",
+  "private_console_log_sha256": "697cf431ce403b2ca166c86c7b805ebbd414a8844fc27e7935686121f8114f63",
+  "private_raw_result_retained_under_cache": true,
+  "redaction": "Repository ID, URLs, account fields, version IDs, and per-check details omitted; original JSON and console log remain private in the local cache.",
+  "screenshots": [
+    {
+      "file": "deckcraft-opened.png",
+      "width": 1400,
+      "height": 900,
+      "bytes": 129286,
+      "sha256": "991f4762d4c5f7ad1d6ce9460bab0cf23891c553075d064b94b8e150ef2b7390",
+      "metadata_chunks": [],
+      "ocr_sensitive_indicators": {
+        "email": false,
+        "url": false,
+        "uuid": false,
+        "credential_terms": false
+      }
+    },
+    {
+      "file": "deckcraft-typed.png",
+      "width": 1400,
+      "height": 900,
+      "bytes": 145541,
+      "sha256": "591aabbee6958a09798d991cd94a033bb5626718ef4fa4db48604371129ac625",
+      "metadata_chunks": [],
+      "ocr_sensitive_indicators": {
+        "email": false,
+        "url": false,
+        "uuid": false,
+        "credential_terms": false
+      }
+    },
+    {
+      "file": "deckcraft-saved.png",
+      "width": 1400,
+      "height": 900,
+      "bytes": 138461,
+      "sha256": "5a6746062c0f5b593633c55f87d0b42167a593ef5d9feb27c2e1323e853a8646",
+      "metadata_chunks": [],
+      "ocr_sensitive_indicators": {
+        "email": false,
+        "url": false,
+        "uuid": false,
+        "credential_terms": false
+      }
+    },
+    {
+      "file": "deckcraft-reopened.png",
+      "width": 1400,
+      "height": 900,
+      "bytes": 143820,
+      "sha256": "d3581689d30a6c8d745e9f02e7f0cd8708a82fc568573e35124bcb673672d6c4",
+      "metadata_chunks": [],
+      "ocr_sensitive_indicators": {
+        "email": false,
+        "url": false,
+        "uuid": false,
+        "credential_terms": false
+      }
+    },
+    {
+      "file": "deckcraft-reopened-typed.png",
+      "width": 1400,
+      "height": 900,
+      "bytes": 161703,
+      "sha256": "e4ba45524d67a7a5d257d299562ed058930687fc0bde59aed482c8ee86e9cf7c",
+      "metadata_chunks": [],
+      "ocr_sensitive_indicators": {
+        "email": false,
+        "url": false,
+        "uuid": false,
+        "credential_terms": false
+      }
+    },
+    {
+      "file": "deckcraft-reopened-saved.png",
+      "width": 1400,
+      "height": 900,
+      "bytes": 160017,
+      "sha256": "9c15f4673a7cffcc81dc2980e4100ed984559c3298a8624f5eaa1e7a02801f33",
+      "metadata_chunks": [],
+      "ocr_sensitive_indicators": {
+        "email": false,
+        "url": false,
+        "uuid": false,
+        "credential_terms": false
+      }
+    },
+    {
+      "file": "deckcraft-render-reference.png",
+      "width": 1400,
+      "height": 867,
+      "bytes": 121013,
+      "sha256": "9a173c0cb1172f9fad17780afcb63eaf1e0804335936de2a8e8d45c9675f2fdd",
+      "metadata_chunks": [],
+      "ocr_sensitive_indicators": {
+        "email": false,
+        "url": false,
+        "uuid": false,
+        "credential_terms": false
+      }
+    }
+  ],
+  "observed_outcomes": {
+    "setup_fixture": "DeckCraft itself created the native .deckcraft file; uploaded before the editor-save workflow as setup only.",
+    "first_save": {
+      "captured_native_save_payload_contains_marker": true,
+      "host_reported_save_success": true,
+      "user_attributed_history_transition": "1 -> 2",
+      "Seafile_readback_contains_marker": true,
+      "native_bytes_changed": true,
+      "edited_title_visible_after_save": true
+    },
+    "fresh_session": {
+      "new_context_logged_in_and_opened_from_Seafile_file_list": true,
+      "fresh_relay_readback_matches_Seafile_readback_and_renders_edit": true
+    },
+    "second_save_after_reopen": {
+      "payload_contains_both_markers": true,
+      "host_reported_save_success": true,
+      "user_attributed_history_transition": "2 -> 3",
+      "Seafile_readback_retains_both_markers": true,
+      "bytes_differ_from_first_saved_version": true
+    },
+    "editor_save_downloads": 0
+  }
+}

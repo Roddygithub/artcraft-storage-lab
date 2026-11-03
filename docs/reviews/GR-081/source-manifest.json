@@ -1,0 +1,25 @@
+{
+  "base_commit": "fce28f23682f00844418bdde97523d0cf25fb935",
+  "tested_worktree_patch_sha256": "6484634af87678bda8bcb17957402813d6d9f76414283917386deb14b1a69fac",
+  "changed_files": [
+    "lab/real-seafile/run_browser.py",
+    "tests/test_deckcraft_render_wait.py"
+  ],
+  "source_sha256": {
+    "lab/real-seafile/run_browser.py": "e13a88996ca25c9bab2629089093bf274b564961bb5226a54c0fce8c8ae98f59",
+    "tests/test_deckcraft_render_wait.py": "9e667c4caec721ee865f89a09455602c1996d34db10eee9bb5029492c868d17d",
+    "tests/test_deckcraft_real_edit.py": "6091a5902b35603db7ed03070192bc25eccb6bcd3999d0ff3fdf2ce8bff59b88",
+    "lab/real-seafile/run_slice.py": "ca076445c573feb6bdad63c044618b98e28d0a0739b08ac51d78583447fa758f",
+    "lab/real-seafile/compose.yml": "500d94f4ab6bf5c9b8e32cf91754f1617c2e2ec7547cb6ca8862efe43b3cb4d4",
+    "tests/fixtures/deckcraft-rendered-reference.png": "b974e222027d165f09b85dd9bfddc92130104c2d3cd4adc2c2aa9f6931457a2a",
+    "tests/fixtures/deckcraft-host-opened.png": "a6d0443322b5e2cbc4dbf278a3c267701401cd613f427ac24d1a144255ad8e9c"
+  },
+  "runtime": {
+    "project_name": "artcraft-deckcraft-20261103",
+    "isolation": "rootless Podman; synthetic Seafile only",
+    "bundle_zip_sha256": "2b269d4319cc85287a83e690159b6167258d3cf0b87cf7ea3a696f26c3c5a4fb",
+    "compose_sha256": "e0ecc071c052420ed5989f423a970aad99eec083f207ae6fddeb176b47cd6c40",
+    "scope": "browser run; HTTP slice was not repeated in this item"
+  },
+  "verification": "The two changed files match the prepared browser container source. Runtime bridge code was unchanged from the previously reviewed bridge candidate."
+}

@@ -225,6 +225,12 @@ file-list clicks, version creation, explicit old-page closure and semantic fresh
 reopen. [Retained scope and evidence](../lab/real-seafile/results/2026-11-02-wordcraft-pilot/README.md).
 Other apps below retain their historical coverage; this does not repeat their browser runs.
 
+2026-11-03 follow-up: a direct parent-run DeckCraft native `.deckcraft` scenario also passed on
+synthetic Seafile: 26/26 browser assertions, two user-attributed saves, exact fresh-session
+relay/readback comparison, and semantic title-marker retention. The test generated and uploaded
+its fixture before editing. This was not Aptarchy task completion; foreign `.pptx` behavior,
+font fidelity, and production remain unverified. [GR-081 evidence](GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md).
+
 
 Owner-only (production; this audit will not do them):
 

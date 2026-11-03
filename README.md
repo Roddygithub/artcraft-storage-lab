@@ -20,6 +20,11 @@ Status: **prototype, validated on a stock Seafile CE 13.0.28** in an isolated VM
 incorporated (30 fake-host tests). Not yet deployed anywhere real. Nothing
 published upstream.
 
+ROADMAP step 3 is now evidenced for WordCraft DOCX, GridCraft XLSX, and a native
+DeckCraft `.deckcraft` document. The DeckCraft Seafile browser run is separately
+recorded in [`GR-081`](docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md); it does
+not verify foreign `.pptx` editing or production behavior.
+
 ## What works today
 
 | File | Editor | How |
