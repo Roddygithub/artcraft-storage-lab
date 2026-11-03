@@ -1,5 +1,11 @@
 # GridCraft XLSX real-edit browser slice — code-stage evidence
 
+> Historical code-stage record below. A subsequent parent-operated replay of reviewed candidate
+> `29484f65d5c09f3d819b87c1f64b0c41f0e6d567` passed **HTTP 48/48 and browser 48/48**, including
+> genuine WordCraft and GridCraft edits, two saves and fresh-session reopen. See the
+> [fresh runtime evidence](../../lab/real-seafile/results/2026-11-03-gridcraft-pilot/README.md).
+> Earlier NOT RUN statements describe their code-stage candidates, not that later replay.
+
 > Code-stage candidate only. Real Seafile runtime for this slice is **NOT RUN** here: the parent
 > owns the separately authorized isolated replay after independent exact-candidate review.
 > Historical WordCraft runtime successes and the first pilot's failed/blocked states are preserved

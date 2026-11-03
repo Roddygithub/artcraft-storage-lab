@@ -1,0 +1,200 @@
+{
+  "ran_at": "2026-11-03T10:16:23Z",
+  "passed": 48,
+  "failed": 0,
+  "raw_result_sha256": "062b84e605d58b69dda7e65ee017caa2a510a7827d783e5fce394cc684f7edec",
+  "checks": [
+    {
+      "name": "browser_login",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_request_carries_the_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saved_docx_contains_the_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_is_not_identical_bytes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saved_docx_bytes_look_right",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_fresh_seafile_session",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_bytes_identical_to_the_saved_version",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_second_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_seafile_holds_both_markers",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_holds_the_original_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_holds_the_second_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saves_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_save_request_carries_the_typed_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_semantically_contains_the_typed_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_keeps_the_fixture_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_save_is_not_identical_bytes",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_bytes_look_right",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_fresh_seafile_session",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_bytes_identical_to_the_saved_version",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_parsed_the_saved_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_holds_the_original_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_holds_the_second_typed_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_second_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_seafile_holds_both_values",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_second_save_is_not_identical_bytes",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_saves_did_not_download",
+      "ok": true
+    }
+  ]
+}

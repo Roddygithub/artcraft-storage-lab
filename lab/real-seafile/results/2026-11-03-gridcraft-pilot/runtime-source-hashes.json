@@ -1,0 +1,25 @@
+{
+  "source_commit": "29484f65d5c09f3d819b87c1f64b0c41f0e6d567",
+  "scope": "Prepared source files verified against Git before execution; not every listed file is an entrypoint. Runtime editors configuration is retained separately.",
+  "files": {
+    "bridge/README.md": "2a3a854182c961dd88559a90410d51d7b022ad28d048d9b2167b416a9737b86c",
+    "bridge/__init__.py": "f6a60a4b505fe189487196780db1830dab39f02bba6de157f8670de8f7c693d5",
+    "bridge/__main__.py": "e8555e96ee38cc883ebefff06894cfb72e1e08411de7ec47fc25a6bbfefe5af3",
+    "bridge/app.py": "07cd457401fc59ce9c8be464b0ea6f030027c80cd1e337e51be77481e308f34d",
+    "bridge/editors.example.json": "5a21a37d6aa0b3998c78a308bf350842989dee121962524e1e92b2baf41bc2ef",
+    "bridge/settings.py": "fe6f1fbdb2386638d4928f288e47cb3324802c7a54b69fab283cf893a36e8d19",
+    "bridge/static/host.html": "2e5a9a4764299a261da57786ded0aff439f1180fde1b33bc0be2361a39b21ea8",
+    "bridge/static/host.js": "92c9e98ed4abd0190851be670a032f2672fd5d07c4fe8c2daa411c2e032df6f3",
+    "bridge/wsgi.py": "6f3e9599b029a01b22e7d780e91ac2288c5ceaa8ac4bf8ec30c6dfbdb1531b2a",
+    "lab/real-seafile/.env.example": "134d53ac7fd2e884a525c836077e8d900a38c3b99d17459110eac990d821ccb5",
+    "lab/real-seafile/.gitignore": "2e4aa3f39216f183dc78060ddb2a9c85de3a947a10c1b05a295d5eb070eebb23",
+    "lab/real-seafile/README.md": "60cfd5cd728b1dd16997f05fca30fbe2b30f0cc8ae429c74aba3e37836250836",
+    "lab/real-seafile/compose.yml": "10b642dfcce17aa6b39cf4f736592dfc9865ed6fcc650754d2890fb11614c74e",
+    "lab/real-seafile/debug_editor_load.py": "0cdca4f58d5c87520f26bd2225ac00b3c7d2347b716fd47c97743172e8bdd2fe",
+    "lab/real-seafile/run_browser.py": "88bbbcc61e023ff216561405e57f61baf659fd5830a5e43895e876dd33ff11fd",
+    "lab/real-seafile/run_slice.py": "37381401098f8230f565599fc3e6b173d0e9ab8e8d62617dd0dd296cdb11c57e",
+    "lab/real-seafile/seahub_settings.extra.py": "6d876102a2dbf94f498eeee4f362f3df68b4055133034dd81ab4724699cb6771",
+    "lab/real-seafile/up.sh": "f10e9ca908681097780adfdc3dd0179377f87f87711683d31f293ed334133665",
+    "lab/real-seafile/wire-built-bundle.sh": "1c072bb6cb28abf656eae1d1be703e8fb8611ddd8573fcedfb643d696e647e26"
+  }
+}
