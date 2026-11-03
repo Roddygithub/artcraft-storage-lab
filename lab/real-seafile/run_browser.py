@@ -88,7 +88,9 @@ def save_and_capture(page, status_fn, timeout=90):
         page.keyboard.press("Control+s")
         end = time.monotonic() + timeout
         while time.monotonic() < end:
-            if bodies and "saved to seafile" in (status_fn() or "").lower():
+            if bodies and (status_fn() or "").strip().lower() in (
+                "saved to seafile", "saved (reconciled after a lost response)"
+            ):
                 return bodies[0], True
             page.wait_for_timeout(min(100, max(0, (end - time.monotonic()) * 1000)))
         return (bodies[0] if bodies else None), False

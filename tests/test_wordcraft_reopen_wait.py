@@ -49,9 +49,10 @@ class Fixture:
     """Loopback-only server: / serves a page that fetches /relay/file after DELAY_MS;
     /relay/file serves the next planned (status, body)."""
 
-    def __init__(self, plan, save_status=200):
+    def __init__(self, plan, save_status=200, reconciled=False):
         self.plan = plan
         self.save_status = save_status
+        self.reconciled = reconciled
 
     def start(self):
         outer = self
@@ -89,6 +90,8 @@ class Fixture:
                               b"if(e.ctrlKey&&e.key==='s'){e.preventDefault();"
                               b"setTimeout(()=>fetch('/relay/save',{method:'POST',body:'fixture-payload'})"
                               b".then(r=>{if(r.ok)setTimeout(()=>document.getElementById('status').textContent='saved to seafile',150)}),150);}})")
+                    if outer.reconciled:
+                        script = script.replace(b"saved to seafile", b"saved (reconciled after a lost response)")
                     if self.path == "/nosave":
                         script = b"document.addEventListener('keydown',e=>e.preventDefault())"
                     body = b'<div id="status">unsaved</div><script>' + script + b'</script>'
@@ -232,16 +235,17 @@ def main():
         fx.stop()
 
         # Invoke the production save helper against delayed real HTTP request callbacks.
-        for save_status in (200, 500):
-            fx = Fixture(plan=[], save_status=save_status).start()
+        for save_status, reconciled in ((200, False), (200, True), (500, False)):
+            tag = f"{save_status}" + ("_reconciled" if reconciled else "")
+            fx = Fixture(plan=[], save_status=save_status, reconciled=reconciled).start()
             page = browser.new_page()
             page.goto(fx.url + "/save")
             with patch.object(page, "remove_listener", wraps=page.remove_listener) as removed:
                 body, confirmed = run_browser.save_and_capture(
                     page, lambda: page.locator("#status").inner_text(), timeout=1)
-            check(f"delayed_save_{save_status}_captures_payload", body == b"fixture-payload")
-            check(f"save_{save_status}_confirmation_matches_outcome", confirmed == (save_status == 200))
-            check(f"save_{save_status}_removes_callback", removed.call_count == 1)
+            check(f"delayed_save_{tag}_captures_payload", body == b"fixture-payload")
+            check(f"save_{tag}_confirmation_matches_outcome", confirmed == (save_status == 200))
+            check(f"save_{tag}_removes_callback", removed.call_count == 1)
             page.close()
             fx.stop()
 
