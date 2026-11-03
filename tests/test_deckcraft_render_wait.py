@@ -63,35 +63,33 @@ class FakeHost:
 
 
 def main():
-    reference_image = Image.new("RGB", (640, 360), "#eeeeee")
-    draw = ImageDraw.Draw(reference_image)
-    draw.rectangle((160, 90, 576, 303), fill="white")
-    draw.text((260, 175), "Northern Lights", fill="black")
-    for x in range(160, 576):
-        t = (x - 160) / 416
-        draw.line((x, 294, x, 303), fill=(int(40 + 200 * t), 80, int(220 - 180 * t)))
-    reference_buffer = BytesIO()
-    reference_image.save(reference_buffer, format="PNG")
-    reference = reference_buffer.getvalue()
-
-    changed_image = reference_image.copy()
-    ImageDraw.Draw(changed_image).text((350, 175), "decktyped123", fill="black")
+    # Retained screenshot from a real synthetic-Seafile DeckCraft open, cropped to remove
+    # Seahub chrome. It provides a representative WASM canvas, not a hand-drawn golden image.
+    reference_path = os.path.join(HERE, "fixtures", "deckcraft-rendered-reference.png")
+    reference = open(reference_path, "rb").read()
+    reference_image = Image.open(BytesIO(reference)).convert("RGB")
+    changed_image = reference_image.resize((1350, 815), Image.Resampling.BILINEAR)
+    ImageDraw.Draw(changed_image).text((740, 430), "decktyped123", fill="black")
     changed_buffer = BytesIO()
     changed_image.save(changed_buffer, format="PNG")
     changed = changed_buffer.getvalue()
 
-    blank_image = Image.new("RGB", (640, 360), "#eeeeee")
-    ImageDraw.Draw(blank_image).rectangle((160, 90, 576, 303), fill="white")
+    blank_image = reference_image.copy()
+    width, height = blank_image.size
+    ImageDraw.Draw(blank_image).rectangle((int(width * 0.268), int(height * 0.254),
+                                           int(width * 0.90), int(height * 0.845)), fill="white")
     blank_buffer = BytesIO()
     blank_image.save(blank_buffer, format="PNG")
     blank = blank_buffer.getvalue()
 
+    assert run_browser.deckcraft_canvas_has_document_visuals(reference)
+    assert not run_browser.deckcraft_canvas_has_document_visuals(blank)
     assert run_browser.deckcraft_canvas_matches_reference(reference, reference)
     assert run_browser.deckcraft_canvas_matches_reference(changed, reference)
     assert not run_browser.deckcraft_canvas_matches_reference(blank, reference)
+    assert not run_browser.deckcraft_canvas_matches_reference(blank, blank)
 
-    host = FakeHost([reference] * 4,
-                    loaded=[False] * 6 + [True] * 4)
+    host = FakeHost([reference] * 4, loaded=[False] * 6 + [True] * 4)
     assert run_browser.wait_for_deckcraft_render(host, reference, timeout=2) == reference
     assert host.evaluations == 10 and host.canvas.calls == 4
 

@@ -121,8 +121,29 @@ def open_from_seafile_list(page, base, repo_id, name, timeout=30):
     raise TimeoutError("file-list click did not open an editor page")
 
 
+def deckcraft_canvas_has_document_visuals(image):
+    """Reject startup/blank canvases: the sample deck has a dark title and colored footer."""
+    try:
+        with Image.open(BytesIO(image)) as source:
+            source = source.convert("RGB")
+            width, height = source.size
+            title = source.crop((int(width * 0.40), int(height * 0.44),
+                                 int(width * 0.78), int(height * 0.58)))
+            accent = source.crop((int(width * 0.27), int(height * 0.76),
+                                  int(width * 0.90), int(height * 0.85)))
+            title_pixels = list(title.getdata())
+            accent_pixels = list(accent.getdata())
+            dark_ratio = sum(1 for r, g, b in title_pixels if max(r, g, b) < 100) / len(title_pixels)
+            color_ratio = sum(1 for r, g, b in accent_pixels if max(r, g, b) - min(r, g, b) > 50) / len(accent_pixels)
+            return dark_ratio >= 0.005 and color_ratio >= 0.50
+    except (OSError, ValueError, ZeroDivisionError):
+        return False
+
+
 def deckcraft_canvas_matches_reference(image, reference):
     """Compare the slide area at low resolution, tolerating small session UI/render changes."""
+    if not deckcraft_canvas_has_document_visuals(image) or not deckcraft_canvas_has_document_visuals(reference):
+        return False
     try:
         def slide_area(data):
             with Image.open(BytesIO(data)) as source:
@@ -131,7 +152,6 @@ def deckcraft_canvas_matches_reference(image, reference):
                 return source.crop((int(width * 0.25), int(height * 0.22),
                                     int(width * 0.92), int(height * 0.88))).resize(
                                         (96, 64), Image.Resampling.BILINEAR)
-
         diff = ImageChops.difference(slide_area(image), slide_area(reference)).convert("L")
         changed = sum(1 for value in diff.getdata() if value >= 40)
         return changed / (96 * 64) <= 0.05
