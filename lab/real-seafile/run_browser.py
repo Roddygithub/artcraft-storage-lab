@@ -15,7 +15,6 @@ Writes RESULTS_DIR/browser.json and screenshots.
 from __future__ import annotations
 
 import json
-import hashlib
 import os
 import sys
 import time
@@ -116,8 +115,8 @@ def open_from_seafile_list(page, base, repo_id, name, timeout=30):
     raise TimeoutError("file-list click did not open an editor page")
 
 
-def wait_for_deckcraft_render(host, timeout=90):
-    """Wait for the nested DeckCraft WASM page to finish loading and render a stable canvas."""
+def wait_for_deckcraft_render(host, expected_canvas=None, timeout=90):
+    """Wait for a stable nested canvas, optionally requiring a known document rendering."""
     end = time.monotonic() + timeout
     previous = None
     stable_frames = 0
@@ -130,15 +129,24 @@ def wait_for_deckcraft_render(host, timeout=90):
                 const canvas = doc && doc.getElementById('deckcraft_canvas');
                 const loading = doc && doc.getElementById('deckcraft_loading');
                 return !!doc && doc.readyState === 'complete' && !!canvas && canvas.width > 0 && canvas.height > 0 &&
+                    (!doc.fonts || doc.fonts.status === 'loaded') &&
                     (!loading || doc.defaultView.getComputedStyle(loading).display === 'none' || loading.getClientRects().length === 0);
             }""")
             if loaded:
                 image = host.frame_locator("#frame").locator("#deckcraft_canvas").screenshot(timeout=5000)
-                digest = hashlib.sha256(image).digest()
-                stable_frames = stable_frames + 1 if digest == previous else 1
-                previous = digest
+                # Matching the known presentation image, not just any stable canvas, proves
+                # the received document has reached the renderer before browser input begins.
+                if expected_canvas is None:
+                    stable_frames = stable_frames + 1 if image == previous else 1
+                    previous = image
+                elif image == expected_canvas:
+                    stable_frames = stable_frames + 1 if image == previous else 1
+                    previous = image
+                else:
+                    previous = None
+                    stable_frames = 0
                 if stable_frames >= 4:
-                    return True
+                    return image
             else:
                 previous = None
                 stable_frames = 0
@@ -146,7 +154,22 @@ def wait_for_deckcraft_render(host, timeout=90):
             previous = None
             stable_frames = 0
         host.wait_for_timeout(350)
-    return False
+    return None
+
+
+def stable_deckcraft_canvas(page, timeout=90):
+    """Capture a stable standalone DeckCraft canvas image for a known fixture rendering."""
+    end = time.monotonic() + timeout
+    previous = None
+    stable_frames = 0
+    while time.monotonic() < end:
+        image = page.locator("#deckcraft_canvas").screenshot(timeout=5000)
+        stable_frames = stable_frames + 1 if image == previous else 1
+        previous = image
+        if stable_frames >= 4:
+            return image
+        page.wait_for_timeout(350)
+    return None
 
 
 def frames_dump(page):
@@ -184,10 +207,11 @@ def main():
         ctx = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
         # Standalone editor pages used only to make fixtures: Playwright's evaluate needs eval, which
         # the editor-page CSP forbids. The real host flow below keeps the CSP (that is part of the test).
-        fixctx = browser.new_context(viewport={"width": 1200, "height": 800}, bypass_csp=True)
+        fixctx = browser.new_context(viewport={"width": 1400, "height": 867}, bypass_csp=True)
         page = ctx.new_page()
         console: list[str] = []
         downloads: list = []
+        deckcraft_reference_canvas: bytes | None = None
         track_downloads(ctx, downloads)
         page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
         page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
@@ -605,10 +629,13 @@ def main():
                 p.wait_for_timeout(500)
                 p.keyboard.press("Control+End")
                 p.keyboard.type(value, delay=35)
-                p.wait_for_timeout(750)
+                # Leave the selected text shape so the rendered reference has no caret.
+                p.mouse.click(bx["x"] + bx["width"] * 0.25, bx["y"] + bx["height"] * 0.65)
+                p.wait_for_timeout(500)
 
             host1 = find_frame(page, rs.BRIDGE + "/edit/", 5, name="office_frame", parent=page.main_frame)
-            rendered1 = host1 is not None and wait_for_deckcraft_render(host1)
+            rendered1 = host1 is not None and deckcraft_reference_canvas is not None and \
+                wait_for_deckcraft_render(host1, deckcraft_reference_canvas) is not None
             check("deckcraft_document_rendered_before_first_edit", rendered1)
             if not rendered1:
                 return page
@@ -643,6 +670,8 @@ def main():
             check("deckcraft_saved_native_document_is_readable", bool(got_text),
                   f"text_fields={len(got_text)}")
             page.screenshot(path=os.path.join(RESULTS, "deckcraft-saved.png"))
+            saved_canvas = wait_for_deckcraft_render(host1, None)
+            check("deckcraft_saved_canvas_render_is_stable", saved_canvas is not None)
             check("deckcraft_native_save_did_not_download", not downloads, f"downloads={len(downloads)}")
 
             page.close()
@@ -691,7 +720,7 @@ def main():
                     return f"<{exc}>"
 
             reopened = wait_for_saved_response(p2, relay_file, 180)
-            rendered2 = host2 is not None and wait_for_deckcraft_render(host2)
+            rendered2 = host2 is not None and saved_canvas is not None and wait_for_deckcraft_render(host2, saved_canvas) is not None
             p2.screenshot(path=os.path.join(RESULTS, "deckcraft-reopened.png"))
             check("deckcraft_fresh_session_loaded_the_saved_bytes",
                   reopened is not None and reopened == got and contains(reopened, marker) and rendered2,
@@ -741,32 +770,6 @@ def main():
         page.click("button[type=submit], input[type=submit]")
         page.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
         check("browser_login", "/accounts/login" not in page.url, page.url)
-
-        if os.path.isdir(os.path.join(STATIC, "deckcraft")):
-            try:
-                # Setup only: make a native sample document with DeckCraft itself, then upload
-                # those initial bytes before any Seafile editor session starts.
-                sp = fixctx.new_page()
-                sp.goto(f"{rs.BRIDGE}/editors/deckcraft/index.html", wait_until="domcontentloaded", timeout=60000)
-                sp.wait_for_function("() => !!document.querySelector('canvas')", timeout=120000)
-                sp.wait_for_timeout(4000)
-                with sp.expect_download(timeout=60000) as fixture_download:
-                    sp.mouse.click(48, 18)  # DeckCraft's visible top-left Save control
-                fixture_path = fixture_download.value.path()
-                fixture_bytes = open(fixture_path, "rb").read()
-                fixture_text = rs.deckcraft_text(fixture_bytes)
-                check("deckcraft_native_setup_fixture_generated_by_editor",
-                      bool(fixture_text) and any("Northern Lights" in value for value in fixture_text),
-                      f"{fixture_download.value.suggested_filename} {len(fixture_bytes)} bytes")
-                fixture_name = "native-deck.deckcraft"
-                ids[fixture_name] = rs.upload(admin, repo_id, fixture_name, fixture_bytes)
-                fixtures[fixture_name] = ("deckcraft", fixture_bytes, "")
-                check("deckcraft_native_setup_fixture_uploaded_before_editor_save",
-                      bool(ids[fixture_name]), f"{fixture_name} {len(fixture_bytes)} bytes")
-                sp.close()
-            except Exception as exc:  # noqa: BLE001
-                check("deckcraft_native_setup_fixture_generated_by_editor", False,
-                      f"{type(exc).__name__}: {str(exc)[:220]}")
 
         # Apps with no hand-writable format and no page API: let the standalone app save a new
         # document as a browser download, and use those bytes as the Seafile fixture.
@@ -937,6 +940,36 @@ def main():
                 check("deckcraft_foreign_pptx_download_is_not_a_seafile_save",
                       current == content and len(after) == len(before) and not saved,
                       f"history {len(before)}->{len(after)} bytes_unchanged={current == content}")
+                if os.path.isdir(os.path.join(STATIC, "deckcraft")) and deckcraft_reference_canvas is None:
+                    try:
+                        # Create the native setup fixture at the exact editor viewport size. The
+                        # screenshot is the document-specific ready condition for later sessions.
+                        size = host.evaluate("() => { const f = document.getElementById('frame'); return {width:f.clientWidth,height:f.clientHeight}; }")
+                        sp = fixctx.new_page()
+                        sp.set_viewport_size({"width": size["width"], "height": size["height"]})
+                        sp.goto(f"{rs.BRIDGE}/editors/deckcraft/index.html", wait_until="domcontentloaded", timeout=60000)
+                        sp.wait_for_function("() => !!document.querySelector('#deckcraft_canvas') && !document.getElementById('deckcraft_loading') && (!document.fonts || document.fonts.status === 'loaded')", timeout=120000)
+                        deckcraft_reference_canvas = stable_deckcraft_canvas(sp)
+                        with sp.expect_download(timeout=60000) as fixture_download:
+                            sp.mouse.click(48, 18)  # DeckCraft's visible top-left Save control
+                        fixture_path = fixture_download.value.path()
+                        fixture_bytes = open(fixture_path, "rb").read()
+                        fixture_text = rs.deckcraft_text(fixture_bytes)
+                        fixture_name = "native-deck.deckcraft"
+                        check("deckcraft_native_setup_fixture_generated_by_editor",
+                              deckcraft_reference_canvas is not None and bool(fixture_text) and
+                              any("Northern Lights" in value for value in fixture_text),
+                              f"{fixture_download.value.suggested_filename} {len(fixture_bytes)} bytes")
+                        ids[fixture_name] = rs.upload(admin, repo_id, fixture_name, fixture_bytes)
+                        fixtures[fixture_name] = ("deckcraft", fixture_bytes, "")
+                        queue.append((fixture_name, fixtures[fixture_name]))
+                        check("deckcraft_native_setup_fixture_uploaded_before_editor_save",
+                              bool(ids[fixture_name]), f"{fixture_name} {len(fixture_bytes)} bytes")
+                        sp.close()
+                    except Exception as exc:  # noqa: BLE001
+                        deckcraft_reference_canvas = None
+                        check("deckcraft_native_setup_fixture_generated_by_editor", False,
+                              f"{type(exc).__name__}: {str(exc)[:220]}")
                 continue
             if not saved and downloads and editor not in seen_native:
                 # The app saved under its own native name (e.g. test.deckcraft for a .pptx): the host
