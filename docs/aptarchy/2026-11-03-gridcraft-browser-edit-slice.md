@@ -5,9 +5,12 @@
 > Historical WordCraft runtime successes and the first pilot's failed/blocked states are preserved
 > untouched; see [the first pilot](2026-11-02-first-pilot.md) for that manual-completion assessment.
 
-Source implementation of this slice: `450d19abeb2d3f14bb2221eab07d543c10191890` (branch
-`aptarchy/artcraft-gridcraft-real-edit-20261103`, base `4af729a`). The WordCraft pilot flow and
-its focused regression are unchanged. Integration mode: none; push: false; project GPT:
+Original Aptarchy implementation: `450d19abeb2d3f14bb2221eab07d543c10191890`, followed by
+evidence candidate `9f1fd73d5842ce009e6cf5dfe63363be7c9a0edd` (base `4af729a`). Parent remediation
+implementation: `9fe910fbd3ef8818b39fc9dcf29dccb4966c1f41`, on
+`work/gridcraft-parent-remediation-20261103`. WordCraft's scenario remains intact; its download
+instrumentation and loopback regression now also cover GridCraft's shared callbacks.
+Aptarchy integration mode: none; push: false; project GPT:
 **INCOMPLETE**; upstream: **LOCKED**. No paid/PAYG lane was used.
 
 ## Changes
@@ -22,7 +25,7 @@ Reuses the proven WordCraft helpers (`open_from_seafile_list`, `wait_for_saved_r
 `find_frame`, `check`, `rs.history`/`rs.download`/`rs.upload`) instead of copying the whole flow;
 no new dependency, no editor framework, no mock editor.
 
-## Local verification (commands actually run on the code SHA above)
+## Initial local verification (Aptarchy implementation `450d19a`)
 
 Full transcript: [local-checks.txt](evidence/2026-11-03-gridcraft/local-checks.txt).
 
@@ -37,6 +40,45 @@ The WordCraft loopback regression proves the shared navigation/response-wait hel
 Chromium: delayed callback dispatch (the production wait sees it, the former sleep-only loop did
 not), same-tab and popup file-list opening. It proves helper behavior only — it loads no editor and
 no Seafile, so it does not prove GridCraft or Seafile runtime behavior.
+
+## Parent remediation and fresh local checks
+
+The original candidate received a GPT **FAIL**: missing focused save/download callback coverage
+(major), and an empty shared-string index escaping as `TypeError` (minor). The GLM remediator
+stopped after leaving an unfinished patch; that patch was retained privately, including its
+syntax error, and its four files were restored to the committed candidate. The explicit failed
+continuation reconciliation then tried DeepSeek, which produced no answer before its deadline.
+The Aptarchy task remains **blocked**, with its failed dispatches and failed review retained.
+It is not presented as an autonomous success or an Aptarchy-accepted candidate.
+
+The parent wrote `9fe910f` on a separate branch. `save_and_capture` is now a directly testable
+production helper with a bounded event-pumping wait and unconditional listener removal.
+`track_downloads` covers existing pages and future popups in both editor contexts. The XLSX
+parser turns an empty `<v/>` index into `ValueError`. The loopback fixture exercises delayed
+successful saves, HTTP failure, missing-request timeout, status-reader error, listener cleanup,
+and actual browser downloads on an existing page and popup. These are helper checks, not a
+mock-editor replacement for the future Seafile replay.
+
+| Command on `9fe910fbd3ef8818b39fc9dcf29dccb4966c1f41` | Result |
+| --- | --- |
+| `python3 tests/bridge/test_bridge.py` | 30/30 passed; exit 0; Python 3.14.8 |
+| `python3 tests/test_gridcraft_real_edit.py` | 11/11 passed; exit 0; includes empty shared-string index |
+| `uv run --offline --with playwright -- python tests/test_wordcraft_reopen_wait.py` | 20/20 passed; exit 0; cached Python 3.13.16, Playwright 1.64.1, real Chromium |
+| AST parsing of both runners and both focused test files | Passed on Python 3.14.8 |
+| `git diff --check` | Passed |
+
+The first parent browser check exposed Playwright's inability to wrap the built-in
+`list.append` method as a handler; the production helper uses a Python lambda instead, and the
+fresh run above passed. The parent did not increase budgets again after the additional free
+envelope was exhausted. Local policy changes (GLM 6→8, DeepSeek 4→5), plan
+`plan-abf465650b11` (27 requirements, two ordered phases grouped into one task), recovery patch,
+and temporary parent supervision are retained outside Git. The five-minute supervision detected
+the second provider failure automatically and was disabled when this separate manual recovery
+began. This supervision is external parent orchestration, not an Aptarchy feature.
+
+Both original code and this correction use the completed Aptarchy fixes merged in PR21–23
+(`fdeffa15b5aec46e3f4925092d120b74f200135e`). No PAYG was authorized. Independent review of the
+final corrected candidate is required before the isolated runtime replay.
 
 ## Honest runtime limits
 
