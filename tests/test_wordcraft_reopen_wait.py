@@ -10,6 +10,7 @@ import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from unittest.mock import patch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "lab", "real-seafile"))
@@ -48,13 +49,22 @@ class Fixture:
     """Loopback-only server: / serves a page that fetches /relay/file after DELAY_MS;
     /relay/file serves the next planned (status, body)."""
 
-    def __init__(self, plan):
+    def __init__(self, plan, save_status=200, reconciled=False):
         self.plan = plan
+        self.save_status = save_status
+        self.reconciled = reconciled
 
     def start(self):
         outer = self
 
         class Handler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                self.rfile.read(int(self.headers.get("Content-Length", "0")))
+                self.send_response(outer.save_status)
+                self.send_header("Content-Length", "2")
+                self.end_headers()
+                self.wfile.write(b"{}")
+
             def do_GET(self):
                 if self.path == "/relay/file":
                     with outer.lock:
@@ -68,9 +78,32 @@ class Fixture:
                     self.wfile.write(body)
                 elif self.path.startswith("/library/") or self.path.startswith("/lib/"):
                     body = (b'<a href="/lib/fixture/file/same.docx">same.docx</a>'
-                            b'<a target="_blank" href="/lib/fixture/file/popup.docx">popup.docx</a>')
+                            b'<a target="_blank" href="/lib/fixture/file/popup.docx">popup.docx</a>'
+                            b'<a href="/download">download</a>')
                     self.send_response(200)
                     self.send_header("Content-Type", "text/html")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+                elif self.path in ("/save", "/nosave"):
+                    script = (b"document.addEventListener('keydown',e=>{"
+                              b"if(e.ctrlKey&&e.key==='s'){e.preventDefault();"
+                              b"setTimeout(()=>fetch('/relay/save',{method:'POST',body:'fixture-payload'})"
+                              b".then(r=>{if(r.ok)setTimeout(()=>document.getElementById('status').textContent='saved to seafile',150)}),150);}})")
+                    if outer.reconciled:
+                        script = script.replace(b"saved to seafile", b"saved (reconciled after a lost response)")
+                    if self.path == "/nosave":
+                        script = b"document.addEventListener('keydown',e=>e.preventDefault())"
+                    body = b'<div id="status">unsaved</div><script>' + script + b'</script>'
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+                elif self.path == "/download":
+                    body = b"fixture-download"
+                    self.send_response(200)
+                    self.send_header("Content-Disposition", "attachment; filename=fixture.bin")
                     self.send_header("Content-Length", str(len(body)))
                     self.end_headers()
                     self.wfile.write(body)
@@ -186,11 +219,54 @@ def main():
         fx = Fixture(plan=[]).start()
         context = browser.new_context()
         page = context.new_page()
+        downloads = []
+        run_browser.track_downloads(context, downloads)
         same = run_browser.open_from_seafile_list(page, fx.url, "fixture", "same.docx")
         check("file_list_click_supports_same_tab", same is page and same.url.endswith("/file/same.docx"))
+        with same.expect_download():
+            same.get_by_role("link", name="download", exact=True).click()
+        check("download_observed_on_existing_page", len(downloads) == 1)
         popup = run_browser.open_from_seafile_list(page, fx.url, "fixture", "popup.docx")
         check("file_list_click_supports_new_tab", popup is not page and popup.url.endswith("/file/popup.docx"))
+        with popup.expect_download():
+            popup.get_by_role("link", name="download", exact=True).click()
+        check("download_observed_on_popup", len(downloads) == 2)
         context.close()
+        fx.stop()
+
+        # Invoke the production save helper against delayed real HTTP request callbacks.
+        for save_status, reconciled in ((200, False), (200, True), (500, False)):
+            tag = f"{save_status}" + ("_reconciled" if reconciled else "")
+            fx = Fixture(plan=[], save_status=save_status, reconciled=reconciled).start()
+            page = browser.new_page()
+            page.goto(fx.url + "/save")
+            with patch.object(page, "remove_listener", wraps=page.remove_listener) as removed:
+                body, confirmed = run_browser.save_and_capture(
+                    page, lambda: page.locator("#status").inner_text(), timeout=1)
+            check(f"delayed_save_{tag}_captures_payload", body == b"fixture-payload")
+            check(f"save_{tag}_confirmation_matches_outcome", confirmed == (save_status == 200))
+            check(f"save_{tag}_removes_callback", removed.call_count == 1)
+            page.close()
+            fx.stop()
+
+        fx = Fixture(plan=[]).start()
+        page = browser.new_page()
+        page.goto(fx.url + "/nosave")
+        with patch.object(page, "remove_listener", wraps=page.remove_listener) as removed:
+            result = run_browser.save_and_capture(page, lambda: "unsaved", timeout=0.2)
+        check("save_timeout_rejects_missing_request", result == (None, False))
+        check("save_timeout_removes_callback", removed.call_count == 1)
+        def unavailable_status():
+            raise RuntimeError("status unavailable")
+        page.goto(fx.url + "/save")
+        with patch.object(page, "remove_listener", wraps=page.remove_listener) as removed:
+            try:
+                run_browser.save_and_capture(page, unavailable_status, timeout=1)
+                check("save_status_error_propagates", False)
+            except RuntimeError:
+                check("save_status_error_propagates", True)
+        check("save_status_error_removes_callback", removed.call_count == 1)
+        page.close()
         fx.stop()
         browser.close()
 

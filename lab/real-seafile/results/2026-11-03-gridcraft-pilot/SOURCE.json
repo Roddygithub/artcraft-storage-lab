@@ -1,0 +1,29 @@
+{
+  "source_commit": "29484f65d5c09f3d819b87c1f64b0c41f0e6d567",
+  "implementation_commit": "a9eb3afc95ae5b92337f84a51f9e13e1fa75471d",
+  "runtime": "parent-operated rootless Podman; fresh isolated synthetic Seafile lab; no production",
+  "limits_mib": {
+    "db": 384,
+    "redis": 96,
+    "seafile": 1280,
+    "onlyoffice": 1280,
+    "bridge": 96,
+    "browser": 896,
+    "slice": 256
+  },
+  "published_loopback_ports": [
+    18800,
+    18810,
+    18878
+  ],
+  "browser_editors": [
+    "wordcraft",
+    "gridcraft"
+  ],
+  "runtime_overrides": [
+    "unique project/container/network names; loopback ports; restart=no; bounded CPU/memory",
+    "browser static-directory selector contains WordCraft and GridCraft; bridge serves five verified upstream release bundles",
+    "runtime editors mapping labels the unpatched DeckCraft release; no new browser claim for other apps"
+  ],
+  "aptarchy_outcome": "Original task remains blocked after GPT FAIL and two failed free remediators; parent recovery and runtime execution are separate, not autonomous Aptarchy acceptance."
+}

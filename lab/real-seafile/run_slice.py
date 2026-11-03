@@ -340,6 +340,49 @@ def minimal_odt() -> bytes:
     return buf.getvalue()
 
 
+def xlsx_cells(data: bytes) -> dict[str, str]:
+    """The first worksheet's cell values of an XLSX as {"A1": "1", ...}, resolving plain
+    numeric values, cached formula strings, inline strings and shared strings. Raises
+    ValueError on anything not parseable as an XLSX with a readable first sheet (bad
+    archive, missing/malformed part, invalid shared-string reference), never a partial
+    or empty result, so a positive cell assertion cannot pass on malformed input."""
+    NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+    import xml.etree.ElementTree as ET
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            shared: list[str] = []
+            if "xl/sharedStrings.xml" in z.namelist():
+                sroot = ET.fromstring(z.read("xl/sharedStrings.xml"))
+                for si in sroot.findall(f"{NS}si"):
+                    shared.append("".join(t.text or "" for t in si.iter(f"{NS}t")))
+            sheet = ET.fromstring(z.read("xl/worksheets/sheet1.xml"))
+    except zipfile.BadZipFile as e:
+        raise ValueError(f"not a zip archive: {e}") from e
+    except (KeyError, ET.ParseError) as e:
+        raise ValueError(f"malformed xlsx part: {e}") from e
+    cells: dict[str, str] = {}
+    for c in sheet.iter(f"{NS}c"):
+        ref, t = c.get("r"), c.get("t")
+        if not ref or ref in cells:
+            continue
+        v, inline = c.find(f"{NS}v"), c.find(f"{NS}is")
+        if t == "s":
+            try:
+                idx = int(v.text or "")     # an empty <v/> has text=None
+            except (AttributeError, ValueError):
+                raise ValueError(f"cell {ref}: non-numeric shared-string index {v.text if v is not None else None}") from None
+            if idx < 0 or idx >= len(shared):
+                raise ValueError(f"cell {ref}: shared string index {idx} out of range ({len(shared)})")
+            cells[ref] = shared[idx]
+        elif t == "inlineStr":
+            cells[ref] = "".join(t.text or "" for t in inline.iter(f"{NS}t")) if inline is not None else ""
+        elif v is not None:
+            cells[ref] = v.text or ""
+        else:
+            cells[ref] = ""
+    return cells
+
+
 def minimal_pptx() -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:

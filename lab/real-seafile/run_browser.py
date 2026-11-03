@@ -66,6 +66,38 @@ def wait_for_saved_response(page, captured, timeout=180):
     return None
 
 
+def track_downloads(context, downloads):
+    """Observe downloads on existing pages and popups, before navigation starts."""
+    def attach(page):
+        page.on("download", lambda download: downloads.append(download))
+    context.on("page", attach)
+    for page in context.pages:
+        attach(page)
+
+
+def save_and_capture(page, status_fn, timeout=90):
+    """Capture the real save request and wait for host confirmation while pumping events."""
+    bodies = []
+    def capture(request):
+        if request.method == "POST" and request.url.endswith("/relay/save"):
+            body = request.post_data_buffer
+            if body:
+                bodies.append(body)
+    page.on("request", capture)
+    try:
+        page.keyboard.press("Control+s")
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            if bodies and (status_fn() or "").strip().lower() in (
+                "saved to seafile", "saved (reconciled after a lost response)"
+            ):
+                return bodies[0], True
+            page.wait_for_timeout(min(100, max(0, (end - time.monotonic()) * 1000)))
+        return (bodies[0] if bodies else None), False
+    finally:
+        page.remove_listener("request", capture)
+
+
 def open_from_seafile_list(page, base, repo_id, name, timeout=30):
     """Click the actual file-list link; Seahub may open it here or in a new tab."""
     page.goto(f"{base.rstrip('/')}/library/{repo_id}/", wait_until="domcontentloaded")
@@ -122,12 +154,11 @@ def main():
         page = ctx.new_page()
         console: list[str] = []
         downloads: list = []
-        page.on("download", lambda d: downloads.append(d))
+        track_downloads(ctx, downloads)
         page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
         page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
 
         def attach(page):
-            page.on("download", lambda d: downloads.append(d))
             page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
             page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
             return page
@@ -217,6 +248,7 @@ def main():
             page.close()
             page = attach(ctx.new_page())
             reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(reopen, downloads)
             reopen.on("page", attach)
             p2 = reopen.new_page()
             relay_file: list = []          # the reopened host page's own /relay/file fetches
@@ -328,6 +360,191 @@ def main():
             reopen.close()
             return page
 
+        def gridcraft_real_edit_flow(page, name, content, box, status, before):
+            """ROADMAP step 3, GridCraft XLSX slice: click an actual editor cell, type a
+            distinct value with trusted mouse/keyboard input only, save through the existing
+            host/bridge, then close this editor and reopen the same file from Seafile in a
+            fresh authenticated session and type a second value there. Every assertion on the
+            value is semantic (parsed out of the editor's own /relay/save payload and of the
+            Seafile readback), on top of byte-level deltas and version attribution; downloads
+            are tracked and none is ever accepted as a save."""
+            marker = "gridtyped" + os.urandom(5).hex()
+            marker2 = "gridreopened" + os.urandom(5).hex()
+
+            def typed(p, bx, fx, fy, value, status_fn):
+                """Click inside the editor frame at a relative point, type `value` into the
+                focused cell and commit it (Enter); returns True when the host page shows
+                unsaved changes. Char-by-char typing is retried as an IME-style insert into
+                the SAME focused editor -- still real input, never a file replacement."""
+                p.mouse.click(bx["x"] + bx["width"] * fx, bx["y"] + 60 + (bx["height"] - 60) * fy)
+                p.wait_for_timeout(1000)
+                p.keyboard.type(value, delay=30)
+                p.keyboard.press("Enter")
+                def dirty():
+                    return "unsaved" in (status_fn() or "").lower()
+                end = time.time() + 15
+                while time.time() < end and not dirty():
+                    p.wait_for_timeout(500)
+                if not dirty():
+                    p.keyboard.insert_text(value)
+                    p.keyboard.press("Enter")
+                    end = time.time() + 15
+                    while time.time() < end and not dirty():
+                        p.wait_for_timeout(500)
+                return dirty()
+
+            def semantic(cells, value):
+                return any(v.casefold() == value for v in (cells or {}).values())
+
+            def parse_or_fail(payload, tag):
+                """A required-failure path: an unreadable payload must produce a FAILed
+                check, never an assertion skipped to the generic path."""
+                if payload is None:
+                    check(f"gridcraft_{tag}_payload_is_a_readable_xlsx_with_the_value", False, "no /relay/save payload captured")
+                    return None
+                try:
+                    return rs.xlsx_cells(payload)
+                except ValueError as e:
+                    check(f"gridcraft_{tag}_payload_is_a_readable_xlsx_with_the_value", False, str(e))
+                    return None
+
+            def host_status(host):
+                if host is None:
+                    return ""
+                try:
+                    return host.evaluate("document.getElementById('status') ? document.getElementById('status').textContent : document.body.innerText.slice(0,200)")
+                except Exception as e:  # noqa: BLE001
+                    return f"<{e}>"
+
+            def version_by_user(prev):
+                end = time.time() + 60
+                hist = prev
+                while time.time() < end:
+                    hist = rs.history(admin, repo_id, name)
+                    if len(hist) > len(prev):
+                        return hist
+                    time.sleep(1)
+                return hist
+
+            # -- first real edit: click an actual cell, type a distinct value ------------
+            dirty1 = typed(page, box, 0.35, 0.30, marker, status)
+            check("gridcraft_typed_edit_before_save_is_visible_as_unsaved_changes", dirty1,
+                  f"marker={marker} status={status()!r}")
+            page.screenshot(path=os.path.join(RESULTS, "gridcraft-typed.png"))
+
+            # -- Save through the host/bridge; value verified inside the editor's own payload
+            payload, confirmed = save_and_capture(page, status)
+            payload_cells = parse_or_fail(payload, "save_request")
+            if payload_cells is not None:
+                check("gridcraft_save_request_carries_the_typed_value", semantic(payload_cells, marker),
+                      f"payload={len(payload)}B marker={marker} cells={sorted(payload_cells)[:14]}")
+            check("gridcraft_save_confirmed_by_host_page", confirmed, f"status={status()!r}")
+            after = version_by_user(before)
+            check("gridcraft_save_creates_seafile_version_by_user",
+                  len(after) > len(before) and after[0]["creator"] == admin_username,
+                  f"history {len(before)}->{len(after)} top={after[0] if after else None}")
+
+            # -- Seafile now holds the specific new value (semantic) and differs by bytes --
+            got, _ = rs.download(admin, repo_id, name)
+            try:
+                got_cells = rs.xlsx_cells(got)
+                check("gridcraft_saved_xlsx_semantically_contains_the_typed_value", semantic(got_cells, marker),
+                      f"marker={marker} cells={sorted(got_cells)[:14]}")
+                check("gridcraft_saved_xlsx_keeps_the_fixture_value", got_cells.get("A1") == "1",
+                      f"A1={got_cells.get('A1')!r} (the typed cell is not A1: click at 30% canvas height)")
+            except ValueError as e:
+                check("gridcraft_saved_xlsx_semantically_contains_the_typed_value", False, str(e))
+                check("gridcraft_saved_xlsx_keeps_the_fixture_value", False, str(e))
+            check("gridcraft_save_is_not_identical_bytes", got != content, f"{len(content)} -> {len(got)} bytes")
+            check("gridcraft_saved_xlsx_bytes_look_right", rs.content_matches(name, got), f"len={len(got)}")
+            page.screenshot(path=os.path.join(RESULTS, "gridcraft-saved.png"))
+
+            # -- close the old editor, reopen from Seafile in a fresh session -------------
+            page.close()
+            page = attach(ctx.new_page())
+            reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(reopen, downloads)
+            reopen.on("page", attach)       # downloads/responses tracked before any navigation
+            p2 = reopen.new_page()
+            relay_file: list = []           # the reopened host page's own /relay/file fetches
+            def on_response(r):
+                if r.url.endswith("/relay/file"):
+                    try:
+                        relay_file.append((r.status, r.body()))
+                    except Exception:  # noqa: BLE001
+                        pass
+            reopen.on("response", on_response)
+            p2.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
+            p2.fill("input[name=login]", rs.ADMIN)
+            p2.fill("input[name=password]", rs.ADMIN_PW)
+            p2.click("button[type=submit], input[type=submit]")
+            p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
+            check("gridcraft_reopen_fresh_seafile_session", "/accounts/login" not in p2.url, p2.url)
+            p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
+            check("gridcraft_reopened_from_seafile_file_list", True)
+            host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
+            check("gridcraft_reopen_host_frame_from_seahub", host2 is not None, f"frames={frames_dump(p2)}")
+            def status2():
+                return host_status(host2)
+            body = wait_for_saved_response(p2, relay_file, 180)
+            p2.screenshot(path=os.path.join(RESULTS, "gridcraft-reopened.png"))
+            check("gridcraft_reopen_editor_ready_and_document_opened", body is not None,
+                  f"relay/file responses={len(relay_file)} after {time.time()-t0:.0f}s")
+            check("gridcraft_reopen_bytes_identical_to_the_saved_version", body is not None and body == got,
+                  f"len={len(body) if body else 0} vs saved {len(got)}")
+            try:
+                body_cells = rs.xlsx_cells(body) if body else {}
+                check("gridcraft_reopen_parsed_the_saved_value", semantic(body_cells, marker),
+                      f"cells={sorted(body_cells)[:14]}")
+            except ValueError as e:
+                body_cells = None
+                check("gridcraft_reopen_parsed_the_saved_value", False, str(e))
+
+            # Receiving/parsing the saved bytes is not enough: the reopened editor must render
+            # them and accept an interactive edit of the sheet, then save again through the
+            # same bridge -- and its own payload must still hold the FIRST edit.
+            box2 = p2.locator("#office-frame").bounding_box()
+            payload2 = None
+            if host2 is not None and body is not None and box2 is not None and body_cells is not None:
+                dirty2 = typed(p2, box2, 0.60, 0.55, marker2, status2)
+                check("gridcraft_reopen_typed_edit_is_visible_as_unsaved_changes", dirty2,
+                      f"marker={marker2} status={status2()!r}")
+                payload2, ok2 = save_and_capture(p2, status2)
+                cells2 = parse_or_fail(payload2, "reopen_save_request")
+                if cells2 is not None:
+                    check("gridcraft_reopen_editor_holds_the_original_value", semantic(cells2, marker),
+                          f"marker={marker} cells={sorted(cells2)[:14]}")
+                    check("gridcraft_reopen_editor_holds_the_second_typed_value", semantic(cells2, marker2),
+                          f"marker={marker2} cells={sorted(cells2)[:14]}")
+                check("gridcraft_reopen_save_confirmed_by_host_page", ok2, f"status={status2()!r}")
+                after2 = version_by_user(after)
+                check("gridcraft_reopen_second_save_creates_seafile_version_by_user",
+                      ok2 and len(after2) > len(after) and after2[0]["creator"] == admin_username,
+                      f"history {len(after)}->{len(after2)} top={after2[0] if after2 else None}")
+                got2, _ = rs.download(admin, repo_id, name)
+                try:
+                    got2_cells = rs.xlsx_cells(got2)
+                    check("gridcraft_reopen_seafile_holds_both_values",
+                          semantic(got2_cells, marker) and semantic(got2_cells, marker2),
+                          f"marker={marker2} cells={sorted(got2_cells)[:14]}")
+                except ValueError as e:
+                    check("gridcraft_reopen_seafile_holds_both_values", False, str(e))
+                check("gridcraft_second_save_is_not_identical_bytes", payload2 != payload,
+                      f"{len(payload) if payload else 0} -> {len(payload2) if payload2 else 0} bytes")
+            else:
+                check("gridcraft_reopen_typed_edit_is_visible_as_unsaved_changes", False,
+                      f"host={host2 is not None} opened={body is not None} box={box2 is not None} parsed={body_cells is not None}")
+                check("gridcraft_reopen_editor_holds_the_original_value", False, "no reopened editor flow")
+                check("gridcraft_reopen_editor_holds_the_second_typed_value", False, "no reopened editor flow")
+                check("gridcraft_reopen_save_confirmed_by_host_page", False, "no reopened editor flow")
+                check("gridcraft_reopen_second_save_creates_seafile_version_by_user", False, "no reopened editor flow")
+                check("gridcraft_reopen_seafile_holds_both_values", False, "no reopened editor flow")
+                check("gridcraft_second_save_is_not_identical_bytes", False, "no reopened editor flow")
+            p2.screenshot(path=os.path.join(RESULTS, "gridcraft-reopened-saved.png"))
+            check("gridcraft_saves_did_not_download", not downloads, f"downloads={len(downloads)}")
+            reopen.close()
+            return page
+
         # login
         page.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
         page.fill("input[name=login]", rs.ADMIN)
@@ -415,6 +632,12 @@ def main():
                 if page is not original:
                     attach(page)
                 check("wordcraft_opened_from_seafile_file_list", True)
+            elif editor == "gridcraft":
+                original = page
+                page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
+                if page is not original:
+                    attach(page)
+                check("gridcraft_opened_from_seafile_file_list", True)
             else:
                 page.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}{query}", wait_until="domcontentloaded")
             host = find_frame(page, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=page.main_frame)
@@ -447,6 +670,10 @@ def main():
             if editor == "wordcraft":
                 # ROADMAP step 3 slice: real typed edit before Save + fresh-session reopen
                 page = wordcraft_real_edit_flow(page, name, content, box, status, before)
+                continue
+            if editor == "gridcraft":
+                # ROADMAP step 3 slice: real cell edit, save + fresh-session reopen
+                page = gridcraft_real_edit_flow(page, name, content, box, status, before)
                 continue
             # focus the editor canvas (below the host bar) and ask it to save
             page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 60 + (box["height"] - 60) / 2)

@@ -1,0 +1,36 @@
+== python3 --version
+Python 3.14.8
+
+== python3 tests/bridge/test_bridge.py
+----------------------------------------------------------------------
+Ran 30 tests in 1.097s
+
+OK
+exit=0
+
+== python3 tests/test_gridcraft_real_edit.py
+PASS lab_fixture_a1_is_numeric_one  -- cells={'A1': '1'}
+PASS numeric_and_formula_string_cells_parsed  -- cells={'A1': '3.14', 'A2': '-7', 'B1': 'ab'}
+PASS inline_string_cell_parsed  -- cells={'B2': 'gridtypedx'}
+PASS shared_string_cells_parsed  -- cells={'C3': 'richtext', 'D4': 'hello'}
+PASS not_a_zip_rejected
+PASS zip_without_sheet_rejected
+PASS broken_sheet_xml_rejected
+PASS shared_string_index_out_of_range_rejected
+PASS non_numeric_shared_string_index_rejected
+PASS missing_shared_string_index_rejected
+
+0 failed
+exit=0
+== uv run --offline --with playwright -- python tests/test_wordcraft_reopen_wait.py
+PASS wait_returns_bytes_captured_after_the_wait_began  -- got 887 of 887 bytes after 2s
+PASS returned_bytes_are_the_document_fixture  -- status=200 responses=1
+PASS wait_times_out_without_a_qualifying_response  -- responses=[(200, 0), (500, 4)]
+PASS delayed_success_fails_with_the_former_sleep_only_wait  -- after 4s no callbacks were dispatched; responses=0
+PASS former_wait_starved_a_response_the_browser_received  -- captured=[(200, 887)]
+PASS production_wait_finds_the_starved_response  -- len=887
+PASS file_list_click_supports_same_tab
+PASS file_list_click_supports_new_tab
+
+0 failed
+exit=0
