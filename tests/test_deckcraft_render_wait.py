@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Ensure DeckCraft readiness waits for host open status and an in-session stable canvas."""
+"""Ensure DeckCraft readiness requires the expected slide render, not a stable blank canvas."""
+from io import BytesIO
 import os
 import sys
 import types
+
+from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "lab", "real-seafile"))
@@ -60,20 +63,47 @@ class FakeHost:
 
 
 def main():
-    rendered = b"rendered-native-deck"
-    host = FakeHost([rendered] * 4,
+    reference_image = Image.new("RGB", (640, 360), "#eeeeee")
+    draw = ImageDraw.Draw(reference_image)
+    draw.rectangle((160, 90, 576, 303), fill="white")
+    draw.text((260, 175), "Northern Lights", fill="black")
+    for x in range(160, 576):
+        t = (x - 160) / 416
+        draw.line((x, 294, x, 303), fill=(int(40 + 200 * t), 80, int(220 - 180 * t)))
+    reference_buffer = BytesIO()
+    reference_image.save(reference_buffer, format="PNG")
+    reference = reference_buffer.getvalue()
+
+    changed_image = reference_image.copy()
+    ImageDraw.Draw(changed_image).text((350, 175), "decktyped123", fill="black")
+    changed_buffer = BytesIO()
+    changed_image.save(changed_buffer, format="PNG")
+    changed = changed_buffer.getvalue()
+
+    blank_image = Image.new("RGB", (640, 360), "#eeeeee")
+    ImageDraw.Draw(blank_image).rectangle((160, 90, 576, 303), fill="white")
+    blank_buffer = BytesIO()
+    blank_image.save(blank_buffer, format="PNG")
+    blank = blank_buffer.getvalue()
+
+    assert run_browser.deckcraft_canvas_matches_reference(reference, reference)
+    assert run_browser.deckcraft_canvas_matches_reference(changed, reference)
+    assert not run_browser.deckcraft_canvas_matches_reference(blank, reference)
+
+    host = FakeHost([reference] * 4,
                     loaded=[False] * 6 + [True] * 4)
-    assert run_browser.wait_for_deckcraft_render(host, timeout=2) == rendered
+    assert run_browser.wait_for_deckcraft_render(host, reference, timeout=2) == reference
     assert host.evaluations == 10 and host.canvas.calls == 4
 
     not_opened = FakeHost([b"stable-but-not-opened"] * 20, loaded=False)
-    assert run_browser.wait_for_deckcraft_render(not_opened, timeout=0.02) is None
+    assert run_browser.wait_for_deckcraft_render(not_opened, reference, timeout=0.02) is None
     assert not_opened.canvas.calls == 0
 
-    reopened_capture = b"rendered-in-fresh-session"
-    reopened = FakeHost([reopened_capture] * 4)
-    assert run_browser.wait_for_deckcraft_render(reopened, timeout=2) == reopened_capture
-    print("DeckCraft document-render wait checks: 3/3 passed")
+    blank_canvas = FakeHost([blank] * 12)
+    assert run_browser.wait_for_deckcraft_render(blank_canvas, reference, timeout=0.02) is None
+    reopened = FakeHost([changed] * 4)
+    assert run_browser.wait_for_deckcraft_render(reopened, reference, timeout=2) == changed
+    print("DeckCraft document-render wait checks: 7/7 passed")
 
 
 if __name__ == "__main__":

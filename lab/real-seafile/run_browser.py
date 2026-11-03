@@ -23,11 +23,13 @@ import os
 import sys
 import time
 import urllib.parse
+from io import BytesIO
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import run_slice as rs  # noqa: E402  (reuse API helpers; stdlib only)
 
 from playwright.sync_api import sync_playwright  # noqa: E402
+from PIL import Image, ImageChops  # noqa: E402
 
 RESULTS = os.environ.get("RESULTS_DIR", ".")
 checks: list[dict] = []
@@ -119,8 +121,26 @@ def open_from_seafile_list(page, base, repo_id, name, timeout=30):
     raise TimeoutError("file-list click did not open an editor page")
 
 
-def wait_for_deckcraft_render(host, timeout=90):
-    """Wait for a ready/saved host status and a stable DeckCraft canvas after loading."""
+def deckcraft_canvas_matches_reference(image, reference):
+    """Compare the slide area at low resolution, tolerating small session UI/render changes."""
+    try:
+        def slide_area(data):
+            with Image.open(BytesIO(data)) as source:
+                source = source.convert("RGB")
+                width, height = source.size
+                return source.crop((int(width * 0.25), int(height * 0.22),
+                                    int(width * 0.92), int(height * 0.88))).resize(
+                                        (96, 64), Image.Resampling.BILINEAR)
+
+        diff = ImageChops.difference(slide_area(image), slide_area(reference)).convert("L")
+        changed = sum(1 for value in diff.getdata() if value >= 40)
+        return changed / (96 * 64) <= 0.05
+    except (OSError, ValueError):
+        return False
+
+
+def wait_for_deckcraft_render(host, reference_canvas, timeout=90):
+    """Wait for host readiness, stable frames, and a slide matching the native fixture."""
     end = time.monotonic() + timeout
     previous = None
     stable_frames = 0
@@ -140,10 +160,12 @@ def wait_for_deckcraft_render(host, timeout=90):
             }""")
             if loaded:
                 image = host.frame_locator("#frame").locator("#deckcraft_canvas").screenshot(timeout=5000)
-                # Compare frames only within this session. Separate sessions can render the
-                # same file differently because of transient UI notices or font fallback.
-                stable_frames = stable_frames + 1 if image == previous else 1
-                previous = image
+                if deckcraft_canvas_matches_reference(image, reference_canvas):
+                    stable_frames = stable_frames + 1 if image == previous else 1
+                    previous = image
+                else:
+                    previous = None
+                    stable_frames = 0
                 if stable_frames >= 4:
                     return image
             else:
@@ -209,6 +231,7 @@ def main():
         page = ctx.new_page()
         console: list[str] = []
         downloads: list = []
+        deckcraft_reference_canvas: bytes | None = None
         track_downloads(ctx, downloads)
         page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
         page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
@@ -631,7 +654,8 @@ def main():
                 p.wait_for_timeout(500)
 
             host1 = find_frame(page, rs.BRIDGE + "/edit/", 5, name="office_frame", parent=page.main_frame)
-            rendered1 = host1 is not None and wait_for_deckcraft_render(host1) is not None
+            rendered1 = host1 is not None and deckcraft_reference_canvas is not None and \
+                wait_for_deckcraft_render(host1, deckcraft_reference_canvas) is not None
             check("deckcraft_document_rendered_before_first_edit", rendered1)
             if not rendered1:
                 return page
@@ -666,7 +690,7 @@ def main():
             check("deckcraft_saved_native_document_is_readable", bool(got_text),
                   f"text_fields={len(got_text)}")
             page.screenshot(path=os.path.join(RESULTS, "deckcraft-saved.png"))
-            saved_canvas = wait_for_deckcraft_render(host1, None)
+            saved_canvas = wait_for_deckcraft_render(host1, deckcraft_reference_canvas)
             check("deckcraft_saved_canvas_render_is_stable", saved_canvas is not None)
             check("deckcraft_native_save_did_not_download", not downloads, f"downloads={len(downloads)}")
 
@@ -716,7 +740,8 @@ def main():
                     return f"<{exc}>"
 
             reopened = wait_for_saved_response(p2, relay_file, 180)
-            rendered2 = host2 is not None and saved_canvas is not None and wait_for_deckcraft_render(host2) is not None
+            rendered2 = host2 is not None and saved_canvas is not None and deckcraft_reference_canvas is not None and \
+                wait_for_deckcraft_render(host2, deckcraft_reference_canvas) is not None
             p2.screenshot(path=os.path.join(RESULTS, "deckcraft-reopened.png"))
             check("deckcraft_fresh_session_loaded_the_saved_bytes",
                   reopened is not None and reopened == got and contains(reopened, marker) and rendered2,
@@ -850,6 +875,9 @@ def main():
                 check("deckcraft_native_setup_fixture_generated_by_editor", fixture_ok,
                       f"{fixture_download.value.suggested_filename} {len(fixture_bytes)} bytes")
                 if fixture_ok:
+                    deckcraft_reference_canvas = setup_canvas
+                    with open(os.path.join(RESULTS, "deckcraft-render-reference.png"), "wb") as reference_file:
+                        reference_file.write(setup_canvas)
                     ids[fixture_name] = rs.upload(admin, repo_id, fixture_name, fixture_bytes)
                     fixtures[fixture_name] = ("deckcraft", fixture_bytes, "")
                     check("deckcraft_native_setup_fixture_uploaded_before_editor_save",
