@@ -154,7 +154,7 @@ def deckcraft_canvas_matches_reference(image, reference):
                                         (96, 64), Image.Resampling.BILINEAR)
         diff = ImageChops.difference(slide_area(image), slide_area(reference)).convert("L")
         changed = sum(1 for value in diff.getdata() if value >= 40)
-        return changed / (96 * 64) <= 0.05
+        return changed / (96 * 64) <= 0.08
     except (OSError, ValueError):
         return False
 

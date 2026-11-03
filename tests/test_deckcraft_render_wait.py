@@ -68,7 +68,13 @@ def main():
     reference_path = os.path.join(HERE, "fixtures", "deckcraft-rendered-reference.png")
     reference = open(reference_path, "rb").read()
     reference_image = Image.open(BytesIO(reference)).convert("RGB")
-    changed_image = reference_image.resize((1350, 815), Image.Resampling.BILINEAR)
+    host_path = os.path.join(HERE, "fixtures", "deckcraft-host-opened.png")
+    host_opened = open(host_path, "rb").read()
+    assert run_browser.deckcraft_canvas_has_document_visuals(host_opened)
+    assert run_browser.deckcraft_canvas_matches_reference(host_opened, reference)
+
+    changed_image = Image.open(BytesIO(host_opened)).convert("RGB").resize(
+        (1350, 815), Image.Resampling.BILINEAR)
     ImageDraw.Draw(changed_image).text((740, 430), "decktyped123", fill="black")
     changed_buffer = BytesIO()
     changed_image.save(changed_buffer, format="PNG")
@@ -76,8 +82,8 @@ def main():
 
     blank_image = reference_image.copy()
     width, height = blank_image.size
-    ImageDraw.Draw(blank_image).rectangle((int(width * 0.268), int(height * 0.254),
-                                           int(width * 0.90), int(height * 0.845)), fill="white")
+    ImageDraw.Draw(blank_image).rectangle((int(width * 0.23), int(height * 0.20),
+                                           int(width * 0.94), int(height * 0.85)), fill="white")
     blank_buffer = BytesIO()
     blank_image.save(blank_buffer, format="PNG")
     blank = blank_buffer.getvalue()
