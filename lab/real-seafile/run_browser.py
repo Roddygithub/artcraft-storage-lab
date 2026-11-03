@@ -545,6 +545,152 @@ def main():
             reopen.close()
             return page
 
+        def deckcraft_real_edit_flow(page, name, content, box, status, before):
+            """Edit a native DeckCraft document with trusted browser input, save through WOPI,
+            then reopen in a fresh Seafile session and make a second semantic edit. DeckCraft's
+            current host port has no dirty callback, so save payload, host confirmation, version
+            history, and native-document readback are the save evidence."""
+            marker = "decktyped" + os.urandom(5).hex()
+            marker2 = "deckreopened" + os.urandom(5).hex()
+
+            def texts(data):
+                try:
+                    return rs.deckcraft_text(data)
+                except ValueError:
+                    return []
+
+            def contains(data, value):
+                return value.casefold() in "\n".join(texts(data)).casefold()
+
+            def type_into_title(p, bx, value):
+                # The sample deck's title box is centered on slide 1. Double-click selects
+                # its text; Ctrl+End and trusted keyboard typing append a unique marker.
+                x = bx["x"] + bx["width"] * 0.54
+                y = bx["y"] + bx["height"] * 0.45
+                p.mouse.dblclick(x, y, delay=100)
+                p.wait_for_timeout(500)
+                p.keyboard.press("Control+End")
+                p.keyboard.type(value, delay=35)
+                p.wait_for_timeout(750)
+
+            type_into_title(page, box, marker)
+            page.screenshot(path=os.path.join(RESULTS, "deckcraft-typed.png"))
+            payload, confirmed = save_and_capture(page, status, timeout=120)
+            check("deckcraft_save_request_contains_the_typed_marker",
+                  payload is not None and contains(payload, marker),
+                  f"captured={payload is not None} marker={marker}")
+            check("deckcraft_save_confirmed_by_host_page", confirmed, f"status={status()!r}")
+
+            end = time.time() + 60
+            after = before
+            while time.time() < end:
+                after = rs.history(admin, repo_id, name)
+                if len(after) > len(before):
+                    break
+                time.sleep(1)
+            check("deckcraft_save_creates_seafile_version_by_user",
+                  len(after) > len(before) and after[0]["creator"] == admin_username,
+                  f"history {len(before)}->{len(after)} top={after[0] if after else None}")
+
+            got, _ = rs.download(admin, repo_id, name)
+            check("deckcraft_seafile_readback_contains_the_typed_marker", contains(got, marker),
+                  f"marker={marker} bytes={len(got)}")
+            check("deckcraft_save_changes_native_document_bytes", got != content,
+                  f"{len(content)} -> {len(got)} bytes")
+            got_text = texts(got)
+            check("deckcraft_saved_native_document_is_readable", bool(got_text),
+                  f"text_fields={len(got_text)}")
+            page.screenshot(path=os.path.join(RESULTS, "deckcraft-saved.png"))
+            check("deckcraft_native_save_did_not_download", not downloads, f"downloads={len(downloads)}")
+
+            page.close()
+            page = attach(ctx.new_page())
+            reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(reopen, downloads)
+            reopen.on("page", attach)
+            relay_file = []
+            save_bodies = []
+
+            def on_response(response):
+                if response.url.endswith("/relay/file"):
+                    try:
+                        relay_file.append((response.status, response.body()))
+                    except Exception:  # noqa: BLE001
+                        pass
+
+            def on_save_request(request):
+                if request.method == "POST" and request.url.endswith("/relay/save"):
+                    try:
+                        body = request.post_data_buffer
+                        if body:
+                            save_bodies.append(body)
+                    except Exception:  # noqa: BLE001
+                        pass
+
+            reopen.on("response", on_response)
+            reopen.on("request", on_save_request)
+            p2 = reopen.new_page()
+            p2.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
+            p2.fill("input[name=login]", rs.ADMIN)
+            p2.fill("input[name=password]", rs.ADMIN_PW)
+            p2.click("button[type=submit], input[type=submit]")
+            p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
+            check("deckcraft_fresh_session_logged_into_seafile", "/accounts/login" not in p2.url)
+            p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
+            check("deckcraft_reopened_from_seafile_file_list", True)
+            host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
+
+            def status2():
+                if host2 is None:
+                    return ""
+                try:
+                    return host2.evaluate("document.getElementById('status') ? document.getElementById('status').textContent : document.body.innerText.slice(0,200)")
+                except Exception as exc:  # noqa: BLE001
+                    return f"<{exc}>"
+
+            reopened = wait_for_saved_response(p2, relay_file, 180)
+            p2.screenshot(path=os.path.join(RESULTS, "deckcraft-reopened.png"))
+            check("deckcraft_fresh_session_loaded_the_saved_bytes",
+                  reopened is not None and reopened == got and contains(reopened, marker),
+                  f"relay/file responses={len(relay_file)} bytes={len(reopened) if reopened else 0}")
+            box2 = p2.locator("#office-frame").bounding_box()
+            if host2 is not None and reopened is not None and box2 is not None:
+                type_into_title(p2, box2, marker2)
+                p2.screenshot(path=os.path.join(RESULTS, "deckcraft-reopened-typed.png"))
+                payload2, confirmed2 = save_and_capture(p2, status2, timeout=120)
+                check("deckcraft_reopened_editor_save_contains_both_markers",
+                      payload2 is not None and contains(payload2, marker) and contains(payload2, marker2),
+                      f"captured={payload2 is not None} marker2={marker2}")
+                check("deckcraft_reopened_save_confirmed_by_host_page", confirmed2,
+                      f"status={status2()!r}")
+                end = time.time() + 60
+                after2 = after
+                while time.time() < end:
+                    after2 = rs.history(admin, repo_id, name)
+                    if len(after2) > len(after):
+                        break
+                    time.sleep(1)
+                check("deckcraft_reopened_save_creates_another_version_by_user",
+                      len(after2) > len(after) and after2[0]["creator"] == admin_username,
+                      f"history {len(after)}->{len(after2)}")
+                got2, _ = rs.download(admin, repo_id, name)
+                check("deckcraft_seafile_retains_both_typed_markers",
+                      contains(got2, marker) and contains(got2, marker2),
+                      f"marker2={marker2} bytes={len(got2)}")
+                check("deckcraft_second_save_changes_native_bytes", payload2 != got,
+                      f"{len(got)} -> {len(payload2) if payload2 else 0} bytes")
+            else:
+                check("deckcraft_reopened_editor_save_contains_both_markers", False,
+                      f"host={host2 is not None} reopened={reopened is not None} frame={box2 is not None}")
+                check("deckcraft_reopened_save_confirmed_by_host_page", False, "no reopened editor flow")
+                check("deckcraft_reopened_save_creates_another_version_by_user", False, "no reopened editor flow")
+                check("deckcraft_seafile_retains_both_typed_markers", False, "no reopened editor flow")
+                check("deckcraft_second_save_changes_native_bytes", False, "no reopened editor flow")
+            p2.screenshot(path=os.path.join(RESULTS, "deckcraft-reopened-saved.png"))
+            check("deckcraft_native_edits_did_not_download", not downloads, f"downloads={len(downloads)}")
+            reopen.close()
+            return page
+
         # login
         page.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
         page.fill("input[name=login]", rs.ADMIN)
@@ -552,6 +698,32 @@ def main():
         page.click("button[type=submit], input[type=submit]")
         page.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
         check("browser_login", "/accounts/login" not in page.url, page.url)
+
+        if os.path.isdir(os.path.join(STATIC, "deckcraft")):
+            try:
+                # Setup only: make a native sample document with DeckCraft itself, then upload
+                # those initial bytes before any Seafile editor session starts.
+                sp = fixctx.new_page()
+                sp.goto(f"{rs.BRIDGE}/editors/deckcraft/index.html", wait_until="domcontentloaded", timeout=60000)
+                sp.wait_for_function("() => !!document.querySelector('canvas')", timeout=120000)
+                sp.wait_for_timeout(4000)
+                with sp.expect_download(timeout=60000) as fixture_download:
+                    sp.mouse.click(48, 18)  # DeckCraft's visible top-left Save control
+                fixture_path = fixture_download.value.path()
+                fixture_bytes = open(fixture_path, "rb").read()
+                fixture_text = rs.deckcraft_text(fixture_bytes)
+                check("deckcraft_native_setup_fixture_generated_by_editor",
+                      bool(fixture_text) and any("Northern Lights" in value for value in fixture_text),
+                      f"{fixture_download.value.suggested_filename} {len(fixture_bytes)} bytes")
+                fixture_name = "native-deck.deckcraft"
+                ids[fixture_name] = rs.upload(admin, repo_id, fixture_name, fixture_bytes)
+                fixtures[fixture_name] = ("deckcraft", fixture_bytes, "")
+                check("deckcraft_native_setup_fixture_uploaded_before_editor_save",
+                      bool(ids[fixture_name]), f"{fixture_name} {len(fixture_bytes)} bytes")
+                sp.close()
+            except Exception as exc:  # noqa: BLE001
+                check("deckcraft_native_setup_fixture_generated_by_editor", False,
+                      f"{type(exc).__name__}: {str(exc)[:220]}")
 
         # Apps with no hand-writable format and no page API: let the standalone app save a new
         # document as a browser download, and use those bytes as the Seafile fixture.
@@ -638,6 +810,12 @@ def main():
                 if page is not original:
                     attach(page)
                 check("gridcraft_opened_from_seafile_file_list", True)
+            elif editor == "deckcraft" and name.endswith(".deckcraft"):
+                original = page
+                page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
+                if page is not original:
+                    attach(page)
+                check("deckcraft_opened_native_document_from_seafile_file_list", True)
             else:
                 page.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}{query}", wait_until="domcontentloaded")
             host = find_frame(page, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=page.main_frame)
@@ -675,6 +853,11 @@ def main():
                 # ROADMAP step 3 slice: real cell edit, save + fresh-session reopen
                 page = gridcraft_real_edit_flow(page, name, content, box, status, before)
                 continue
+            if editor == "deckcraft" and name.endswith(".deckcraft"):
+                # Native DeckCraft data gets the explicit edit/save/version/reopen slice. The
+                # foreign-PPTX flow below remains an export check, never a save claim.
+                page = deckcraft_real_edit_flow(page, name, content, box, status, before)
+                continue
             # focus the editor canvas (below the host bar) and ask it to save
             page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 60 + (box["height"] - 60) / 2)
             time.sleep(1)
@@ -696,6 +879,22 @@ def main():
                 time.sleep(1)
             page.screenshot(path=os.path.join(RESULTS, f"{editor}-saved.png"))
             after = rs.history(admin, repo_id, name)
+            if editor == "deckcraft" and name.endswith(".pptx"):
+                exported = downloads[-1] if downloads else None
+                export_ok = False
+                if exported is not None:
+                    try:
+                        export_bytes = open(exported.path(), "rb").read()
+                        export_ok = exported.suggested_filename.lower().endswith(".deckcraft") and bool(rs.deckcraft_text(export_bytes))
+                    except (OSError, ValueError):
+                        export_ok = False
+                check("deckcraft_foreign_pptx_export_is_a_native_download", export_ok,
+                      f"download={exported.suggested_filename if exported else None}")
+                current, _ = rs.download(admin, repo_id, name)
+                check("deckcraft_foreign_pptx_download_is_not_a_seafile_save",
+                      current == content and len(after) == len(before) and not saved,
+                      f"history {len(before)}->{len(after)} bytes_unchanged={current == content}")
+                continue
             if not saved and downloads and editor not in seen_native:
                 # The app saved under its own native name (e.g. test.deckcraft for a .pptx): the host
                 # page turned that into a download. Use those bytes as a fixture in the native format

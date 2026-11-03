@@ -399,6 +399,35 @@ def minimal_pptx() -> bytes:
     return buf.getvalue()
 
 
+def deckcraft_text(data: bytes) -> list[str]:
+    """Read text strings from DeckCraft's native ZIP document for semantic lab assertions."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            if archive.read("mimetype").decode("ascii").strip() != "application/vnd.storyteller.deckcraft+zip":
+                raise ValueError("unexpected DeckCraft MIME type")
+            info = archive.getinfo("presentation.json")
+            if info.file_size > 64 * 1024 * 1024:
+                raise ValueError("DeckCraft presentation JSON exceeds lab parser limit")
+            document = json.loads(archive.read(info))
+    except (zipfile.BadZipFile, KeyError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("not a readable DeckCraft native document") from exc
+
+    strings: list[str] = []
+
+    def collect(value):
+        if isinstance(value, str):
+            strings.append(value)
+        elif isinstance(value, dict):
+            for child in value.values():
+                collect(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect(child)
+
+    collect(document)
+    return strings
+
+
 def content_matches(name: str, data: bytes) -> bool:
     ext = name.rsplit(".", 1)[-1].lower()
     if ext in ("docx", "xlsx", "pptx"):
