@@ -15,6 +15,7 @@ Writes RESULTS_DIR/browser.json and screenshots.
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import sys
 import time
@@ -113,6 +114,39 @@ def open_from_seafile_list(page, base, repo_id, name, timeout=30):
             return target
         page.wait_for_timeout(50)
     raise TimeoutError("file-list click did not open an editor page")
+
+
+def wait_for_deckcraft_render(host, timeout=90):
+    """Wait for the nested DeckCraft WASM page to finish loading and render a stable canvas."""
+    end = time.monotonic() + timeout
+    previous = None
+    stable_frames = 0
+    while time.monotonic() < end:
+        try:
+            loaded = host.evaluate("""() => {
+                const iframe = document.getElementById('frame');
+                let doc;
+                try { doc = iframe && iframe.contentDocument; } catch (_) { return false; }
+                const canvas = doc && doc.getElementById('deckcraft_canvas');
+                const loading = doc && doc.getElementById('deckcraft_loading');
+                return !!doc && doc.readyState === 'complete' && !!canvas && canvas.width > 0 && canvas.height > 0 &&
+                    (!loading || doc.defaultView.getComputedStyle(loading).display === 'none' || loading.getClientRects().length === 0);
+            }""")
+            if loaded:
+                image = host.frame_locator("#frame").locator("#deckcraft_canvas").screenshot(timeout=5000)
+                digest = hashlib.sha256(image).digest()
+                stable_frames = stable_frames + 1 if digest == previous else 1
+                previous = digest
+                if stable_frames >= 4:
+                    return True
+            else:
+                previous = None
+                stable_frames = 0
+        except Exception:  # noqa: BLE001 - iframe may not be ready yet
+            previous = None
+            stable_frames = 0
+        host.wait_for_timeout(350)
+    return False
 
 
 def frames_dump(page):
@@ -573,12 +607,20 @@ def main():
                 p.keyboard.type(value, delay=35)
                 p.wait_for_timeout(750)
 
+            host1 = find_frame(page, rs.BRIDGE + "/edit/", 5, name="office_frame", parent=page.main_frame)
+            rendered1 = host1 is not None and wait_for_deckcraft_render(host1)
+            check("deckcraft_document_rendered_before_first_edit", rendered1)
+            if not rendered1:
+                return page
             type_into_title(page, box, marker)
             page.screenshot(path=os.path.join(RESULTS, "deckcraft-typed.png"))
             payload, confirmed = save_and_capture(page, status, timeout=120)
             check("deckcraft_save_request_contains_the_typed_marker",
                   payload is not None and contains(payload, marker),
                   f"captured={payload is not None} marker={marker}")
+            check("deckcraft_save_request_retains_the_fixture_slide_title",
+                  payload is not None and contains(payload, "Northern Lights"),
+                  "original slide text is extracted from DeckCraft shape runs")
             check("deckcraft_save_confirmed_by_host_page", confirmed, f"status={status()!r}")
 
             end = time.time() + 60
@@ -649,12 +691,13 @@ def main():
                     return f"<{exc}>"
 
             reopened = wait_for_saved_response(p2, relay_file, 180)
+            rendered2 = host2 is not None and wait_for_deckcraft_render(host2)
             p2.screenshot(path=os.path.join(RESULTS, "deckcraft-reopened.png"))
             check("deckcraft_fresh_session_loaded_the_saved_bytes",
-                  reopened is not None and reopened == got and contains(reopened, marker),
-                  f"relay/file responses={len(relay_file)} bytes={len(reopened) if reopened else 0}")
+                  reopened is not None and reopened == got and contains(reopened, marker) and rendered2,
+                  f"relay/file responses={len(relay_file)} rendered={rendered2} bytes={len(reopened) if reopened else 0}")
             box2 = p2.locator("#office-frame").bounding_box()
-            if host2 is not None and reopened is not None and box2 is not None:
+            if host2 is not None and reopened is not None and rendered2 and box2 is not None:
                 type_into_title(p2, box2, marker2)
                 p2.screenshot(path=os.path.join(RESULTS, "deckcraft-reopened-typed.png"))
                 payload2, confirmed2 = save_and_capture(p2, status2, timeout=120)

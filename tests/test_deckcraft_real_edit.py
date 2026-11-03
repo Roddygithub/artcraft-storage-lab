@@ -39,10 +39,18 @@ def raises_value_error(data):
 
 
 def main():
-    sample = archive({"slides": [{"title": "Northern Lights", "notes": ["synthetic note"]}]})
-    assert rs.deckcraft_text(sample) == ["Northern Lights", "synthetic note"]
+    sample = archive({"format": "deckcraft", "presentation": {"slides": [{"shapes": [
+        {"text": {"paragraphs": [{"runs": [{"text": "Northern Lights"}, {"text": "decktyped123"}]}]}}
+    ]}]}})
+    assert rs.deckcraft_text(sample) == ["Northern Lights", "decktyped123"]
+
+    metadata_only = archive({"format": "deckcraft", "metadata": {"marker": "decktyped123"},
+                             "presentation": {"slides": [{"shapes": []}]}})
+    assert rs.deckcraft_text(metadata_only) == []
     assert raises_value_error(b"not a zip")
-    assert raises_value_error(archive({"slides": []}, mimetype="application/zip"))
+    assert raises_value_error(archive({"format": "deckcraft", "presentation": {"slides": []}},
+                                      mimetype="application/zip"))
+    assert raises_value_error(archive({"format": "not-deckcraft", "presentation": {"slides": [{"shapes": []}]}}))
 
     missing_mime = io.BytesIO()
     with zipfile.ZipFile(missing_mime, "w", zipfile.ZIP_DEFLATED) as output:
@@ -54,7 +62,7 @@ def main():
         output.writestr("mimetype", "application/vnd.storyteller.deckcraft+zip")
         output.writestr("presentation.json", "{")
     assert raises_value_error(invalid_json.getvalue())
-    print("DeckCraft native parser checks: 5/5 passed")
+    print("DeckCraft native parser checks: 7/7 passed")
 
 
 if __name__ == "__main__":

@@ -400,7 +400,7 @@ def minimal_pptx() -> bytes:
 
 
 def deckcraft_text(data: bytes) -> list[str]:
-    """Read text strings from DeckCraft's native ZIP document for semantic lab assertions."""
+    """Extract only shape text from a DeckCraft native ZIP document for lab assertions."""
     try:
         with zipfile.ZipFile(io.BytesIO(data)) as archive:
             if archive.read("mimetype").decode("ascii").strip() != "application/vnd.storyteller.deckcraft+zip":
@@ -411,20 +411,36 @@ def deckcraft_text(data: bytes) -> list[str]:
             document = json.loads(archive.read(info))
     except (zipfile.BadZipFile, KeyError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise ValueError("not a readable DeckCraft native document") from exc
-
+    if not isinstance(document, dict) or document.get("format") != "deckcraft":
+        raise ValueError("DeckCraft presentation JSON has an unexpected format")
+    presentation = document.get("presentation")
+    slides = presentation.get("slides") if isinstance(presentation, dict) else None
+    if not isinstance(slides, list) or not slides:
+        raise ValueError("DeckCraft presentation has no slides")
     strings: list[str] = []
-
-    def collect(value):
-        if isinstance(value, str):
-            strings.append(value)
-        elif isinstance(value, dict):
-            for child in value.values():
-                collect(child)
-        elif isinstance(value, list):
-            for child in value:
-                collect(child)
-
-    collect(document)
+    for slide in slides:
+        shapes = slide.get("shapes") if isinstance(slide, dict) else None
+        if not isinstance(shapes, list):
+            raise ValueError("DeckCraft slide has no shape list")
+        for shape in shapes:
+            if not isinstance(shape, dict):
+                raise ValueError("DeckCraft shape is not an object")
+            text = shape.get("text")
+            if text is None:
+                continue
+            paragraphs = text.get("paragraphs") if isinstance(text, dict) else None
+            if not isinstance(paragraphs, list):
+                raise ValueError("DeckCraft text shape has no paragraph list")
+            for paragraph in paragraphs:
+                runs = paragraph.get("runs") if isinstance(paragraph, dict) else None
+                if not isinstance(runs, list):
+                    raise ValueError("DeckCraft paragraph has no run list")
+                for run in runs:
+                    if not isinstance(run, dict):
+                        raise ValueError("DeckCraft text run is not an object")
+                    value = run.get("text")
+                    if isinstance(value, str):
+                        strings.append(value)
     return strings
 
 
