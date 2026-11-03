@@ -115,6 +115,10 @@ def main():
         f'<worksheet xmlns="{NS}"><sheetData><row r="1"><c r="A1" t="s"></c></row></sheetData></worksheet>',
         f'<sst xmlns="{NS}"><si><t>only</t></si></sst>')
     check("missing_shared_string_index_rejected", raises_value_error(missing_v, "missing v"))
+    empty_v = workbook(
+        f'<worksheet xmlns="{NS}"><sheetData><row r="1"><c r="B2" t="s"><v/></c></row></sheetData></worksheet>',
+        f'<sst xmlns="{NS}"><si><t>only</t></si></sst>')
+    check("empty_shared_string_index_rejected", raises_value_error(empty_v, "empty v"))
 
     print(f"\n{len(failures)} failed", flush=True)
     return 1 if failures else 0

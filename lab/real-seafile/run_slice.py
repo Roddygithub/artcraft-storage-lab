@@ -368,7 +368,7 @@ def xlsx_cells(data: bytes) -> dict[str, str]:
         v, inline = c.find(f"{NS}v"), c.find(f"{NS}is")
         if t == "s":
             try:
-                idx = int(v.text)           # None/"" -> ValueError from int()
+                idx = int(v.text or "")     # an empty <v/> has text=None
             except (AttributeError, ValueError):
                 raise ValueError(f"cell {ref}: non-numeric shared-string index {v.text if v is not None else None}") from None
             if idx < 0 or idx >= len(shared):

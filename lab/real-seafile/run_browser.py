@@ -66,6 +66,36 @@ def wait_for_saved_response(page, captured, timeout=180):
     return None
 
 
+def track_downloads(context, downloads):
+    """Observe downloads on existing pages and popups, before navigation starts."""
+    def attach(page):
+        page.on("download", lambda download: downloads.append(download))
+    context.on("page", attach)
+    for page in context.pages:
+        attach(page)
+
+
+def save_and_capture(page, status_fn, timeout=90):
+    """Capture the real save request and wait for host confirmation while pumping events."""
+    bodies = []
+    def capture(request):
+        if request.method == "POST" and request.url.endswith("/relay/save"):
+            body = request.post_data_buffer
+            if body:
+                bodies.append(body)
+    page.on("request", capture)
+    try:
+        page.keyboard.press("Control+s")
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            if bodies and "saved to seafile" in (status_fn() or "").lower():
+                return bodies[0], True
+            page.wait_for_timeout(min(100, max(0, (end - time.monotonic()) * 1000)))
+        return (bodies[0] if bodies else None), False
+    finally:
+        page.remove_listener("request", capture)
+
+
 def open_from_seafile_list(page, base, repo_id, name, timeout=30):
     """Click the actual file-list link; Seahub may open it here or in a new tab."""
     page.goto(f"{base.rstrip('/')}/library/{repo_id}/", wait_until="domcontentloaded")
@@ -122,12 +152,11 @@ def main():
         page = ctx.new_page()
         console: list[str] = []
         downloads: list = []
-        page.on("download", lambda d: downloads.append(d))
+        track_downloads(ctx, downloads)
         page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
         page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
 
         def attach(page):
-            page.on("download", lambda d: downloads.append(d))
             page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
             page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
             return page
@@ -217,6 +246,7 @@ def main():
             page.close()
             page = attach(ctx.new_page())
             reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(reopen, downloads)
             reopen.on("page", attach)
             p2 = reopen.new_page()
             relay_file: list = []          # the reopened host page's own /relay/file fetches
@@ -361,34 +391,6 @@ def main():
                         p.wait_for_timeout(500)
                 return dirty()
 
-            def save_and_capture(p, status_fn, timeout=90):
-                """Ctrl+S inside the editor frame; captures the editor's own save payload off
-                the /relay/save request the host page sends for it, waits for the host's
-                confirmation. Callback-dependent waits pump Playwright, not Python state.
-                Returns (payload_bytes_or_None, confirmed)."""
-                bodies: list = []
-                def on_save_req(r):
-                    if r.method == "POST" and r.url.endswith("/relay/save"):
-                        try:
-                            b = r.post_data_buffer
-                            if b:
-                                bodies.append(b)
-                        except Exception:  # noqa: BLE001
-                            pass
-                p.on("request", on_save_req)
-                p.keyboard.press("Control+s")
-                end = time.time() + timeout
-                confirmed = False
-                while time.time() < end:
-                    if "saved to seafile" in (status_fn() or "").lower():
-                        confirmed = True
-                        break
-                    p.wait_for_timeout(1000)
-                while time.time() < end and confirmed and not bodies:
-                    p.wait_for_timeout(250)      # payload request may trail the status flip
-                p.remove_listener("request", on_save_req)
-                return (bodies[0] if bodies else None), confirmed
-
             def semantic(cells, value):
                 return any(v.casefold() == value for v in (cells or {}).values())
 
@@ -459,6 +461,7 @@ def main():
             page.close()
             page = attach(ctx.new_page())
             reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(reopen, downloads)
             reopen.on("page", attach)       # downloads/responses tracked before any navigation
             p2 = reopen.new_page()
             relay_file: list = []           # the reopened host page's own /relay/file fetches
@@ -629,7 +632,6 @@ def main():
                 check("wordcraft_opened_from_seafile_file_list", True)
             elif editor == "gridcraft":
                 original = page
-                ctx.on("page", attach)      # track downloads on popup pages from before navigation
                 page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
                 if page is not original:
                     attach(page)
