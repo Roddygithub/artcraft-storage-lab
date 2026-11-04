@@ -23,8 +23,9 @@
   passes, and the isolated runtime was rerun successfully. GPT R2 then found
   stale PDF size/hash documentation and an EOF loop on malformed xref input.
   The retained bytes and documentation now agree; an EOF guard and regression
-  were added. GPT R3 found a stale HISTORY byte count; it is corrected.
-  Exact-commit GPT R4 is pending; project GPT remains INCOMPLETE and upstream
+  were added. GPT R3 found a stale HISTORY byte count; it is corrected. GPT R4
+  found a stale closing sentence in the report; it is corrected with the R3
+  review link. Exact-commit GPT R5 is pending; project GPT remains INCOMPLETE and upstream
   publication LOCKED.
 - Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
   `docs/reviews/GR-084/`.

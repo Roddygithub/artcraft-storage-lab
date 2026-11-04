@@ -24,4 +24,6 @@ GR-057 entry is unchanged.
 
 The review did not replay the browser or services. The HTTP 48/48 and browser
 18/18 results remain bounded to the retained synthetic run. Exact-commit GPT
-R4 is pending. No project-level PASS or upstream authorization is implied.
+R4 was pending when this record was written; R4's status-line finding is
+recorded in `INDEPENDENT-GPT-REVIEW-R4.md`. No project-level PASS or upstream
+authorization is implied.
