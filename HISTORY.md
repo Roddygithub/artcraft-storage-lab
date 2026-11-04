@@ -6,26 +6,25 @@
 
 # 2026-11-04 — GR-083 WordCraft / ONLYOFFICE DOCX comparison
 
-- Opened the same three deterministic DOCX fixtures through WordCraft and
-  ONLYOFFICE in a disposable rootless Podman Seafile lab. All six opens reported
-  ready; fixture/readback hashes stayed identical; no browser downloads were
-  recorded. Corrected Ctrl+End captures show the second-page heading and
-  paragraph in both editors; the ONLYOFFICE table is partly obscured by a tip
-  and viewport crop. Its run also logged two HTTP 502s for plugin/theme
-  manifests; their cause remains NOT VERIFIED.
-- Screenshots show similar prose/runs and lists/table rendering. This bounded
-  sample is not a broad fidelity result. No editing, saving, or Seafile version
-  creation was attempted.
+- After the corpus OOXML-order fix passed independent source review R2, reran a
+  fresh synthetic rootless-Podman Seafile comparison. All three corrected DOCX
+  fixtures opened in both editors with readiness signals; all six Seafile
+  readback hashes matched the fixtures and no browser downloads were observed.
+  The runners exited 0. No editing, saving, or version creation was attempted.
+- The visual spot checks show prose/runs, lists/table, and page-two content in
+  both editors. The ONLYOFFICE first-use tip sits in lower-right whitespace; its
+  table is visible near the viewport bottom. WordCraft recorded two
+  `net::ERR_ABORTED` request failures whose cause remains NOT VERIFIED. The two
+  ONLYOFFICE plugin/theme 502s from the initial run did not recur; their cause
+  also remains NOT VERIFIED. Full OOXML/page-layout fidelity is not established.
 - This was direct parent work, not Aptarchy completion. Production and upstream
   were untouched.
-- Independent review R1 found out-of-order OOXML property elements in the
-  generated corpus (P2) and an ambiguous fidelity sentence in the re-foundation
-  summary (P3). The generator now uses the required order for the emitted style,
-  table and cell properties, focused order tests were added, and the sentence is
-  clarified. R2 passed the bounded source remediation with no current P1–P3
-  findings. The old screenshots/results remain historical; fresh synthetic
-  replay is pending. Project GPT remains INCOMPLETE and upstream publication
-  LOCKED.
+- Independent review R1 found out-of-order OOXML property elements (P2) and an
+  ambiguous fidelity sentence (P3). The generator and focused order tests were
+  corrected; R2 passed the bounded source remediation with no current P1–P3
+  findings. The initial pre-remediation screenshots/results are archived as
+  historical. Independent review of the corrected runtime evidence R3 is
+  pending. Project GPT remains INCOMPLETE and upstream publication LOCKED.
 - Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md` and
   `docs/reviews/GR-083/`.
 

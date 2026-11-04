@@ -7,17 +7,16 @@
 
 ## CURRENT GR: GR-083 — WordCraft / ONLYOFFICE DOCX comparison
 
-An initial direct parent run opened the same three synthetic DOCX fixtures
-through WordCraft and ONLYOFFICE in a disposable rootless Podman Seafile lab.
-It reported six ready opens, unchanged before/after hashes and no downloads,
-but independent review R1 found out-of-order OOXML property elements in the
-generated corpus. The generator and focused ordering checks are corrected;
-the initial screenshots/results are historical and do not validate the current
-corpus. R1's wording minor in the re-foundation summary is also corrected; R2
-independently passed the bounded source remediation. Fresh synthetic replay is
-now pending. The initial run's
-ONLYOFFICE plugin/theme requests returned two HTTP 502s (cause NOT VERIFIED);
-its page-2 table is partly obscured. This was not an edit/save test or Aptarchy
+After the OOXML ordering fix passed independent source review R2, a fresh
+rootless-Podman run opened all three corrected synthetic DOCX fixtures in both
+WordCraft and ONLYOFFICE: six ready opens, unchanged readback hashes, and no
+browser downloads. The report and screenshots now describe this corrected run;
+the initial pre-remediation evidence is archived separately. Two WordCraft
+`net::ERR_ABORTED` request failures remain unexplained; the initial ONLYOFFICE
+plugin/theme 502s did not recur, but their cause remains NOT VERIFIED. The
+ONLYOFFICE page-2 table is visible near the viewport bottom, with its first-use
+tip in lower-right whitespace. No edit, save, or version was tested. Independent
+evidence review R3 is pending. This was direct parent work, not Aptarchy
 completion. Production/upstream remain untouched; project GPT is INCOMPLETE and
 upstream is LOCKED. Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md`
 and `docs/reviews/GR-083/`.

@@ -240,15 +240,17 @@ count findings were corrected; R3 found no current P1–P3 finding and did not r
 This is not Aptarchy task completion. Broad DXF fidelity, production, human HTTPS and post-change
 ONLYOFFICE UI remain unverified. [GR-082 evidence](GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md).
 
-2026-11-04 follow-up: an initial disposable synthetic Seafile comparison opened three DOCX
-fixtures in WordCraft and ONLYOFFICE; it reported six ready opens, unchanged readback and no
-downloads. R1 later found out-of-order OOXML property elements in the generated corpus. The
-generator and focused sequence checks are corrected; R2 passed the bounded source remediation,
-but these initial screenshots/results are historical and do not validate the corrected corpus. A
-fresh replay is pending.
-The initial run logged two HTTP 502s for plugin/theme manifests (cause NOT VERIFIED); the
-ONLYOFFICE page-2 table is partly obscured. No editing, save, or version creation was attempted.
-This was direct parent work, not Aptarchy completion. Production and upstream were untouched.
+2026-11-04 follow-up: after R1's out-of-order OOXML finding was fixed and passed bounded source
+review R2, a fresh disposable synthetic Seafile run opened the corrected three-fixture corpus in
+WordCraft and ONLYOFFICE. All six readiness checks passed, Seafile readback stayed byte-identical
+to each fixture, and the browser observed no downloads. The page-two screenshots show the heading,
+paragraph and table in both apps; an ONLYOFFICE first-use tip sits in whitespace, with the table
+near the viewport bottom. The initial pre-remediation captures remain archived. Two WordCraft
+`net::ERR_ABORTED` request failures were recorded and are unexplained. The two ONLYOFFICE
+plugin/theme 502s seen only in the initial run did not recur; their original cause remains
+NOT VERIFIED. No editing, save, or version creation was attempted. R3 independent evidence review
+is pending. This was direct parent work, not Aptarchy completion. Production and upstream were
+untouched.
 [GR-083 evidence](GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md).
 
 
@@ -285,24 +287,24 @@ Lab (safe, isolated, no production, no upstream):
 
    **Independent review R2 of the bridge** (separate context, 2026-10-31): PASS_WITH_FIXES. Its HIGH findings — a 3xx or non-200 PutFile answer was reported as a save (urllib follows redirects and turns PutFile into a GET), a refused save left the host page "clean" so the tab could close without a prompt, a save whose answer was lost could never be retried (409 forever), and the README claimed `UserCanWrite`/locks as an authorization boundary — are fixed: redirects refused, every save read back and compared before 200, reconciliation on lost answer/5xx/redirect and on a stale expected version when the stored bytes already match, `X-Expected-Version` mandatory, refused saves keep the page dirty, expired tokens download the document instead of losing it, full CSP (`connect-src 'self'`, inline bootstrap by hash) on editor pages, `WOPISrc` restricted to the WOPI file endpoint, forged top-level `/edit` POSTs refused, per-route caching with ETag/304 and streamed bundles. What the bridge cannot fix and the READMEs now say plainly: Seahub's `PutFile` remains writable to anyone holding a token (U2), and the race window is the PutFile round-trip, not milliseconds.
 
-   The shim is a lab adapter: it drives the app through the control protocol the capabilities audit (§2.5) said not to use as *the* host contract. It is honest about that in its header, it needs no app change, and it is what makes an unpatched VectorCraft usable now; the upstream `host.rs` stays the proposal. The initial GR-083 WordCraft/ONLYOFFICE comparison opened three DOCX fixtures in both editors, but R1 found out-of-order OOXML properties in the generated corpus. The generator and focused order tests are corrected; the initial screenshots/results are historical only, and a fresh synthetic replay awaits R2 source review. The initial run also recorded two plugin/theme manifest 502s; their cause remains NOT VERIFIED. A non-headless HTTPS pass (WebGPU, clipboard, fonts and unload guard) by a human remains open.
+   The shim is a lab adapter: it drives the app through the control protocol the capabilities audit (§2.5) said not to use as *the* host contract. It is honest about that in its header, it needs no app change, and it is what makes an unpatched VectorCraft usable now; the upstream `host.rs` stays the proposal. The GR-083 WordCraft/ONLYOFFICE comparison opened three corrected DOCX fixtures in both editors with unchanged readback and no downloads. R1's OOXML-order finding was fixed; R2 source review passed and R3 evidence review is pending. No edit/save/version or full fidelity claim is made. Two WordCraft requests aborted; the initial ONLYOFFICE plugin/theme 502s did not recur, but both causes remain NOT VERIFIED. A non-headless HTTPS pass (WebGPU, clipboard, fonts and unload guard) by a human remains open.
 5. Re-target GR-049/052 tests at the relay; add a protocol contract test for the upstream bridge messages.
 6. Rewrite `README.md`, `ROADMAP.md`, `AGENTS.md` to the new product form; archive the GR corpus under `docs/history/`.
 7. Prepare (do not publish) the ArtCraft `saveResult` RFC and a note on Seahub WOPI PutFile findings.
 
 ```text
 REFOUNDATION_STATE=DECISION_REACHED
-CURRENT_REALITY=stateless WOPI editor bridge prototype validated in an isolated Seafile CE 13.0.28 lab; not deployed to production; GR-083 initial DOCX comparison had an OOXML ordering defect; source fix passed bounded R2 review and fresh replay is pending; full page-layout fidelity remains unverified and two ONLYOFFICE manifest 502s remain unresolved
+CURRENT_REALITY=stateless WOPI editor bridge prototype validated in isolated synthetic Seafile labs; not deployed to production; GR-083 corrected DOCX corpus opened in WordCraft and ONLYOFFICE with unchanged readback; no edit/save/version or full fidelity result; R3 evidence review pending; two WordCraft aborted requests and the initial ONLYOFFICE manifest 502s remain unexplained
 ASSUMPTIONS_INVALIDATED=no generic write channel (WOPI exists; any extension on Seahub>=13, office/PDF only on 12.0); ONLYOFFICE CE limited (limit removed 9.4); CAS required (Seafile's own editors don't); ArtCraft mature (3–5 weeks old, alpha); cheap reviews predictive (0%)
 PRECONDITIONS=Seafile>=13 for non-office formats; bridge enforces UserCanWrite itself; WOPI_ACCESS_TOKEN_EXPIRATION set to 30 min
-INDEPENDENT_REVIEW=R1 FAIL (report) -> incorporated; R2 PASS_WITH_FIXES (bridge code, 2026-10-31: PutFile outcome unverified + redirects followed, refused save left the page clean, reconciliation holes, README over-claims, editor-page CSP, WOPISrc path, caching) -> all HIGH and MEDIUM items fixed (bridge/, 30 fake-host tests), READMEs reworded; GR-083 R1 found OOXML order P2 and wording P3, fixes verified by bounded R2; fresh runtime replay pending; project GPT gate remains incomplete
+INDEPENDENT_REVIEW=R1 FAIL (report) -> incorporated; R2 PASS_WITH_FIXES (bridge code, 2026-10-31: PutFile outcome unverified + redirects followed, refused save left the page clean, reconciliation holes, README over-claims, editor-page CSP, WOPISrc path, caching) -> all HIGH and MEDIUM items fixed (bridge/, 30 fake-host tests), READMEs reworded; GR-083 R1 found OOXML order P2 and wording P3, fixes verified by bounded R2; corrected open/readback replay passed six opens, R3 evidence review pending; project GPT gate remains incomplete
 ARCHITECTURE_OPTIONS_CONSIDERED=A current, B Seafile-native only, C generic WOPI editor bridge, D ArtCraft storage provider, E hook+Seahub PR, F upstream-only
 CURRENT_LEADING_ARCHITECTURE=C (+B for office formats)
 WHY=zero patches either side, public CE protocol, stateless, upgrade-resilient, keeps lab's real contributions, ArtCraft adopted only where it beats incumbents
 COMPONENTS_TO_KEEP=Seafile API knowledge, host-page save discipline, reconciliation/retry logic+tests, fixtures, bounded zip tooling, saveResult RFC draft
 COMPONENTS_TO_REMOVE=gateway sessions/capabilities/custom HTTP, Seahub+C patches (and live deployment), craft-platform fork, 13 app patches, VectorCraft polling, Nextcloud/ownCloud scope, GR review loop
 MAJOR_UNCERTAINTIES=U1–U7 above, minus U2/U3/U4 (resolved on CE 13.0.28, §7)
-NEXT_EXECUTABLE_STEP=owner decisions (ONLYOFFICE api.js 404, GR-015 rollback, Seafile 13 upgrade); lab: fresh synthetic GR-083 replay, investigate the two ONLYOFFICE manifest 502s if needed, human HTTPS pass, then final independent report/bridge review and project GPT gate
+NEXT_EXECUTABLE_STEP=review corrected GR-083 runtime evidence; continue remaining bridge browser-slice audits and owner-only prerequisites (ONLYOFFICE api.js 404, GR-015 rollback, Seafile 13 upgrade); human HTTPS pass; then final independent report/bridge review and project GPT gate
 PRODUCTION_STATUS=UNTOUCHED
 UPSTREAM_STATUS=LOCKED
 ```

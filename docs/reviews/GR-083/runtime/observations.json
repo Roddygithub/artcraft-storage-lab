@@ -1,97 +1,117 @@
 {
   "date": "2026-11-04",
-  "run": "corrected fresh rootless-Podman replay; browser moved to document end with Ctrl+End",
-  "evidence_status": "Historical pre-remediation run. Review R1 identified out-of-order OOXML property elements in the generated corpus; this run does not validate the corrected corpus.",
-  "result": "Six open/readback checks passed; no editing or saving was attempted.",
+  "run_id": "gr083-corrected-synthetic-replay3",
+  "evidence_status": "Fresh synthetic replay using the OOXML-order-corrected corpus. This is a parent-operated runtime observation, not Aptarchy task completion.",
+  "candidate_source_commit": "116aac04fb868499faa29f4d5ccb6100f6c57746",
+  "runtime_checkout_commit": "35cdbf5c06d2629bfddcf7d15a7d7db947ffbb7f",
+  "result": "Six opens completed (3 WordCraft, 3 ONLYOFFICE); all editor-ready and readback-unchanged assertions passed. No edit, save, or version creation was attempted.",
   "fixtures_sha256": {
-    "fidelity-prose.docx": "74e3cf07905970189c8cb872cd3e7c2aa9cc48e76468850161f6f93b594c19de",
-    "fidelity-structure.docx": "9748c05957723a0dd20db0a78a1ac421670a891707fc1bd2e559ababefd8b1f8",
-    "fidelity-layout.docx": "9ac17faed431982445dea9201311b9838e407f515dd5e6930bd9710360bd4eea"
+    "fidelity-prose.docx": "fcb8cf20a836dbfeaff810aa54d6cdfe14137d93937ec91ab28e2b4100b0b17d",
+    "fidelity-structure.docx": "ba21691b2b27ecc886e54393cbe097a3a78811e437dd635bb0bbe1b6e36cd3aa",
+    "fidelity-layout.docx": "432a7d1c9f7699b633a7adea39d561e2fe2aeaf7fa5df50d269ba0782679b69d"
   },
   "variants": [
     {
       "editor": "wordcraft",
-      "checks_pass": true,
-      "browser_downloads": "none",
-      "diagnostic_http_errors": [],
+      "runner_checks_pass": true,
+      "browser_downloads": "none observed",
       "opened": [
         {
-          "file": "fidelity-prose.docx",
+          "fixture": "fidelity-prose.docx",
           "editor_frame_seen": true,
           "render_ready_hint": true,
           "title_in_dom_text": false,
           "seahub_prepare_error": false,
-          "source_readback_unchanged": true,
+          "readback_unchanged": true,
+          "source_readback_sha256_matches_fixture": true,
           "page_two_capture": false
         },
         {
-          "file": "fidelity-structure.docx",
+          "fixture": "fidelity-structure.docx",
           "editor_frame_seen": true,
           "render_ready_hint": true,
           "title_in_dom_text": false,
           "seahub_prepare_error": false,
-          "source_readback_unchanged": true,
+          "readback_unchanged": true,
+          "source_readback_sha256_matches_fixture": true,
           "page_two_capture": false
         },
         {
-          "file": "fidelity-layout.docx",
+          "fixture": "fidelity-layout.docx",
           "editor_frame_seen": true,
           "render_ready_hint": true,
           "title_in_dom_text": false,
           "seahub_prepare_error": false,
-          "source_readback_unchanged": true,
+          "readback_unchanged": true,
+          "source_readback_sha256_matches_fixture": true,
           "page_two_capture": true
         }
-      ]
+      ],
+      "http_error_responses": 0,
+      "request_failed_events": {
+        "count": 2,
+        "failure_classes": [
+          "net::ERR_ABORTED"
+        ],
+        "note": "WordCraft recorded two net::ERR_ABORTED request failures; request targets omitted and cause NOT VERIFIED."
+      }
     },
     {
       "editor": "onlyoffice",
-      "checks_pass": true,
-      "browser_downloads": "none",
-      "diagnostic_http_errors": [
-        {
-          "status": 502,
-          "endpoint": "ONLYOFFICE plugin manifest"
-        },
-        {
-          "status": 502,
-          "endpoint": "ONLYOFFICE theme manifest"
-        }
-      ],
+      "runner_checks_pass": true,
+      "browser_downloads": "none observed",
       "opened": [
         {
-          "file": "fidelity-prose.docx",
+          "fixture": "fidelity-prose.docx",
           "editor_frame_seen": true,
           "render_ready_hint": true,
           "title_in_dom_text": false,
           "seahub_prepare_error": false,
-          "source_readback_unchanged": true,
+          "readback_unchanged": true,
+          "source_readback_sha256_matches_fixture": true,
           "page_two_capture": false
         },
         {
-          "file": "fidelity-structure.docx",
+          "fixture": "fidelity-structure.docx",
           "editor_frame_seen": true,
           "render_ready_hint": true,
           "title_in_dom_text": false,
           "seahub_prepare_error": false,
-          "source_readback_unchanged": true,
+          "readback_unchanged": true,
+          "source_readback_sha256_matches_fixture": true,
           "page_two_capture": false
         },
         {
-          "file": "fidelity-layout.docx",
+          "fixture": "fidelity-layout.docx",
           "editor_frame_seen": true,
           "render_ready_hint": true,
           "title_in_dom_text": false,
           "seahub_prepare_error": false,
-          "source_readback_unchanged": true,
+          "readback_unchanged": true,
+          "source_readback_sha256_matches_fixture": true,
           "page_two_capture": true
         }
-      ]
+      ],
+      "http_error_responses": 0,
+      "request_failed_events": {
+        "count": 0,
+        "failure_classes": [],
+        "note": "No request-failed events recorded."
+      }
     }
   ],
-  "page_two_visual_check": {
-    "wordcraft": "Corrected capture shows the second-page heading, paragraph, and table.",
-    "onlyoffice": "Corrected capture shows the second-page heading and paragraph; table comparison is partly obscured by the editor first-use tip and viewport crop."
+  "visual_spot_check": {
+    "prose": "Both captures show heading, paragraphs, inline emphasis, and colored text; wrapping is similar in this sample.",
+    "structure": "Both captures show headings, bullet and numbered lists, and the two-column table; spacing is not pixel-identical.",
+    "page_two": "Both page-two captures show the heading, paragraph, and table. In ONLYOFFICE, the first-use tip sits in lower-right whitespace; the table is visible close to the viewport bottom. This is a spot check only."
   },
-  "privacy": "URLs, repository IDs, account names, tokens, cookies, raw DOM, and DOCX bytes are omitted."
+  "historical_only": "The initial pre-remediation screenshots and observations are archived under runtime/pre-remediation/ and do not validate the corrected corpus.",
+  "limitations": [
+    "No edit, save, or Seafile version was tested.",
+    "No full ECMA-376 schema validation or quantitative fidelity benchmark was performed.",
+    "The exact Seafile patch version is NOT VERIFIED.",
+    "The two ONLYOFFICE plugin/theme 502s seen in the initial pre-remediation run were not reproduced in this run; their cause remains NOT VERIFIED.",
+    "Two WordCraft net::ERR_ABORTED request-failed events were recorded; their targets and cause are omitted and NOT VERIFIED."
+  ],
+  "privacy": "No URLs, hostnames, account identifiers, repository/library IDs, tokens, cookies, raw DOM, or DOCX bytes are included."
 }

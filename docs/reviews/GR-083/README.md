@@ -1,39 +1,50 @@
 # GR-083 evidence bundle
 
-This bundle retains the sanitized result of the initial 2026-11-04 synthetic DOCX comparison. Its
-JSON omits Seafile library IDs, URLs, tokens, cookies, and raw DOM. Screenshots are unaltered
-captures from the disposable synthetic lab; private logs and DOCX bytes are not included.
+This bundle records a corrected-corpus synthetic DOCX comparison run on 2026-11-04. The public
+JSON omits Seafile library IDs, URLs, tokens, cookies, raw DOM, and raw logs. Screenshots are
+unaltered captures from the disposable synthetic lab; private logs and DOCX bytes are not
+included.
 
-**Evidence status:** review R1 found out-of-order OOXML property elements in the generated corpus.
-The generator and focused ordering checks have since been corrected, but these observations and
-screenshots predate that correction. They are preserved for audit and do not validate the current
-corpus. A fresh synthetic replay is pending independent source re-review. The ordering checks are
-not a full ECMA-376 schema validation. R2 independently accepted the bounded source remediation;
-fresh runtime evidence is now pending.
+**Current evidence:** the R2-reviewed corpus was opened three times in WordCraft and three times
+in ONLYOFFICE. All six editor readiness checks and unchanged Seafile readback checks passed; no
+browser downloads were observed. This run did not edit or save documents and did not create
+Seafile versions. Independent evidence review R3 is pending. The OOXML ordering checks are
+focused regression checks, not full ECMA-376 schema validation.
+
+The initial pre-remediation run is archived under `runtime/pre-remediation/`; it is historical
+and does not validate the corrected corpus. Its two ONLYOFFICE plugin/theme 502s did not recur in
+the corrected run, but their cause remains **NOT VERIFIED**. The corrected run recorded two
+WordCraft `net::ERR_ABORTED` request-failed events; targets and cause are omitted and
+**NOT VERIFIED**.
 
 ## Contents
 
-- `runtime/observations.json` — six bounded file-open/readback outcomes and fixture hashes.
-- `runtime/environment.json` — disposable image tags/config IDs and isolation scope.
-- `runtime/cleanup.json` — dedicated API service and test-container cleanup status.
+- `runtime/observations.json` — six corrected-corpus open/readback outcomes, fixture hashes,
+  limited visual notes and sanitized request-failure counts.
+- `runtime/environment.json` — disposable image tags/digests and isolation scope.
+- `runtime/cleanup.json` — dedicated API service, project containers/networks and port cleanup.
 - `runtime/private-artifact-hashes.json` — hashes only for private raw records retained in the
   local cache, not the records themselves.
-- `runtime/candidate-provenance.json` — provenance for the initial pre-remediation replay only.
+- `runtime/candidate-provenance.json` — reviewed source hashes, runtime-copy match, and the
+  served WordCraft asset inventory/hash.
+- `runtime/pre-remediation/` — prior sanitized observations, provenance, cleanup record and
+  screenshots retained as historical evidence.
 - `INDEPENDENT-REVIEW-R1.md` — findings and remediation status from the first independent review.
 - `INDEPENDENT-REVIEW-R2.md` — bounded source re-review; no full schema or runtime validation.
 - `runtime/wordcraft/` — prose/runs, lists/table, first-page layout and page-2 screenshots.
 - `runtime/onlyoffice/` — prose/runs, lists/table, first-page and corrected page-2 screenshots.
 
-Every retained PNG has valid chunk framing and only image/color chunks; no textual, EXIF, or
-trailing data was found. Corrected page-2 screenshots show text in both editors; the ONLYOFFICE
-table is partly obscured by a first-use tip and viewport crop. The initial wheel-only captures
-are not included. The corrected ONLYOFFICE run logged two 502 responses on plugin/theme
-manifest endpoints; their cause is not established.
+Every retained PNG was checked for valid chunk framing and absence of textual/EXIF metadata or
+trailing bytes. The page-2 screenshots show the heading, paragraph and table in both editors. In
+ONLYOFFICE, the first-use tip is in lower-right whitespace and the table is visible near the
+viewport bottom. The initial wheel-only captures are not included.
 
-The runtime result is limited to opening and reading the same synthetic fixtures. No editor
-save, new version, or edit fidelity was tested. Earlier disposable attempts that failed before
-both editor routes completed are not counted as passing runs; the retained result is the
-corrected completed replay.
+The runtime result is limited to opening and reading the same corrected synthetic fixtures. No
+editor save, new version, or edit fidelity was tested. WordCraft recorded two aborted network
+requests (`net::ERR_ABORTED`); their request targets and cause are not in this bundle. The earlier
+ONLYOFFICE 502s were not reproduced; the original cause remains unknown. Earlier disposable
+attempts that failed before both editor routes completed are not counted as passing runs; the
+retained current result is the corrected completed replay.
 
 Project GPT remains **INCOMPLETE**; upstream publication remains **LOCKED**. This initial run was
 direct parent work and is not Aptarchy task completion.

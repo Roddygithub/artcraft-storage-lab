@@ -1,12 +1,28 @@
 {
-  "evidence_status": "Historical pre-remediation run; does not validate the current corpus source.",
-  "runtime_source_commit": "075a8621caaad025c2437ae071378ac2d18207d9",
-  "runtime_wordcraft_bundle": "GR-082 runtime-r2 browser static selection; WordCraft v0.13.2 unpatched",
-  "runtime_bundle_zip_sha256_recorded_by_GR_082": "b6c9c8d3a730495189ba0c213fe64313f317be8fc0611ac1ff8cdd6a4b20880c",
-  "served_static_matches_GR_082_runtime_r2": true,
-  "asset_count": 26,
-  "total_bytes": 50880732,
-  "bundle_file_sha256": {
+  "candidate_source_commit": "116aac04fb868499faa29f4d5ccb6100f6c57746",
+  "runtime_checkout_commit": "35cdbf5c06d2629bfddcf7d15a7d7db947ffbb7f",
+  "runtime_source_copy_matches_checkout": true,
+  "source_file_sha256": {
+    "lab/real-seafile/docx_fidelity_corpus.py": "17771133b70f6eeb4a622c1786588a65457d31a9467bf34981cde5920173bd56",
+    "lab/real-seafile/compare_docx_fidelity_browser.py": "6108320c3eaa64a68f85fb9475329beee5ae26673f48ec293fb4353b83da1c2e",
+    "lab/real-seafile/switch_docx_route.py": "d64e32a2918c1e843d033fbb93a7cc1dd2737d24c9e4ca2f3cbca3ff8c9aa0fb",
+    "lab/real-seafile/run_slice.py": "ca076445c573feb6bdad63c044618b98e28d0a0739b08ac51d78583447fa758f",
+    "lab/real-seafile/run_browser.py": "6ee142a955c07f0ea85c076155ab5463fad73bf8e677ef84e6156272e4aed222",
+    "bridge/app.py": "07cd457401fc59ce9c8be464b0ea6f030027c80cd1e337e51be77481e308f34d",
+    "bridge/settings.py": "fe6f1fbdb2386638d4928f288e47cb3324802c7a54b69fab283cf893a36e8d19",
+    "bridge/wsgi.py": "6f3e9599b029a01b22e7d780e91ac2288c5ceaa8ac4bf8ec30c6dfbdb1531b2a",
+    "bridge/static/host.js": "92c9e98ed4abd0190851be670a032f2672fd5d07c4fe8c2daa411c2e032df6f3",
+    "bridge/static/host.html": "2e5a9a4764299a261da57786ded0aff439f1180fde1b33bc0be2361a39b21ea8"
+  },
+  "private_runner_sha256": "be7fab32d56935c25b4f5ea6e2e010e3eb8679cb8a45658d8100dce1949e987e",
+  "private_compose_sha256": "678e54971da806f3874dc6d317cd0401553cb200cfda3bddfc1a573600d9117d",
+  "runtime_wordcraft_bundle": "WordCraft Web v0.13.2, unpatched",
+  "runtime_wordcraft_bundle_zip_sha256_recorded_by_GR_082": "b6c9c8d3a730495189ba0c213fe64313f317be8fc0611ac1ff8cdd6a4b20880c",
+  "served_wordcraft_asset_count": 26,
+  "served_wordcraft_total_bytes": 50880732,
+  "served_wordcraft_tree_sha256": "f50ec2e04a84736584f003d2ddeb081173e1c55d286e7aa818adb83fad37dd37",
+  "served_wordcraft_assets_match_pre_remediation_manifest": true,
+  "served_wordcraft_asset_sha256": {
     ".htaccess": "c92d61b428bff284fce08dc57f0255261476397f2cba5836c833974eded5c725",
     "ATTRIBUTION.md": "fa08926f60697c21c62e9277a583969f75c24fb451bd160b432674031e2b7cdb",
     "HOSTING.md": "77ae3e6252c357dfe917d47de515f1707321b00d99339412aefa1c42ab6c3b7c",
@@ -34,17 +50,10 @@
     "wordcraft-web-97267fff62d92a8d.js": "a5b91ef30152583f7c0f7646e05c98e474f3e86323f87cd924ff7f3e2d21a89b",
     "wordcraft-web-97267fff62d92a8d_bg.wasm": "b1fc951aca4992012ab28f3f894db6e5f4b5c9776aed9e403563332f54395bf2"
   },
-  "pre_remediation_workspace_sources_and_private_replay_sha256": {
-    "corpus_generator_sha256": "08357352743b4087d3db241d668917cff1e30d5962b838ee8d78322c85ed7efe",
-    "browser_harness_sha256": "6108320c3eaa64a68f85fb9475329beee5ae26673f48ec293fb4353b83da1c2e",
-    "source_run_browser_sha256": "6ee142a955c07f0ea85c076155ab5463fad73bf8e677ef84e6156272e4aed222",
-    "source_run_slice_sha256": "ca076445c573feb6bdad63c044618b98e28d0a0739b08ac51d78583447fa758f",
-    "route_switch_sha256": "d64e32a2918c1e843d033fbb93a7cc1dd2737d24c9e4ca2f3cbca3ff8c9aa0fb",
-    "corpus_test_sha256": "fd188ecad8d9253a076cdaed42d108aa1e4583b90add14109dd26639524f83e0",
-    "route_switch_test_sha256": "b2f1e76c1ca8b225c32d7a77922ffec268043db23cdae0a0b83c77f8526357fa",
-    "private_runner_sha256": "4dc0b0f9270d8cbc780e8c20ce4141d9b8b61ad1a5e26adf69614d4776947649",
-    "private_compose_sha256": "0a6c4d780ee5b25c2d0c5ca43389867cd3bd4c23918b3848a2a6f8f83d4fa212"
+  "fixture_sha256": {
+    "fidelity-prose.docx": "fcb8cf20a836dbfeaff810aa54d6cdfe14137d93937ec91ab28e2b4100b0b17d",
+    "fidelity-structure.docx": "ba21691b2b27ecc886e54393cbe097a3a78811e437dd635bb0bbe1b6e36cd3aa",
+    "fidelity-layout.docx": "432a7d1c9f7699b633a7adea39d561e2fe2aeaf7fa5df50d269ba0782679b69d"
   },
-  "pre_remediation_runtime_source_copies_matched_initial_workspace": true,
   "private_runner_and_compose_contents_not_in_git": true
 }

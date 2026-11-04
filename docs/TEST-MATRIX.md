@@ -11,18 +11,19 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 
 | Scenario | Expected | Result |
 |---|---|---|
-| Same corrected synthetic corpus opens in both editors | Three corrected DOCX fixtures open in each editor and report ready | [ ] Fresh replay pending R2 source review; initial six-open run used out-of-order OOXML properties and is retained as historical only |
-| Prose and inline runs | Heading, paragraphs, bold, italic and colored text are visible | [~] Historical screenshots show similar rendering; they predate the corpus ordering fix and are not final runtime evidence |
-| Lists and table | Headings, bullet/numbered lists and a two-column table are visible | [~] Historical screenshots show these elements; they predate the corpus ordering fix and are not final runtime evidence |
-| Page-2 rendering | Second-page heading and paragraph appear after the page break in both editors | [~] Historical corrected Ctrl+End captures show text in both; WordCraft's table is visible, ONLYOFFICE's is partly obscured; fresh replay pending |
+| Same corrected synthetic corpus opens in both editors | Three corrected DOCX fixtures open in each editor and report ready | [x] Fresh replay: six ready opens, all six readback hashes match, no browser downloads; R3 evidence review pending |
+| Prose and inline runs | Heading, paragraphs, bold, italic and colored text are visible | [~] Fresh screenshots show these elements in both editors; small visual spot check, not a fidelity benchmark |
+| Lists and table | Headings, bullet/numbered lists and a two-column table are visible | [~] Fresh screenshots show the structure in both; spacing is not pixel-identical |
+| Page-2 rendering | Second-page heading and paragraph appear after the page break in both editors | [~] Fresh captures show the heading, paragraph and table; ONLYOFFICE tip is in lower-right whitespace and table is near viewport bottom |
 | Edit, save, Seafile version and reopen | Compare edited-document fidelity across both editors | [ ] NOT RUN; this was an open/readback-only comparison |
 | Broad OOXML fidelity, foreign documents, other browsers, production | General compatibility and deployment behavior | [ ] NOT VERIFIED |
-| Independent source review | Separate review of report, code and retained evidence | [x] R1 P2/P3 fixes verified by R2 bounded PASS; fresh runtime evidence review still pending |
+| Independent source/runtime evidence review | Separate review of report, code and retained evidence | [~] R1 P2/P3 fixes verified by bounded R2 source PASS; fresh runtime evidence R3 pending |
 
 Evidence: [GR-083 report](GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md),
 [bundle](reviews/GR-083/). Direct parent work, not Aptarchy task completion.
-The initial run also recorded two ONLYOFFICE plugin/theme HTTP 502s; cause remains
-NOT VERIFIED. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+The initial ONLYOFFICE plugin/theme 502s did not recur; their cause remains NOT VERIFIED.
+The fresh run recorded two WordCraft `net::ERR_ABORTED` request failures, also unexplained.
+No edit/save/version was tested. Project GPT remains INCOMPLETE and upstream publication LOCKED.
 
 ## GR-082 — CADCraft DXF edit on synthetic Seafile
 

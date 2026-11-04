@@ -45,13 +45,14 @@ R1 reviewed commit `075a8621` and found P2 out-of-order OOXML property elements
 in generated styles/table/cells and P3 ambiguous fidelity wording. The generator,
 focused order tests and summary were corrected. R2 reviewed exact commit
 `116aac04` and returned a bounded PASS with no current P1–P3 findings. Its
-15-checksum and six focused tests passed. The prior screenshots/results predate
-the correction and remain historical only; do not accept them as runtime
-validation of the corrected corpus. A fresh synthetic replay is pending; request
-an independent evidence review after it. The prior run logged two ONLYOFFICE
-plugin/theme manifest 502s; their cause is NOT VERIFIED. No edit/save/version
-behavior was tested. Project GPT remains INCOMPLETE and upstream publication
-LOCKED.
+15-checksum and six focused tests passed. A fresh corrected-corpus synthetic
+replay then passed six editor-ready opens and six unchanged Seafile readbacks,
+with no browser downloads. The initial pre-remediation screenshots/results are
+archived separately. Two WordCraft `net::ERR_ABORTED` request failures remain
+unexplained; the initial ONLYOFFICE plugin/theme 502s did not recur, but their
+cause remains NOT VERIFIED. No edit/save/version or full-fidelity behavior was
+tested. Independent runtime evidence review R3 is pending. Project GPT remains
+INCOMPLETE and upstream publication LOCKED.
 
 Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md`,
 `docs/reviews/GR-083/`.

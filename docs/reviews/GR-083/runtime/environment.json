@@ -1,16 +1,47 @@
 {
   "date": "2026-11-04",
-  "runtime": "rootless Podman; new disposable project; synthetic Seafile library",
-  "image_tags_and_config_ids": {
-    "docker.io/library/mariadb:10.11": "72b6ab51626b71b6118295b90c9408e537ff1cfdaa0b35c9930e8c2ee49a47bf",
-    "docker.io/library/redis:7": "9823645c452a9a994f575ed238e1a4f67365acbf8e842db769060820fab06449",
-    "docker.io/seafileltd/seafile-mc:13.0-latest": "d3b8f07584d05a6cc1443bb86b48f916b452bbd49b0d6fea9f127fcf354bb490",
-    "docker.io/onlyoffice/documentserver:9.4": "4934c364adccc2898d0998951fb09d455496454de417cce2a74b7b1e808daab0",
-    "docker.io/library/python:3.12-slim": "ae4e8b7c575fabea88a029b6cae757f342ca2525e07f7c22272d5105c346b35e",
-    "mcr.microsoft.com/playwright/python:v1.49.0-noble": "e4b60cccdb125f81cf87e38e373e63d9c3f645dcdb8ff00565f41303eb6815a0"
+  "runtime": "rootless Podman, new disposable project, synthetic Seafile library",
+  "images": {
+    "docker.io/library/mariadb:10.11": {
+      "repo_digests": [
+        "docker.io/library/mariadb@sha256:6c65a843396dc6c78dd0da19eccaa0a91d25d9d26a4c2afcb75010ac3f59f5ea",
+        "docker.io/library/mariadb@sha256:d769e37960821dfdcf096954f6e7ac89f747e116c1bba98e48edd265dfc7deae"
+      ]
+    },
+    "docker.io/library/redis:7": {
+      "repo_digests": [
+        "docker.io/library/redis@sha256:a7aad82554197a54c653388bfded882a59d6b4a02468484bc31bae6772dcc42c",
+        "docker.io/library/redis@sha256:b6b6e3dc0c0952737748e55d5d885272840c7e42ba41ab1d5489f693419882f5"
+      ]
+    },
+    "docker.io/seafileltd/seafile-mc:13.0-latest": {
+      "repo_digests": [
+        "docker.io/seafileltd/seafile-mc@sha256:b0c90832126bf432db908449f1bb450211e6bbf75a2193bab3399e2a9636eccf",
+        "docker.io/seafileltd/seafile-mc@sha256:d8880d888d318b402591e64576e43c322d78d00e51d18c07aaa4fa8125571582"
+      ]
+    },
+    "docker.io/onlyoffice/documentserver:9.4": {
+      "repo_digests": [
+        "docker.io/onlyoffice/documentserver@sha256:8c114db7648a1654828d33e1f9f3b18e97c4caae6707d34bf04d793d260f7e67",
+        "docker.io/onlyoffice/documentserver@sha256:e3da62a847b9a5d51a11f73cfea1d9c13c3be3809614490d4edddcf01dcf919b"
+      ]
+    },
+    "docker.io/library/python:3.12-slim": {
+      "repo_digests": [
+        "docker.io/library/python@sha256:1148dbb014615300fa7e713b2f94f550c0d1c69780c0805f84f093ceee34dd0b",
+        "docker.io/library/python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30"
+      ]
+    },
+    "mcr.microsoft.com/playwright/python:v1.49.0-noble": {
+      "repo_digests": [
+        "mcr.microsoft.com/playwright/python@sha256:2ffdecba64eeeb8aaf165c2ad30b649442d373ac8c040faf136e8fc2ba9f8d6f",
+        "mcr.microsoft.com/playwright/python@sha256:35a390e70ab8ba7fbc909dc01af2329e287e89ccc8fb2f04a1a7ae94cacc5c30"
+      ]
+    }
   },
   "seafile_exact_patch_version": "NOT VERIFIED",
   "onlyoffice_enabled_in_test_variant": true,
   "wopi_disabled_only_in_disposable_onlyoffice_variant": true,
-  "production_and_production_ONLYOFFICE_accessed": false
+  "production_and_production_ONLYOFFICE_accessed": false,
+  "scope": "Loopback-only disposable comparison; no production service or upstream repository was used."
 }

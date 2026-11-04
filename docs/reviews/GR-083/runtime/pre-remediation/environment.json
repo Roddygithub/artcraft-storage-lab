@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-04",
+  "runtime": "rootless Podman; new disposable project; synthetic Seafile library",
+  "image_tags_and_config_ids": {
+    "docker.io/library/mariadb:10.11": "72b6ab51626b71b6118295b90c9408e537ff1cfdaa0b35c9930e8c2ee49a47bf",
+    "docker.io/library/redis:7": "9823645c452a9a994f575ed238e1a4f67365acbf8e842db769060820fab06449",
+    "docker.io/seafileltd/seafile-mc:13.0-latest": "d3b8f07584d05a6cc1443bb86b48f916b452bbd49b0d6fea9f127fcf354bb490",
+    "docker.io/onlyoffice/documentserver:9.4": "4934c364adccc2898d0998951fb09d455496454de417cce2a74b7b1e808daab0",
+    "docker.io/library/python:3.12-slim": "ae4e8b7c575fabea88a029b6cae757f342ca2525e07f7c22272d5105c346b35e",
+    "mcr.microsoft.com/playwright/python:v1.49.0-noble": "e4b60cccdb125f81cf87e38e373e63d9c3f645dcdb8ff00565f41303eb6815a0"
+  },
+  "seafile_exact_patch_version": "NOT VERIFIED",
+  "onlyoffice_enabled_in_test_variant": true,
+  "wopi_disabled_only_in_disposable_onlyoffice_variant": true,
+  "production_and_production_ONLYOFFICE_accessed": false
+}

@@ -30,14 +30,14 @@ CADCraft runs are direct parent work, not Aptarchy completion. See
 scenarios, foreign `.pptx` editing, broad CADCraft fidelity and production
 behavior still require separate validation.
 
-The initial synthetic WordCraft/ONLYOFFICE DOCX comparison is recorded in
-[`GR-083`](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md). Review R1 found
-out-of-order OOXML property elements in its generated corpus; the generator and
-focused order checks are corrected and R2 passed, but a fresh synthetic browser
-replay is pending. The initial screenshots/results are historical and
-do not validate the corrected corpus. That run recorded two ONLYOFFICE
-plugin/theme manifest 502s, whose cause remains unverified, and did no editing
-or save. This comparison does not replace the owner’s live ONLYOFFICE repair.
+The bounded synthetic WordCraft/ONLYOFFICE DOCX comparison is recorded in
+[`GR-083`](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md). After R1's
+OOXML-order finding was fixed and passed source review R2, a fresh run opened
+three corrected fixtures in each editor with unchanged readback hashes and no
+downloads. It did not edit or save. Independent review of the fresh evidence R3
+is pending. The initial pre-remediation artifacts remain archived; earlier
+ONLYOFFICE manifest 502s did not recur, but their cause is unverified. This
+comparison does not replace the owner’s live ONLYOFFICE repair.
 
 ## What works today
 
