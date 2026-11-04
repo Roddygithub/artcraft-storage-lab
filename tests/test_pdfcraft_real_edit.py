@@ -94,6 +94,10 @@ def main():
     )
     assert not run_browser.pdf_text_field_has_value(superseded, "name", marker.decode())
     assert run_browser.pdf_text_field_has_value(superseded, "name", "different-current-value")
+
+    truncated_xref = b"%PDF-1.7\nstartxref\n0000000040\n%%EOF\n".ljust(40, b" ") + b"xref\n"
+    assert run_browser._current_pdf_object_bodies(truncated_xref) is None
+    assert not run_browser.pdf_text_field_has_value(truncated_xref, "name", marker.decode())
     print("PASS: PdfCraft AcroForm field-value assertions")
 
 

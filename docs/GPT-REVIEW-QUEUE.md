@@ -53,7 +53,10 @@ navigation.
 GPT R1 found P2 in the form-value assertion: a stale value from a superseded
 incremental PDF object could satisfy it. The assertion now reads active objects
 through the classic xref chain, with a regression for stale values; the
-corrected source passed a fresh isolated replay. Exact-commit GPT R2 is pending.
+corrected source passed a fresh isolated replay. GPT R2 then found that the
+retained PDF hash/size differed from the runtime readback and identified an EOF
+loop for truncated xref input. The retained artifact and records now agree;
+the helper has an EOF guard and regression. Exact-commit GPT R3 is pending.
 Other PDF documents, broad fidelity, human HTTPS, production, and project
 completion remain NOT VERIFIED. This is direct parent work, not Aptarchy task
 completion. Project GPT remains INCOMPLETE and upstream publication LOCKED.

@@ -5,10 +5,11 @@ Final runtime run (2026-11-04, fresh isolated rootless Podman project):
 - HTTP slice: 48 passed, 0 failed; Seafile CE 13.0.28.
 - Focused PdfCraft Chromium slice: 18 passed, 0 failed.
 - HTTP completed before browser; the runner exited successfully and removed the project containers/network.
-- Relay save payload and Seafile readback: 2,385 bytes each, identical SHA-256.
+- Relay save payload and Seafile readback: 2,386 bytes each, SHA-256 `d1bb31792966cf0b5551029e56224074629e2590c9a6865be92ce70d6599dad2`; retained PDF matches.
 - Fresh-context /relay/file response matched Seafile readback; the saved PDF field value was present.
 - No editor download observed.
 - Active-xref reader also matched the current field value in the retained saved PDF.
+- After the runtime, GPT R2's malformed-xref EOF loop was fixed with a progress guard and a focused offline regression; valid-runtime behavior was not rerun for that helper-only change.
 - `pdftotext` extracted the field with three `Bad form bounding box` warnings; full external PDF validity is not claimed.
 
 Local focused checks:

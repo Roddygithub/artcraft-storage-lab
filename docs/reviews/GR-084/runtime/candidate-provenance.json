@@ -3,12 +3,13 @@
   "source_files": [
     {
       "path": "lab/real-seafile/run_browser.py",
-      "sha256": "934acd2e0a70a511b9f039645b9e98e873b24c2a5ef541191f0d39dad4951b7a",
-      "runtime_copy_sha256": "934acd2e0a70a511b9f039645b9e98e873b24c2a5ef541191f0d39dad4951b7a"
+      "sha256": "0f7b68054dceb25670b25133a37a7094987a8a85c1731b344ecd857bf5de5dbe",
+      "runtime_copy_sha256": "934acd2e0a70a511b9f039645b9e98e873b24c2a5ef541191f0d39dad4951b7a",
+      "runtime_difference": "The post-run source adds only EOF/no-progress checks to malformed xref handling; this test-helper-only guard was regression-tested offline after run 7 and does not alter the recorded valid-PDF flow."
     },
     {
       "path": "tests/test_pdfcraft_real_edit.py",
-      "sha256": "f424c731fb524cdea856ac02490f353308cd72455039fb634c89e5740c840ec5"
+      "sha256": "b2bf3f8a3ddb575fb9576b24783ee284030f4c21d516f079b2d5346794485aad"
     },
     {
       "path": "lab/real-seafile/fixtures/form.pdf",

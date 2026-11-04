@@ -20,8 +20,11 @@
 - Exact-candidate GPT R1 found P2: the saved-field assertion could accept a
   marker from a superseded incremental PDF object. The assertion now resolves
   active objects through the classic xref chain, the stale-value regression
-  passes, and the isolated runtime was rerun successfully. Exact-commit GPT R2
-  is pending; project GPT remains INCOMPLETE and upstream publication LOCKED.
+  passes, and the isolated runtime was rerun successfully. GPT R2 then found
+  stale PDF size/hash documentation and an EOF loop on malformed xref input.
+  The retained bytes and documentation now agree; an EOF guard and regression
+  were added. Exact-commit GPT R3 is pending; project GPT remains INCOMPLETE and
+  upstream publication LOCKED.
 - Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
   `docs/reviews/GR-084/`.
 

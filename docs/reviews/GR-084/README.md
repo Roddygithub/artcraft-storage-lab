@@ -7,7 +7,7 @@ This bundle records the 2026-11-04 isolated PdfCraft browser run. The synthetic 
 - HTTP slice: **48/48** checks passed against synthetic Seafile CE **13.0.28**.
 - Focused Chromium browser slice: **18/18** checks passed using actual PdfCraft Web **v0.16.1**.
 - A browser-typed AcroForm value was present in the editor save payload, Seafile readback, and a fresh-session `/relay/file` response.
-- The relay save payload and Seafile readback were byte-identical (2,385 bytes; SHA-256 `69c2f8989bf0345a4620483fffaf5c72c27e4e2486b6099032ccb0d3b25af35b`). A new user-attributed Seafile version was observed, the fresh session reopened the edit, and no editor download occurred.
+- The relay save payload and Seafile readback were byte-identical (2,386 bytes; SHA-256 `d1bb31792966cf0b5551029e56224074629e2590c9a6865be92ce70d6599dad2`). The retained PDF matches these bytes. A new user-attributed Seafile version was observed, the fresh session reopened the edit, and no editor download occurred.
 - `pdftotext` extracted the saved field value but emitted three `Bad form bounding box` warnings; full external PDF validity is not claimed.
 - The fixture upload was setup only. The fresh PDF editor was opened through the direct Seafile `?edit_pdf=true` route because the ordinary PDF list link opens Seafile preview.
 
@@ -24,8 +24,8 @@ This bundle records the 2026-11-04 isolated PdfCraft browser run. The synthetic 
 - `runtime/pdfcraft-saved.pdf` — synthetic saved PDF returned by Seafile. The relay payload copy remains private; its equal digest is recorded above.
 - `../..` `lab/real-seafile/fixtures/form.pdf` — original synthetic fixture, copied from the reviewed GR-057 synthetic PDF.
 - `INDEPENDENT-REVIEW-R1.md` — bounded independent source audit, separate from the exact-candidate GPT review.
-- `INDEPENDENT-GPT-REVIEW-R1.md` — exact-candidate GPT R1 P2 finding and remediation; GPT R2 of the resulting exact commit is pending.
+- `INDEPENDENT-GPT-REVIEW-R1.md` and `INDEPENDENT-GPT-REVIEW-R2.md` — exact-candidate GPT findings and remediations; GPT R3 of the resulting exact commit is pending.
 
-The corrected candidate code was copied into the private runtime before the run; its `run_browser.py` SHA-256 exactly matched the working source. The saved-output assertion reads active objects through the classic xref chain, with regression coverage that rejects a value from a superseded revision. The release bundle provenance is recorded as `storytold/pdfcraft` v0.16.1, archive SHA-256 `00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf`, unpatched.
+The R1-corrected candidate code was copied into the private runtime before the run; its runtime-copy digest is retained in `candidate-provenance.json`. The later R2 EOF guard is a test-helper-only change, regression-tested offline after the run; the valid run-7 PDF result was not rerun for it. The saved-output assertion reads active objects through the classic xref chain, with regression coverage that rejects a value from a superseded revision. The release bundle provenance is recorded as `storytold/pdfcraft` v0.16.1, archive SHA-256 `00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf`, unpatched.
 
 This evidence does not verify other PDF files, full PDF fidelity, a Seafile file-list click into PdfCraft, production, the human HTTPS checklist, or project completion. It is direct parent work, not Aptarchy completion. Project GPT remains **INCOMPLETE** and upstream remains **LOCKED**.

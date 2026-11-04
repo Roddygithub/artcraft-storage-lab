@@ -19,7 +19,9 @@ xref framing. The regression appends two revisions for the same field and
 checks that the earlier value fails while the current value passes. The
 focused test passed, and the corrected source was included in a fresh isolated
 Seafile/PdfCraft replay (HTTP 48/48; browser 18/18). The exact resulting commit
-is pending independent GPT R2 review.
+was pending independent GPT R2 review when this record was written. R2 returned
+two further findings; their outcomes are recorded in
+`INDEPENDENT-GPT-REVIEW-R2.md`.
 
 ## Limits
 

@@ -214,6 +214,8 @@ def _current_pdf_object_bodies(data):
     seen = set()
 
     def read_line(position):
+        if position < 0 or position >= len(data):
+            return None, position
         end = data.find(b"\n", position)
         if end < 0:
             return data[position:].rstrip(b"\r"), len(data)
@@ -225,8 +227,13 @@ def _current_pdf_object_bodies(data):
         seen.add(xref_offset)
         position = xref_offset + 4
         line, position = read_line(position)
+        if line is None:
+            return None
         while not line.strip():
-            line, position = read_line(position)
+            next_line, next_position = read_line(position)
+            if next_line is None or next_position <= position:
+                return None
+            line, position = next_line, next_position
         while line.strip() != b"trailer":
             subsection = re.fullmatch(rb"\s*(\d+)\s+(\d+)\s*", line)
             if not subsection:
@@ -236,6 +243,8 @@ def _current_pdf_object_bodies(data):
                 return None
             for number in range(first, first + count):
                 entry, position = read_line(position)
+                if entry is None:
+                    return None
                 parsed = re.fullmatch(rb"\s*(\d{10})\s+(\d{5})\s+([nf])\s*", entry)
                 if not parsed:
                     return None
@@ -243,6 +252,8 @@ def _current_pdf_object_bodies(data):
                 if number not in entries:
                     entries[number] = (offset, generation) if parsed.group(3) == b"n" else None
             line, position = read_line(position)
+            if line is None:
+                return None
 
         next_start = re.search(rb"(?m)^startxref\b", data[position:])
         if not next_start:
