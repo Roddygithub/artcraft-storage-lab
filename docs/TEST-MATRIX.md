@@ -19,7 +19,7 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | Runtime slices | HTTP and focused browser assertions pass | [x] HTTP 48/48; PdfCraft Chromium 18/18 on synthetic Seafile CE 13.0.28 |
 | Coverage boundary | Report distinguishes setup upload, file-list behavior, and wider compatibility | [x] Fixture upload was setup only; fresh editor reopened via direct route because PDF file-list link opens preview |
 | Broader PDF compatibility, human HTTPS, production, other browsers, ONLYOFFICE regression | Wider compatibility/deployment | [ ] NOT VERIFIED |
-| Independent review | Exact committed evidence/source reviewed by GPT | [~] GPT R1/R2 findings corrected: active-xref check, exact retained PDF digest, and malformed-xref EOF regression; exact-commit GPT R3 pending |
+| Independent review | Exact committed evidence/source reviewed by GPT | [~] GPT R1/R2 fixes verified; R3's P3 stale history byte count corrected; exact-commit GPT R4 pending |
 
 Direct parent run, not Aptarchy task completion. Project GPT remains INCOMPLETE and upstream publication LOCKED. Evidence: [GR-084 report](GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md) and [bundle](reviews/GR-084/).
 

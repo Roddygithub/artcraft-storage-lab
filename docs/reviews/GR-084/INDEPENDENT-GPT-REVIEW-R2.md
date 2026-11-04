@@ -26,5 +26,7 @@ and queue now describe the corrected archive identity and helper behavior.
 The successful runtime itself was not rerun for the malformed-input-only
 helper change; full PDF parser support remains out of scope.
 
-Exact-commit GPT R3 review is pending. No project-level PASS or upstream
+At the time this record was written, exact-commit GPT R3 review was pending.
+R3 later found the stale HISTORY count; the correction and review outcome are
+recorded in `INDEPENDENT-GPT-REVIEW-R3.md`. No project-level PASS or upstream
 authorization is implied.

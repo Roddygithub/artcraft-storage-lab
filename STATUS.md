@@ -21,7 +21,8 @@ now follows active classic-xref entries, the stale-value regression passes,
 and a fresh isolated runtime replay passed again. GPT R2 found a stale
 size/hash in the archived PDF and a malformed-xref EOF loop. The archived bytes
 now match the recorded relay/readback output; the helper now has an EOF guard
-and regression. Exact-commit GPT R3 is pending. Project GPT remains
+and regression. GPT R3 found a stale HISTORY byte count; it is corrected.
+Exact-commit GPT R4 is pending. Project GPT remains
 INCOMPLETE and upstream is LOCKED. Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md`
 and `docs/reviews/GR-084/`.
 

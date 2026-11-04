@@ -8,7 +8,8 @@ now resolves active objects through the classic xref chain, and a regression
 rejects stale values. GPT R2 also found that the retained PDF's documented hash
 and size were stale, plus an EOF no-progress case in the narrow xref helper.
 The archived PDF metadata now matches the actual run-7 relay/readback bytes;
-the helper now fails closed on EOF and has a regression. Exact-commit GPT R3
+the helper now fails closed on EOF and has a regression. GPT R3 found one stale
+2,385-byte count in `HISTORY.md`; it is corrected to 2,386. Exact-commit GPT R4
 review is pending. The EOF guard was added after the run; it affects only
 malformed helper input, not the valid saved PDF used by the recorded run.
 

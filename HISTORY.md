@@ -10,7 +10,7 @@
   18/18 with PdfCraft Web v0.16.1 and synthetic Seafile CE 13.0.28. A real
   browser edit to the PDF name field was saved as a user-attributed Seafile
   version, read back, and reopened in a new browser context. The relay save
-  payload matched Seafile readback byte-for-byte (2,385 bytes); no editor
+  payload matched Seafile readback byte-for-byte (2,386 bytes); no editor
   download occurred. The fresh editor open used `?edit_pdf=true` directly
   because the ordinary PDF list link opens Seafile preview.
 - The fixture upload was setup only. One synthetic AcroForm PDF was exercised;
@@ -23,8 +23,9 @@
   passes, and the isolated runtime was rerun successfully. GPT R2 then found
   stale PDF size/hash documentation and an EOF loop on malformed xref input.
   The retained bytes and documentation now agree; an EOF guard and regression
-  were added. Exact-commit GPT R3 is pending; project GPT remains INCOMPLETE and
-  upstream publication LOCKED.
+  were added. GPT R3 found a stale HISTORY byte count; it is corrected.
+  Exact-commit GPT R4 is pending; project GPT remains INCOMPLETE and upstream
+  publication LOCKED.
 - Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
   `docs/reviews/GR-084/`.
 
