@@ -13,8 +13,9 @@ It reported six ready opens, unchanged before/after hashes and no downloads,
 but independent review R1 found out-of-order OOXML property elements in the
 generated corpus. The generator and focused ordering checks are corrected;
 the initial screenshots/results are historical and do not validate the current
-corpus. Fresh synthetic replay awaits independent R2 source review. R1's
-wording minor in the re-foundation summary is also corrected. The initial run's
+corpus. R1's wording minor in the re-foundation summary is also corrected; R2
+independently passed the bounded source remediation. Fresh synthetic replay is
+now pending. The initial run's
 ONLYOFFICE plugin/theme requests returned two HTTP 502s (cause NOT VERIFIED);
 its page-2 table is partly obscured. This was not an edit/save test or Aptarchy
 completion. Production/upstream remain untouched; project GPT is INCOMPLETE and

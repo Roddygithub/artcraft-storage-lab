@@ -14,6 +14,6 @@
 
 The corpus generator now emits paragraph-style properties as `pPr` then `rPr`, table-cell width before shading, and table width before borders. A focused test checks these three used child-order constraints in generated fixtures; this is not a complete ECMA-376 schema validator. The report wording is clarified.
 
-The retained browser run and screenshots predate this source correction. They are historical only and do not validate the corrected corpus. A fresh synthetic browser replay remains pending after independent source re-review. The ONLYOFFICE manifest 502 cause also remains **NOT VERIFIED**.
+The retained browser run and screenshots predate this source correction. They are historical only and do not validate the corrected corpus. R2 later passed the bounded source remediation; a fresh synthetic browser replay remains pending. The ONLYOFFICE manifest 502 cause also remains **NOT VERIFIED**.
 
 Review checks before remediation: five committed tests passed, 14 evidence checksums passed, screenshots had valid PNG framing and no metadata/trailing payload, and no private identifiers or credentials were observed. The reviewer did not access services, run browsers/builds, or edit files.

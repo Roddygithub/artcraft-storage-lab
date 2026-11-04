@@ -8,7 +8,8 @@ captures from the disposable synthetic lab; private logs and DOCX bytes are not 
 The generator and focused ordering checks have since been corrected, but these observations and
 screenshots predate that correction. They are preserved for audit and do not validate the current
 corpus. A fresh synthetic replay is pending independent source re-review. The ordering checks are
-not a full ECMA-376 schema validation.
+not a full ECMA-376 schema validation. R2 independently accepted the bounded source remediation;
+fresh runtime evidence is now pending.
 
 ## Contents
 
@@ -19,6 +20,7 @@ not a full ECMA-376 schema validation.
   local cache, not the records themselves.
 - `runtime/candidate-provenance.json` — provenance for the initial pre-remediation replay only.
 - `INDEPENDENT-REVIEW-R1.md` — findings and remediation status from the first independent review.
+- `INDEPENDENT-REVIEW-R2.md` — bounded source re-review; no full schema or runtime validation.
 - `runtime/wordcraft/` — prose/runs, lists/table, first-page layout and page-2 screenshots.
 - `runtime/onlyoffice/` — prose/runs, lists/table, first-page and corrected page-2 screenshots.
 

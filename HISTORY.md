@@ -22,9 +22,10 @@
   generated corpus (P2) and an ambiguous fidelity sentence in the re-foundation
   summary (P3). The generator now uses the required order for the emitted style,
   table and cell properties, focused order tests were added, and the sentence is
-  clarified. The old screenshots/results remain historical; fresh synthetic
-  replay is pending R2 source review. Project GPT remains INCOMPLETE and upstream
-  publication LOCKED.
+  clarified. R2 passed the bounded source remediation with no current P1–P3
+  findings. The old screenshots/results remain historical; fresh synthetic
+  replay is pending. Project GPT remains INCOMPLETE and upstream publication
+  LOCKED.
 - Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md` and
   `docs/reviews/GR-083/`.
 

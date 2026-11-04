@@ -33,8 +33,8 @@ behavior still require separate validation.
 The initial synthetic WordCraft/ONLYOFFICE DOCX comparison is recorded in
 [`GR-083`](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md). Review R1 found
 out-of-order OOXML property elements in its generated corpus; the generator and
-focused order checks are corrected, but a fresh synthetic browser replay is
-pending R2 source review. The initial screenshots/results are historical and
+focused order checks are corrected and R2 passed, but a fresh synthetic browser
+replay is pending. The initial screenshots/results are historical and
 do not validate the corrected corpus. That run recorded two ONLYOFFICE
 plugin/theme manifest 502s, whose cause remains unverified, and did no editing
 or save. This comparison does not replace the owner’s live ONLYOFFICE repair.

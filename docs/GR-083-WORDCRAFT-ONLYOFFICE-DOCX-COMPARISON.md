@@ -45,7 +45,8 @@ the Python standard library. After review R1 identified out-of-order property el
 generator was corrected and focused tests were added for the specific style/table/cell sequences
 used by this corpus. These checks do not establish full ECMA-376 schema conformance. The retained
 screenshots and observations were produced before that correction and are kept only as historical
-records; they are not evidence for the corrected corpus. A fresh browser replay remains pending.
+records; they are not evidence for the corrected corpus. Independent source re-review R2 returned
+a bounded PASS with no current P1–P3 findings. A fresh browser replay remains pending.
 
 `lab/real-seafile/compare_docx_fidelity_browser.py` performs the
 file-list opens, editor readiness checks, download observation, and exact pre/post readback
@@ -66,6 +67,6 @@ observations are historical only; their bundle README identifies this boundary. 
 remain outside Git; only their SHA-256 digests are retained in the bundle.
 
 R1 also corrected an ambiguous sentence in the re-foundation summary. R2 independent source review
-and a fresh synthetic browser replay are pending. This was direct parent work, not Aptarchy task
+is complete; fresh synthetic browser replay is pending. This was direct parent work, not Aptarchy task
 completion. The two ONLYOFFICE manifest 502s and the partly obscured page-2 table remain follow-ups;
 their cause and full layout fidelity are **NOT VERIFIED**.

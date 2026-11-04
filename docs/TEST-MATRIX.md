@@ -17,7 +17,7 @@ Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · 
 | Page-2 rendering | Second-page heading and paragraph appear after the page break in both editors | [~] Historical corrected Ctrl+End captures show text in both; WordCraft's table is visible, ONLYOFFICE's is partly obscured; fresh replay pending |
 | Edit, save, Seafile version and reopen | Compare edited-document fidelity across both editors | [ ] NOT RUN; this was an open/readback-only comparison |
 | Broad OOXML fidelity, foreign documents, other browsers, production | General compatibility and deployment behavior | [ ] NOT VERIFIED |
-| Independent review | Separate review of report, code and retained evidence | [~] R1 found one P2 corpus-order issue and one P3 wording issue; source/docs corrected, R2 pending |
+| Independent source review | Separate review of report, code and retained evidence | [x] R1 P2/P3 fixes verified by R2 bounded PASS; fresh runtime evidence review still pending |
 
 Evidence: [GR-083 report](GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md),
 [bundle](reviews/GR-083/). Direct parent work, not Aptarchy task completion.
