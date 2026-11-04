@@ -1,0 +1,48 @@
+{
+  "base_commit": "74f95d55786363c1b8d955ce10f0ad5517d10da6",
+  "source_files": [
+    {
+      "path": "lab/real-seafile/run_browser.py",
+      "sha256": "1cd8e480c95bff132b1cfb476f5c8d4091a27d91c5ee54476b1f8e505e41427d",
+      "runtime_copy_sha256": "1cd8e480c95bff132b1cfb476f5c8d4091a27d91c5ee54476b1f8e505e41427d"
+    },
+    {
+      "path": "tests/test_pdfcraft_real_edit.py",
+      "sha256": "686cf20675ebc606768d76c7feea4bc3ea8d2bfeebbca91f00a058ee9f4f2074"
+    },
+    {
+      "path": "lab/real-seafile/fixtures/form.pdf",
+      "size": 1744,
+      "sha256": "c6f8b656e225101129aa36bd5467adc8dba16730915f19caca17f6a546d0b040"
+    }
+  ],
+  "pdfcraft_bundle": {
+    "upstream": "storytold/pdfcraft",
+    "release": "v0.16.1",
+    "archive_sha256": "00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf",
+    "patched": false,
+    "files": [
+      {
+        "path": "pdfcraft/index.html",
+        "size": 1210,
+        "sha256": "3a6e2ec1bad7f1f495256502bcfb525646267681c7b66577d689475ace33264c"
+      },
+      {
+        "path": "pdfcraft/pdfcraft-web-a30dc4dd8a148def_bg.wasm",
+        "size": 49909107,
+        "sha256": "fcf3e3721c399fd695d3e431689f35b83e81b94960bd5d1eb57e1614ba5dcec4"
+      },
+      {
+        "path": "pdfcraft/pdfcraft-web-d3ba543cb17a7f63.js",
+        "size": 165584,
+        "sha256": "84eea07a552e7c98b12c837f086c4da2364a285a5d468ad8ffc0f082fda0e042"
+      }
+    ]
+  },
+  "runtime_configuration": {
+    "compose_snapshot_sha256": "83c7540c3ebe13c2ac003a5dec21847faa733c642135da13f6422e9fd06cdce7",
+    "runner_snapshot_sha256": "2e38fb647637957df1e405a1d2fd911cbcf61c87fe98879d8c7225e624a51a72",
+    "private_cache_root": "Private local cache; absolute path omitted from repository evidence.",
+    "environment_file_included": false
+  }
+}

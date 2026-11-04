@@ -24,7 +24,8 @@ edit/save/version result. The run and its cleanup are summarized in
 [`runtime/observations.json`](reviews/GR-083/runtime/observations.json),
 [`runtime/environment.json`](reviews/GR-083/runtime/environment.json), and
 [`runtime/cleanup.json`](reviews/GR-083/runtime/cleanup.json). Independent evidence review R3
-is pending.
+found two archive-only defects (invalid archived JSON and broken review links); R4 verified both
+repairs and reported no remaining findings in its bounded evidence scope.
 
 ## Historical pre-remediation run
 
@@ -66,8 +67,8 @@ generator was corrected and focused tests were added for the specific style/tabl
 used by this corpus. These checks do not establish full ECMA-376 schema conformance. The initial
 screenshots and observations are archived under `reviews/GR-083/runtime/pre-remediation/` and
 remain historical only. Independent source re-review R2 returned a bounded PASS with no current
-P1–P3 findings; the corrected replay is now retained in `reviews/GR-083/runtime/` and independent
-evidence review R3 is pending.
+P1–P3 findings; the corrected replay is now retained in `reviews/GR-083/runtime/`. R3's
+archive-only findings were corrected, and R4 returned a bounded PASS with no findings.
 
 `lab/real-seafile/compare_docx_fidelity_browser.py` performs the
 file-list opens, editor readiness checks, download observation, and exact pre/post readback
@@ -88,7 +89,8 @@ their SHA-256 digests are retained in the bundle. The prior pre-remediation obse
 screenshots are preserved separately for audit. See [`docs/reviews/GR-083/`](reviews/GR-083/README.md).
 
 R1 also corrected an ambiguous sentence in the re-foundation summary. R2 independent source review
-and the corrected synthetic open/readback replay are complete; R3 independent evidence review is
-pending. This was direct parent work, not Aptarchy task completion. The earlier ONLYOFFICE manifest
+and the corrected synthetic open/readback replay are complete. R3's archive findings were fixed;
+R4 returned a bounded PASS with no findings. This was direct parent work, not Aptarchy task
+completion. The earlier ONLYOFFICE manifest
 502s did not recur, but their cause remains **NOT VERIFIED**; WordCraft's two aborted requests also
 remain unexplained. Full layout fidelity, editing/saving, and version creation remain **NOT VERIFIED**.

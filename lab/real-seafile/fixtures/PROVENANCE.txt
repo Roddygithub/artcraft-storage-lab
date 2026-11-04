@@ -1,0 +1,5 @@
+form.pdf
+Synthetic one-page AcroForm fixture for the PdfCraft real-edit browser slice.
+Copied from docs/reviews/GR-057/runtime/synthetic.pdf (GR-057, 2026-10-25).
+SHA-256: c6f8b656e225101129aa36bd5467adc8dba16730915f19caca17f6a546d0b040
+The first text field is named "name" and is initially empty; the file contains no user data.

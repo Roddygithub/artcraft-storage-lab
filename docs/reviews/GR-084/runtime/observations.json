@@ -1,0 +1,21 @@
+{
+  "scope": "One synthetic one-page AcroForm PDF opened by the isolated Seafile/PdfCraft route.",
+  "fixture_setup": "The synthetic fixture was uploaded before editing; that setup upload is not the editor save.",
+  "edit": "A unique alphanumeric value was typed through Chromium into the existing PDF name field. The editor showed unsaved changes before Ctrl+S.",
+  "save": "The editor POST payload contained the field value; the host confirmed save; Seafile History gained a version attributed by the test to the synthetic test user.",
+  "readback": "The PDF downloaded from Seafile contains the field value. Its bytes equal the captured relay save payload (2,385 bytes; SHA-256 69c2f8989bf0345a4620483fffaf5c72c27e4e2486b6099032ccb0d3b25af35b).",
+  "fresh_session": "A new browser context authenticated separately and opened the same synthetic file through its explicit ?edit_pdf=true route. /relay/file bytes equaled Seafile readback and the field value remained present.",
+  "downloads": "The browser observed no file download during the editor save flow.",
+  "navigation_limit": "The fresh PDF editor was opened by direct Seafile file route with ?edit_pdf=true because the ordinary Seafile PDF list link opens preview; this run does not claim a file-list click into PdfCraft.",
+  "not_verified": [
+    "other PDF forms/documents",
+    "broad PDF fidelity or complete external PDF validity",
+    "file-list click into PdfCraft",
+    "human HTTPS browser pass",
+    "other browsers",
+    "production behavior",
+    "post-change ONLYOFFICE regression",
+    "project-level GPT completion"
+  ],
+  "pdf_tool_diagnostic": "pdftotext extracted the saved field value but emitted three 'Bad form bounding box' warnings; full external PDF validity is not claimed."
+}

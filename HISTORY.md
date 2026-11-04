@@ -4,6 +4,25 @@
 > Seahub/fileserver patch architecture. Current WOPI bridge follow-ups continue in this log and are
 > summarized in `README.md`, `ROADMAP.md` and `lab/real-seafile/results/`.
 
+# 2026-11-04 — GR-084 PdfCraft real edit on synthetic Seafile
+
+- Final isolated rootless-Podman run passed HTTP 48/48 and focused Chromium
+  18/18 with PdfCraft Web v0.16.1 and synthetic Seafile CE 13.0.28. A real
+  browser edit to the PDF name field was saved as a user-attributed Seafile
+  version, read back, and reopened in a new browser context. The relay save
+  payload matched Seafile readback byte-for-byte (2,385 bytes); no editor
+  download occurred. The fresh editor open used `?edit_pdf=true` directly
+  because the ordinary PDF list link opens Seafile preview.
+- The fixture upload was setup only. One synthetic AcroForm PDF was exercised;
+  other PDFs, human HTTPS, production, and broad PDF fidelity remain NOT
+  VERIFIED. Lab cleanup removed the test containers; the private cache data is
+  retained locally. This was direct parent work, not Aptarchy completion.
+- Independent source audit R1 found no remaining P1/P2 after a filter fix. The
+  exact-commit GPT review is pending; project GPT remains INCOMPLETE and
+  upstream publication LOCKED.
+- Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-084/`.
+
 # 2026-11-04 — GR-083 WordCraft / ONLYOFFICE DOCX comparison
 
 - After the corpus OOXML-order fix passed independent source review R2, reran a
@@ -23,8 +42,9 @@
   ambiguous fidelity sentence (P3). The generator and focused order tests were
   corrected; R2 passed the bounded source remediation with no current P1–P3
   findings. The initial pre-remediation screenshots/results are archived as
-  historical. Independent review of the corrected runtime evidence R3 is
-  pending. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+  historical. R3 found two archive-only defects; both were fixed and R4
+  returned a bounded PASS with no findings. Project GPT remains INCOMPLETE and
+  upstream publication LOCKED.
 - Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md` and
   `docs/reviews/GR-083/`.
 

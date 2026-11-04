@@ -39,6 +39,26 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-084 — PdfCraft AcroForm edit on synthetic Seafile
+
+The final isolated rootless-Podman run passed HTTP **48/48** and focused
+Chromium **18/18** on synthetic Seafile CE 13.0.28 with released PdfCraft Web
+v0.16.1. A typed AcroForm edit produced a user-attributed Seafile version; the
+relay payload matched Seafile readback byte-for-byte and a fresh browser
+context reopened the edit through the explicit `?edit_pdf=true` route. No
+editor download occurred. Fixture upload was setup only. The standard PDF
+file-list link opens preview, so this run does not claim file-list-to-PdfCraft
+navigation.
+
+The source-audit lane's initial dynamic-fixture filter concern was fixed; its
+follow-up found no remaining P1/P2. Exact-commit GPT review remains pending.
+Other PDF documents, broad fidelity, human HTTPS, production, and project
+completion remain NOT VERIFIED. This is direct parent work, not Aptarchy task
+completion. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+
+Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+`docs/reviews/GR-084/`.
+
 ## GR-083 — WordCraft / ONLYOFFICE DOCX comparison
 
 R1 reviewed commit `075a8621` and found P2 out-of-order OOXML property elements
@@ -51,7 +71,8 @@ with no browser downloads. The initial pre-remediation screenshots/results are
 archived separately. Two WordCraft `net::ERR_ABORTED` request failures remain
 unexplained; the initial ONLYOFFICE plugin/theme 502s did not recur, but their
 cause remains NOT VERIFIED. No edit/save/version or full-fidelity behavior was
-tested. Independent runtime evidence review R3 is pending. Project GPT remains
+tested. R3's two archive findings were corrected and R4 returned a bounded PASS
+with no findings. Project GPT remains
 INCOMPLETE and upstream publication LOCKED.
 
 Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md`,

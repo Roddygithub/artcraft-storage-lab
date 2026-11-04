@@ -8,7 +8,8 @@ included.
 **Current evidence:** the R2-reviewed corpus was opened three times in WordCraft and three times
 in ONLYOFFICE. All six editor readiness checks and unchanged Seafile readback checks passed; no
 browser downloads were observed. This run did not edit or save documents and did not create
-Seafile versions. Independent evidence review R3 is pending. The OOXML ordering checks are
+Seafile versions. R3's archive-only findings were repaired; R4 returned a bounded PASS with no
+findings. The OOXML ordering checks are
 focused regression checks, not full ECMA-376 schema validation.
 
 The initial pre-remediation run is archived under `runtime/pre-remediation/`; it is historical
@@ -31,6 +32,7 @@ WordCraft `net::ERR_ABORTED` request-failed events; targets and cause are omitte
   screenshots retained as historical evidence.
 - `INDEPENDENT-REVIEW-R1.md` — findings and remediation status from the first independent review.
 - `INDEPENDENT-REVIEW-R2.md` — bounded source re-review; no full schema or runtime validation.
+- `INDEPENDENT-REVIEW-R3.md` and `INDEPENDENT-REVIEW-R4.md` — archive repair finding and its bounded verification.
 - `runtime/wordcraft/` — prose/runs, lists/table, first-page layout and page-2 screenshots.
 - `runtime/onlyoffice/` — prose/runs, lists/table, first-page and corrected page-2 screenshots.
 

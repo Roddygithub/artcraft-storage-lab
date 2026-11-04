@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-04",
+  "runtime": "Rootless Podman; isolated disposable project and fresh synthetic Seafile data; loopback-only test ports.",
+  "seafile_version": "13.0.28",
+  "browser": "Chromium in the pinned Playwright container shown below.",
+  "images": [
+    {
+      "image": "docker.io/library/mariadb:10.11",
+      "digests": [
+        "6c65a843396dc6c78dd0da19eccaa0a91d25d9d26a4c2afcb75010ac3f59f5ea",
+        "d769e37960821dfdcf096954f6e7ac89f747e116c1bba98e48edd265dfc7deae"
+      ]
+    },
+    {
+      "image": "docker.io/library/redis:7",
+      "digests": [
+        "a7aad82554197a54c653388bfded882a59d6b4a02468484bc31bae6772dcc42c",
+        "b6b6e3dc0c0952737748e55d5d885272840c7e42ba41ab1d5489f693419882f5"
+      ]
+    },
+    {
+      "image": "docker.io/seafileltd/seafile-mc:13.0-latest",
+      "digests": [
+        "b0c90832126bf432db908449f1bb450211e6bbf75a2193bab3399e2a9636eccf",
+        "d8880d888d318b402591e64576e43c322d78d00e51d18c07aaa4fa8125571582"
+      ]
+    },
+    {
+      "image": "docker.io/onlyoffice/documentserver:9.4",
+      "digests": [
+        "8c114db7648a1654828d33e1f9f3b18e97c4caae6707d34bf04d793d260f7e67",
+        "e3da62a847b9a5d51a11f73cfea1d9c13c3be3809614490d4edddcf01dcf919b"
+      ]
+    },
+    {
+      "image": "docker.io/library/python:3.12-slim",
+      "digests": [
+        "1148dbb014615300fa7e713b2f94f550c0d1c69780c0805f84f093ceee34dd0b",
+        "b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30"
+      ]
+    },
+    {
+      "image": "mcr.microsoft.com/playwright/python:v1.49.0-noble",
+      "digests": [
+        "2ffdecba64eeeb8aaf165c2ad30b649442d373ac8c040faf136e8fc2ba9f8d6f",
+        "35a390e70ab8ba7fbc909dc01af2329e287e89ccc8fb2f04a1a7ae94cacc5c30"
+      ]
+    }
+  ],
+  "production_seafile_or_onlyoffice_accessed": false,
+  "production_configuration_changed": false,
+  "private_environment_file": "Generated in private cache; excluded from Git and this bundle."
+}

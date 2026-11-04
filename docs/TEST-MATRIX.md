@@ -7,17 +7,33 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-084 — PdfCraft AcroForm edit on synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Synthetic route and editor open | Seafile opens the PDF in PdfCraft | [x] HTTP route checks and browser editor readiness passed |
+| Real AcroForm edit before save | Typed value changes an existing field and editor becomes dirty | [x] Chromium typed the value into the fixture's `name` field; dirty state observed before Ctrl+S |
+| Host save and Seafile version | Bridge receives editor bytes, confirms save, and Seafile records a user-attributed version | [x] Save payload contained the typed field value; host confirmation and new history row were observed |
+| Readback and fresh-session reopen | Seafile readback and new session retain the exact edit | [x] Relay payload equals Seafile readback byte-for-byte; fresh `?edit_pdf=true` session loaded the same bytes and field value |
+| Download behavior | Editor save does not fall back to browser download | [x] No download observed |
+| Runtime slices | HTTP and focused browser assertions pass | [x] HTTP 48/48; PdfCraft Chromium 18/18 on synthetic Seafile CE 13.0.28 |
+| Coverage boundary | Report distinguishes setup upload, file-list behavior, and wider compatibility | [x] Fixture upload was setup only; fresh editor reopened via direct route because PDF file-list link opens preview |
+| Broader PDF compatibility, human HTTPS, production, other browsers, ONLYOFFICE regression | Wider compatibility/deployment | [ ] NOT VERIFIED |
+| Independent review | Exact committed evidence/source reviewed by GPT | [~] Source audit R1 has no remaining P1/P2; exact-commit GPT review pending |
+
+Direct parent run, not Aptarchy task completion. Project GPT remains INCOMPLETE and upstream publication LOCKED. Evidence: [GR-084 report](GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md) and [bundle](reviews/GR-084/).
+
 ## GR-083 — WordCraft / ONLYOFFICE DOCX comparison
 
 | Scenario | Expected | Result |
 |---|---|---|
-| Same corrected synthetic corpus opens in both editors | Three corrected DOCX fixtures open in each editor and report ready | [x] Fresh replay: six ready opens, all six readback hashes match, no browser downloads; R3 evidence review pending |
+| Same corrected synthetic corpus opens in both editors | Three corrected DOCX fixtures open in each editor and report ready | [x] Fresh replay: six ready opens, all six readback hashes match, no browser downloads; R3 archive fixes verified in R4 |
 | Prose and inline runs | Heading, paragraphs, bold, italic and colored text are visible | [~] Fresh screenshots show these elements in both editors; small visual spot check, not a fidelity benchmark |
 | Lists and table | Headings, bullet/numbered lists and a two-column table are visible | [~] Fresh screenshots show the structure in both; spacing is not pixel-identical |
 | Page-2 rendering | Second-page heading and paragraph appear after the page break in both editors | [~] Fresh captures show the heading, paragraph and table; ONLYOFFICE tip is in lower-right whitespace and table is near viewport bottom |
 | Edit, save, Seafile version and reopen | Compare edited-document fidelity across both editors | [ ] NOT RUN; this was an open/readback-only comparison |
 | Broad OOXML fidelity, foreign documents, other browsers, production | General compatibility and deployment behavior | [ ] NOT VERIFIED |
-| Independent source/runtime evidence review | Separate review of report, code and retained evidence | [~] R1 P2/P3 fixes verified by bounded R2 source PASS; fresh runtime evidence R3 pending |
+| Independent source/runtime evidence review | Separate review of report, code and retained evidence | [x] R1 P2/P3 source findings closed by bounded R2; R3 archive findings corrected and R4 returned bounded PASS |
 
 Evidence: [GR-083 report](GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md),
 [bundle](reviews/GR-083/). Direct parent work, not Aptarchy task completion.

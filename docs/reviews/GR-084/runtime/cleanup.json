@@ -1,0 +1,8 @@
+{
+  "project": "artcraft-wopi-pdfcraft-r6",
+  "cleanup_method": "Disposable compose runner ran down --remove-orphans in a finally block.",
+  "containers_remaining": false,
+  "test_ports_listening_after_run": false,
+  "podman_user_socket": "inactive (dead) after run; it was restored to its previously inactive state.",
+  "private_cache_database": "Retained locally for audit; it contains only this synthetic disposable lab, is not a running service, and is not in Git."
+}

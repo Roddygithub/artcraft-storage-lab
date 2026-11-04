@@ -5,7 +5,22 @@
 > `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT GR: GR-083 — WordCraft / ONLYOFFICE DOCX comparison
+## CURRENT GR: GR-084 — PdfCraft real edit on synthetic Seafile
+
+In the final isolated run, the HTTP slice passed 48/48 and focused Chromium
+passed 18/18 with released PdfCraft Web v0.16.1 on synthetic Seafile CE
+13.0.28. A browser-typed AcroForm value reached a user-attributed new version;
+relay-save bytes exactly matched Seafile readback and a fresh-session
+`?edit_pdf=true` reopen. No editor download occurred. This was direct parent
+work, not Aptarchy completion. It covers one synthetic PDF and does not claim a
+file-list click into PdfCraft, broad PDF fidelity, production, or project
+completion. The lab containers are removed, ports are free, and the Podman user
+socket is inactive. Independent source audit R1 found no remaining P1/P2 after
+the filter fix; exact-commit GPT review is pending. Project GPT remains
+INCOMPLETE and upstream is LOCKED. Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md`
+and `docs/reviews/GR-084/`.
+
+## PREVIOUS GR: GR-083 — WordCraft / ONLYOFFICE DOCX comparison
 
 After the OOXML ordering fix passed independent source review R2, a fresh
 rootless-Podman run opened all three corrected synthetic DOCX fixtures in both
@@ -16,7 +31,8 @@ the initial pre-remediation evidence is archived separately. Two WordCraft
 plugin/theme 502s did not recur, but their cause remains NOT VERIFIED. The
 ONLYOFFICE page-2 table is visible near the viewport bottom, with its first-use
 tip in lower-right whitespace. No edit, save, or version was tested. Independent
-evidence review R3 is pending. This was direct parent work, not Aptarchy
+evidence review R3's archive findings were corrected; R4 returned a bounded
+PASS with no findings. This was direct parent work, not Aptarchy
 completion. Production/upstream remain untouched; project GPT is INCOMPLETE and
 upstream is LOCKED. Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md`
 and `docs/reviews/GR-083/`.

@@ -11,7 +11,8 @@ For each exercised file:
   2. Seahub's React WOPI page posts the access token to the bridge; a frame on the bridge
      origin appears (host page), which frames the editor bundle;
   3. wait for the editor's `<app>:ready`, the host's `open`, and the editor to load the bytes;
-  4. ask the editor to save (Ctrl/Cmd+S inside the editor frame); the host relays PutFile;
+  4. make a real edit where a dedicated flow exists, then ask the editor to save
+     (Ctrl/Cmd+S inside the editor frame); the host relays PutFile;
   5. verify through the Seafile API that a new version by the user exists, and that the host
      page reports it.
 Writes RESULTS_DIR/browser.json and screenshots.
@@ -21,6 +22,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import sys
 import time
 import urllib.parse
@@ -196,6 +198,101 @@ def dxf_has_circle(data, center=(20.0, 20.0), radius=10.0):
         math.isclose(r, radius, rel_tol=0, abs_tol=1e-6)
         for x, y, r in circles
     )
+
+
+def pdf_text_field_has_value(data, field_name, expected):
+    """Find an AcroForm text field value in ordinary or incremental PDF objects.
+
+    This deliberately reads only `/T` and `/V` dictionary strings from PDF objects; a marker
+    elsewhere in page text or metadata cannot satisfy the saved-form assertion.
+    """
+    def string_after(chunk, key):
+        match = re.search(rb"/" + re.escape(key.encode("ascii")) + rb"\b\s*", chunk)
+        if not match:
+            return None
+        pos = match.end()
+        if pos >= len(chunk):
+            return None
+        if chunk[pos:pos + 1] == b"(":
+            pos += 1
+            depth = 1
+            value = bytearray()
+            while pos < len(chunk) and depth:
+                char = chunk[pos]
+                pos += 1
+                if char == 0x5C:  # PDF backslash escape, including three-digit octal.
+                    if pos >= len(chunk):
+                        return None
+                    escaped = chunk[pos]
+                    pos += 1
+                    if escaped in b"01234567":
+                        digits = bytes([escaped])
+                        for _ in range(2):
+                            if pos < len(chunk) and chunk[pos] in b"01234567":
+                                digits += bytes([chunk[pos]])
+                                pos += 1
+                            else:
+                                break
+                        value.append(int(digits, 8) & 0xFF)
+                    elif escaped in (0x0A, 0x0D):  # escaped line ending is continuation
+                        if escaped == 0x0D and pos < len(chunk) and chunk[pos] == 0x0A:
+                            pos += 1
+                    else:
+                        value.append({ord("n"): 10, ord("r"): 13, ord("t"): 9,
+                                      ord("b"): 8, ord("f"): 12}.get(escaped, escaped))
+                elif char == 0x28:
+                    depth += 1
+                    value.append(char)
+                elif char == 0x29:
+                    depth -= 1
+                    if depth:
+                        value.append(char)
+                else:
+                    value.append(char)
+            return bytes(value) if depth == 0 else None
+        if chunk[pos:pos + 1] == b"<" and chunk[pos:pos + 2] != b"<<":
+            end = chunk.find(b">", pos + 1)
+            if end < 0:
+                return None
+            try:
+                return bytes.fromhex(re.sub(rb"\s+", b"", chunk[pos + 1:end]).decode("ascii"))
+            except (UnicodeDecodeError, ValueError):
+                return None
+        return None
+
+    wanted_name = field_name.encode("ascii")
+    wanted_value = expected.encode("utf-8")
+    for match in re.finditer(rb"\d+\s+\d+\s+obj\b(.*?)\bendobj\b", data, re.DOTALL):
+        obj = match.group(1)
+        name = string_after(obj, "T")
+        value = string_after(obj, "V")
+        if name != wanted_name or value is None:
+            continue
+        if value.startswith(b"\xfe\xff"):
+            try:
+                value = value[2:].decode("utf-16-be").encode("utf-8")
+            except UnicodeDecodeError:
+                continue
+        elif value.startswith(b"\xff\xfe"):
+            try:
+                value = value[2:].decode("utf-16-le").encode("utf-8")
+            except UnicodeDecodeError:
+                continue
+        if value == wanted_value:
+            return True
+    return False
+
+
+def select_browser_fixtures(fixtures, editor):
+    """Optionally limit a replay to one configured editor; empty selection means all."""
+    if not editor:
+        return fixtures
+    dynamic_editors = {"soundcraft", "designcraft", "figcraft", "deckcraft"}
+    if editor in dynamic_editors:
+        return {}
+    if editor not in {spec[0] for spec in fixtures.values()}:
+        raise ValueError(f"BROWSER_ONLY_EDITOR is not present in the browser fixture map: {editor}")
+    return {name: spec for name, spec in fixtures.items() if spec[0] == editor}
 
 
 def cadcraft_canvas_edit_pixels(image, original):
@@ -513,14 +610,19 @@ def main():
     admin_username = me.get("email", rs.ADMIN)
     st, repo = rs.api(admin, "POST", "/api2/repos/", {"name": f"browser-slice-{int(time.time())}"})
     repo_id = repo["repo_id"]
+    pdf_fixture_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "form.pdf")
+    with open(pdf_fixture_path, "rb") as fixture_file:
+        pdf_fixture = fixture_file.read()
     fixtures = {
         "test.docx": ("wordcraft", rs.minimal_docx("hello from the browser slice"), ""),
         "test.xlsx": ("gridcraft", rs.minimal_xlsx(), ""),
-        "test.pdf": ("pdfcraft", rs.MINIMAL_PDF, "?edit_pdf=true"),
+        "test.pdf": ("pdfcraft", pdf_fixture, "?edit_pdf=true"),
         "test.dxf": ("cadcraft", rs.MINIMAL_DXF, ""),
         "test.svg": ("vectorcraft", rs.SVG_V1, ""),          # page-API shim, not an upstream bridge
         "test.png": ("photocraft", rs.MINIMAL_PNG, ""),       # lab host.rs port, built from upstream source
     }
+    only_editor = os.environ.get("BROWSER_ONLY_EDITOR", "").strip()
+    fixtures = select_browser_fixtures(fixtures, only_editor)
     STATIC = "/app/lab/real-seafile/static"
     # Editors whose bundle is not in the lab (not built yet) are skipped, not failed.
     for name in list(fixtures):
@@ -548,6 +650,119 @@ def main():
         def attach(page):
             page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
             page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
+            return page
+
+        def pdfcraft_real_edit_flow(page, name, content, box, status, before):
+            """Type into the fixture's name AcroForm field, save through WOPI, then verify
+            the field value in Seafile readback and the bytes fetched by a fresh session."""
+            marker = "pdfedited" + os.urandom(5).hex()
+            # GR-057's retained PdfCraft capture locates the first text widget at (520, 260)
+            # in its 1280x752 editor viewport. Scale that measured editor point into this
+            # browser's office-frame box, below the 60 px host bar.
+            page.mouse.click(
+                box["x"] + box["width"] * (520 / 1280),
+                box["y"] + 60 + (box["height"] - 60) * (260 / 752),
+            )
+            page.keyboard.press("Control+a")
+            page.keyboard.type(marker, delay=30)
+
+            def dirty():
+                return "unsaved" in (status() or "").lower() or "dirty=true" in (status() or "").lower()
+
+            end = time.monotonic() + 30
+            while time.monotonic() < end and not dirty():
+                page.wait_for_timeout(250)
+            check("pdfcraft_typed_form_edit_is_dirty_before_save", dirty(),
+                  f"marker={marker} status={status()!r}")
+            page.screenshot(path=os.path.join(RESULTS, "pdfcraft-typed.png"))
+
+            payload, confirmed = save_and_capture(page, status, timeout=120)
+            check("pdfcraft_save_request_contains_the_typed_name_field_value",
+                  payload is not None and pdf_text_field_has_value(payload, "name", marker),
+                  f"captured={payload is not None} marker={marker} bytes={len(payload) if payload else 0}")
+            check("pdfcraft_save_confirmed_by_host_page", confirmed, f"status={status()!r}")
+
+            after = before
+            end = time.monotonic() + 90
+            while time.monotonic() < end:
+                after = rs.history(admin, repo_id, name)
+                if len(after) > len(before):
+                    break
+                time.sleep(1)
+            check("pdfcraft_save_creates_seafile_version_by_user",
+                  len(after) > len(before) and after[0]["creator"] == admin_username,
+                  f"history {len(before)}->{len(after)} top={after[0] if after else None}")
+
+            saved, _ = rs.download(admin, repo_id, name)
+            saved_path = os.path.join(RESULTS, "pdfcraft-saved.pdf")
+            with open(saved_path, "wb") as output:
+                output.write(saved)
+            if payload:
+                with open(os.path.join(RESULTS, "pdfcraft-relay-save.pdf"), "wb") as output:
+                    output.write(payload)
+            check("pdfcraft_relay_save_bytes_match_seafile_readback",
+                  payload is not None and payload == saved,
+                  f"relay={len(payload) if payload else 0} readback={len(saved)}")
+            check("pdfcraft_saved_pdf_name_field_contains_typed_value",
+                  pdf_text_field_has_value(saved, "name", marker),
+                  f"marker={marker} bytes={len(saved)}")
+            check("pdfcraft_saved_pdf_differs_from_fixture", saved != content,
+                  f"{len(content)} -> {len(saved)} bytes")
+            check("pdfcraft_saved_pdf_bytes_look_right", rs.content_matches(name, saved),
+                  f"bytes={len(saved)}")
+            page.screenshot(path=os.path.join(RESULTS, "pdfcraft-saved.png"))
+
+            page.close()
+            page = attach(ctx.new_page())
+            reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(reopen, downloads)
+            reopen.on("page", attach)
+            p2 = reopen.new_page()
+            relay_file = []
+
+            def on_response(response):
+                if response.url.endswith("/relay/file"):
+                    try:
+                        relay_file.append((response.status, response.body()))
+                    except Exception:  # noqa: BLE001
+                        pass
+
+            reopen.on("response", on_response)
+            p2.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
+            p2.fill("input[name=login]", rs.ADMIN)
+            p2.fill("input[name=password]", rs.ADMIN_PW)
+            p2.click("button[type=submit], input[type=submit]")
+            p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
+            check("pdfcraft_fresh_seafile_session", "/accounts/login" not in p2.url, p2.url)
+            # Seafile's file-list PDF link opens its preview; the supported editor route is
+            # the same specific Seafile file URL with ?edit_pdf=true (also used for first open).
+            p2.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}?edit_pdf=true",
+                    wait_until="domcontentloaded")
+            check("pdfcraft_reopened_from_seafile_pdf_edit_route", p2.url.endswith("?edit_pdf=true"))
+            host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60,
+                               name="office_frame", parent=p2.main_frame)
+            check("pdfcraft_reopen_host_frame_from_seahub", host2 is not None,
+                  f"frames={frames_dump(p2)}")
+
+            def status2():
+                if host2 is None:
+                    return ""
+                try:
+                    return host2.evaluate("document.getElementById('status') ? document.getElementById('status').textContent : document.body.innerText.slice(0,200)")
+                except Exception as exc:  # noqa: BLE001
+                    return f"<{exc}>"
+
+            reopened = wait_for_saved_response(p2, relay_file, 180)
+            p2.screenshot(path=os.path.join(RESULTS, "pdfcraft-reopened.png"))
+            check("pdfcraft_fresh_open_loaded_the_saved_pdf_field_value",
+                  reopened is not None and reopened == saved and
+                  pdf_text_field_has_value(reopened, "name", marker),
+                  f"responses={len(relay_file)} marker={marker} bytes={len(reopened) if reopened else 0}")
+            check("pdfcraft_reopen_status_reports_opened_document",
+                  any(word in (status2() or "").lower() for word in ("open", "loaded", "ready")),
+                  f"status={status2()!r}")
+            check("pdfcraft_save_did_not_download", not downloads, f"downloads={len(downloads)}")
+            reopen.close()
             return page
 
         def wordcraft_real_edit_flow(page, name, content, box, status, before):
@@ -1203,6 +1418,8 @@ def main():
         # Apps with no hand-writable format and no page API: let the standalone app save a new
         # document as a browser download, and use those bytes as the Seafile fixture.
         for editor, fname, ext in (("soundcraft", "test.scraft", "scraft"), ("designcraft", "test.designcraft", "designcraft")):
+            if only_editor and editor != only_editor:
+                continue
             if not os.path.isdir(os.path.join(STATIC, editor)):
                 continue
             try:
@@ -1226,7 +1443,7 @@ def main():
 
         # FigCraft has no file format we can write by hand: let the app make one through its page
         # API on the standalone editor page, then upload it to Seafile and run the host flow on it.
-        if os.path.isdir(os.path.join(STATIC, "figcraft")):
+        if (not only_editor or only_editor == "figcraft") and os.path.isdir(os.path.join(STATIC, "figcraft")):
             try:
                 fig = fixctx.new_page()
                 fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html?control", wait_until="commit", timeout=60000)   # ?control: opt-in page API
@@ -1263,12 +1480,12 @@ def main():
             except Exception as e:  # noqa: BLE001
                 check("figcraft_fixture_made_by_the_app", False, str(e)[:300])
 
-        else:
+        elif not os.path.isdir(os.path.join(STATIC, "figcraft")):
             print("skip FigCraft fixture: no bundle for figcraft", flush=True)
 
         # Generate a valid native fixture with DeckCraft itself. The HTTP slice separately
         # asserts the .pptx route; this browser slice is specifically the native edit workflow.
-        if os.path.isdir(os.path.join(STATIC, "deckcraft")):
+        if (not only_editor or only_editor == "deckcraft") and os.path.isdir(os.path.join(STATIC, "deckcraft")):
             try:
                 sp = fixctx.new_page()
                 sp.goto(f"{rs.BRIDGE}/editors/deckcraft/index.html", wait_until="domcontentloaded", timeout=60000)
@@ -1294,8 +1511,15 @@ def main():
             except Exception as exc:  # noqa: BLE001
                 check("deckcraft_native_setup_fixture_generated_by_editor", False,
                       f"{type(exc).__name__}: {str(exc)[:220]}")
-        else:
+        elif not os.path.isdir(os.path.join(STATIC, "deckcraft")):
             print("skip DeckCraft native fixture: no bundle for deckcraft", flush=True)
+
+        if only_editor:
+            check("browser_editor_filter_selects_requested_editor",
+                  len(fixtures) == 1 and next(iter(fixtures.values()))[0] == only_editor,
+                  f"selected={sorted(fixtures)}")
+            if len(fixtures) != 1 or next(iter(fixtures.values()))[0] != only_editor:
+                raise RuntimeError(f"BROWSER_ONLY_EDITOR produced no fixture: {only_editor}")
 
         queue = list(fixtures.items())
         seen_native = set()
@@ -1364,6 +1588,10 @@ def main():
             if editor == "gridcraft":
                 # ROADMAP step 3 slice: real cell edit, save + fresh-session reopen
                 page = gridcraft_real_edit_flow(page, name, content, box, status, before)
+                continue
+            if editor == "pdfcraft":
+                # A fillable synthetic AcroForm gives PdfCraft an actual content edit to save.
+                page = pdfcraft_real_edit_flow(page, name, content, box, status, before)
                 continue
             if editor == "deckcraft" and name.endswith(".deckcraft"):
                 # Native DeckCraft data gets the explicit edit/save/version/reopen slice.
