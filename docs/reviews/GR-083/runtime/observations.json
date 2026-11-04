@@ -1,0 +1,96 @@
+{
+  "date": "2026-11-04",
+  "run": "corrected fresh rootless-Podman replay; browser moved to document end with Ctrl+End",
+  "result": "Six open/readback checks passed; no editing or saving was attempted.",
+  "fixtures_sha256": {
+    "fidelity-prose.docx": "74e3cf07905970189c8cb872cd3e7c2aa9cc48e76468850161f6f93b594c19de",
+    "fidelity-structure.docx": "9748c05957723a0dd20db0a78a1ac421670a891707fc1bd2e559ababefd8b1f8",
+    "fidelity-layout.docx": "9ac17faed431982445dea9201311b9838e407f515dd5e6930bd9710360bd4eea"
+  },
+  "variants": [
+    {
+      "editor": "wordcraft",
+      "checks_pass": true,
+      "browser_downloads": "none",
+      "diagnostic_http_errors": [],
+      "opened": [
+        {
+          "file": "fidelity-prose.docx",
+          "editor_frame_seen": true,
+          "render_ready_hint": true,
+          "title_in_dom_text": false,
+          "seahub_prepare_error": false,
+          "source_readback_unchanged": true,
+          "page_two_capture": false
+        },
+        {
+          "file": "fidelity-structure.docx",
+          "editor_frame_seen": true,
+          "render_ready_hint": true,
+          "title_in_dom_text": false,
+          "seahub_prepare_error": false,
+          "source_readback_unchanged": true,
+          "page_two_capture": false
+        },
+        {
+          "file": "fidelity-layout.docx",
+          "editor_frame_seen": true,
+          "render_ready_hint": true,
+          "title_in_dom_text": false,
+          "seahub_prepare_error": false,
+          "source_readback_unchanged": true,
+          "page_two_capture": true
+        }
+      ]
+    },
+    {
+      "editor": "onlyoffice",
+      "checks_pass": true,
+      "browser_downloads": "none",
+      "diagnostic_http_errors": [
+        {
+          "status": 502,
+          "endpoint": "ONLYOFFICE plugin manifest"
+        },
+        {
+          "status": 502,
+          "endpoint": "ONLYOFFICE theme manifest"
+        }
+      ],
+      "opened": [
+        {
+          "file": "fidelity-prose.docx",
+          "editor_frame_seen": true,
+          "render_ready_hint": true,
+          "title_in_dom_text": false,
+          "seahub_prepare_error": false,
+          "source_readback_unchanged": true,
+          "page_two_capture": false
+        },
+        {
+          "file": "fidelity-structure.docx",
+          "editor_frame_seen": true,
+          "render_ready_hint": true,
+          "title_in_dom_text": false,
+          "seahub_prepare_error": false,
+          "source_readback_unchanged": true,
+          "page_two_capture": false
+        },
+        {
+          "file": "fidelity-layout.docx",
+          "editor_frame_seen": true,
+          "render_ready_hint": true,
+          "title_in_dom_text": false,
+          "seahub_prepare_error": false,
+          "source_readback_unchanged": true,
+          "page_two_capture": true
+        }
+      ]
+    }
+  ],
+  "page_two_visual_check": {
+    "wordcraft": "Corrected capture shows the second-page heading, paragraph, and table.",
+    "onlyoffice": "Corrected capture shows the second-page heading and paragraph; table comparison is partly obscured by the editor first-use tip and viewport crop."
+  },
+  "privacy": "URLs, repository IDs, account names, tokens, cookies, raw DOM, and DOCX bytes are omitted."
+}

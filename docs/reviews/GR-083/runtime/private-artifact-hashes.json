@@ -1,0 +1,12 @@
+{
+  "note": "Hashes only. Raw private logs and synthetic library state remain outside Git.",
+  "artifacts_sha256": {
+    "wordcraft_raw_observations_sha256": "7fad38122acf72a1b19e22d26733a5f1b25d4f6a45ad2e153e66e5c297b5a799",
+    "onlyoffice_raw_observations_sha256": "a264cd419a9430f4436554353b0aee96f34302ca478749e26e75aca77c7ed374",
+    "wordcraft_private_container_log_sha256": "561f06de018772bc38b6335563d97eddf367b31442c0db919883249bc9e06ba5",
+    "onlyoffice_private_container_log_sha256": "121b5fb6b6dbd2451a05ce607551fbae2d79f6e8dbc2910e127494ca943c890c",
+    "private_service_log_sha256": "7c3dd9a230db5e8d57eb0f98000860884ed9ca4e08bb0aa8b6d0cf32abedaeac",
+    "private_synthetic_library_state_sha256": "e9907c08934f6d120a84b7499b1ba0f6bb59ba671b5a83e153fe79002f85ffbb",
+    "private_runner_log_sha256": "0bd4d6afd7d2dbb6b31f5667b8ea20ed52bdbf592280dcc198187e5e738a5660"
+  }
+}

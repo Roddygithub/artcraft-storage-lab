@@ -5,7 +5,22 @@
 > `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT GR: GR-082 — CADCraft real edit on synthetic Seafile
+## CURRENT GR: GR-083 — WordCraft / ONLYOFFICE DOCX comparison
+
+A direct parent run opened the same three deterministic synthetic DOCX fixtures
+through WordCraft and ONLYOFFICE in a disposable rootless Podman Seafile lab.
+All six editor opens reported ready, the before/after file hashes were unchanged,
+and no browser downloads occurred. Corrected Ctrl+End captures show the
+second-page heading and paragraph in both editors; the ONLYOFFICE table is
+partly obscured by its first-use tip and viewport crop. The corrected
+ONLYOFFICE run logged two HTTP 502s for plugin/theme manifests; their cause is
+NOT VERIFIED. This was an open/readback comparison, not an edit/save test, and
+was direct parent work, not Aptarchy completion. Independent review is pending.
+Production and upstream remain untouched; project GPT is INCOMPLETE and
+upstream is LOCKED. Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md`
+and `docs/reviews/GR-083/`.
+
+## PREVIOUS GR: GR-082 — CADCraft real edit on synthetic Seafile
 
 The direct parent run exercised a fresh rootless Podman lab using Seafile CE
 13.0.28 and released CADCraft Web v0.15.1. CADCraft opened `test.dxf` from the

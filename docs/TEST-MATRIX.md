@@ -7,6 +7,22 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-083 — WordCraft / ONLYOFFICE DOCX comparison
+
+| Scenario | Expected | Result |
+|---|---|---|
+| Same synthetic corpus opens in both editors | Three DOCX fixtures open in each editor and report ready | [x] Six opens; exact file hashes unchanged; no browser downloads. Corrected ONLYOFFICE run logged two HTTP 502s for plugin/theme manifests; cause NOT VERIFIED |
+| Prose and inline runs | Heading, paragraphs, bold, italic and colored text are visible | [x] Similar rendering in the retained screenshots; visual spot check only |
+| Lists and table | Headings, bullet/numbered lists and a two-column table are visible | [x] Present in both screenshots; spacing is not pixel-identical |
+| Page-2 rendering | Second-page heading and paragraph appear after the page break in both editors | [~] Corrected Ctrl+End captures show the heading and paragraph in both. WordCraft's table is visible; ONLYOFFICE's table is partly obscured by a first-use tip and viewport crop |
+| Edit, save, Seafile version and reopen | Compare edited-document fidelity across both editors | [ ] NOT RUN; this was an open/readback-only comparison |
+| Broad OOXML fidelity, foreign documents, other browsers, production | General compatibility and deployment behavior | [ ] NOT VERIFIED |
+| Independent review | Separate review of report, code and retained evidence | [ ] Pending |
+
+Evidence: [GR-083 report](GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md),
+[bundle](reviews/GR-083/). Direct parent work, not Aptarchy task completion.
+Project GPT remains INCOMPLETE and upstream publication LOCKED.
+
 ## GR-082 — CADCraft DXF edit on synthetic Seafile
 
 | Scenario | Expected | Result |

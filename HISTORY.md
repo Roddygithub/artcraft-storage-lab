@@ -4,6 +4,24 @@
 > Seahub/fileserver patch architecture. Current WOPI bridge follow-ups continue in this log and are
 > summarized in `README.md`, `ROADMAP.md` and `lab/real-seafile/results/`.
 
+# 2026-11-04 — GR-083 WordCraft / ONLYOFFICE DOCX comparison
+
+- Opened the same three deterministic DOCX fixtures through WordCraft and
+  ONLYOFFICE in a disposable rootless Podman Seafile lab. All six opens reported
+  ready; fixture/readback hashes stayed identical; no browser downloads were
+  recorded. Corrected Ctrl+End captures show the second-page heading and
+  paragraph in both editors; the ONLYOFFICE table is partly obscured by a tip
+  and viewport crop. Its run also logged two HTTP 502s for plugin/theme
+  manifests; their cause remains NOT VERIFIED.
+- Screenshots show similar prose/runs and lists/table rendering. This bounded
+  sample is not a broad fidelity result. No editing, saving, or Seafile version
+  creation was attempted.
+- This was direct parent work, not Aptarchy completion. Production and upstream
+  were untouched. Independent review is pending; project GPT remains INCOMPLETE
+  and upstream publication LOCKED.
+- Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md` and
+  `docs/reviews/GR-083/`.
+
 # 2026-11-03 — GR-082 CADCraft real edit on synthetic Seafile
 
 - Ran a fresh rootless Podman Seafile CE 13.0.28 lab using the released,

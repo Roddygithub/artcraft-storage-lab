@@ -20,10 +20,22 @@ Status: **prototype, validated on a stock Seafile CE 13.0.28** in an isolated VM
 incorporated (30 fake-host tests). Not yet deployed anywhere real. Nothing
 published upstream.
 
-ROADMAP step 3 is now evidenced for WordCraft DOCX, GridCraft XLSX, and a native
-DeckCraft `.deckcraft` document. The DeckCraft Seafile browser run is separately
-recorded in [`GR-081`](docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md); it does
-not verify foreign `.pptx` editing or production behavior.
+ROADMAP step 3 has current-bridge Seafile evidence for WordCraft DOCX and GridCraft
+XLSX, the five-route GR-078 replay (WordCraft, GridCraft, PdfCraft, VectorCraft and
+PhotoCraft), native DeckCraft `.deckcraft`, and CADCraft DXF. The DeckCraft and
+CADCraft runs are direct parent work, not Aptarchy completion. See
+[`GR-078`](docs/GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md),
+[`GR-081`](docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md), and
+[`GR-082`](docs/GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md). Remaining dispatched
+scenarios, foreign `.pptx` editing, broad CADCraft fidelity and production
+behavior still require separate validation.
+
+The initial synthetic WordCraft/ONLYOFFICE DOCX comparison is recorded in
+[`GR-083`](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md). It covers
+prose/runs, lists/tables, and visible page-2 heading/text in a small synthetic
+sample. Full table/layout fidelity remains unverified; two ONLYOFFICE plugin/theme
+manifest requests returned 502. It performed no editing or save and does not
+replace the owner’s live ONLYOFFICE repair.
 
 ## What works today
 
