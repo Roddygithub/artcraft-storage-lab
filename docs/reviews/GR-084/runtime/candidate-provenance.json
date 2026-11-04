@@ -1,14 +1,14 @@
 {
-  "base_commit": "74f95d55786363c1b8d955ce10f0ad5517d10da6",
+  "base_commit": "c09933c7f45b49e6b2d518c1589fc1a52863619e",
   "source_files": [
     {
       "path": "lab/real-seafile/run_browser.py",
-      "sha256": "1cd8e480c95bff132b1cfb476f5c8d4091a27d91c5ee54476b1f8e505e41427d",
-      "runtime_copy_sha256": "1cd8e480c95bff132b1cfb476f5c8d4091a27d91c5ee54476b1f8e505e41427d"
+      "sha256": "934acd2e0a70a511b9f039645b9e98e873b24c2a5ef541191f0d39dad4951b7a",
+      "runtime_copy_sha256": "934acd2e0a70a511b9f039645b9e98e873b24c2a5ef541191f0d39dad4951b7a"
     },
     {
       "path": "tests/test_pdfcraft_real_edit.py",
-      "sha256": "686cf20675ebc606768d76c7feea4bc3ea8d2bfeebbca91f00a058ee9f4f2074"
+      "sha256": "f424c731fb524cdea856ac02490f353308cd72455039fb634c89e5740c840ec5"
     },
     {
       "path": "lab/real-seafile/fixtures/form.pdf",
@@ -40,9 +40,10 @@
     ]
   },
   "runtime_configuration": {
-    "compose_snapshot_sha256": "83c7540c3ebe13c2ac003a5dec21847faa733c642135da13f6422e9fd06cdce7",
-    "runner_snapshot_sha256": "2e38fb647637957df1e405a1d2fd911cbcf61c87fe98879d8c7225e624a51a72",
+    "compose_snapshot_sha256": "d991edad4640d09207e3d08cef5b9da00a5ea4532cc9500e3d2d28db8c461134",
+    "runner_snapshot_sha256": "ecf5c6b26e0c3f061bdcd604a2cde3c9d75971ef6fb1c93c5622e21e48a52a55",
     "private_cache_root": "Private local cache; absolute path omitted from repository evidence.",
     "environment_file_included": false
-  }
+  },
+  "previous_reviewed_commit": "c09933c7f45b49e6b2d518c1589fc1a52863619e"
 }

@@ -21,7 +21,7 @@ services:
       start_period: 30s
       timeout: 5s
       retries: 10
-    container_name: artcraft-wopi-pdfcraft-r6-db
+    container_name: artcraft-wopi-pdfcraft-r7-db
     mem_limit: 384m
     cpus: 0.5
   redis:
@@ -36,12 +36,12 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     networks:
       - seafile-net
-    container_name: artcraft-wopi-pdfcraft-r6-redis
+    container_name: artcraft-wopi-pdfcraft-r7-redis
     mem_limit: 96m
     cpus: 0.5
   seafile:
     image: docker.io/seafileltd/seafile-mc:13.0-latest
-    container_name: artcraft-wopi-pdfcraft-r6-seafile
+    container_name: artcraft-wopi-pdfcraft-r7-seafile
     restart: no
     ports:
       - 127.0.0.1:19000:80
@@ -96,7 +96,7 @@ services:
     cpus: 1
   onlyoffice:
     image: docker.io/onlyoffice/documentserver:9.4
-    container_name: artcraft-wopi-pdfcraft-r6-onlyoffice
+    container_name: artcraft-wopi-pdfcraft-r7-onlyoffice
     restart: no
     ports:
       - 127.0.0.1:19010:80
@@ -112,7 +112,7 @@ services:
     cpus: 1
   bridge:
     image: docker.io/library/python:3.12-slim
-    container_name: artcraft-wopi-pdfcraft-r6-bridge
+    container_name: artcraft-wopi-pdfcraft-r7-bridge
     restart: no
     working_dir: /app
     command:
@@ -156,7 +156,7 @@ services:
       - RESULTS_DIR=/results
     networks:
       - seafile-net
-    container_name: artcraft-wopi-pdfcraft-r6-slice
+    container_name: artcraft-wopi-pdfcraft-r7-slice
     restart: no
     mem_limit: 256m
     cpus: 0.5
@@ -185,11 +185,11 @@ services:
       - BROWSER_ONLY_EDITOR=pdfcraft
     networks:
       - seafile-net
-    container_name: artcraft-wopi-pdfcraft-r6-browser
+    container_name: artcraft-wopi-pdfcraft-r7-browser
     restart: no
     mem_limit: 896m
     cpus: 1.5
     shm_size: 256m
 networks:
   seafile-net:
-    name: artcraft-wopi-pdfcraft-r6-net
+    name: artcraft-wopi-pdfcraft-r7-net

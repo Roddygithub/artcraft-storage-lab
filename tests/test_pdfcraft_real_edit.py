@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline semantic checks for PdfCraft's synthetic AcroForm save assertions."""
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -26,6 +27,28 @@ except ModuleNotFoundError:
 import run_browser  # noqa: E402
 
 
+def append_pdf_revision(data, object_number, body, size):
+    previous = int(re.findall(rb"(?m)^startxref\s+(\d+)\s*$", data)[-1])
+    prefix = b"" if data.endswith(b"\n") else b"\n"
+    object_offset = len(data) + len(prefix)
+    serialized = (f"{object_number} 0 obj\n".encode() + body +
+                  b"\nendobj\n")
+    xref_offset = object_offset + len(serialized)
+    xref = (f"xref\n{object_number} 1\n{object_offset:010d} 00000 n \n"
+            f"trailer\n<< /Size {size} /Root 1 0 R /Prev {previous} >>\n"
+            f"startxref\n{xref_offset}\n%%EOF\n").encode()
+    return data + prefix + serialized + xref
+
+
+def field_body(field_name=b"name", value_token=None):
+    data = open(os.path.join(HERE, "..", "lab", "real-seafile", "fixtures", "form.pdf"), "rb").read()
+    match = re.search(rb"(?ms)^4\s+0\s+obj\b(.*?)\bendobj\b", data)
+    body = match.group(1).strip().replace(b"/T (name)", b"/T (" + field_name + b")")
+    if value_token is not None:
+        body = body[:-2] + b" /V " + value_token + b" >>"
+    return body
+
+
 def main():
     fixtures = {"test.docx": ("wordcraft", b"docx", ""),
                 "test.pdf": ("pdfcraft", b"pdf", "?edit_pdf=true")}
@@ -48,20 +71,29 @@ def main():
     assert not run_browser.pdf_text_field_has_value(fixture, "name", "pdfedited1234567890")
 
     marker = b"pdfedited1234567890"
-    literal = fixture + b"\n14 0 obj\n<< /FT /Tx /T (name) /V (" + marker + b") >>\nendobj\n"
+    literal = append_pdf_revision(fixture, 4, field_body(value_token=b"(" + marker + b")"), 13)
     assert run_browser.pdf_text_field_has_value(literal, "name", marker.decode())
 
     hex_value = marker.hex().upper().encode()
-    hexadecimal = fixture + b"\n14 0 obj\n<< /FT /Tx /T (name) /V <" + hex_value + b"> >>\nendobj\n"
+    hexadecimal = append_pdf_revision(fixture, 4, field_body(value_token=b"<" + hex_value + b">"), 13)
     assert run_browser.pdf_text_field_has_value(hexadecimal, "name", marker.decode())
 
-    escaped = (fixture + b"\n14 0 obj\n<< /FT /Tx /T (name) /V (pdfedited\\(123\\)) >>\nendobj\n")
+    escaped = append_pdf_revision(fixture, 4, field_body(value_token=b"(pdfedited\\(123\\))"), 13)
     assert run_browser.pdf_text_field_has_value(escaped, "name", "pdfedited(123)")
 
-    other_field = fixture + b"\n14 0 obj\n<< /FT /Tx /T (city) /V (" + marker + b") >>\nendobj\n"
+    other_field = append_pdf_revision(fixture, 4, field_body(b"city", b"(" + marker + b")"), 13)
     assert not run_browser.pdf_text_field_has_value(other_field, "name", marker.decode())
-    unrelated_page_text = fixture + b"\n14 0 obj\n<< /Contents (" + marker + b") >>\nendobj\n"
+    unrelated_page_text = append_pdf_revision(
+        fixture, 14, b"<< /Contents (" + marker + b") >>", 15
+    )
     assert not run_browser.pdf_text_field_has_value(unrelated_page_text, "name", marker.decode())
+
+    superseded = append_pdf_revision(fixture, 4, field_body(value_token=b"(" + marker + b")"), 13)
+    superseded = append_pdf_revision(
+        superseded, 4, field_body(value_token=b"(different-current-value)"), 13
+    )
+    assert not run_browser.pdf_text_field_has_value(superseded, "name", marker.decode())
+    assert run_browser.pdf_text_field_has_value(superseded, "name", "different-current-value")
     print("PASS: PdfCraft AcroForm field-value assertions")
 
 

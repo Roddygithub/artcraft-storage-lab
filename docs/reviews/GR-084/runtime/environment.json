@@ -1,8 +1,8 @@
 {
   "date": "2026-11-04",
-  "runtime": "Rootless Podman; isolated disposable project and fresh synthetic Seafile data; loopback-only test ports.",
+  "runtime": "Rootless Podman; isolated disposable project and fresh synthetic Seafile data; host ports bound to loopback.",
   "seafile_version": "13.0.28",
-  "browser": "Chromium in the pinned Playwright container shown below.",
+  "browser": "Chromium in pinned Playwright container.",
   "images": [
     {
       "image": "docker.io/library/mariadb:10.11",
@@ -49,5 +49,6 @@
   ],
   "production_seafile_or_onlyoffice_accessed": false,
   "production_configuration_changed": false,
-  "private_environment_file": "Generated in private cache; excluded from Git and this bundle."
+  "private_environment_file": "Generated privately; excluded from Git and this bundle.",
+  "socket": "Podman user socket was activated for this isolated replay and returned to inactive state after cleanup."
 }

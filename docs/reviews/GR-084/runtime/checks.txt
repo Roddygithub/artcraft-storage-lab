@@ -1,17 +1,19 @@
 GR-084 checks
 
-Runtime (2026-11-04, isolated rootless Podman):
+Final runtime run (2026-11-04, fresh isolated rootless Podman project):
+- Command: `nice -n 10 env BROWSER_ONLY_EDITOR=pdfcraft python3 runtime-runner.py`.
 - HTTP slice: 48 passed, 0 failed; Seafile CE 13.0.28.
 - Focused PdfCraft Chromium slice: 18 passed, 0 failed.
-- The runner exited successfully after running HTTP then browser; project cleanup was executed.
+- HTTP completed before browser; the runner exited successfully and removed the project containers/network.
 - Relay save payload and Seafile readback: 2,385 bytes each, identical SHA-256.
-- Fresh-context /relay/file response matched Seafile readback; saved PDF remained semantically readable.
+- Fresh-context /relay/file response matched Seafile readback; the saved PDF field value was present.
 - No editor download observed.
-- `pdftotext` extracted the field value with three `Bad form bounding box` warnings; no full external PDF validity claim.
+- Active-xref reader also matched the current field value in the retained saved PDF.
+- `pdftotext` extracted the field with three `Bad form bounding box` warnings; full external PDF validity is not claimed.
 
 Local focused checks:
 - PYTHONDONTWRITEBYTECODE=1 python3 tests/test_pdfcraft_real_edit.py
-- python3 -m py_compile lab/real-seafile/run_browser.py tests/test_pdfcraft_real_edit.py
+- In-memory syntax compile of both changed Python files.
 - git diff --check
 
 Raw logs and result JSON remain in the private cache; only their SHA-256 digests are published.

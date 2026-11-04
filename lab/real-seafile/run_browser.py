@@ -200,11 +200,84 @@ def dxf_has_circle(data, center=(20.0, 20.0), radius=10.0):
     )
 
 
-def pdf_text_field_has_value(data, field_name, expected):
-    """Find an AcroForm text field value in ordinary or incremental PDF objects.
+def _current_pdf_object_bodies(data):
+    """Read active objects from a classic-xref PDF, newest revision taking precedence.
 
-    This deliberately reads only `/T` and `/V` dictionary strings from PDF objects; a marker
-    elsewhere in page text or metadata cannot satisfy the saved-form assertion.
+    Xref streams/object streams are intentionally unsupported here; the focused lab fixture and
+    PdfCraft output use classic xref tables. Unsupported or malformed framing fails closed.
+    """
+    starts = list(re.finditer(rb"(?m)^startxref\s+(\d+)\s*$", data))
+    if not starts:
+        return None
+    xref_offset = int(starts[-1].group(1))
+    entries = {}
+    seen = set()
+
+    def read_line(position):
+        end = data.find(b"\n", position)
+        if end < 0:
+            return data[position:].rstrip(b"\r"), len(data)
+        return data[position:end].rstrip(b"\r"), end + 1
+
+    while xref_offset:
+        if xref_offset in seen or xref_offset >= len(data) or data[xref_offset:xref_offset + 4] != b"xref":
+            return None
+        seen.add(xref_offset)
+        position = xref_offset + 4
+        line, position = read_line(position)
+        while not line.strip():
+            line, position = read_line(position)
+        while line.strip() != b"trailer":
+            subsection = re.fullmatch(rb"\s*(\d+)\s+(\d+)\s*", line)
+            if not subsection:
+                return None
+            first, count = map(int, subsection.groups())
+            if count > len(data) // 17 + 1:
+                return None
+            for number in range(first, first + count):
+                entry, position = read_line(position)
+                parsed = re.fullmatch(rb"\s*(\d{10})\s+(\d{5})\s+([nf])\s*", entry)
+                if not parsed:
+                    return None
+                offset, generation = int(parsed.group(1)), int(parsed.group(2))
+                if number not in entries:
+                    entries[number] = (offset, generation) if parsed.group(3) == b"n" else None
+            line, position = read_line(position)
+
+        next_start = re.search(rb"(?m)^startxref\b", data[position:])
+        if not next_start:
+            return None
+        trailer = data[position:position + next_start.start()]
+        previous = re.search(rb"/Prev\s+(\d+)\b", trailer)
+        if not previous:
+            break
+        previous_offset = int(previous.group(1))
+        if previous_offset >= xref_offset:
+            return None
+        xref_offset = previous_offset
+
+    bodies = []
+    for number, entry in entries.items():
+        if entry is None:
+            continue
+        offset, generation = entry
+        if offset >= len(data):
+            return None
+        header = re.match(rb"(\d+)\s+(\d+)\s+obj\b", data[offset:])
+        if not header or int(header.group(1)) != number or int(header.group(2)) != generation:
+            return None
+        end = data.find(b"endobj", offset + header.end())
+        if end < 0:
+            return None
+        bodies.append(data[offset + header.end():end])
+    return bodies
+
+
+def pdf_text_field_has_value(data, field_name, expected):
+    """Find the current AcroForm `/T` and `/V` strings; unsupported framing fails closed.
+
+    This is not a full PDF parser. It reads only objects selected by the active classic xref chain,
+    so superseded incremental object bodies cannot satisfy the form-value assertion.
     """
     def string_after(chunk, key):
         match = re.search(rb"/" + re.escape(key.encode("ascii")) + rb"\b\s*", chunk)
@@ -262,8 +335,10 @@ def pdf_text_field_has_value(data, field_name, expected):
 
     wanted_name = field_name.encode("ascii")
     wanted_value = expected.encode("utf-8")
-    for match in re.finditer(rb"\d+\s+\d+\s+obj\b(.*?)\bendobj\b", data, re.DOTALL):
-        obj = match.group(1)
+    objects = _current_pdf_object_bodies(data)
+    if objects is None:
+        return False
+    for obj in objects:
         name = string_after(obj, "T")
         value = string_after(obj, "V")
         if name != wanted_name or value is None:

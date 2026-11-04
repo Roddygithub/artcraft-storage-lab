@@ -3,7 +3,7 @@
 from pathlib import Path
 import json, subprocess, time, sys
 ROOT = Path(__file__).resolve().parent
-COMPOSE = ["/usr/bin/podman", "compose", "-f", str(ROOT / "compose.yml"), "--project-name", "artcraft-wopi-pdfcraft-r6"]
+COMPOSE = ["/usr/bin/podman", "compose", "-f", str(ROOT / "compose.yml"), "--project-name", "artcraft-wopi-pdfcraft-r7"]
 
 def run(args, **kwargs):
     return subprocess.run(args, cwd=ROOT, check=True, timeout=900, **kwargs)
@@ -15,7 +15,7 @@ def main():
         run(COMPOSE + ["up", "-d", "db", "redis", "seafile", "onlyoffice", "bridge"])
         config = "/shared/seafile/conf/seahub_settings.py"
         for _ in range(120):
-            ready = subprocess.run(["/usr/bin/podman", "exec", "artcraft-wopi-pdfcraft-r6-seafile", "test", "-f", config], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+            ready = subprocess.run(["/usr/bin/podman", "exec", "artcraft-wopi-pdfcraft-r7-seafile", "test", "-f", config], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
             if ready.returncode == 0:
                 break
             time.sleep(5)
@@ -23,9 +23,9 @@ def main():
             raise RuntimeError("isolated Seahub settings did not appear")
         env = dict(line.split("=", 1) for line in ROOT.joinpath(".env").read_text().splitlines() if "=" in line)
         block = ROOT.joinpath("app/lab/real-seafile/seahub_settings.extra.py").read_text().replace("__ONLYOFFICE_JWT_SECRET__", env["ONLYOFFICE_JWT_SECRET"])
-        run(["/usr/bin/podman", "exec", "artcraft-wopi-pdfcraft-r6-seafile", "cp", config, config + ".pre-artcraft"])
-        run(["/usr/bin/podman", "exec", "artcraft-wopi-pdfcraft-r6-seafile", "sed", "-i", "/^# >>> artcraft-lab/,/^# <<< artcraft-lab/d", config])
-        run(["/usr/bin/podman", "exec", "-i", "artcraft-wopi-pdfcraft-r6-seafile", "sh", "-c", "cat >> /shared/seafile/conf/seahub_settings.py"], input=(chr(10) + block).encode())
+        run(["/usr/bin/podman", "exec", "artcraft-wopi-pdfcraft-r7-seafile", "cp", config, config + ".pre-artcraft"])
+        run(["/usr/bin/podman", "exec", "artcraft-wopi-pdfcraft-r7-seafile", "sed", "-i", "/^# >>> artcraft-lab/,/^# <<< artcraft-lab/d", config])
+        run(["/usr/bin/podman", "exec", "-i", "artcraft-wopi-pdfcraft-r7-seafile", "sh", "-c", "cat >> /shared/seafile/conf/seahub_settings.py"], input=(chr(10) + block).encode())
         run(COMPOSE + ["restart", "seafile"])
         for stage in ["slice", "browser"]:
             with ROOT.joinpath("results", stage + "-run.log").open("wb") as log:

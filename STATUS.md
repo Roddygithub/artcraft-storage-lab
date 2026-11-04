@@ -15,8 +15,11 @@ relay-save bytes exactly matched Seafile readback and a fresh-session
 work, not Aptarchy completion. It covers one synthetic PDF and does not claim a
 file-list click into PdfCraft, broad PDF fidelity, production, or project
 completion. The lab containers are removed, ports are free, and the Podman user
-socket is inactive. Independent source audit R1 found no remaining P1/P2 after
-the filter fix; exact-commit GPT review is pending. Project GPT remains
+socket is inactive. Exact-candidate GPT R1 found a P2: the saved-field
+assertion could accept a value from a superseded PDF revision. The assertion
+now follows active classic-xref entries, the stale-value regression passes,
+and a fresh isolated runtime replay passed again. Exact-commit GPT R2 is
+pending. Project GPT remains
 INCOMPLETE and upstream is LOCKED. Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md`
 and `docs/reviews/GR-084/`.
 

@@ -23,8 +23,9 @@ This bundle records the 2026-11-04 isolated PdfCraft browser run. The synthetic 
 - `runtime/pdfcraft-*.png` — four unaltered Chromium captures before edit, after typing, after save, and after fresh-session reopen. They were visually inspected; PNG metadata contains no account, origin, or library details.
 - `runtime/pdfcraft-saved.pdf` — synthetic saved PDF returned by Seafile. The relay payload copy remains private; its equal digest is recorded above.
 - `../..` `lab/real-seafile/fixtures/form.pdf` — original synthetic fixture, copied from the reviewed GR-057 synthetic PDF.
-- `INDEPENDENT-REVIEW-R1.md` — bounded independent source audit; the final GPT review of the exact GR-084 commit is pending.
+- `INDEPENDENT-REVIEW-R1.md` — bounded independent source audit, separate from the exact-candidate GPT review.
+- `INDEPENDENT-GPT-REVIEW-R1.md` — exact-candidate GPT R1 P2 finding and remediation; GPT R2 of the resulting exact commit is pending.
 
-The candidate code was copied into the private runtime before the run; its `run_browser.py` SHA-256 exactly matched the working source. The release bundle provenance is recorded as `storytold/pdfcraft` v0.16.1, archive SHA-256 `00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf`, unpatched.
+The corrected candidate code was copied into the private runtime before the run; its `run_browser.py` SHA-256 exactly matched the working source. The saved-output assertion reads active objects through the classic xref chain, with regression coverage that rejects a value from a superseded revision. The release bundle provenance is recorded as `storytold/pdfcraft` v0.16.1, archive SHA-256 `00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf`, unpatched.
 
 This evidence does not verify other PDF files, full PDF fidelity, a Seafile file-list click into PdfCraft, production, the human HTTPS checklist, or project completion. It is direct parent work, not Aptarchy completion. Project GPT remains **INCOMPLETE** and upstream remains **LOCKED**.

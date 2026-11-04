@@ -17,9 +17,11 @@
   other PDFs, human HTTPS, production, and broad PDF fidelity remain NOT
   VERIFIED. Lab cleanup removed the test containers; the private cache data is
   retained locally. This was direct parent work, not Aptarchy completion.
-- Independent source audit R1 found no remaining P1/P2 after a filter fix. The
-  exact-commit GPT review is pending; project GPT remains INCOMPLETE and
-  upstream publication LOCKED.
+- Exact-candidate GPT R1 found P2: the saved-field assertion could accept a
+  marker from a superseded incremental PDF object. The assertion now resolves
+  active objects through the classic xref chain, the stale-value regression
+  passes, and the isolated runtime was rerun successfully. Exact-commit GPT R2
+  is pending; project GPT remains INCOMPLETE and upstream publication LOCKED.
 - Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
   `docs/reviews/GR-084/`.
 

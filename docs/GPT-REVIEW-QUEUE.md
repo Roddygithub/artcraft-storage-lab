@@ -50,8 +50,10 @@ editor download occurred. Fixture upload was setup only. The standard PDF
 file-list link opens preview, so this run does not claim file-list-to-PdfCraft
 navigation.
 
-The source-audit lane's initial dynamic-fixture filter concern was fixed; its
-follow-up found no remaining P1/P2. Exact-commit GPT review remains pending.
+GPT R1 found P2 in the form-value assertion: a stale value from a superseded
+incremental PDF object could satisfy it. The assertion now reads active objects
+through the classic xref chain, with a regression for stale values; the
+corrected source passed a fresh isolated replay. Exact-commit GPT R2 is pending.
 Other PDF documents, broad fidelity, human HTTPS, production, and project
 completion remain NOT VERIFIED. This is direct parent work, not Aptarchy task
 completion. Project GPT remains INCOMPLETE and upstream publication LOCKED.

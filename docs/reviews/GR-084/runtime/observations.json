@@ -17,5 +17,7 @@
     "post-change ONLYOFFICE regression",
     "project-level GPT completion"
   ],
-  "pdf_tool_diagnostic": "pdftotext extracted the saved field value but emitted three 'Bad form bounding box' warnings; full external PDF validity is not claimed."
+  "pdf_tool_diagnostic": "pdftotext extracted the saved field value but emitted three 'Bad form bounding box' warnings; full external PDF validity is not claimed.",
+  "runtime_run": "Final fresh database run after GPT R1 remediation; HTTP completed before focused Chromium.",
+  "revisions_assertion": "The PDF field check resolves active objects through the classic xref revision chain; the offline regression rejects a superseded incremental field value."
 }
