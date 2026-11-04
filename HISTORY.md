@@ -25,7 +25,8 @@
   The retained bytes and documentation now agree; an EOF guard and regression
   were added. GPT R3 found a stale HISTORY byte count; it is corrected. GPT R4
   found a stale closing sentence in the report; it is corrected with the R3
-  review link. Exact-commit GPT R5 is pending; project GPT remains INCOMPLETE and upstream
+  review link. GPT R5 found a stale opening-review status; it is corrected.
+  Exact-commit GPT R6 is pending; project GPT remains INCOMPLETE and upstream
   publication LOCKED.
 - Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
   `docs/reviews/GR-084/`.

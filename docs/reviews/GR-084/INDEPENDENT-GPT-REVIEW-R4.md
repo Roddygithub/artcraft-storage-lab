@@ -22,4 +22,6 @@ The runtime review did not reproduce the HTTP or browser run. Its recorded
 48/48 HTTP and 18/18 Chromium result remains bounded to one synthetic PDF.
 No project-level PASS or upstream authorization is implied.
 
-Exact-commit GPT R5 review is pending.
+Exact-commit GPT R5 review was pending when this record was written. R5 later
+found a stale opening status in the main report; its correction is recorded in
+`INDEPENDENT-GPT-REVIEW-R5.md`.

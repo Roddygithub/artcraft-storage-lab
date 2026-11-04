@@ -24,7 +24,7 @@ This bundle records the 2026-11-04 isolated PdfCraft browser run. The synthetic 
 - `runtime/pdfcraft-saved.pdf` — synthetic saved PDF returned by Seafile. The relay payload copy remains private; its equal digest is recorded above.
 - `../..` `lab/real-seafile/fixtures/form.pdf` — original synthetic fixture, copied from the reviewed GR-057 synthetic PDF.
 - `INDEPENDENT-REVIEW-R1.md` — bounded independent source audit, separate from the exact-candidate GPT review.
-- `INDEPENDENT-GPT-REVIEW-R1.md` through `INDEPENDENT-GPT-REVIEW-R4.md` — exact-candidate GPT findings and remediations; GPT R5 of the resulting exact commit is pending.
+- `INDEPENDENT-GPT-REVIEW-R1.md` through `INDEPENDENT-GPT-REVIEW-R5.md` — exact-candidate GPT findings and remediations; GPT R6 of the resulting exact commit is pending.
 
 The R1-corrected candidate code was copied into the private runtime before the run; its runtime-copy digest is retained in `candidate-provenance.json`. The later R2 EOF guard is a test-helper-only change, regression-tested offline after the run; the valid run-7 PDF result was not rerun for it. The R3 stale history byte count was corrected. The saved-output assertion reads active objects through the classic xref chain, with regression coverage that rejects a value from a superseded revision. The release bundle provenance is recorded as `storytold/pdfcraft` v0.16.1, archive SHA-256 `00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf`, unpatched.
 

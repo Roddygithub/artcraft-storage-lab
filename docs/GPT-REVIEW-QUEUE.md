@@ -58,7 +58,8 @@ retained PDF hash/size differed from the runtime readback and identified an EOF
 loop for truncated xref input. The retained artifact and records now agree;
 the helper has an EOF guard and regression. R3 found a stale 2,385-byte count
 in HISTORY; it is corrected to 2,386. R4 found a stale closing line in the
-report; the report now links R3 and marks R5 pending. Exact-commit GPT R5 is pending.
+report and R5 found a stale opening line; both now give the same review state.
+Exact-commit GPT R6 is pending.
 Other PDF documents, broad fidelity, human HTTPS, production, and project
 completion remain NOT VERIFIED. This is direct parent work, not Aptarchy task
 completion. Project GPT remains INCOMPLETE and upstream publication LOCKED.

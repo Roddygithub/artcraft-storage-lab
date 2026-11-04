@@ -9,8 +9,10 @@ rejects stale values. GPT R2 also found that the retained PDF's documented hash
 and size were stale, plus an EOF no-progress case in the narrow xref helper.
 The archived PDF metadata now matches the actual run-7 relay/readback bytes;
 the helper now fails closed on EOF and has a regression. GPT R3 found one stale
-2,385-byte count in `HISTORY.md`; it is corrected to 2,386. Exact-commit GPT R4
-review is pending. The EOF guard was added after the run; it affects only
+2,385-byte count in `HISTORY.md`; it is corrected to 2,386. R4 found and closed
+a stale closing-review sentence; R5 found and closed a stale opening-review
+sentence. Exact-commit GPT R6 review is pending. The EOF guard was added after
+the run; it affects only
 malformed helper input, not the valid saved PDF used by the recorded run.
 
 ## Run result
@@ -29,4 +31,4 @@ This proves one visible edit/save/version/readback/reopen sequence for a one-pag
 
 The following remain **NOT VERIFIED**: other PDF forms or documents, broad PDF fidelity, complete external PDF validity or parser correctness, a human HTTPS browser pass, other browsers, production behavior, a post-change ONLYOFFICE edit/save regression, and the remaining project-level roadmap gates. The browser flow uses the actual released PdfCraft bundle, but this evidence does not certify the wider project or every dispatched editor.
 
-This was direct parent work, not Aptarchy task completion. No production Seafile or ONLYOFFICE configuration was accessed or changed, and no upstream repository was contacted. Evidence and reproducibility notes are in [`docs/reviews/GR-084/`](reviews/GR-084/README.md). GPT findings and remediations are recorded in [`INDEPENDENT-GPT-REVIEW-R1.md`](reviews/GR-084/INDEPENDENT-GPT-REVIEW-R1.md), [`INDEPENDENT-GPT-REVIEW-R2.md`](reviews/GR-084/INDEPENDENT-GPT-REVIEW-R2.md), and [`INDEPENDENT-GPT-REVIEW-R3.md`](reviews/GR-084/INDEPENDENT-GPT-REVIEW-R3.md). R4 found and corrected a stale pending-review sentence in this report; exact-commit R5 is pending.
+This was direct parent work, not Aptarchy task completion. No production Seafile or ONLYOFFICE configuration was accessed or changed, and no upstream repository was contacted. Evidence and reproducibility notes are in [`docs/reviews/GR-084/`](reviews/GR-084/README.md). GPT findings and remediations are recorded in the R1–R5 review files under `docs/reviews/GR-084/`; R4's stale closing status and R5's stale opening status have both been corrected. Exact-commit R6 is pending.
