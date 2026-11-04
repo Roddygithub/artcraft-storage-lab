@@ -59,7 +59,8 @@ loop for truncated xref input. The retained artifact and records now agree;
 the helper has an EOF guard and regression. R3 found a stale 2,385-byte count
 in HISTORY; it is corrected to 2,386. R4 found a stale closing line in the
 report and R5 found a stale opening line; both now give the same review state.
-Exact-commit GPT R6 is pending.
+GPT R6 returned a bounded PASS with no P1–P3 findings on exact candidate
+61c98fe. Runtime remains retained evidence, not independently reproduced.
 Other PDF documents, broad fidelity, human HTTPS, production, and project
 completion remain NOT VERIFIED. This is direct parent work, not Aptarchy task
 completion. Project GPT remains INCOMPLETE and upstream publication LOCKED.

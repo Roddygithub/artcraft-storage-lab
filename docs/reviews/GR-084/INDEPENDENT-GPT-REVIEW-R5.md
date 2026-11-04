@@ -23,5 +23,6 @@ pending. The opening status now records R1–R5 outcomes and R6 as pending.
 
 The HTTP 48/48 and browser 18/18 results remain retained evidence, not a
 reproduced runtime. The post-run EOF helper change is disclosed. Exact-commit
-GPT R6 review is pending. No project-level PASS or upstream authorization is
-implied.
+GPT R6 was pending when this record was written; R6 later returned a bounded
+PASS, recorded in `INDEPENDENT-GPT-REVIEW-R6.md`. No project-level PASS or
+upstream authorization is implied.

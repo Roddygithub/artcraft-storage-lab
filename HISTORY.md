@@ -26,8 +26,9 @@
   were added. GPT R3 found a stale HISTORY byte count; it is corrected. GPT R4
   found a stale closing sentence in the report; it is corrected with the R3
   review link. GPT R5 found a stale opening-review status; it is corrected.
-  Exact-commit GPT R6 is pending; project GPT remains INCOMPLETE and upstream
-  publication LOCKED.
+  GPT R6 returned a bounded PASS with no P1–P3 findings on exact candidate
+  `61c98fe45483809ff11bad4efae413ee893041e8`. Project GPT remains INCOMPLETE
+  and upstream publication LOCKED.
 - Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
   `docs/reviews/GR-084/`.
 
