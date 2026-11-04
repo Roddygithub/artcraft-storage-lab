@@ -231,6 +231,15 @@ relay/readback comparison, and semantic title-marker retention. The test generat
 its fixture before editing. This was not Aptarchy task completion; foreign `.pptx` behavior,
 font fidelity, and production remain unverified. [GR-081 evidence](GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md).
 
+2026-11-03 follow-up: direct parent work also passed a real CADCraft DXF circle edit in a fresh
+synthetic Seafile lab: HTTP 48/48, browser 95/95 (18 CADCraft checks), user-attributed version,
+exact relay/readback byte equality, no editor-save download, and fresh-session file-list reopen
+with the circle rendered. The same run continued through DeckCraft. The initial browser attempt
+failed six CAD checks; the passing evidence is from a fresh database after fixes. Evidence R1/R2
+count findings were corrected; R3 found no current P1–P3 finding and did not replay the runtime.
+This is not Aptarchy task completion. Broad DXF fidelity, production, human HTTPS and post-change
+ONLYOFFICE UI remain unverified. [GR-082 evidence](GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md).
+
 
 Owner-only (production; this audit will not do them):
 

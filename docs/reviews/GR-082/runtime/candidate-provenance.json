@@ -1,0 +1,20 @@
+{
+  "run_date": "2026-11-03",
+  "base_commit": "297354dca920c6ee70004d9d27eda25836658b2f",
+  "changed_files_sha256": {
+    "lab/real-seafile/run_browser.py": "6ee142a955c07f0ea85c076155ab5463fad73bf8e677ef84e6156272e4aed222",
+    "tests/test_cadcraft_real_edit.py": "9e53841c4be36e1797b8cbdfcb54537a9b74f4de8990e2a14997987a490c0cb9"
+  },
+  "prepared_working_tree_patch_sha256": "53e741b9defdc88639ed3be169e008103660af774e27a29e4754953006fab41e",
+  "isolated_lab_compose_sha256": "caa67a9075c23851796818c312aaa1660e9f958488556eb141ae79c55d9761f5",
+  "runtime_bundle_zip_sha256": {
+    "wordcraft": "b6c9c8d3a730495189ba0c213fe64313f317be8fc0611ac1ff8cdd6a4b20880c",
+    "gridcraft": "f6675cfe26f89f07cb9d9ff23a5ae0a946088eef6e22c93ac1141f0279f741f8",
+    "pdfcraft": "00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf",
+    "cadcraft": "4d8acce3209082699078aa868ef79fedd4437ba0d18014a0f031d118a0abceb8",
+    "deckcraft": "2b269d4319cc85287a83e690159b6167258d3cf0b87cf7ea3a696f26c3c5a4fb"
+  },
+  "verified_runtime_bundle_asset_count": 66,
+  "verification": "All 14 prepared source-file hashes, 66 runtime bundle file size/hash pairs, and the compose-file hash matched the prepared manifest.",
+  "secrets_and_runtime_identifiers": "Excluded."
+}

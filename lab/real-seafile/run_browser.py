@@ -19,6 +19,7 @@ Writes RESULTS_DIR/browser.json and screenshots.
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 import time
@@ -119,6 +120,237 @@ def open_from_seafile_list(page, base, repo_id, name, timeout=30):
             return target
         page.wait_for_timeout(50)
     raise TimeoutError("file-list click did not open an editor page")
+
+
+def dxf_circles(data):
+    """Return validated ASCII DXF circle geometry, or None for malformed structure/entities."""
+    try:
+        # CADCraft pads group codes and values; strip both before checking EOF or pairs.
+        lines = [line.strip() for line in data.decode("ascii").splitlines()]
+    except UnicodeDecodeError:
+        return None
+    if len(lines) < 4 or len(lines) % 2 or lines[-2:] != ["0", "EOF"]:
+        return None
+    pairs = []
+    for index in range(0, len(lines), 2):
+        code, value = lines[index].strip(), lines[index + 1].strip()
+        if not code.isdigit():
+            return None
+        pairs.append((code, value))
+    entities = []
+    index = 0
+    while index < len(pairs):
+        if pairs[index] != ("0", "SECTION") or index + 1 >= len(pairs) or pairs[index + 1][0] != "2":
+            return None
+        section_name = pairs[index + 1][1].upper()
+        section_end = index + 2
+        while section_end < len(pairs) and pairs[section_end] != ("0", "ENDSEC"):
+            if pairs[section_end] == ("0", "SECTION"):
+                return None
+            section_end += 1
+        if section_end >= len(pairs):
+            return None
+        if section_name == "ENTITIES":
+            entities.append(pairs[index + 2:section_end])
+        index = section_end + 1
+        if index == len(pairs) - 1 and pairs[index] == ("0", "EOF"):
+            break
+    if index != len(pairs) - 1 or pairs[index] != ("0", "EOF") or len(entities) != 1:
+        return None
+
+    geometry = []
+    body = entities[0]
+    index = 0
+    while index < len(body):
+        code, entity_type = body[index]
+        if code != "0":
+            return None
+        index += 1
+        fields = {}
+        while index < len(body) and body[index][0] != "0":
+            group, value = body[index]
+            fields.setdefault(group, []).append(value)
+            index += 1
+        if entity_type.upper() == "CIRCLE":
+            try:
+                coords = [float(fields[group][0]) for group in ("10", "20", "40")
+                          if len(fields.get(group, [])) == 1]
+                if len(coords) != 3 or not all(math.isfinite(value) for value in coords) or coords[2] <= 0:
+                    return None
+            except ValueError:
+                return None
+            geometry.append(tuple(coords))
+    return geometry
+
+
+def dxf_circle_count(data):
+    circles = dxf_circles(data)
+    return len(circles) if circles is not None else None
+
+
+def dxf_has_circle(data, center=(20.0, 20.0), radius=10.0):
+    circles = dxf_circles(data)
+    return circles is not None and any(
+        math.isclose(x, center[0], rel_tol=0, abs_tol=1e-6) and
+        math.isclose(y, center[1], rel_tol=0, abs_tol=1e-6) and
+        math.isclose(r, radius, rel_tol=0, abs_tol=1e-6)
+        for x, y, r in circles
+    )
+
+
+def cadcraft_canvas_edit_pixels(image, original):
+    """Count visible drawing-area changes, excluding CAD toolbar and command-line chrome."""
+    try:
+        with Image.open(BytesIO(image)) as current, Image.open(BytesIO(original)) as before:
+            current = current.convert("RGB")
+            before = before.convert("RGB")
+            if current.size != before.size:
+                return None
+            width, height = current.size
+            bounds = (int(width * 0.18), int(height * 0.10),
+                      int(width * 0.78), int(height * 0.84))
+            diff = ImageChops.difference(current.crop(bounds), before.crop(bounds)).convert("L")
+            return sum(1 for value in diff.getdata() if value >= 40)
+    except (OSError, ValueError):
+        return None
+
+
+def cadcraft_drawing_region(image):
+    try:
+        with Image.open(BytesIO(image)) as source:
+            source = source.convert("RGB")
+            width, height = source.size
+            return source.crop((int(width * 0.18), int(height * 0.10),
+                                int(width * 0.78), int(height * 0.84)))
+    except (OSError, ValueError):
+        return None
+
+
+def cadcraft_rendered_circle_metrics(image, original):
+    """Check changed strokes form a near-circular ring in the drawing viewport."""
+    current = cadcraft_drawing_region(image)
+    before = cadcraft_drawing_region(original)
+    if current is None or before is None or current.size != before.size:
+        return None
+    diff = ImageChops.difference(current, before).convert("L")
+    points = [(x, y) for y in range(diff.height) for x in range(diff.width)
+              if diff.getpixel((x, y)) >= 40]
+    if len(points) < 100:
+        return None
+    left, right = min(x for x, _ in points), max(x for x, _ in points)
+    top, bottom = min(y for _, y in points), max(y for _, y in points)
+    width, height = right - left + 1, bottom - top + 1
+    aspect = width / height if height else 0
+    center_x, center_y = (left + right) / 2, (top + bottom) / 2
+    radii = [math.hypot(x - center_x, y - center_y) for x, y in points]
+    radius = sorted(radii)[len(radii) // 2]
+    if radius < 8:
+        return None
+    tolerance = max(2.0, radius * 0.05)
+    ring_fraction = sum(abs(value - radius) <= tolerance for value in radii) / len(radii)
+    return len(points), aspect, ring_fraction, radius
+
+
+def wait_for_cadcraft_original_canvas(host, timeout=60):
+    """Wait for a loaded CADCraft canvas whose drawing viewport is stable across three frames."""
+    end = time.monotonic() + timeout
+    previous = None
+    stable = 0
+    while time.monotonic() < end:
+        try:
+            loaded = host.evaluate("""() => {
+                const frame = document.getElementById('frame');
+                const doc = frame && frame.contentDocument;
+                const canvas = doc && doc.getElementById('cadcraft_canvas');
+                const loading = doc && doc.getElementById('cadcraft_loading');
+                const status = document.getElementById('status');
+                return !!canvas && canvas.width > 0 && canvas.height > 0 && !!status &&
+                    /ready|saved/i.test(status.textContent || '') &&
+                    (!loading || loading.getClientRects().length === 0 ||
+                     doc.defaultView.getComputedStyle(loading).display === 'none');
+            }""")
+            if loaded:
+                image = host.frame_locator("#frame").locator("#cadcraft_canvas").screenshot(timeout=5000)
+                region = cadcraft_drawing_region(image)
+                current = region.tobytes() if region is not None else None
+                if current is not None:
+                    stable = stable + 1 if current == previous else 1
+                    previous = current
+                    if stable >= 3:
+                        return image
+            else:
+                previous = None
+                stable = 0
+        except Exception:  # noqa: BLE001 - editor frame may still be loading
+            previous = None
+            stable = 0
+        host.wait_for_timeout(250)
+    return None
+
+
+def wait_for_cadcraft_canvas_change(host, original, timeout=60):
+    """Wait for stable, circle-shaped new strokes; ignore animated canvas chrome outside viewport."""
+    end = time.monotonic() + timeout
+    previous = None
+    stable = 0
+    while time.monotonic() < end:
+        try:
+            image = host.frame_locator("#frame").locator("#cadcraft_canvas").screenshot(timeout=5000)
+            metrics = cadcraft_rendered_circle_metrics(image, original)
+            region = cadcraft_drawing_region(image)
+            current = region.tobytes() if region is not None else None
+            if metrics is not None and metrics[0] >= 250 and 0.90 <= metrics[1] <= 1.10 and metrics[2] >= 0.80:
+                stable = stable + 1 if current == previous else 1
+                previous = current
+                if stable >= 3:
+                    return image
+            else:
+                previous = None
+                stable = 0
+        except Exception:  # noqa: BLE001 - iframe may not be ready yet
+            previous = None
+            stable = 0
+        host.wait_for_timeout(350)
+    return None
+
+
+def cadcraft_canvas_bounds(host):
+    return host.evaluate("""() => {
+        const frame = document.getElementById('frame');
+        const doc = frame && frame.contentDocument;
+        const canvas = doc && doc.getElementById('cadcraft_canvas');
+        const frameRect = frame && frame.getBoundingClientRect();
+        const rect = canvas && canvas.getBoundingClientRect();
+        if (!frameRect || !rect || !rect.width || !rect.height) return null;
+        return {frameX: frameRect.x, frameY: frameRect.y,
+                x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+                viewportWidth: document.documentElement.clientWidth,
+                viewportHeight: document.documentElement.clientHeight};
+    }""")
+
+
+def cadcraft_add_circle(page, host, outer_box, center, radius, status_fn, timeout=20):
+    """Use measured CADCraft canvas bounds and trusted input; await host dirty confirmation."""
+    bounds = cadcraft_canvas_bounds(host)
+    if not bounds or not bounds.get("viewportWidth") or not bounds.get("viewportHeight"):
+        return False
+    scale_x = outer_box["width"] / bounds["viewportWidth"]
+    scale_y = outer_box["height"] / bounds["viewportHeight"]
+    x = outer_box["x"] + (bounds["frameX"] + bounds["x"] + bounds["width"] * 0.48) * scale_x
+    y = outer_box["y"] + (bounds["frameY"] + bounds["y"] + bounds["height"] * 0.90) * scale_y
+    page.mouse.click(x, y)
+    page.keyboard.type("CIRCLE", delay=50)
+    page.keyboard.press("Enter")
+    page.keyboard.type(center, delay=50)
+    page.keyboard.press("Enter")
+    page.keyboard.type(radius, delay=50)
+    page.keyboard.press("Enter")
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        if status_fn().strip().lower() == "unsaved changes":
+            return True
+        page.wait_for_timeout(100)
+    return False
 
 
 def deckcraft_canvas_has_document_visuals(image):
@@ -872,6 +1104,94 @@ def main():
             reopen.close()
             return page
 
+        def cadcraft_real_edit_flow(page, name, content, box, status, before):
+            """Draw a circle with trusted CADCraft input, save via WOPI and reopen from Seahub."""
+            host1 = find_frame(page, rs.BRIDGE + "/edit/", 5, name="office_frame", parent=page.main_frame)
+            original_canvas = wait_for_cadcraft_original_canvas(host1) if host1 is not None else None
+            check("cadcraft_initial_fixture_has_no_circle", dxf_circle_count(content) == 0)
+            check("cadcraft_initial_drawing_canvas_captured", original_canvas is not None)
+            if original_canvas is None:
+                return page
+
+            # Keep the edit inside the fixture's initial 0..10 view so it must render before Save.
+            dirty = cadcraft_add_circle(page, host1, box, "5,5", "3", status)
+            page.mouse.move(box["x"] + 4, box["y"] + 4)
+            check("cadcraft_user_circle_edit_marks_host_dirty", dirty, f"status={status()!r}")
+            edited_canvas = wait_for_cadcraft_canvas_change(host1, original_canvas)
+            page.screenshot(path=os.path.join(RESULTS, "cadcraft-typed.png"))
+            metrics = cadcraft_rendered_circle_metrics(edited_canvas, original_canvas) if edited_canvas else None
+            check("cadcraft_circle_is_visible_before_save", metrics is not None and
+                  0.90 <= metrics[1] <= 1.10 and metrics[2] >= 0.80,
+                  f"rendered pixels/aspect/ring={metrics}")
+
+            payload, confirmed = save_and_capture(page, status, timeout=120)
+            check("cadcraft_save_payload_contains_circle_entity",
+                  payload is not None and dxf_has_circle(payload, center=(5, 5), radius=3),
+                  f"payload bytes={len(payload) if payload else 0}; circles={dxf_circle_count(payload) if payload else None}")
+            check("cadcraft_save_confirmed_by_host_page", confirmed, f"status={status()!r}")
+            end = time.monotonic() + 60
+            after = before
+            while time.monotonic() < end:
+                after = rs.history(admin, repo_id, name)
+                if len(after) > len(before):
+                    break
+                time.sleep(1)
+            check("cadcraft_circle_save_creates_seafile_version_by_user",
+                  len(after) > len(before) and after[0]["creator"] == admin_username,
+                  f"history {len(before)}->{len(after)}")
+            got, _ = rs.download(admin, repo_id, name)
+            check("cadcraft_seafile_readback_contains_circle_entity",
+                  dxf_has_circle(got, center=(5, 5), radius=3),
+                  f"readback bytes={len(got)}; circles={dxf_circle_count(got)}")
+            check("cadcraft_relay_save_bytes_match_seafile_readback", payload is not None and payload == got,
+                  f"payload={len(payload) if payload else 0}; readback={len(got)}")
+            saved_canvas = wait_for_cadcraft_canvas_change(host1, original_canvas)
+            page.screenshot(path=os.path.join(RESULTS, "cadcraft-saved.png"))
+            saved_metrics = cadcraft_rendered_circle_metrics(saved_canvas, original_canvas) \
+                if saved_canvas is not None else None
+            check("cadcraft_saved_canvas_still_renders_circle",
+                  saved_metrics is not None and 0.90 <= saved_metrics[1] <= 1.10 and saved_metrics[2] >= 0.80,
+                  f"rendered pixels/aspect/ring={saved_metrics}")
+            check("cadcraft_save_did_not_download", not downloads, f"downloads={len(downloads)}")
+
+            page.close()
+            reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(reopen, downloads)
+            reopen.on("page", attach)
+            relay_file = []
+            def on_response(response):
+                if response.url.endswith("/relay/file"):
+                    try:
+                        relay_file.append((response.status, response.body()))
+                    except Exception:  # noqa: BLE001
+                        pass
+            reopen.on("response", on_response)
+            p2 = reopen.new_page()
+            p2.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
+            p2.fill("input[name=login]", rs.ADMIN)
+            p2.fill("input[name=password]", rs.ADMIN_PW)
+            p2.click("button[type=submit], input[type=submit]")
+            p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
+            p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
+            check("cadcraft_fresh_session_opened_from_seafile_file_list", "/accounts/login" not in p2.url)
+            host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
+            reopened_bytes = wait_for_saved_response(p2, relay_file, 180)
+            reopened_canvas = wait_for_cadcraft_canvas_change(host2, original_canvas) if host2 is not None else None
+            reopened_metrics = cadcraft_rendered_circle_metrics(reopened_canvas, original_canvas) \
+                if reopened_canvas is not None else None
+            check("cadcraft_fresh_session_reads_saved_dxf",
+                  reopened_bytes is not None and reopened_bytes == got and
+                  dxf_has_circle(reopened_bytes, center=(5, 5), radius=3),
+                  f"relay/file bytes={len(reopened_bytes) if reopened_bytes else 0}; circles={dxf_circle_count(reopened_bytes) if reopened_bytes else None}")
+            check("cadcraft_fresh_session_renders_saved_circle",
+                  reopened_metrics is not None and 0.90 <= reopened_metrics[1] <= 1.10 and
+                  reopened_metrics[2] >= 0.80,
+                  f"rendered pixels/aspect/ring={reopened_metrics}")
+            p2.screenshot(path=os.path.join(RESULTS, "cadcraft-reopened.png"))
+            check("cadcraft_edits_did_not_download", not downloads, f"downloads={len(downloads)}")
+            reopen.close()
+            return ctx.new_page()
+
         # login
         page.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
         page.fill("input[name=login]", rs.ADMIN)
@@ -1002,6 +1322,12 @@ def main():
                 if page is not original:
                     attach(page)
                 check("deckcraft_opened_native_document_from_seafile_file_list", True)
+            elif editor == "cadcraft":
+                original = page
+                page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
+                if page is not original:
+                    attach(page)
+                check("cadcraft_opened_dxf_from_seafile_file_list", True)
             else:
                 page.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}{query}", wait_until="domcontentloaded")
             host = find_frame(page, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=page.main_frame)
@@ -1042,6 +1368,9 @@ def main():
             if editor == "deckcraft" and name.endswith(".deckcraft"):
                 # Native DeckCraft data gets the explicit edit/save/version/reopen slice.
                 page = deckcraft_real_edit_flow(page, name, content, box, status, before)
+                continue
+            if editor == "cadcraft":
+                page = cadcraft_real_edit_flow(page, name, content, box, status, before)
                 continue
             # focus the editor canvas (below the host bar) and ask it to save
             page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 60 + (box["height"] - 60) / 2)

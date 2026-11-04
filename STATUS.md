@@ -1,11 +1,38 @@
 # STATUS
 
-> **2026-10-31 — superseded.** The GR series below describes the gateway + Seahub/fileserver patch
-> architecture that `docs/REFOUNDATION-REPORT.md` retired. Current state: `README.md`, `ROADMAP.md`,
-> `lab/real-seafile/results/`. This file is kept as history and is no longer updated.
+> **2026-10-31 — architecture note.** Older GR records include the retired gateway + Seahub/fileserver
+> patch architecture. Current state is summarized in `README.md`, `ROADMAP.md` and
+> `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT GR: GR-080 — security evidence and ONLYOFFICE status reconciliation
+## CURRENT GR: GR-082 — CADCraft real edit on synthetic Seafile
+
+The direct parent run exercised a fresh rootless Podman lab using Seafile CE
+13.0.28 and released CADCraft Web v0.15.1. CADCraft opened `test.dxf` from the
+Seafile list, accepted a visible circle edit, showed unsaved state, saved a
+user-attributed new version, and reopened the saved circle in a new browser
+context. Relay bytes exactly matched Seafile readback. The complete browser
+slice passed 95/95 assertions (18/18 CADCraft); HTTP passed 48/48. The first
+runtime attempt failed six CAD checks and remains private; the recorded pass
+uses a fresh synthetic database after the fixes. Independent evidence R1/R2
+found P3 count errors in current summaries; both are corrected. Independent
+evidence R3 found no current P1–P3 findings. This is direct parent work,
+not Aptarchy completion. Production,
+human HTTPS, broader DXF fidelity and post-change ONLYOFFICE UI remain NOT
+VERIFIED. Project GPT remains INCOMPLETE and upstream LOCKED. Evidence:
+`docs/GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and `docs/reviews/GR-082/`.
+
+## PREVIOUS GR: GR-081 — DeckCraft native edit on synthetic Seafile
+
+Native `.deckcraft` browser workflow passed 26/26 assertions with two
+user-attributed saves, exact fresh-session relay/readback equality and semantic
+title-marker retention. The fixture was generated and uploaded before editing.
+This was direct parent work, not Aptarchy completion. Font fidelity, foreign
+`.pptx`, production and other browsers remain NOT VERIFIED. Independent R1–R3
+evidence reviews returned bounded PROVISIONAL PASS. See
+`docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and `docs/reviews/GR-081/`.
+
+## PREVIOUS GR: GR-080 — security evidence and ONLYOFFICE status reconciliation
 
 Updated `docs/SECURITY.md` to reflect the later GR-015 isolated synthetic
 Seahub/C-fileserver build and runtime, while retaining the historical GPT FAIL

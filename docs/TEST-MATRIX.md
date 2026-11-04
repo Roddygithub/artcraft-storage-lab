@@ -7,6 +7,25 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-082 — CADCraft DXF edit on synthetic Seafile
+
+| Scenario | Expected | Result |
+|---|---|---|
+| File-list open and initial canvas | Open the synthetic DXF and capture a stable drawing without the target circle | [x] Fresh Seafile file-list open; initial fixture has no circle |
+| Trusted CAD edit | Enter a circle command and see the circle before save | [x] Center 5,5, radius 3; host reports unsaved changes and stable drawing-region checks detect the circle |
+| Host save and Seafile version | Save through the bridge and create a user-attributed version | [x] Host says “saved to Seafile”; readback contains the circle; relay payload equals readback byte-for-byte |
+| Fresh-session reopen | Reopen from the Seafile file list in a new browser context | [x] Saved bytes match readback and the circle renders; old page closed; no editor-save download |
+| Sequential browser continuation | Later app flows still work after CADCraft lifecycle | [x] DeckCraft continued in the same run and its existing save/reopen assertions passed |
+| HTTP / browser assertions | Full recorded slices pass | [x] HTTP 48/48; browser 95/95, including CADCraft 18/18; sanitized results in `docs/reviews/GR-082/` |
+| DXF breadth, human HTTPS, other browsers, production, ONLYOFFICE UI regression | Broader compatibility/deployment | [ ] NOT VERIFIED |
+| Independent evidence review | Separate review of result bundle and claims | [x] R1/R2 P3 count findings corrected; R3 bounded provisional pass, no current P1–P3 findings |
+
+GR-082 was direct parent work, not Aptarchy completion. The first runtime attempt
+failed six CAD checks; the passing result is from a fresh synthetic database
+after fixes. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+See [the report](GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md) and
+[evidence bundle](reviews/GR-082/).
+
 ## GR-081 — DeckCraft native edit on synthetic Seafile
 
 | Scenario | Expected | Result |

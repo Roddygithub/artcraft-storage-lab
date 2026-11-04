@@ -1,8 +1,40 @@
 # 2026-10-26 — GR-080 security evidence reconciliation
 
-> **2026-10-31 — superseded.** The GR series below describes the gateway + Seahub/fileserver patch
-> architecture that `docs/REFOUNDATION-REPORT.md` retired. Current state: `README.md`, `ROADMAP.md`,
-> `lab/real-seafile/results/`. This file is kept as history and is no longer updated.
+> **2026-10-31 — architecture note.** Earlier GR entries include the retired gateway +
+> Seahub/fileserver patch architecture. Current WOPI bridge follow-ups continue in this log and are
+> summarized in `README.md`, `ROADMAP.md` and `lab/real-seafile/results/`.
+
+# 2026-11-03 — GR-082 CADCraft real edit on synthetic Seafile
+
+- Ran a fresh rootless Podman Seafile CE 13.0.28 lab using the released,
+  unpatched CADCraft Web v0.15.1 bundle. A trusted browser edit drew a circle in
+  the synthetic DXF; the host confirmed save, Seafile created a
+  user-attributed version, and the saved circle reopened from the Seafile file
+  list in a new browser context. Relay bytes matched Seafile readback exactly;
+  editor save produced no download.
+- HTTP passed 48/48 and the sequential browser slice passed 95/95, including
+  all 18 CADCraft assertions and the subsequent DeckCraft flow. The first
+  runtime attempt failed six CAD assertions and is retained only outside Git;
+  the passing evidence is from a fresh synthetic database after fixes.
+- This was direct parent work, not Aptarchy task completion. Production,
+  human HTTPS, broad DXF compatibility and post-change ONLYOFFICE UI remain
+  NOT VERIFIED. Evidence R1/R2 count findings are corrected; R3 returned a
+  bounded provisional pass with no current P1–P3 findings and did not replay
+  the runtime. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+- Evidence: `docs/GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+  `docs/reviews/GR-082/`.
+
+# 2026-11-03 — GR-081 DeckCraft native edit on synthetic Seafile
+
+- Direct parent browser run completed 26/26 checks across two native saves,
+  fresh-session reopen and byte-equality assertions. Fixture setup upload
+  preceded editing. This was not Aptarchy task completion.
+- Font/layout fidelity, foreign `.pptx`, production and other browsers remain
+  NOT VERIFIED. Independent R1–R3 evidence reviews returned bounded
+  PROVISIONAL PASS. Project GPT remains INCOMPLETE and upstream publication
+  LOCKED.
+- Evidence: `docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+  `docs/reviews/GR-081/`.
 
 
 - Updated `docs/SECURITY.md` to distinguish the historical GPT FAIL candidate

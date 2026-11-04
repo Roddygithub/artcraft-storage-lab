@@ -39,6 +39,25 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-082 — CADCraft real edit on synthetic Seafile
+
+The direct parent run passed **48/48 HTTP** checks and **95/95 browser** checks,
+including all 18 CADCraft assertions. In a fresh rootless Podman lab, the
+released CADCraft v0.15.1 bundle opened a synthetic DXF, accepted a visible
+circle edit, saved a user-attributed Seafile version, confirmed the save,
+matched relay bytes to Seafile readback, and reopened the circle in a new
+browser context. The run continued successfully into DeckCraft. The earlier
+runtime attempt failed six CAD checks and is not counted as passing evidence.
+R2–R4 source reviews passed for proceeding to and validating the isolated run;
+Evidence R1/R2 found P3 count errors in current summaries; both are corrected.
+Evidence R3 returned a bounded provisional pass with no current P1–P3
+findings and did not replay the runtime. Production, human HTTPS, broad DXF
+fidelity and post-change ONLYOFFICE UI remain NOT VERIFIED. This was not
+Aptarchy completion. Project GPT remains INCOMPLETE; upstream remains LOCKED.
+
+Evidence: `docs/GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+`docs/reviews/GR-082/`.
+
 ## GR-081 — DeckCraft native edit on synthetic Seafile
 
 The native `.deckcraft` browser workflow passed 26/26 assertions: real file-list

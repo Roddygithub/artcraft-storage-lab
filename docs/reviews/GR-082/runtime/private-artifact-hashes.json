@@ -1,0 +1,20 @@
+{
+  "note": "Hashes identify private raw runtime records; those records are not included in this repository.",
+  "artifacts": [
+    {
+      "artifact": "slice.json",
+      "sha256": "239cdbf2b1cf56b4590a80b553da3b5f562738fbb6a69a02e60753991d7e93e9",
+      "retained_outside_git": true
+    },
+    {
+      "artifact": "browser.json",
+      "sha256": "fae1f21fc36ec9485e0028b0c6fa2b715aa241fa4f16739223407f06499d84e7",
+      "retained_outside_git": true
+    },
+    {
+      "artifact": "browser-console.log",
+      "sha256": "8897b26ad83c79793aa68845955ac31618e411714d23d2c704267f4988be1745",
+      "retained_outside_git": true
+    }
+  ]
+}
