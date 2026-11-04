@@ -1,6 +1,7 @@
 {
   "date": "2026-11-04",
   "run": "corrected fresh rootless-Podman replay; browser moved to document end with Ctrl+End",
+  "evidence_status": "Historical pre-remediation run. Review R1 identified out-of-order OOXML property elements in the generated corpus; this run does not validate the corrected corpus.",
   "result": "Six open/readback checks passed; no editing or saving was attempted.",
   "fixtures_sha256": {
     "fidelity-prose.docx": "74e3cf07905970189c8cb872cd3e7c2aa9cc48e76468850161f6f93b594c19de",

@@ -31,11 +31,13 @@ scenarios, foreign `.pptx` editing, broad CADCraft fidelity and production
 behavior still require separate validation.
 
 The initial synthetic WordCraft/ONLYOFFICE DOCX comparison is recorded in
-[`GR-083`](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md). It covers
-prose/runs, lists/tables, and visible page-2 heading/text in a small synthetic
-sample. Full table/layout fidelity remains unverified; two ONLYOFFICE plugin/theme
-manifest requests returned 502. It performed no editing or save and does not
-replace the owner’s live ONLYOFFICE repair.
+[`GR-083`](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md). Review R1 found
+out-of-order OOXML property elements in its generated corpus; the generator and
+focused order checks are corrected, but a fresh synthetic browser replay is
+pending R2 source review. The initial screenshots/results are historical and
+do not validate the corrected corpus. That run recorded two ONLYOFFICE
+plugin/theme manifest 502s, whose cause remains unverified, and did no editing
+or save. This comparison does not replace the owner’s live ONLYOFFICE repair.
 
 ## What works today
 

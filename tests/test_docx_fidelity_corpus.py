@@ -13,9 +13,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "lab" / "real-seafile"))
 import docx_fidelity_corpus as corpus  # noqa: E402
 
+NS = {"w": corpus.W}
+
 
 class FidelityCorpusTests(unittest.TestCase):
-    def test_three_deterministic_cases_are_valid_ooxml_packages(self):
+    def test_three_deterministic_cases_are_well_formed_docx_packages(self):
         first = corpus.corpus()
         second = corpus.corpus()
         self.assertEqual(first, second)
@@ -50,6 +52,33 @@ class FidelityCorpusTests(unittest.TestCase):
         self.assertIn("<w:tbl>", xml["fidelity-structure.docx"])
         self.assertIn("w:type=\"page\"", xml["fidelity-layout.docx"])
         self.assertIn("Second page heading", xml["fidelity-layout.docx"])
+
+    def test_used_wordprocessingml_property_elements_follow_schema_order(self):
+        for data in corpus.corpus().values():
+            with zipfile.ZipFile(io.BytesIO(data)) as docx:
+                styles = ET.fromstring(docx.read("word/styles.xml"))
+                for style_id in ("Title", "Heading1", "Heading2"):
+                    style = styles.find(f"w:style[@w:styleId='{style_id}']", NS)
+                    self.assertIsNotNone(style)
+                    children = [child.tag.rsplit("}", 1)[-1] for child in style]
+                    self.assertLess(children.index("pPr"), children.index("rPr"))
+
+                document = ET.fromstring(docx.read("word/document.xml"))
+                table = document.find(".//w:tbl", NS)
+                if table is None:
+                    continue
+                table_properties = table.find("w:tblPr", NS)
+                self.assertIsNotNone(table_properties)
+                table_children = [child.tag.rsplit("}", 1)[-1]
+                                  for child in table_properties]
+                self.assertLess(table_children.index("tblW"),
+                                table_children.index("tblBorders"))
+
+                header_cell_properties = table.find("w:tr/w:tc/w:tcPr", NS)
+                self.assertIsNotNone(header_cell_properties)
+                cell_children = [child.tag.rsplit("}", 1)[-1]
+                                 for child in header_cell_properties]
+                self.assertLess(cell_children.index("tcW"), cell_children.index("shd"))
 
 
 if __name__ == "__main__":

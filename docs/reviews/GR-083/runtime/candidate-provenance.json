@@ -1,4 +1,6 @@
 {
+  "evidence_status": "Historical pre-remediation run; does not validate the current corpus source.",
+  "runtime_source_commit": "075a8621caaad025c2437ae071378ac2d18207d9",
   "runtime_wordcraft_bundle": "GR-082 runtime-r2 browser static selection; WordCraft v0.13.2 unpatched",
   "runtime_bundle_zip_sha256_recorded_by_GR_082": "b6c9c8d3a730495189ba0c213fe64313f317be8fc0611ac1ff8cdd6a4b20880c",
   "served_static_matches_GR_082_runtime_r2": true,
@@ -32,7 +34,7 @@
     "wordcraft-web-97267fff62d92a8d.js": "a5b91ef30152583f7c0f7646e05c98e474f3e86323f87cd924ff7f3e2d21a89b",
     "wordcraft-web-97267fff62d92a8d_bg.wasm": "b1fc951aca4992012ab28f3f894db6e5f4b5c9776aed9e403563332f54395bf2"
   },
-  "workspace_sources_and_private_replay_sha256": {
+  "pre_remediation_workspace_sources_and_private_replay_sha256": {
     "corpus_generator_sha256": "08357352743b4087d3db241d668917cff1e30d5962b838ee8d78322c85ed7efe",
     "browser_harness_sha256": "6108320c3eaa64a68f85fb9475329beee5ae26673f48ec293fb4353b83da1c2e",
     "source_run_browser_sha256": "6ee142a955c07f0ea85c076155ab5463fad73bf8e677ef84e6156272e4aed222",
@@ -43,6 +45,6 @@
     "private_runner_sha256": "4dc0b0f9270d8cbc780e8c20ce4141d9b8b61ad1a5e26adf69614d4776947649",
     "private_compose_sha256": "0a6c4d780ee5b25c2d0c5ca43389867cd3bd4c23918b3848a2a6f8f83d4fa212"
   },
-  "runtime_source_copies_match_workspace": true,
+  "pre_remediation_runtime_source_copies_matched_initial_workspace": true,
   "private_runner_and_compose_contents_not_in_git": true
 }

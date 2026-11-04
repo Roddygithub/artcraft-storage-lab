@@ -17,8 +17,14 @@
   sample is not a broad fidelity result. No editing, saving, or Seafile version
   creation was attempted.
 - This was direct parent work, not Aptarchy completion. Production and upstream
-  were untouched. Independent review is pending; project GPT remains INCOMPLETE
-  and upstream publication LOCKED.
+  were untouched.
+- Independent review R1 found out-of-order OOXML property elements in the
+  generated corpus (P2) and an ambiguous fidelity sentence in the re-foundation
+  summary (P3). The generator now uses the required order for the emitted style,
+  table and cell properties, focused order tests were added, and the sentence is
+  clarified. The old screenshots/results remain historical; fresh synthetic
+  replay is pending R2 source review. Project GPT remains INCOMPLETE and upstream
+  publication LOCKED.
 - Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md` and
   `docs/reviews/GR-083/`.
 

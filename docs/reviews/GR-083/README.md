@@ -1,8 +1,14 @@
 # GR-083 evidence bundle
 
-This bundle retains the sanitized result of the 2026-11-04 synthetic DOCX comparison. Its JSON
-omits Seafile library IDs, URLs, tokens, cookies, and raw DOM. Screenshots are unaltered captures
-from the disposable synthetic lab; private logs and DOCX bytes are not included.
+This bundle retains the sanitized result of the initial 2026-11-04 synthetic DOCX comparison. Its
+JSON omits Seafile library IDs, URLs, tokens, cookies, and raw DOM. Screenshots are unaltered
+captures from the disposable synthetic lab; private logs and DOCX bytes are not included.
+
+**Evidence status:** review R1 found out-of-order OOXML property elements in the generated corpus.
+The generator and focused ordering checks have since been corrected, but these observations and
+screenshots predate that correction. They are preserved for audit and do not validate the current
+corpus. A fresh synthetic replay is pending independent source re-review. The ordering checks are
+not a full ECMA-376 schema validation.
 
 ## Contents
 
@@ -11,6 +17,8 @@ from the disposable synthetic lab; private logs and DOCX bytes are not included.
 - `runtime/cleanup.json` — dedicated API service and test-container cleanup status.
 - `runtime/private-artifact-hashes.json` — hashes only for private raw records retained in the
   local cache, not the records themselves.
+- `runtime/candidate-provenance.json` — provenance for the initial pre-remediation replay only.
+- `INDEPENDENT-REVIEW-R1.md` — findings and remediation status from the first independent review.
 - `runtime/wordcraft/` — prose/runs, lists/table, first-page layout and page-2 screenshots.
 - `runtime/onlyoffice/` — prose/runs, lists/table, first-page and corrected page-2 screenshots.
 
@@ -25,5 +33,5 @@ save, new version, or edit fidelity was tested. Earlier disposable attempts that
 both editor routes completed are not counted as passing runs; the retained result is the
 corrected completed replay.
 
-Project GPT remains **INCOMPLETE**; upstream publication remains **LOCKED**. This run was direct
-parent work and is not Aptarchy task completion.
+Project GPT remains **INCOMPLETE**; upstream publication remains **LOCKED**. This initial run was
+direct parent work and is not Aptarchy task completion.

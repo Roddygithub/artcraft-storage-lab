@@ -41,15 +41,16 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 ## GR-083 — WordCraft / ONLYOFFICE DOCX comparison
 
-Review the exact current diff and the GR-083 report/evidence bundle. The bounded
-runtime opened three identical synthetic DOCX fixtures in both editors; readback
-hashes were unchanged and there were no browser downloads. Corrected Ctrl+End
-captures show the second-page heading and paragraph in both editors. The
-ONLYOFFICE table is partly obscured by a first-use tip and viewport crop. That
-run logged two HTTP 502s for plugin/theme manifests; the cause is NOT VERIFIED.
-No edit/save/version behavior was tested. Review the exact diff, report, and
-retained evidence without generalizing this small visual sample. Review status:
-pending. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+R1 reviewed commit `075a8621` and requested changes: P2 out-of-order OOXML
+property elements in the generated styles/table/cells, and P3 ambiguous fidelity
+wording in the re-foundation summary. The generator and focused order tests have
+been corrected; the summary is clarified. Review the exact remediation commit,
+the R1 record, report and retained evidence. The previous screenshots/results
+predate the correction and are historical only; do not accept them as runtime
+validation of the corrected corpus. A fresh synthetic replay remains pending
+source review. The prior run logged two ONLYOFFICE plugin/theme manifest 502s;
+their cause is NOT VERIFIED. It did not test edit/save/version behavior. Project
+GPT remains INCOMPLETE and upstream publication LOCKED.
 
 Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md`,
 `docs/reviews/GR-083/`.
