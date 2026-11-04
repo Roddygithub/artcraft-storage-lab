@@ -91,7 +91,7 @@
   ],
   "page_two_visual_check": {
     "wordcraft": "Corrected capture shows the second-page heading, paragraph, and table.",
-    "The second-page heading, paragraph, and table are visible near the viewport bottom. The first-use tip sits in lower-right whitespace; the lower table edge is close to the viewport crop."
+    "onlyoffice": "The second-page heading, paragraph, and table are visible near the viewport bottom. The first-use tip sits in lower-right whitespace; the lower table edge is close to the viewport crop."
   },
   "privacy": "URLs, repository IDs, account names, tokens, cookies, raw DOM, and DOCX bytes are omitted."
 }
