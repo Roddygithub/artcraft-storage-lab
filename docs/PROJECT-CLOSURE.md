@@ -117,3 +117,14 @@ does not hide that failure and the runner exits 1 after cleanup. Replacement
 readiness still requires the prose/list-format corpus, broader document features,
 HTTPS desktop acceptance and final independent gate. No ONLYOFFICE removal or
 production change has been performed.
+
+The prose and list/table corpus recovery cases each passed **28/28** browser
+assertions at captured source `9a71dff`, while retaining HTTP 44/2 and exit 1.
+Both first relay/readback pairs are byte-identical. Their original direct
+formatted runs and resolved bullet/decimal list semantics survive both saves,
+alongside the earlier bounded structural invariants. Four parent-inspected
+screenshots and synthetic DOCX payloads are retained with a runnable verifier:
+`lab/real-seafile/results/2026-11-08-wordcraft-corpus-recovery/`.
+This extends tested synthetic coverage; it does not prove arbitrary-document
+fidelity or authorize retiring ONLYOFFICE. Required real-use formats are being
+clarified before a replacement/migration plan is finalized.
