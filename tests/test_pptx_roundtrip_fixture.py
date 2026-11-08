@@ -22,6 +22,20 @@ def package(changes=None, remove=()):
 
 
 class FixtureTests(unittest.TestCase):
+    def test_editor_filter_preserves_static_pptx_and_still_allows_dynamic_native(self):
+        import ast
+        source = Path(__file__).resolve().parents[1] / 'lab/real-seafile/run_browser.py'
+        node = next(n for n in ast.parse(source.read_text()).body
+                    if isinstance(n, ast.FunctionDef) and n.name == 'select_browser_fixtures')
+        namespace = {}
+        exec(compile(ast.Module(body=[node], type_ignores=[]), str(source), 'exec'), namespace)
+        select = namespace['select_browser_fixtures']
+        fixtures = {'test.docx': ('wordcraft', b'docx', ''),
+                    'synthetic.pptx': ('deckcraft', b'pptx', '')}
+        self.assertEqual(select(fixtures, 'deckcraft'), {'synthetic.pptx': fixtures['synthetic.pptx']})
+        self.assertEqual(select({}, 'deckcraft'), {})
+        self.assertEqual(select(fixtures, ''), fixtures)
+
     def test_positive_and_deterministic(self):
         data = fixture.synthetic_pptx()
         self.assertEqual(data, fixture.synthetic_pptx())

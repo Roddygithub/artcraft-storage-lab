@@ -490,7 +490,7 @@ def select_browser_fixtures(fixtures, editor):
     if not editor:
         return fixtures
     dynamic_editors = {"soundcraft", "designcraft", "figcraft", "deckcraft"}
-    if editor in dynamic_editors:
+    if editor in dynamic_editors and editor not in {spec[0] for spec in fixtures.values()}:
         return {}
     if editor not in {spec[0] for spec in fixtures.values()}:
         raise ValueError(f"BROWSER_ONLY_EDITOR is not present in the browser fixture map: {editor}")
@@ -2047,7 +2047,8 @@ def main():
                 page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
                 if page is not original:
                     attach(page)
-                check("deckcraft_opened_native_document_from_seafile_file_list", True)
+                check("pptx_opened_from_seafile_file_list" if name.endswith(".pptx") else
+                      "deckcraft_opened_native_document_from_seafile_file_list", True)
             elif editor == "cadcraft":
                 original = page
                 page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
