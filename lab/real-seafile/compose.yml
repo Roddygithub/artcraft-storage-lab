@@ -11,7 +11,7 @@ services:
       - MYSQL_LOG_CONSOLE=true
       - MARIADB_AUTO_UPGRADE=1
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql:Z
     networks: [seafile-net]
     healthcheck:
       test: ["CMD", "/usr/local/bin/healthcheck.sh", "--connect", "--mariadbupgrade", "--innodb_initialized"]
@@ -30,12 +30,11 @@ services:
 
   seafile:
     image: seafileltd/seafile-mc:13.0-latest
-    container_name: seafile
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8000:80"
+      - "127.0.0.1:${SEAFILE_PORT:-8000}:80"
     volumes:
-      - ./data/seafile:/shared
+      - ./data/seafile:/shared:Z
     environment:
       - SEAFILE_MYSQL_DB_HOST=db
       - SEAFILE_MYSQL_DB_PORT=3306
@@ -79,10 +78,9 @@ services:
 
   onlyoffice:
     image: onlyoffice/documentserver:9.4
-    container_name: onlyoffice
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8100:80"
+      - "127.0.0.1:${ONLYOFFICE_PORT:-8100}:80"
     environment:
       - JWT_ENABLED=true
       - JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
@@ -94,14 +92,13 @@ services:
 
   bridge:
     image: python:3.12-slim
-    container_name: bridge
     restart: unless-stopped
     working_dir: /app
     command: ["python3", "-m", "bridge"]
     ports:
-      - "127.0.0.1:8778:8778"
+      - "127.0.0.1:${BRIDGE_PORT:-8778}:8778"
     volumes:
-      - ./app:/app:ro
+      - ./app:/app:ro,z
     environment:
       - BRIDGE_PUBLIC_URL=http://bridge:8778
       - BRIDGE_SEAHUB_ORIGIN=http://seafile.lab
@@ -117,8 +114,8 @@ services:
     working_dir: /app
     command: ["python3", "-I", "lab/real-seafile/run_slice.py"]
     volumes:
-      - ./app:/app:ro
-      - ./results:/results
+      - ./app:/app:ro,z
+      - ./results:/results:z
     environment:
       - SEAFILE_URL=http://seafile.lab
       - BRIDGE_URL=http://bridge:8778
@@ -134,10 +131,11 @@ services:
     profiles: [test]
     working_dir: /app
     command: ["bash", "-c", "pip install -q --break-system-packages playwright==1.49.0 Pillow==13.0.0 && python3 lab/real-seafile/run_browser.py"]
-    ipc: host
+    ipc: private
+    shm_size: 1gb
     volumes:
-      - ./app:/app:ro
-      - ./results:/results
+      - ./app:/app:ro,z
+      - ./results:/results:z
     environment:
       - SEAFILE_URL=http://seafile.lab
       - BRIDGE_URL=http://bridge:8778
@@ -146,8 +144,9 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - RESULTS_DIR=/results
+      - BROWSER_ONLY_EDITOR=${BROWSER_ONLY_EDITOR:-}
+      - BROWSER_WORDCRAFT_FIXTURE=${BROWSER_WORDCRAFT_FIXTURE:-}
     networks: [seafile-net]
 
 networks:
-  seafile-net:
-    name: seafile-net
+  seafile-net: {}

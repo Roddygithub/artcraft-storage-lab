@@ -3,7 +3,57 @@
 A stock Seafile CE 13 + ONLYOFFICE Docs CE + the bridge + upstream Craft web bundles, in a
 dedicated Lima VM with Docker. Nothing here touches a production system; the VM is disposable.
 
-## Run
+## Linux rootless Podman candidate (offline-tested; real run NOT VERIFIED)
+
+`local.py` uses the same Compose file as Lima. Prerequisites: Linux, Python 3.11+,
+working **rootless** local Podman (subuid/subgid mappings, rootless networking and storage),
+`podman-compose` supporting `--podman-args`, Compose profiles and `down --remove-orphans`,
+free loopback ports 8000/8100/8778, and enough disk/RAM for Seafile, ONLYOFFICE and Chromium.
+Images and browser pip packages require network access on the eventual real run. No socket or
+systemd unit is started, stopped or reused; Podman is explicitly local (`--remote=false`).
+
+Supply static assets previously acquired through `scripts/craft_web_zip.py` or
+`deploy/bridge/fetch-editors.sh`. Supply an **independently checked** JSON manifest mapping every
+relative POSIX file path under that static directory to its lowercase SHA-256, including any
+provenance files. Example shape: `{"wordcraft/index.html": "<64 hex characters>", ...}`.
+There are no excluded static files. Directories do not count; symlinks and special files are
+rejected. Missing, extra or changed files abort before any Podman call. Do not derive expected
+hashes from an untrusted runtime or its provenance label: GR085 found an old four-file WordCraft
+runtime labeled v0.13.2. The manifest establishes byte identity, not release authenticity.
+
+```bash
+python3 lab/real-seafile/local.py \
+  --run-dir "$HOME/seafile-lab-runs/candidate-001" \
+  --static /absolute/path/to/verified-static \
+  --manifest /absolute/path/to/independently-verified-static-sha256.json
+```
+
+The explicit run directory must not exist and must be outside this checkout. It is created
+mode 0700; fresh random synthetic credentials are written mode 0600 in its `.env`. Current
+`bridge/` and `lab/` source are copied there excluding `results`, `static`, `cache`, `.cache`
+and `__pycache__`; supplied static assets are copied and then verified. No private runner or
+second Compose YAML is needed. Every project gets a random name, including its network and
+containers. Ports bind only to loopback; override all three with `--seafile-port`,
+`--onlyoffice-port`, `--bridge-port` if needed. Browser IPC is private with 1 GiB shared memory.
+
+The launcher starts the disposable stack, appends the managed Seahub configuration through
+that project's Seafile service only, restarts it, runs slice then browser, and always attempts
+project-scoped `down --remove-orphans` after startup, including on failure. Subprocess waits
+are bounded (startup 15 minutes, each slice 60 minutes, cleanup 3 minutes). It never removes
+volumes or data. Interrupted/failed runs are retained and cannot be reused by the launcher.
+After an uncatchable kill, use the recorded `project.txt` and the copied Compose file for
+manual project-scoped cleanup; never use global Podman prune commands.
+
+Optional browser selection: `--editor wordcraft --wordcraft-fixture fidelity-layout.docx` (the fixture
+name is passed unchanged to `BROWSER_WORDCRAFT_FIXTURE`; use a name supported by
+`run_browser.py`). These options affect browser only; the HTTP slice remains complete.
+Raw logs, generated config, credentials and results remain inside the private run directory.
+Review and redact evidence before copying anything into Git; this launcher does not publish it.
+Offline check: `python3 tests/lab/test_local.py`. The parent must run the real lab and obtain
+independent review before treating this candidate as final evidence.
+
+## Run with Lima (existing workflow)
+
 
 ```bash
 limactl start --name=seafile-lab --cpus=4 --memory=6 --disk=30 --tty=false template:docker

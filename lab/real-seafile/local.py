@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+"""One fresh, private rootless Podman lab; no user socket required."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import secrets
+import shutil
+import signal
+import subprocess
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def manifest(directory):
+    result = {}
+    for path in sorted(directory.rglob('*')):
+        if path.is_symlink() or not (path.is_file() or path.is_dir()):
+            raise ValueError(f'non-regular asset: {path}')
+        if path.is_file():
+            with path.open('rb') as source:
+                result[path.relative_to(directory).as_posix()] = hashlib.file_digest(
+                    source, 'sha256').hexdigest()
+    return result
+
+
+def snapshot(run, assets, expected):
+    # Copy first, then verify the bytes that services will actually read.
+    for name in ('bridge', 'lab'):
+        shutil.copytree(ROOT / name, run / 'app' / name,
+                        ignore=shutil.ignore_patterns('results', 'static', 'cache',
+                                                     '__pycache__', '.cache'))
+    target = run / 'app/lab/real-seafile/static'
+    shutil.copytree(assets, target, symlinks=True)
+    actual = manifest(target)
+    if not actual or actual != expected:
+        raise ValueError('static SHA256 manifest mismatch (exact membership and hashes required)')
+    (run / 'static-sha256.json').write_text(json.dumps(actual, indent=2) + '\n')
+    shutil.copyfile(run / 'app/lab/real-seafile/compose.yml', run / 'compose.yml')
+
+
+def command(args, cwd, env, log, timeout=120):
+    with log.open('ab') as output:
+        proc = subprocess.Popen(args, cwd=cwd, env=env, stdout=output,
+                                stderr=subprocess.STDOUT, start_new_session=True)
+        try:
+            code = proc.wait(timeout=timeout)
+        except BaseException:
+            os.killpg(proc.pid, signal.SIGTERM)
+            try:
+                proc.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                os.killpg(proc.pid, signal.SIGKILL)
+                proc.wait(timeout=10)
+            raise
+        if code:
+            raise RuntimeError(f'{args[0]} failed ({code}); see private {log.name}')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--run-dir', type=Path, required=True)
+    parser.add_argument('--static', type=Path, required=True)
+    parser.add_argument('--manifest', type=Path, required=True,
+                        help='JSON object: relative POSIX filename -> lowercase SHA256')
+    for name, default in [('seafile', 8000), ('onlyoffice', 8100), ('bridge', 8778)]:
+        parser.add_argument(f'--{name}-port', type=int, default=default)
+    parser.add_argument('--editor', default='')
+    parser.add_argument('--wordcraft-fixture', default='')
+    args = parser.parse_args()
+    run = args.run_dir.expanduser().resolve()
+    if run == ROOT or ROOT in run.parents:
+        parser.error('run directory must be outside the repository')
+    ports = [args.seafile_port, args.onlyoffice_port, args.bridge_port]
+    if len(set(ports)) != 3 or any(not 1 <= p <= 65535 for p in ports):
+        parser.error('ports must be distinct and between 1 and 65535')
+    expected = json.loads(args.manifest.read_text())
+    os.umask(0o077)
+    run.mkdir(mode=0o700, parents=True, exist_ok=False)
+    snapshot(run, args.static.resolve(), expected)
+    project = 'craftlab-' + secrets.token_hex(8)
+    values = {key: secrets.token_hex(32) for key in (
+        'SEAFILE_MYSQL_DB_PASSWORD', 'INIT_SEAFILE_MYSQL_ROOT_PASSWORD',
+        'REDIS_PASSWORD', 'JWT_PRIVATE_KEY', 'ONLYOFFICE_JWT_SECRET', 'ADMIN_PASSWORD')}
+    values['ADMIN_EMAIL'] = 'synthetic-' + secrets.token_hex(8) + '@lab.test'
+    (run / '.env').write_text(''.join(f'{k}={v}\n' for k, v in values.items()))
+    # Do not inherit remote Podman/Docker targets or compose overrides.
+    env = {k: v for k, v in os.environ.items()
+           if not k.startswith(('CONTAINER_', 'DOCKER_', 'COMPOSE_', 'PODMAN_'))}
+    env.update(values)
+    env.update({f'{name.upper()}_PORT': str(port) for name, port in
+                zip(('seafile', 'onlyoffice', 'bridge'), ports)})
+    env.update(BROWSER_ONLY_EDITOR=args.editor,
+               BROWSER_WORDCRAFT_FIXTURE=args.wordcraft_fixture)
+    log = run / 'launcher.log'
+    command(['podman', '--remote=false', 'info', '--format', '{{.Host.Security.Rootless}}'], run, env, log)
+    if log.read_text().strip() != 'true':
+        raise RuntimeError('Podman must report rootless=true')
+    compose = ['podman-compose', '--podman-args=--remote=false', '-f', str(run / 'compose.yml'), '-p', project,
+               '--profile', 'test']
+    (run / 'project.txt').write_text(project + '\n')
+    (run / 'results').mkdir()
+    # Configure only the Seafile container belonging to this new project.
+    config = (run / 'app/lab/real-seafile/seahub_settings.extra.py').read_text()
+    config = config.replace('__ONLYOFFICE_JWT_SECRET__', values['ONLYOFFICE_JWT_SECRET'])
+    script = ("from pathlib import Path; import time\n"
+              "p=Path('/shared/seafile/conf/seahub_settings.py')\n"
+              "for _ in range(120):\n"
+              " if p.is_file(): break\n"
+              " time.sleep(5)\n"
+              "else: raise SystemExit('Seahub config never appeared')\n"
+              f"with p.open('a') as f: f.write('\\n' + {config!r})\n")
+    try:
+        command(compose + ['up', '-d', 'db', 'redis', 'seafile', 'onlyoffice', 'bridge'],
+                run, env, log, 900)
+        command(compose + ['exec', '-T', 'seafile', 'python3', '-c', script], run, env, log, 630)
+        command(compose + ['restart', 'seafile'], run, env, log)
+        for service in ('slice', 'browser'):
+            command(compose + ['run', '--rm', service], run, env, log, 3600)
+    finally:
+        try:
+            command(compose + ['logs', '--no-color'], run, env, run / 'services.log')
+        finally:
+            command(compose + ['down', '--remove-orphans'], run, env, log, 180)
+    print(f'Private evidence: {run / "results"}')
+
+
+if __name__ == '__main__':
+    def interrupted(*_):
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, interrupted)
+    try:
+        main()
+    except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as exc:
+        sys.exit(str(exc))
