@@ -171,14 +171,20 @@
       return r.text().then(function (t) { var j; try { j = JSON.parse(t); } catch (e) { j = { error: 'HTTP ' + r.status + ' from the proxy' }; } return { status: r.status, body: j }; });
     }).then(function (res) {
       state.saving = false;
-      if (res.status === 200) {
+      if (res.status === 200 && res.body && res.body.verified === true &&
+          typeof res.body.version === 'string' && res.body.version.trim()) {
         state.version = res.body.version;
-        state.failedSave = false;
-        if (state.dirtyRevision === revision) state.dirty = false;
-        status(res.body.reconciled ? 'saved (reconciled after a lost response)' : 'saved to Seafile', 'ok');
+        if (state.dirtyRevision === revision) {
+          state.failedSave = false;
+          state.dirty = false;
+        }
+        if (state.failedSave) status('earlier save verified; newer save failed, save again before closing', 'error');
+        else if (state.dirty) status('saved earlier edits to Seafile; unsaved changes remain', 'warn');
+        else status(res.body.reconciled ? 'saved (reconciled after a lost response)' : 'saved to Seafile', 'ok');
         if (ticket) post('saveResult', { ticket: ticket, ok: true, version: res.body.version });
         return;
       }
+      if (res.status === 200) return reject('save failed: the bridge did not verify the stored document');
       if (res.status === 409) {
         return reject('conflict: the file changed in Seafile since you opened it. Reopen it to see the current version; your edits stay in the editor.');
       }
@@ -207,9 +213,9 @@
     } else if (kind === 'openRequest') {
       openDocument();
     } else if (kind === 'dirty') {
-      state.dirty = !!d.dirty;
+      state.dirty = state.failedSave || !!d.dirty;
       state.dirtyRevision++;
-      if (state.dirty && !state.saving) status('unsaved changes', 'warn');
+      if (state.dirty && !state.saving && !state.failedSave) status('unsaved changes', 'warn');
     } else if (kind === 'save') {
       handleSave(d);
     } else if (kind === 'failed') {
