@@ -5,7 +5,18 @@
 > `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT GR: GR-085 — WordCraft corrected layout fixture edit/save
+## CURRENT — zero-patch project closure in progress
+
+Save safety and the new rootless launcher passed bounded source review at
+7380e46 and a real WordCraft replay: HTTP 48/48, browser 28/28 (GR-086).
+The final candidate is four unmodified upstream editors plus two declared
+JavaScript shims; Rust ports remain experimental. VectorCraft/FigCraft scene
+and ACK corrections, a fresh combined replay, ONLYOFFICE regression, human
+HTTPS acceptance and the final project gates remain open. The owner accepted
+the documented non-atomic Seahub write window. See `docs/PROJECT-CLOSURE.md`.
+Project GPT INCOMPLETE; upstream LOCKED; parent work, not Aptarchy completion.
+
+## PREVIOUS GR: GR-085 — WordCraft corrected layout fixture edit/save
 
 Fresh isolated replay on 2026-11-08 passed HTTP **48/48** then focused
 WordCraft Chromium **28/28**. Two trusted typed edits created two user-attributed

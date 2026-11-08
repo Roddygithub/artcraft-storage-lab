@@ -1,3 +1,13 @@
+# 2026-11-08 — completion candidate preparation
+
+- GR-086 retains the verified-save/failed-save guard and reproducible rootless
+  launcher regression: HTTP 48/48, WordCraft 28/28 on source7380e46; bounded
+  independent source R2 PASS, not the project gate.
+- Corrected current evidence attribution: GR-078 is retired integration.
+  Zero-patch candidate excludes local Rust ports; PPTX stays on ONLYOFFICE.
+- Owner explicitly accepted the documented host conditional-write limitation.
+  Remaining closure requirements are in `docs/PROJECT-CLOSURE.md`.
+
 # 2026-10-26 — GR-080 security evidence reconciliation
 
 > **2026-10-31 — architecture note.** Earlier GR entries include the retired gateway +

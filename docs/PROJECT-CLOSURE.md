@@ -21,13 +21,13 @@ This is a scope correction required by rule 6, not validation of those ports.
 
 | Requirement | Current evidence/state |
 | --- | --- |
-| WordCraft real edits and semantic fresh reopen | GR-085; safety changes replayed privately, HTTP 48/48 + browser 28/28, evidence publication pending |
+| WordCraft real edits and semantic fresh reopen | GR-085; safety replay GR-086, HTTP 48/48 + browser 28/28 |
 | GridCraft real edits and semantic fresh reopen | 2026-11-03 pilot; exact final-candidate replay pending |
 | PdfCraft field edit/save/reopen | GR-084; explicit PDF editor route, final-candidate replay pending |
 | CADCraft circle edit/save/reopen | GR-082; final-candidate replay pending |
 | VectorCraft and FigCraft semantic edits/reopen | Implemented, offline assertions pass; runtime and review pending |
 | ONLYOFFICE browser edit/save/version regression | Pending; API/conversion and opening checks alone are insufficient |
-| Reproducible rootless launcher with exact asset identity | Implemented, five offline tests, bounded source review PASS; successful WordCraft real run, publication pending |
+| Reproducible rootless launcher with exact asset identity | Implemented, five offline tests, bounded source review PASS; successful WordCraft real run retained in GR-086 |
 | Human HTTPS desktop acceptance | Pending: `lab/real-seafile/README.md` checklist |
 | Frozen clean candidate, exact SHA, forensic review | Pending |
 | Fresh independent project GPT gate after forensic review | Pending |
