@@ -16,8 +16,11 @@ web editors, with no patch to either side. The architecture is the stateless WOP
    creates a new version, the editor confirms the save, the file is closed and
    reopened with the edit intact. A browser download is **not** a save. A manual
    `curl` upload is **not** a save.
-2. **Never break ONLYOFFICE.** The existing Seafile ↔ ONLYOFFICE integration stays
-   functional throughout development. Do not uninstall, disable, or reconfigure it.
+2. **ONLYOFFICE retirement authorized by the owner on 2026-11-08.** This supersedes
+   the former requirement to preserve ONLYOFFICE: the owner explicitly requested
+   its removal from the desktop and Proxmox server. Do not reinstall it or run
+   further ONLYOFFICE compatibility campaigns. Preserve user documents and record
+   removal/rollback evidence. ArtCraft format coverage is still verified separately.
 3. **Never touch production Seafile destructively.** Read-only inspection first.
    Keep a rollback path for every change. Use a synthetic library and synthetic
    documents for tests.
