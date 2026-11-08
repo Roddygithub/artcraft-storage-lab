@@ -4,7 +4,9 @@
 # dotted hostname, hence the seafile.lab alias). Nothing here touches production.
 services:
   db:
-    image: mariadb:10.11
+    mem_limit: 384m
+    cpus: 0.5
+    image: docker.io/library/mariadb:10.11
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=${INIT_SEAFILE_MYSQL_ROOT_PASSWORD}
@@ -21,7 +23,9 @@ services:
       retries: 10
 
   redis:
-    image: redis:7
+    mem_limit: 96m
+    cpus: 0.5
+    image: docker.io/library/redis:7
     restart: unless-stopped
     command: ["/bin/sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\" --save '' --appendonly no"]
     environment:
@@ -29,7 +33,9 @@ services:
     networks: [seafile-net]
 
   seafile:
-    image: seafileltd/seafile-mc:13.0-latest
+    mem_limit: 1280m
+    cpus: 1
+    image: docker.io/seafileltd/seafile-mc:13.0-latest
     restart: unless-stopped
     ports:
       - "127.0.0.1:${SEAFILE_PORT:-8000}:80"
@@ -77,7 +83,9 @@ services:
         aliases: [seafile.lab]
 
   onlyoffice:
-    image: onlyoffice/documentserver:9.4
+    mem_limit: 1280m
+    cpus: 1
+    image: docker.io/onlyoffice/documentserver:9.4
     restart: unless-stopped
     ports:
       - "127.0.0.1:${ONLYOFFICE_PORT:-8100}:80"
@@ -91,7 +99,9 @@ services:
     networks: [seafile-net]
 
   bridge:
-    image: python:3.12-slim
+    mem_limit: 128m
+    cpus: 0.5
+    image: docker.io/library/python:3.12-slim
     restart: unless-stopped
     working_dir: /app
     command: ["python3", "-m", "bridge"]
@@ -109,7 +119,9 @@ services:
     networks: [seafile-net]
 
   slice:
-    image: python:3.12-slim
+    mem_limit: 256m
+    cpus: 0.5
+    image: docker.io/library/python:3.12-slim
     profiles: [test]
     working_dir: /app
     command: ["python3", "-I", "lab/real-seafile/run_slice.py"]
@@ -127,6 +139,8 @@ services:
     networks: [seafile-net]
 
   browser:
+    mem_limit: 896m
+    cpus: 1.5
     image: mcr.microsoft.com/playwright/python:v1.49.0-noble
     profiles: [test]
     working_dir: /app
