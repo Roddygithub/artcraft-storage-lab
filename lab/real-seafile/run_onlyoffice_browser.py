@@ -95,7 +95,11 @@ def main():
         with sync_playwright() as p:
             browser = p.chromium.launch(args=["--disable-dev-shm-usage"])
             try:
-                for round_no, marker in enumerate([*markers, None], 1):
+                # Each final Find query gets its own fresh authenticated editor.
+                # No positive result from a previous query can satisfy it.
+                rounds = [(marker, None) for marker in markers] + [
+                    (None, value) for value in [baseline, *markers]]
+                for round_no, (marker, query) in enumerate(rounds, 1):
                     before = rs.history(token, repo_id, name)
                     require(f"round{round_no}_history_available", bool(before))
                     ctx = browser.new_context(viewport={"width": 1400, "height": 900},
@@ -150,15 +154,17 @@ def main():
                             editor.keyboard.press("Control+f")
                             search = frame.locator("#search-adv-text input")
                             search.wait_for(state="visible", timeout=30000)
-                            for index, value in enumerate([baseline, *markers]):
-                                search.fill(value)
-                                search.press("Enter")
-                                frame.locator("#search-adv-results-number").filter(
-                                    has_text=re.compile(r"\b[1-9][0-9]*\b")
-                                ).wait_for(state="visible", timeout=30000)
-                                require(f"final_reopen_current_text_{index}", True)
-                            editor.screenshot(path=str(results / "onlyoffice-final-reopen.png"))
-                            require("final_reopen_no_browser_download", not downloads)
+                            frame.locator("#search-adv-results-number").filter(
+                                has_text=re.compile(r"^No search results$")
+                            ).wait_for(state="visible", timeout=30000)
+                            search.fill(query)
+                            search.press("Enter")
+                            frame.locator("#search-adv-results-number").filter(
+                                has_text=re.compile(r"\b[1-9][0-9]*\b")
+                            ).wait_for(state="visible", timeout=30000)
+                            require(f"final_reopen_current_text_{round_no - 3}", True)
+                            editor.screenshot(path=str(results / f"onlyoffice-final-reopen-{round_no}.png"))
+                            require(f"final_reopen_{round_no}_no_browser_download", not downloads)
                             continue
                         # Canvas readiness plus actual mutation/readback is mandatory; a
                         # missing frame/canvas cannot turn into a conditional pass.
