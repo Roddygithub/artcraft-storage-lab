@@ -1,0 +1,79 @@
+{
+  "captured_utc": "2026-11-04T15:16:28Z",
+  "passed": 18,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "browser_login",
+      "passed": true
+    },
+    {
+      "name": "browser_editor_filter_selects_requested_editor",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_typed_form_edit_is_dirty_before_save",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_save_request_contains_the_typed_name_field_value",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_relay_save_bytes_match_seafile_readback",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_saved_pdf_name_field_contains_typed_value",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_saved_pdf_differs_from_fixture",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_saved_pdf_bytes_look_right",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_fresh_seafile_session",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_reopened_from_seafile_pdf_edit_route",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_reopen_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_fresh_open_loaded_the_saved_pdf_field_value",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_reopen_status_reports_opened_document",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_save_did_not_download",
+      "passed": true
+    }
+  ]
+}

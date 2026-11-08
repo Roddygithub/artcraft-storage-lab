@@ -1,0 +1,13 @@
+{
+  "runner_exit_statuses": {
+    "wordcraft": 0,
+    "onlyoffice": 0
+  },
+  "dedicated_podman_api_service": "inactive/dead; ExecMainStatus=0",
+  "test_project_containers_remaining": 0,
+  "test_project_networks_remaining": 0,
+  "test_ports_listening": 0,
+  "synthetic_volume_data": "retained outside Git for local evidence; no active container/service",
+  "unrelated_services_or_volumes_touched": false,
+  "checked_after_run": true
+}

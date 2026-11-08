@@ -1,0 +1,50 @@
+{
+  "base_commit": "c09933c7f45b49e6b2d518c1589fc1a52863619e",
+  "source_files": [
+    {
+      "path": "lab/real-seafile/run_browser.py",
+      "sha256": "0f7b68054dceb25670b25133a37a7094987a8a85c1731b344ecd857bf5de5dbe",
+      "runtime_copy_sha256": "934acd2e0a70a511b9f039645b9e98e873b24c2a5ef541191f0d39dad4951b7a",
+      "runtime_difference": "The post-run source adds only EOF/no-progress checks to malformed xref handling; this test-helper-only guard was regression-tested offline after run 7 and does not alter the recorded valid-PDF flow."
+    },
+    {
+      "path": "tests/test_pdfcraft_real_edit.py",
+      "sha256": "b2bf3f8a3ddb575fb9576b24783ee284030f4c21d516f079b2d5346794485aad"
+    },
+    {
+      "path": "lab/real-seafile/fixtures/form.pdf",
+      "size": 1744,
+      "sha256": "c6f8b656e225101129aa36bd5467adc8dba16730915f19caca17f6a546d0b040"
+    }
+  ],
+  "pdfcraft_bundle": {
+    "upstream": "storytold/pdfcraft",
+    "release": "v0.16.1",
+    "archive_sha256": "00f3e85e29bb9dfa3d43a655cc4197cdc679f4ec7e8ef1bb5e623dc3603c0edf",
+    "patched": false,
+    "files": [
+      {
+        "path": "pdfcraft/index.html",
+        "size": 1210,
+        "sha256": "3a6e2ec1bad7f1f495256502bcfb525646267681c7b66577d689475ace33264c"
+      },
+      {
+        "path": "pdfcraft/pdfcraft-web-a30dc4dd8a148def_bg.wasm",
+        "size": 49909107,
+        "sha256": "fcf3e3721c399fd695d3e431689f35b83e81b94960bd5d1eb57e1614ba5dcec4"
+      },
+      {
+        "path": "pdfcraft/pdfcraft-web-d3ba543cb17a7f63.js",
+        "size": 165584,
+        "sha256": "84eea07a552e7c98b12c837f086c4da2364a285a5d468ad8ffc0f082fda0e042"
+      }
+    ]
+  },
+  "runtime_configuration": {
+    "compose_snapshot_sha256": "d991edad4640d09207e3d08cef5b9da00a5ea4532cc9500e3d2d28db8c461134",
+    "runner_snapshot_sha256": "ecf5c6b26e0c3f061bdcd604a2cde3c9d75971ef6fb1c93c5622e21e48a52a55",
+    "private_cache_root": "Private local cache; absolute path omitted from repository evidence.",
+    "environment_file_included": false
+  },
+  "previous_reviewed_commit": "c09933c7f45b49e6b2d518c1589fc1a52863619e"
+}

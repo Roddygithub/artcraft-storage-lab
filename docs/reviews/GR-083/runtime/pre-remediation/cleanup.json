@@ -1,0 +1,8 @@
+{
+  "runner_exit_status": 0,
+  "dedicated_podman_api_service": "stopped; inactive/dead after the run",
+  "test_project_containers_remaining": 0,
+  "test_ports_listening": 0,
+  "synthetic_volume_data": "retained outside Git for local evidence; no active container/service",
+  "unrelated_services_or_volumes_touched": false
+}

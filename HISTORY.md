@@ -1,8 +1,106 @@
 # 2026-10-26 — GR-080 security evidence reconciliation
 
-> **2026-10-31 — superseded.** The GR series below describes the gateway + Seahub/fileserver patch
-> architecture that `docs/REFOUNDATION-REPORT.md` retired. Current state: `README.md`, `ROADMAP.md`,
-> `lab/real-seafile/results/`. This file is kept as history and is no longer updated.
+> **2026-10-31 — architecture note.** Earlier GR entries include the retired gateway +
+> Seahub/fileserver patch architecture. Current WOPI bridge follow-ups continue in this log and are
+> summarized in `README.md`, `ROADMAP.md` and `lab/real-seafile/results/`.
+
+# 2026-11-08 — GR-085 WordCraft corrected layout fixture edit/save
+
+- Fresh isolated lab: HTTP 48/48 then Chromium 28/28. Two real typed edits,
+  two user-attributed versions, confirmation, old-page closure and fresh-session
+  file-list reopen; original main-document text and both markers retained.
+- Diagnosed incorrect runtime asset identity in two earlier failed private
+  attempts. The successful attempt imported the official WordCraft v0.13.2 ZIP
+  through the bounded ZIP helper and matched all 26 GR-083 asset hashes.
+- Candidate `8a6f07b` passed bounded independent GPT source review. Evidence
+  remains parent-operated; full DOCX fidelity and project GPT approval are not
+  claimed. Cleanup completed; Aptarchy completion remains false.
+- Evidence: `lab/real-seafile/results/2026-11-08-wordcraft-fidelity-edit/`.
+
+# 2026-11-04 — GR-084 PdfCraft real edit on synthetic Seafile
+
+- Final isolated rootless-Podman run passed HTTP 48/48 and focused Chromium
+  18/18 with PdfCraft Web v0.16.1 and synthetic Seafile CE 13.0.28. A real
+  browser edit to the PDF name field was saved as a user-attributed Seafile
+  version, read back, and reopened in a new browser context. The relay save
+  payload matched Seafile readback byte-for-byte (2,386 bytes); no editor
+  download occurred. The fresh editor open used `?edit_pdf=true` directly
+  because the ordinary PDF list link opens Seafile preview.
+- The fixture upload was setup only. One synthetic AcroForm PDF was exercised;
+  other PDFs, human HTTPS, production, and broad PDF fidelity remain NOT
+  VERIFIED. Lab cleanup removed the test containers; the private cache data is
+  retained locally. This was direct parent work, not Aptarchy completion.
+- Exact-candidate GPT R1 found P2: the saved-field assertion could accept a
+  marker from a superseded incremental PDF object. The assertion now resolves
+  active objects through the classic xref chain, the stale-value regression
+  passes, and the isolated runtime was rerun successfully. GPT R2 then found
+  stale PDF size/hash documentation and an EOF loop on malformed xref input.
+  The retained bytes and documentation now agree; an EOF guard and regression
+  were added. GPT R3 found a stale HISTORY byte count; it is corrected. GPT R4
+  found a stale closing sentence in the report; it is corrected with the R3
+  review link. GPT R5 found a stale opening-review status; it is corrected.
+  GPT R6 returned a bounded PASS with no P1–P3 findings on exact candidate
+  `61c98fe45483809ff11bad4efae413ee893041e8`. Project GPT remains INCOMPLETE
+  and upstream publication LOCKED.
+- Evidence: `docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md` and
+  `docs/reviews/GR-084/`.
+
+# 2026-11-04 — GR-083 WordCraft / ONLYOFFICE DOCX comparison
+
+- After the corpus OOXML-order fix passed independent source review R2, reran a
+  fresh synthetic rootless-Podman Seafile comparison. All three corrected DOCX
+  fixtures opened in both editors with readiness signals; all six Seafile
+  readback hashes matched the fixtures and no browser downloads were observed.
+  The runners exited 0. No editing, saving, or version creation was attempted.
+- The visual spot checks show prose/runs, lists/table, and page-two content in
+  both editors. The ONLYOFFICE first-use tip sits in lower-right whitespace; its
+  table is visible near the viewport bottom. WordCraft recorded two
+  `net::ERR_ABORTED` request failures whose cause remains NOT VERIFIED. The two
+  ONLYOFFICE plugin/theme 502s from the initial run did not recur; their cause
+  also remains NOT VERIFIED. Full OOXML/page-layout fidelity is not established.
+- This was direct parent work, not Aptarchy completion. Production and upstream
+  were untouched.
+- Independent review R1 found out-of-order OOXML property elements (P2) and an
+  ambiguous fidelity sentence (P3). The generator and focused order tests were
+  corrected; R2 passed the bounded source remediation with no current P1–P3
+  findings. The initial pre-remediation screenshots/results are archived as
+  historical. R3 found two archive-only defects; both were fixed and R4
+  returned a bounded PASS with no findings. Project GPT remains INCOMPLETE and
+  upstream publication LOCKED.
+- Evidence: `docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md` and
+  `docs/reviews/GR-083/`.
+
+# 2026-11-03 — GR-082 CADCraft real edit on synthetic Seafile
+
+- Ran a fresh rootless Podman Seafile CE 13.0.28 lab using the released,
+  unpatched CADCraft Web v0.15.1 bundle. A trusted browser edit drew a circle in
+  the synthetic DXF; the host confirmed save, Seafile created a
+  user-attributed version, and the saved circle reopened from the Seafile file
+  list in a new browser context. Relay bytes matched Seafile readback exactly;
+  editor save produced no download.
+- HTTP passed 48/48 and the sequential browser slice passed 95/95, including
+  all 18 CADCraft assertions and the subsequent DeckCraft flow. The first
+  runtime attempt failed six CAD assertions and is retained only outside Git;
+  the passing evidence is from a fresh synthetic database after fixes.
+- This was direct parent work, not Aptarchy task completion. Production,
+  human HTTPS, broad DXF compatibility and post-change ONLYOFFICE UI remain
+  NOT VERIFIED. Evidence R1/R2 count findings are corrected; R3 returned a
+  bounded provisional pass with no current P1–P3 findings and did not replay
+  the runtime. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+- Evidence: `docs/GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+  `docs/reviews/GR-082/`.
+
+# 2026-11-03 — GR-081 DeckCraft native edit on synthetic Seafile
+
+- Direct parent browser run completed 26/26 checks across two native saves,
+  fresh-session reopen and byte-equality assertions. Fixture setup upload
+  preceded editing. This was not Aptarchy task completion.
+- Font/layout fidelity, foreign `.pptx`, production and other browsers remain
+  NOT VERIFIED. Independent R1–R3 evidence reviews returned bounded
+  PROVISIONAL PASS. Project GPT remains INCOMPLETE and upstream publication
+  LOCKED.
+- Evidence: `docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md`,
+  `docs/reviews/GR-081/`.
 
 
 - Updated `docs/SECURITY.md` to distinguish the historical GPT FAIL candidate

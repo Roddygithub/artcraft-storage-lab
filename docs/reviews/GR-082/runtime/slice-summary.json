@@ -1,0 +1,201 @@
+{
+  "captured_at": "2026-11-03T17:04:42Z",
+  "seafile_version": "13.0.28",
+  "checks_passed": 48,
+  "checks_failed": 0,
+  "checks": [
+    {
+      "name": "seafile_up",
+      "passed": true
+    },
+    {
+      "name": "bridge_up",
+      "passed": true
+    },
+    {
+      "name": "onlyoffice_up",
+      "passed": true
+    },
+    {
+      "name": "seahub_server_info",
+      "passed": true
+    },
+    {
+      "name": "reader_user_ready",
+      "passed": true
+    },
+    {
+      "name": "reader_share_readonly",
+      "passed": true
+    },
+    {
+      "name": "seahub_svg_routes_to_wopi",
+      "passed": true
+    },
+    {
+      "name": "seahub_docx_routes_to_wopi_wordcraft",
+      "passed": true
+    },
+    {
+      "name": "seahub_xlsx_routes_to_wopi_gridcraft",
+      "passed": true
+    },
+    {
+      "name": "seahub_pdf_default_is_viewer_not_wopi",
+      "passed": true
+    },
+    {
+      "name": "seahub_pdf_edit_pdf_routes_to_wopi_pdfcraft",
+      "passed": true
+    },
+    {
+      "name": "seahub_dxf_routes_to_wopi_cadcraft",
+      "passed": true
+    },
+    {
+      "name": "seahub_pptx_routes_to_wopi_deckcraft",
+      "passed": true
+    },
+    {
+      "name": "seahub_odt_routes_to_onlyoffice",
+      "passed": true
+    },
+    {
+      "name": "bridge_open_docx_wordcraft",
+      "passed": true
+    },
+    {
+      "name": "bridge_serves_wordcraft_bundle",
+      "passed": true
+    },
+    {
+      "name": "bridge_open_xlsx_gridcraft",
+      "passed": true
+    },
+    {
+      "name": "bridge_serves_gridcraft_bundle",
+      "passed": true
+    },
+    {
+      "name": "bridge_open_pdf_pdfcraft",
+      "passed": true
+    },
+    {
+      "name": "bridge_serves_pdfcraft_bundle",
+      "passed": true
+    },
+    {
+      "name": "bridge_open_dxf_cadcraft",
+      "passed": true
+    },
+    {
+      "name": "bridge_serves_cadcraft_bundle",
+      "passed": true
+    },
+    {
+      "name": "bridge_open_pptx_deckcraft",
+      "passed": true
+    },
+    {
+      "name": "bridge_serves_deckcraft_bundle",
+      "passed": true
+    },
+    {
+      "name": "discovery_form_token_not_in_url",
+      "passed": true
+    },
+    {
+      "name": "discovery_wopisrc_is_seahub",
+      "passed": true
+    },
+    {
+      "name": "bridge_open_host_page",
+      "passed": true
+    },
+    {
+      "name": "bridge_host_page_frame_ancestors_seahub",
+      "passed": true
+    },
+    {
+      "name": "bridge_version_is_seafile_obj_id",
+      "passed": true
+    },
+    {
+      "name": "relay_file_returns_bytes",
+      "passed": true
+    },
+    {
+      "name": "relay_save_ok",
+      "passed": true
+    },
+    {
+      "name": "seafile_has_new_bytes",
+      "passed": true
+    },
+    {
+      "name": "history_two_versions_attributed_to_admin",
+      "passed": true
+    },
+    {
+      "name": "relay_stale_version_409_no_overwrite",
+      "passed": true
+    },
+    {
+      "name": "relay_external_change_409_no_overwrite",
+      "passed": true
+    },
+    {
+      "name": "relay_identical_bytes_idempotent",
+      "passed": true
+    },
+    {
+      "name": "relay_rename_refused_400",
+      "passed": true
+    },
+    {
+      "name": "relay_wrong_signature_415",
+      "passed": true
+    },
+    {
+      "name": "relay_lock_seahub_ok",
+      "passed": true
+    },
+    {
+      "name": "relay_lock_conflict_409",
+      "passed": true
+    },
+    {
+      "name": "relay_unlock_ok",
+      "passed": true
+    },
+    {
+      "name": "seahub_readonly_gets_wopi_view_form",
+      "passed": true
+    },
+    {
+      "name": "bridge_readonly_open",
+      "passed": true
+    },
+    {
+      "name": "bridge_readonly_save_refused_403",
+      "passed": true
+    },
+    {
+      "name": "seahub_putfile_ignores_can_edit",
+      "passed": true
+    },
+    {
+      "name": "onlyoffice_apijs_200",
+      "passed": true
+    },
+    {
+      "name": "onlyoffice_jwt_command_ok",
+      "passed": true
+    },
+    {
+      "name": "onlyoffice_fetches_from_seahub_and_converts",
+      "passed": true
+    }
+  ],
+  "redaction": "Repository IDs, URLs, account names, session details, tokens, cookies, and raw per-check details omitted."
+}

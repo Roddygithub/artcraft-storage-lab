@@ -20,6 +20,31 @@ Status: **prototype, validated on a stock Seafile CE 13.0.28** in an isolated VM
 incorporated (30 fake-host tests). Not yet deployed anywhere real. Nothing
 published upstream.
 
+ROADMAP step 3 has current-bridge Seafile evidence for WordCraft DOCX and GridCraft
+XLSX, the five-route GR-078 replay (WordCraft, GridCraft, PdfCraft, VectorCraft and
+PhotoCraft), native DeckCraft `.deckcraft`, and CADCraft DXF. The DeckCraft and
+CADCraft runs are direct parent work, not Aptarchy completion. See
+[`GR-078`](docs/GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md),
+[`GR-081`](docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md), and
+[`GR-082`](docs/GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md). Remaining dispatched
+scenarios, foreign `.pptx` editing, broad CADCraft fidelity and production
+behavior still require separate validation.
+
+The bounded synthetic WordCraft/ONLYOFFICE DOCX comparison is recorded in
+[`GR-083`](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md). After R1's
+OOXML-order finding was fixed and passed source review R2, a fresh run opened
+three corrected fixtures in each editor with unchanged readback hashes and no
+downloads. It did not edit or save. R3's archive-only findings were corrected
+and R4 returned a bounded pass with no findings. The initial pre-remediation artifacts remain archived; earlier
+ONLYOFFICE manifest 502s did not recur, but their cause is unverified. This
+comparison does not replace the owner’s live ONLYOFFICE repair.
+
+GR-084 adds one isolated PdfCraft edit/save/version/readback/reopen using a
+synthetic AcroForm PDF. The focused browser slice passed 18/18 and HTTP passed
+48/48; relay-save bytes equaled Seafile readback. This direct parent run is not
+Aptarchy completion and does not establish broad PDF compatibility or project
+completion. See [`GR-084`](docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md).
+
 ## What works today
 
 | File | Editor | How |

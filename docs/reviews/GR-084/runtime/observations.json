@@ -1,0 +1,24 @@
+{
+  "scope": "One synthetic one-page AcroForm PDF opened by the isolated Seafile/PdfCraft route.",
+  "fixture_setup": "The synthetic fixture was uploaded before editing; that setup upload is not the editor save.",
+  "edit": "A unique alphanumeric value was typed through Chromium into the existing PDF name field. The editor showed unsaved changes before Ctrl+S.",
+  "save": "The editor POST payload contained the field value; the host confirmed save; Seafile History gained a version attributed by the test to the synthetic test user.",
+  "readback": "The PDF downloaded from Seafile contains the field value. Its bytes equal the captured relay save payload (2,386 bytes; SHA-256 d1bb31792966cf0b5551029e56224074629e2590c9a6865be92ce70d6599dad2). The retained PDF matches those bytes.",
+  "fresh_session": "A new browser context authenticated separately and opened the same synthetic file through its explicit ?edit_pdf=true route. /relay/file bytes equaled Seafile readback and the field value remained present.",
+  "downloads": "The browser observed no file download during the editor save flow.",
+  "navigation_limit": "The fresh PDF editor was opened by direct Seafile file route with ?edit_pdf=true because the ordinary Seafile PDF list link opens preview; this run does not claim a file-list click into PdfCraft.",
+  "not_verified": [
+    "other PDF forms/documents",
+    "broad PDF fidelity or complete external PDF validity",
+    "file-list click into PdfCraft",
+    "human HTTPS browser pass",
+    "other browsers",
+    "production behavior",
+    "post-change ONLYOFFICE regression",
+    "project-level GPT completion"
+  ],
+  "pdf_tool_diagnostic": "pdftotext extracted the saved field value but emitted three 'Bad form bounding box' warnings; full external PDF validity is not claimed.",
+  "runtime_run": "Final fresh database run after GPT R1 remediation; HTTP completed before focused Chromium.",
+  "revisions_assertion": "The PDF field check resolves active objects through the classic xref revision chain; the offline regression rejects a superseded incremental field value.",
+  "post_run_helper_fix": "GPT R2 found an EOF no-progress loop in malformed xref handling. An EOF guard and regression were added after runtime run 7; successful-run behavior on the valid saved PDF was not rerun for this malformed-input-only helper change."
+}

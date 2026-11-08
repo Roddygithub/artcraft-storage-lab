@@ -1,0 +1,389 @@
+{
+  "captured_at": "2026-11-03T17:09:59Z",
+  "seafile_version": "13.0.28",
+  "checks_passed": 95,
+  "checks_failed": 0,
+  "checks": [
+    {
+      "name": "browser_login",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_native_setup_fixture_generated_by_editor",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_native_setup_fixture_uploaded_before_editor_save",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_opened_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_save_request_carries_the_typed_marker",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_saved_docx_contains_the_typed_marker",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_save_is_not_identical_bytes",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_saved_docx_bytes_look_right",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_fresh_seafile_session",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopened_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_bytes_identical_to_the_saved_version",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_second_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_seafile_holds_both_markers",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_holds_the_original_marker",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_holds_the_second_typed_marker",
+      "passed": true
+    },
+    {
+      "name": "wordcraft_saves_did_not_download",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_opened_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_save_request_carries_the_typed_value",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_semantically_contains_the_typed_value",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_keeps_the_fixture_value",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_save_is_not_identical_bytes",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_bytes_look_right",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_fresh_seafile_session",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopened_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_bytes_identical_to_the_saved_version",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_parsed_the_saved_value",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_holds_the_original_value",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_holds_the_second_typed_value",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_second_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_reopen_seafile_holds_both_values",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_second_save_is_not_identical_bytes",
+      "passed": true
+    },
+    {
+      "name": "gridcraft_saves_did_not_download",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "pdfcraft_saved_pdf_bytes_look_right",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_opened_dxf_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_initial_fixture_has_no_circle",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_initial_drawing_canvas_captured",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_user_circle_edit_marks_host_dirty",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_circle_is_visible_before_save",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_save_payload_contains_circle_entity",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_circle_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_seafile_readback_contains_circle_entity",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_relay_save_bytes_match_seafile_readback",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_saved_canvas_still_renders_circle",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_save_did_not_download",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_fresh_session_opened_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_fresh_session_reads_saved_dxf",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_fresh_session_renders_saved_circle",
+      "passed": true
+    },
+    {
+      "name": "cadcraft_edits_did_not_download",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_opened_native_document_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_host_frame_from_seahub",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_editor_ready_and_document_opened",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_document_rendered_before_first_edit",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_title_edit_is_visible_in_rendered_canvas",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_request_contains_the_typed_marker",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_request_retains_the_fixture_slide_title",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_creates_seafile_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_seafile_readback_contains_the_typed_marker",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_save_changes_native_document_bytes",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_saved_native_document_is_readable",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_saved_canvas_retains_the_visible_title_edit",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_native_save_did_not_download",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_fresh_session_logged_into_seafile",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_reopened_from_seafile_file_list",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_fresh_session_loaded_the_saved_bytes",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_reopened_editor_save_contains_both_markers",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_reopened_save_confirmed_by_host_page",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_reopened_save_creates_another_version_by_user",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_seafile_retains_both_typed_markers",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_second_save_changes_native_bytes",
+      "passed": true
+    },
+    {
+      "name": "deckcraft_native_edits_did_not_download",
+      "passed": true
+    }
+  ],
+  "redaction": "Repository IDs, URLs, account names, session details, tokens, cookies, and raw per-check details omitted."
+}

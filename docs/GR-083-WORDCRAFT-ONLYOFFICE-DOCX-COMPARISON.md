@@ -1,0 +1,96 @@
+# GR-083 — WordCraft and ONLYOFFICE DOCX comparison
+
+**Current status: corrected synthetic open/readback replay passed six opens.** Three fixtures
+opened in each editor with ready signals, unchanged Seafile readback, and no browser downloads.
+No edit, save, or Seafile version creation was attempted. This bounded comparison is not project
+GPT approval, production validation, or upstream authorization. Project GPT remains
+**INCOMPLETE** and upstream publication remains **LOCKED**.
+
+## Corrected-corpus replay
+
+On 2026-11-04, after the OOXML property ordering remediation passed source review R2, a fresh
+rootless-Podman run used a new disposable project and synthetic Seafile library. The runtime
+source copy matched the reviewed checkout; the served WordCraft asset tree matched the recorded
+GR-082 runtime bundle. Both WordCraft and ONLYOFFICE opened all three corrected fixtures and
+reported editor-frame/readiness signals. For all six opens, the before/after Seafile readback
+hash matched the fixture hash. The runner exited 0 for both variants; no browser downloads were
+observed. The exact Seafile patch version remains **NOT VERIFIED**.
+
+WordCraft recorded two `net::ERR_ABORTED` request-failed events; their targets and cause were not
+retained in the public evidence and remain **NOT VERIFIED**. No HTTP error response was recorded
+in this replay. The two ONLYOFFICE plugin/theme manifest 502s from the earlier run did not recur;
+their cause remains **NOT VERIFIED**. These are open/readback observations only, not an
+edit/save/version result. The run and its cleanup are summarized in
+[`runtime/observations.json`](reviews/GR-083/runtime/observations.json),
+[`runtime/environment.json`](reviews/GR-083/runtime/environment.json), and
+[`runtime/cleanup.json`](reviews/GR-083/runtime/cleanup.json). Independent evidence review R3
+found two archive-only defects (invalid archived JSON and broken review links); R4 verified both
+repairs and reported no remaining findings in its bounded evidence scope.
+
+## Historical pre-remediation run
+
+On 2026-11-04, a direct parent run used a disposable rootless Podman stack with synthetic
+Seafile data. The WordCraft route opened the same three deterministic DOCX fixtures, then a
+separate lab-only route configuration sent those same files to ONLYOFFICE. ONLYOFFICE remained
+enabled; WOPI was disabled only in that disposable ONLYOFFICE comparison variant. The test
+did not change the standard lab configuration, production Seafile, production ONLYOFFICE, or
+any upstream repository.
+
+Both variants opened all three files in the expected editor and reported a render-ready hint.
+Seafile readback hashes before and after each open were identical to the fixture hashes. The
+browser recorded no downloads. All six open/readback checks passed. This initial pre-remediation
+ONLYOFFICE run recorded two HTTP 502 responses for its plugin and theme manifests; their cause is
+NOT VERIFIED. The exact Seafile patch version was not recorded; the container image was tagged
+`seafileltd/seafile-mc:13.0-latest`. The ONLYOFFICE image was tagged
+`onlyoffice/documentserver:9.4`.
+
+## Visual sample
+
+| Fixture | WordCraft | ONLYOFFICE | Bounded observation |
+| --- | --- | --- | --- |
+| Prose, bold, italic, colored run | [Screenshot](reviews/GR-083/runtime/wordcraft/fidelity-prose.png) | [Screenshot](reviews/GR-083/runtime/onlyoffice/fidelity-prose.png) | Heading, paragraphs, inline emphasis and red text are visible in both; wrapping is similar in this sample. |
+| Heading, bullet/numbered lists, two-column table | [Screenshot](reviews/GR-083/runtime/wordcraft/fidelity-structure.png) | [Screenshot](reviews/GR-083/runtime/onlyoffice/fidelity-structure.png) | Both show the headings, list items and table cells. Layout and spacing are not pixel-identical. |
+| Page break and second-page content | [Page 1](reviews/GR-083/runtime/wordcraft/fidelity-layout.png), [page-2 capture](reviews/GR-083/runtime/wordcraft/fidelity-layout-page2.png) | [Page 1](reviews/GR-083/runtime/onlyoffice/fidelity-layout.png), [page-2 capture](reviews/GR-083/runtime/onlyoffice/fidelity-layout-page2.png) | Both corrected captures show the second-page heading, paragraph, and table. ONLYOFFICE's first-use tip sits in lower-right whitespace; the table is visible near the viewport bottom. This is a spot check, not full pagination/table fidelity. |
+
+This is a small visual spot check, not a quantitative OOXML fidelity benchmark. The editor
+canvas does not expose the fixture title in DOM text, so visible content was assessed from the
+retained screenshots. The page-2 capture used a trusted click followed by Ctrl+End; an earlier
+wheel-only capture was not reliable. The ONLYOFFICE screenshots show a first-use “Multipage
+view” tip in lower-right whitespace. Broader OOXML pagination, foreign documents,
+editing/saving, history, and additional browsers were not tested.
+
+## Reproduction assets and checks
+
+The deterministic corpus is generated by `lab/real-seafile/docx_fidelity_corpus.py` using only
+the Python standard library. After review R1 identified out-of-order property elements, the
+generator was corrected and focused tests were added for the specific style/table/cell sequences
+used by this corpus. These checks do not establish full ECMA-376 schema conformance. The initial
+screenshots and observations are archived under `reviews/GR-083/runtime/pre-remediation/` and
+remain historical only. Independent source re-review R2 returned a bounded PASS with no current
+P1–P3 findings; the corrected replay is now retained in `reviews/GR-083/runtime/`. R3's
+archive-only findings were corrected, and R4 returned a bounded PASS with no findings.
+
+`lab/real-seafile/compare_docx_fidelity_browser.py` performs the
+file-list opens, editor readiness checks, download observation, and exact pre/post readback
+hash comparisons inside the test browser container. `lab/real-seafile/switch_docx_route.py`
+changes the DOCX route only in the disposable comparison stack and fails closed if the expected
+settings are ambiguous.
+
+Focused local checks:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 python3 tests/test_docx_fidelity_corpus.py
+PYTHONDONTWRITEBYTECODE=1 python3 tests/test_docx_fidelity_route_switch.py
+```
+
+The corpus and route-helper tests pass. Current sanitized observations and screenshots correspond
+to the corrected-corpus replay. Private raw logs and library identifiers remain outside Git; only
+their SHA-256 digests are retained in the bundle. The prior pre-remediation observations and
+screenshots are preserved separately for audit. See [`docs/reviews/GR-083/`](reviews/GR-083/README.md).
+
+R1 also corrected an ambiguous sentence in the re-foundation summary. R2 independent source review
+and the corrected synthetic open/readback replay are complete. R3's archive findings were fixed;
+R4 returned a bounded PASS with no findings. This was direct parent work, not Aptarchy task
+completion. The earlier ONLYOFFICE manifest
+502s did not recur, but their cause remains **NOT VERIFIED**; WordCraft's two aborted requests also
+remain unexplained. Full layout fidelity, editing/saving, and version creation remain **NOT VERIFIED**.

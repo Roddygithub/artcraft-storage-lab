@@ -1,0 +1,11 @@
+{
+  "description": "Digests only. Raw runner JSON/logs remain in the private local cache and are not retained in Git.",
+  "sha256": {
+    "slice.json": "84f0993b24db4210311f83270e03cad6a07d515c60f751e681b46acbab152d99",
+    "browser.json": "e08f5743cfdee19f68e6a655162a47f9754728cba6f10dcd47204f326cc63125",
+    "slice-run.log": "e93cdc768f347f489bbae9b9ef9cb4cbee0669eb768b19da7b0829e54c6646e1",
+    "browser-run.log": "47693aefeead74393ebe197dd6d197ddbde261cb66390c4478fa4f21a254d1a3",
+    "browser-console.log": "3e07c143fa952d183f0840335629746b4f71ba345509a772e4ef9e409d20207d",
+    "services-final.log": "3c663436b88bcfcdbc2986c83fa0e46eb9f9a7f5a0a56636d922f565dae45aff"
+  }
+}
