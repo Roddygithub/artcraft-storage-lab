@@ -4,6 +4,19 @@
 > Seahub/fileserver patch architecture. Current WOPI bridge follow-ups continue in this log and are
 > summarized in `README.md`, `ROADMAP.md` and `lab/real-seafile/results/`.
 
+# 2026-11-08 — GR-085 WordCraft corrected layout fixture edit/save
+
+- Fresh isolated lab: HTTP 48/48 then Chromium 28/28. Two real typed edits,
+  two user-attributed versions, confirmation, old-page closure and fresh-session
+  file-list reopen; original main-document text and both markers retained.
+- Diagnosed incorrect runtime asset identity in two earlier failed private
+  attempts. The successful attempt imported the official WordCraft v0.13.2 ZIP
+  through the bounded ZIP helper and matched all 26 GR-083 asset hashes.
+- Candidate `8a6f07b` passed bounded independent GPT source review. Evidence
+  remains parent-operated; full DOCX fidelity and project GPT approval are not
+  claimed. Cleanup completed; Aptarchy completion remains false.
+- Evidence: `lab/real-seafile/results/2026-11-08-wordcraft-fidelity-edit/`.
+
 # 2026-11-04 — GR-084 PdfCraft real edit on synthetic Seafile
 
 - Final isolated rootless-Podman run passed HTTP 48/48 and focused Chromium

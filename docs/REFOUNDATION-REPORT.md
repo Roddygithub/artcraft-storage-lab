@@ -308,3 +308,18 @@ NEXT_EXECUTABLE_STEP=review corrected GR-083 runtime evidence; continue remainin
 PRODUCTION_STATUS=UNTOUCHED
 UPSTREAM_STATUS=LOCKED
 ```
+
+
+### GR-085 — corrected WordCraft layout fixture edit/save, 2026-11-08
+
+A fresh isolated synthetic-Seafile replay passed HTTP 48/48 then WordCraft
+Chromium 28/28 on candidate `8a6f07b`. Two typed edits created two
+user-attributed versions; a fresh authenticated file-list reopen fetched the
+first saved bytes, and the second save retained both markers and the original
+main-document text. The old page was closed and no browser download occurred.
+The successful runtime verified all 26 served files against the official
+WordCraft v0.13.2 ZIP and GR-083, correcting a mismatched copied runtime in two
+earlier failed private attempts. Bounded independent source review passed.
+Full layout/header/footer fidelity and independent runtime replay remain
+unverified. See [GR-085](GR-085-WORDCRAFT-FIDELITY-REAL-EDIT.md).
+Direct parent work, not Aptarchy completion; project GPT INCOMPLETE, upstream LOCKED.

@@ -1,0 +1,188 @@
+{
+  "date": "2026-11-08",
+  "code_candidate": "8a6f07bbe1ddecfd44852ea8adc85777901e1788",
+  "code_base": "f394d1ba95999ece526c8fe275dae35a756dab13",
+  "source_sha256": {
+    "lab/real-seafile/run_browser.py": "9e1521808c0d55857fcc4dc0fc2b0d690d3de19b86943230ff563e337f4037ae",
+    "lab/real-seafile/run_slice.py": "ca076445c573feb6bdad63c044618b98e28d0a0739b08ac51d78583447fa758f",
+    "lab/real-seafile/docx_fidelity_corpus.py": "17771133b70f6eeb4a622c1786588a65457d31a9467bf34981cde5920173bd56",
+    "lab/real-seafile/editors.json": "034e07f1bd49dec9cce594f22d0d02ab0b6df20f864d9b6a957175fc00e7563a",
+    "lab/real-seafile/seahub_settings.extra.py": "6d876102a2dbf94f498eeee4f362f3df68b4055133034dd81ab4724699cb6771",
+    "bridge/app.py": "07cd457401fc59ce9c8be464b0ea6f030027c80cd1e337e51be77481e308f34d",
+    "bridge/settings.py": "fe6f1fbdb2386638d4928f288e47cb3324802c7a54b69fab283cf893a36e8d19",
+    "bridge/wsgi.py": "6f3e9599b029a01b22e7d780e91ac2288c5ceaa8ac4bf8ec30c6dfbdb1531b2a",
+    "bridge/static/host.js": "92c9e98ed4abd0190851be670a032f2672fd5d07c4fe8c2daa411c2e032df6f3",
+    "bridge/static/host.html": "2e5a9a4764299a261da57786ded0aff439f1180fde1b33bc0be2361a39b21ea8"
+  },
+  "runtime_source_matches_candidate": true,
+  "wordcraft_release": "v0.13.2",
+  "archive_sha256": "b6c9c8d3a730495189ba0c213fe64313f317be8fc0611ac1ff8cdd6a4b20880c",
+  "served_asset_sha256": {
+    "OFL-shippori-mincho.txt": "41fba056279be5f45ff9a99e44b7b53897b42732f5806d8e666e0ab49ac6bd38",
+    "LICENSE-MIT": "fc257de83c44ae49e4aad1cf777b886794be3ac9c8d00c010ef55935d5bbeba5",
+    "OFL-noto-sans-hebrew.txt": "9b9fe028b5ba74d231659a1bbaf0ed09b11e759d1ca6a070999e16d151616b47",
+    "OFL-biz-ud-mincho.txt": "ef0ed524b3bd012f37015e986809eed6f67905456ebfc1ebd7fcc2765282ee01",
+    "wordcraft-web-97267fff62d92a8d_bg.wasm": "b1fc951aca4992012ab28f3f894db6e5f4b5c9776aed9e403563332f54395bf2",
+    "LICENSE-APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+    "OFL-noto-sans-georgian.txt": "8c02263c5d73d40544f9ed91e30c4e947407057a3cc430d7b786189aeceff6df",
+    "_headers": "e3e253de74fb99a761fc91d4dec4b81ad6a1022b29c98761b5ac1e8ba5aff05a",
+    "OFL-biz-ud-pgothic.txt": "e753d7155d53c747d037a445e584c8ecfca6dd79846db610417e282a736b28bc",
+    "OFL-noto-sans-symbols-2.txt": "b118dd41337806a5d4797052c77caf3bd096aed783e5eb21b4d11154351e1ac0",
+    "OFL-noto-sans-symbols.txt": "b118dd41337806a5d4797052c77caf3bd096aed783e5eb21b4d11154351e1ac0",
+    "HOSTING.md": "77ae3e6252c357dfe917d47de515f1707321b00d99339412aefa1c42ab6c3b7c",
+    "OFL-noto-sans-cjk-sc.txt": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+    "README.md": "1c952f2dfed1a2cb598ecc7940bbfa8e4d281948068e01d66baaaf903f5d33c2",
+    "OFL-noto-sans-arabic.txt": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96",
+    "wordcraft-web-97267fff62d92a8d.js": "a5b91ef30152583f7c0f7646e05c98e474f3e86323f87cd924ff7f3e2d21a89b",
+    "OFL-noto-sans-devanagari.txt": "a216f6f8d85c7228093e0ee5e258d9d377e6671f68acb4db1930b29583d0f331",
+    "index.html": "aa4145b04af0e48f7bdd4cf098f9d143ed254a38d07407e81bb5e043df8cb9eb",
+    "NOTICE": "8943b156492b6f0caa7c59a53f97d7cc6a7b79ea3e54147b491e0821538606da",
+    "ATTRIBUTION.md": "fa08926f60697c21c62e9277a583969f75c24fb451bd160b432674031e2b7cdb",
+    "wordcraft-fa59e09a3f921e03.ico": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225",
+    "OFL-noto-sans-thai.txt": "2e98fd23a52d253db8612cd5942c8f2ff4111b21d2367050fdca91d8ccc374a0",
+    "OFL-lxgw-wenkai-lite.txt": "0333a85fe077b6849f8e417acc44e8bd879442ceb681e271acf93e2d57fd4e2e",
+    "OFL-nanum-gothic.txt": "eeacf16032901d0ed0456876ec77b8f0fda6b3fecec7d972f8543eb602e6c30f",
+    ".htaccess": "c92d61b428bff284fce08dc57f0255261476397f2cba5836c833974eded5c725",
+    "snippets/eframe-d31a8450ea12dfc1/inline0.js": "22a98f9d0c5a0532d291bdc9a3050439420b3d11143b4568fcfd3c66fff36995"
+  },
+  "served_assets_match_gr083": true,
+  "fixture_sha256": "432a7d1c9f7699b633a7adea39d561e2fe2aeaf7fa5df50d269ba0782679b69d",
+  "screenshots": {
+    "wordcraft-before-edit.png": {
+      "sha256": "37f4077836ea2540df14ba1fba9fd820a8784f4408083c7afe4a51e2f4077363",
+      "bytes": 97935,
+      "png_chunks": [
+        "IHDR",
+        "sRGB",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IEND"
+      ]
+    },
+    "wordcraft-typed.png": {
+      "sha256": "fa184add34394e55dec18e1900ce8468a2066434a3345d4cee377eee3c4b8a73",
+      "bytes": 95207,
+      "png_chunks": [
+        "IHDR",
+        "sRGB",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IEND"
+      ]
+    },
+    "wordcraft-saved.png": {
+      "sha256": "5ab10927fc3a29d734625ae3434f9d3c97da5661509a5e056df242199a47b755",
+      "bytes": 95214,
+      "png_chunks": [
+        "IHDR",
+        "sRGB",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IEND"
+      ]
+    },
+    "wordcraft-reopened.png": {
+      "sha256": "9338e15214fa55c6f4a30dd5a9616a4398766a65caf9acfc20d88039ee5f280e",
+      "bytes": 97742,
+      "png_chunks": [
+        "IHDR",
+        "sRGB",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IEND"
+      ]
+    },
+    "wordcraft-reopened-saved.png": {
+      "sha256": "ce4dc3ff3d284959b5e53fd5554070a0543750fb570aed0b362070dabdd5e5a5",
+      "bytes": 118414,
+      "png_chunks": [
+        "IHDR",
+        "sRGB",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IDAT",
+        "IEND"
+      ]
+    }
+  },
+  "private_runner_sha256": "e9d888ec5ffaeaddf0ba51311af9f508cc64220c702e6a835635619445afd31a",
+  "private_compose_sha256": "9d55ca3011f7a809cc1b8d23c38b7cb57032b997e079a3d481c83f497327555c",
+  "private_console_sha256": "e09359b9816d811166f6016704376d0b68d37033a9eec88784a8f9f4caf66a7d",
+  "rootless_and_cleanup": "parent observed: rootless true, project containers/network removed, test ports free, user Podman socket/service inactive",
+  "previous_failed_attempts": {
+    "run1": "interrupted after blank page; private records preserved; not counted as success",
+    "run2": "HTTP 48/48; browser 5/6, visible-content gate failed before editing",
+    "run2_served_assets": {
+      "index.html": {
+        "bytes": 1604,
+        "sha256": "40601eee4f5289f80ba591718152f02954913b41f9ba59db6b4dbd63215363e9"
+      },
+      "wordcraft-fa59e09a3f921e03.ico": {
+        "bytes": 18378,
+        "sha256": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225"
+      },
+      "wordcraft-web-23d39124b59d8f10_bg.wasm": {
+        "bytes": 57121831,
+        "sha256": "f55ee118ab6fa9a7b13423cbe6f0ad6f6335687bfcbb5dae39230f93bf8363af"
+      },
+      "wordcraft-web-8823bb9226287bf0.js": {
+        "bytes": 167595,
+        "sha256": "6ce0ac51303dadb39d1d94e1f14d77210391dfecdbf4b2f56fecbe904a6c9add"
+      }
+    },
+    "run2_provenance_text_did_not_describe_actual_assets": true
+  },
+  "not_aptarchy_completion": true
+}

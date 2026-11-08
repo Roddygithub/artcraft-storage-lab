@@ -5,7 +5,22 @@
 > `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT GR: GR-084 — PdfCraft real edit on synthetic Seafile
+## CURRENT GR: GR-085 — WordCraft corrected layout fixture edit/save
+
+Fresh isolated replay on 2026-11-08 passed HTTP **48/48** then focused
+WordCraft Chromium **28/28**. Two trusted typed edits created two user-attributed
+versions, with host confirmation, old-page closure, fresh authenticated
+file-list reopen and original main-body text retained after both saves. No
+browser download was observed. A mismatched four-file WordCraft runtime was
+replaced by the official v0.13.2 ZIP; all 26 served asset hashes match GR-083.
+Source candidate `8a6f07b` passed bounded independent GPT source review.
+Evidence is parent-operated; full DOCX fidelity and independent runtime replay
+remain unverified. Lab cleanup completed. Direct parent work, not Aptarchy
+completion. Project GPT **INCOMPLETE**, upstream **LOCKED**.
+Evidence: `docs/GR-085-WORDCRAFT-FIDELITY-REAL-EDIT.md` and
+`lab/real-seafile/results/2026-11-08-wordcraft-fidelity-edit/`.
+
+## PREVIOUS GR: GR-084 — PdfCraft real edit on synthetic Seafile
 
 In the final isolated run, the HTTP slice passed 48/48 and focused Chromium
 passed 18/18 with released PdfCraft Web v0.16.1 on synthetic Seafile CE

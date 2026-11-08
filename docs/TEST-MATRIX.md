@@ -7,6 +7,21 @@ production data.
 Legend: `[ ]` not implemented · `[~]` partially verified / evidence limited · `[x]` passed ·
 `[!]` failed (see the evidence bundle) · `[-]` out of scope
 
+## GR-085 — corrected WordCraft layout fixture real edit
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Official WordCraft v0.13.2 exact asset identity | [x] 26 files match pinned ZIP and GR-083 hashes | candidate-provenance.json |
+| HTTP slice before browser | [x] 48/48 | http-results.json |
+| File-list open, typed edit, host confirmation and user-attributed version | [x] | browser-results.json, typed/saved PNGs |
+| Old-page closure and fresh-session file-list reopen, exact readback/open bytes | [x] harness assertions; runtime parent-operated | browser-results.json |
+| Second typed edit/save/version, both markers and original main text retained | [x] 28/28 browser checks overall | browser-results.json, reopened-saved PNG |
+| Full layout, header/footer and formatting retention | [ ] NOT VERIFIED | main-text assertions only |
+| Independent review | [x] bounded source PASS on 8a6f07b; runtime not replayed | SOURCE-REVIEW-R1.md |
+
+Bundle: `lab/real-seafile/results/2026-11-08-wordcraft-fidelity-edit/`.
+Direct parent work, not Aptarchy completion. Project INCOMPLETE; upstream LOCKED.
+
 ## GR-084 — PdfCraft AcroForm edit on synthetic Seafile
 
 | Scenario | Expected | Result |
