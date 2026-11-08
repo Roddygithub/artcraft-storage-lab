@@ -84,8 +84,7 @@ class Element:
     def __init__(self, label, page): self.label, self.page = label, page
     def click(self, **kwargs):
         actions.append((self.label, 'click', kwargs.get('button', 'left')))
-        if self.label == 'Default': self.page.context.pages.append(Popup())
-    def hover(self, **_kwargs): actions.append((self.label, 'hover'))
+        if self.label == 'test.svg' and kwargs.get('button') == 'middle': self.page.context.pages.append(Popup())
 class Popup:
     def wait_for_load_state(self, state, **_kwargs): assert state == 'domcontentloaded'
 class Listing:
@@ -94,10 +93,7 @@ class Listing:
     def get_by_role(self, role, name, exact):
         assert (role, name, exact) == ('link', 'test.svg', True)
         return Element(name, self)
-    def get_by_text(self, text, exact):
-        assert exact
-        return Element(text, self)
 listing = Listing()
-assert isinstance(namespace['open_from_seafile_list'](listing, 'https://synthetic.invalid', 'library', 'test.svg', default_editor=True), Popup)
-assert actions == [('test.svg', 'click', 'right'), ('Open with', 'hover'), ('Default', 'click', 'left')]
+assert isinstance(namespace['open_from_seafile_list'](listing, 'https://synthetic.invalid', 'library', 'test.svg', middle_click=True), Popup)
+assert actions == [('test.svg', 'click', 'middle')]
 print('PASS offline VectorCraft/FigCraft geometry assertions; runtime NOT RUN')

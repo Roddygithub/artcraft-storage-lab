@@ -109,18 +109,16 @@ def save_and_capture(page, status_fn, timeout=90):
         page.remove_listener("request", capture)
 
 
-def open_from_seafile_list(page, base, repo_id, name, timeout=30, default_editor=False):
+def open_from_seafile_list(page, base, repo_id, name, timeout=30, middle_click=False):
     """Click the actual file-list link; Seahub may open it here or in a new tab."""
     page.goto(f"{base.rstrip('/')}/library/{repo_id}/", wait_until="domcontentloaded")
     previous_pages = set(page.context.pages)
     previous_url = page.url
     link = page.get_by_role("link", name=name, exact=True)
-    if default_editor:
-        # SVG's normal click opens Seahub's image overlay without navigating.
-        # Its file-list context menu exposes the actual default-editor route.
-        link.click(button="right", timeout=timeout * 1000)
-        page.get_by_text("Open with", exact=True).hover(timeout=timeout * 1000)
-        page.get_by_text("Default", exact=True).click(timeout=timeout * 1000)
+    if middle_click:
+        # CE 13.0.28's left-click handler opens an image overlay. A native middle
+        # click follows the same file-list anchor in a new tab, without that handler.
+        link.click(button="middle", timeout=timeout * 1000)
     else:
         link.click(timeout=timeout * 1000)
     end = time.monotonic() + timeout
@@ -1678,7 +1676,7 @@ def main():
                 p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
                 check(f"{editor}_fresh_authenticated_session", "/accounts/login" not in p2.url)
                 p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name,
-                                            default_editor=editor == "vectorcraft")
+                                            middle_click=editor == "vectorcraft")
                 host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
                 reopened = wait_for_saved_response(p2, relay_file, 180)
                 check(f"{editor}_fresh_relay_bytes_equal_saved", reopened is not None and reopened == saved)
@@ -1936,7 +1934,7 @@ def main():
             t0 = time.time()
             if editor in ("vectorcraft", "figcraft"):
                 page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name,
-                                             default_editor=editor == "vectorcraft")
+                                             middle_click=editor == "vectorcraft")
                 check(f"{editor}_opened_from_seafile_file_list", True)
             elif editor == "wordcraft":
                 original = page
