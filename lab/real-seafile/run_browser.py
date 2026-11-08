@@ -26,6 +26,8 @@ import re
 import sys
 import time
 import urllib.parse
+import zipfile
+import xml.etree.ElementTree as ET
 from io import BytesIO
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -122,6 +124,87 @@ def open_from_seafile_list(page, base, repo_id, name, timeout=30):
             return target
         page.wait_for_timeout(50)
     raise TimeoutError("file-list click did not open an editor page")
+
+
+def svg_has_rectangle(data, geometry):
+    """Check painted SVG geometry, never embedded editor metadata.
+
+    Cached VectorCraft crates/svg/src/export.rs emits rectangle paths as M/L/Z.
+    Fail closed on other path commands/transforms rather than guessing their bounds.
+    """
+    try:
+        root = ET.fromstring(data)
+        x, y, w, h = (geometry[k] for k in ("x", "y", "width", "height"))
+        corners = {(x, y), (x+w, y), (x+w, y+h), (x, y+h)}
+        def visit(node):
+            tag = node.tag.rsplit("}", 1)[-1]
+            if tag in ("metadata", "defs", "clipPath", "mask", "symbol") or "transform" in node.attrib:
+                return False
+            if tag == "rect":
+                if all(float(node.get(k, "0")) == geometry[k] for k in geometry):
+                    return True
+            if tag == "path":
+                d = node.get("d", "")
+                tokens = re.findall(r"[A-Za-z]|[-+]?(?:\d*\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?", d)
+                # One closed, four-corner, straight-edged rectangle; no curves or metadata search.
+                if tokens and tokens[0] == "M" and tokens[-1] in ("Z", "z"):
+                    points, i = [], 0
+                    while i < len(tokens)-1:
+                        if tokens[i] not in ("M", "L") or i+2 >= len(tokens):
+                            break
+                        points.append((float(tokens[i+1]), float(tokens[i+2])))
+                        i += 3
+                    if i == len(tokens)-1 and len(points) == 4 and set(points) == corners and all(
+                        a[0] == b[0] or a[1] == b[1] for a, b in zip(points, points[1:]+points[:1])
+                    ):
+                        return True
+            return any(visit(child) for child in node)
+        return root.tag == "{http://www.w3.org/2000/svg}svg" and visit(root)
+    except (ET.ParseError, ValueError, TypeError):
+        return False
+
+
+def figcraft_has_frame(data, marker, geometry):
+    """Native format v1: format/src/lib.rs DocumentJson flattens doc::Document.
+
+    doc/src/node.rs flattens NodeKind (`type`), with width/height and an optional
+    kurbo Affine six-number array. Only a frame attached to a real page counts.
+    """
+    try:
+        with zipfile.ZipFile(BytesIO(data)) as archive:
+            doc = json.loads(archive.read("document.json"))
+        nodes = doc["nodes"]
+        if not isinstance(nodes, dict) or not all(isinstance(n, dict) for n in nodes.values()):
+            return False
+        return doc["format"] == "figcraft" and doc["version"] == 1 and any(
+            n.get("type") == "frame" and n.get("name") == marker and
+            n.get("width") == geometry["width"] and n.get("height") == geometry["height"] and
+            n.get("transform", [1, 0, 0, 1, 0, 0]) == [1, 0, 0, 1, geometry["x"], geometry["y"]] and
+            n.get("parent") in doc["pages"] and
+            nodes[str(n["parent"])].get("type") == "page" and
+            n["id"] in nodes[str(n["parent"])].get("children", [])
+            for n in nodes.values()
+        )
+    except (KeyError, TypeError, ValueError, zipfile.BadZipFile):
+        return False
+
+
+def scene_has_geometry(scene, geometry, marker=None):
+    """Match actual inspect nodes with bounds, not a JSON substring."""
+    if isinstance(scene, dict):
+        bounds = scene.get("absoluteBounds" if marker else "bounds")
+        if "id" in scene and isinstance(bounds, dict) and all(bounds.get(k) == v for k, v in geometry.items()):
+            if (marker is None and str(scene.get("kind", "")).lower() in ("path", "rectangle")) or (scene.get("name") == marker and scene.get("type") == "FRAME"):
+                return True
+        return any(scene_has_geometry(v, geometry, marker) for v in scene.values())
+    return isinstance(scene, list) and any(scene_has_geometry(v, geometry, marker) for v in scene)
+
+
+def page_api(host, app, method, params):
+    return host.evaluate("""async ([app, method, params]) => {
+        const api = document.getElementById('frame').contentWindow[app];
+        return await api.request(method, params);
+    }""", [app, method, params])
 
 
 def dxf_circles(data):
@@ -1476,6 +1559,129 @@ def main():
             reopen.close()
             return page
 
+        def geometry_real_edit_flow(page, name, editor, content, box, host, status, before):
+            # Source contracts: VectorCraft docs/control-protocol.md + engine/inspect.rs;
+            # FigCraft engine/inspect.rs, doc/node.rs, format/src/lib.rs (cached source).
+            marker = "wopi-frame-" + os.urandom(6).hex()
+            # Keep SVG art inside the fixture's 10x10 artboard; quarter units serialize exactly.
+            geometry = dict(x=1, y=2, width=3 + (os.urandom(1)[0] % 8) / 4,
+                            height=2 + (os.urandom(1)[0] % 8) / 4) if editor == "vectorcraft" else dict(
+                x=0, y=0, width=113 + os.urandom(1)[0] % 67, height=79 + os.urandom(1)[0] % 59)
+            semantic = (lambda data: svg_has_rectangle(data, geometry)) if editor == "vectorcraft" else (
+                lambda data: figcraft_has_frame(data, marker, geometry))
+            check(f"{editor}_fixture_lacks_new_geometry", not semantic(content))
+            params = dict(geometry)
+            if editor == "figcraft":
+                params.update(type="frame", name=marker)
+            def inspect(target):
+                return page_api(target, editor, "document.inspect", {})
+
+            # Host "ready" means bytes were posted, not that the editor parsed them.
+            fixture_geometry = dict(x=0, y=0, width=10, height=10) if editor == "vectorcraft" else dict(
+                x=0, y=0, width=80, height=60)
+            loaded = False
+            end = time.monotonic() + 90
+            while time.monotonic() < end:
+                try:
+                    loaded = scene_has_geometry(inspect(host), fixture_geometry,
+                                                "Fixture Home" if editor == "figcraft" else None)
+                except Exception:  # Control channel may still be starting.
+                    loaded = False
+                if loaded:
+                    break
+                page.wait_for_timeout(250)
+            check(f"{editor}_fixture_parsed_before_edit", loaded)
+            if not loaded:
+                raise RuntimeError(f"{editor} fixture never appeared in API scene")
+            page_api(host, editor, "engine.execute", {
+                "command": "shape.rectangle" if editor == "vectorcraft" else "node.create", "params": params})
+
+            check(f"{editor}_edited_scene_contains_geometry", scene_has_geometry(
+                inspect(host), geometry, marker if editor == "figcraft" else None))
+            page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 100)
+            payload, confirmed = save_and_capture(page, status, timeout=120)
+            check(f"{editor}_save_confirmed_by_host_page", confirmed, status())
+            check(f"{editor}_relay_save_contains_actual_geometry", payload is not None and semantic(payload))
+            after = before
+            end = time.monotonic() + 90
+            while time.monotonic() < end:
+                after = rs.history(admin, repo_id, name)
+                if len(after) > len(before):
+                    break
+                page.wait_for_timeout(500)
+            check(f"{editor}_edit_creates_version_by_user", len(after) > len(before) and
+                  after[0]["creator"] == admin_username, f"history {len(before)}->{len(after)}")
+            saved, _ = rs.download(admin, repo_id, name)
+            check(f"{editor}_relay_bytes_equal_seafile", payload is not None and payload == saved)
+            check(f"{editor}_saved_geometry_differs_from_fixture", saved != content and semantic(saved))
+            for label, data in (("saved", saved), ("relay-save", payload)):
+                if data is not None:
+                    with open(os.path.join(RESULTS, f"{editor}-{label}." + name.rsplit('.', 1)[-1]), "wb") as out:
+                        out.write(data)
+            page.screenshot(path=os.path.join(RESULTS, f"{editor}-saved.png"))
+            page.close()
+            check(f"{editor}_old_page_closed", page.is_closed())
+            reopen = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(reopen, downloads)
+            reopen.on("page", attach)
+            relay_file = []
+            def capture(response):
+                if response.url.endswith("/relay/file"):
+                    relay_file.append((response.status, response.body()))
+            reopen.on("response", capture)
+            try:
+                p2 = reopen.new_page()
+                p2.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
+                p2.fill("input[name=login]", rs.ADMIN)
+                p2.fill("input[name=password]", rs.ADMIN_PW)
+                p2.click("button[type=submit], input[type=submit]")
+                p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
+                check(f"{editor}_fresh_authenticated_session", "/accounts/login" not in p2.url)
+                p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
+                host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
+                reopened = wait_for_saved_response(p2, relay_file, 180)
+                check(f"{editor}_fresh_relay_bytes_equal_saved", reopened is not None and reopened == saved)
+                scene_ok = False
+                end = time.monotonic() + 90
+                while host2 is not None and time.monotonic() < end:
+                    try:
+                        scene_ok = scene_has_geometry(inspect(host2), geometry, marker if editor == "figcraft" else None)
+                    except Exception:  # API may not be ready while the file is loading.
+                        scene_ok = False
+                    if scene_ok:
+                        break
+                    p2.wait_for_timeout(500)
+                check(f"{editor}_fresh_api_scene_retains_geometry", scene_ok)
+                # Ask the reopened app to serialize through the same shim. An identical save
+                # need not produce a relay request: inspect the app's captured native file too.
+                serialized = None
+                if scene_ok:
+                    empty = host2.evaluate("app => document.getElementById('frame').contentWindow[app].files().length === 0", editor)
+                    check(f"{editor}_fresh_serialization_has_no_stale_capture", empty)
+                    if not empty:
+                        raise RuntimeError("fresh editor already has captured saves; cannot prove reserialization")
+                    host2.evaluate("() => document.getElementById('frame').contentWindow.__craftHostShim.save()")
+                    end = time.monotonic() + 90
+                    while time.monotonic() < end:
+                        result = host2.evaluate("""name => {
+                            const api = document.getElementById('frame').contentWindow[""" + json.dumps(editor) + """];
+                            const file = (api.files() || []).find(f => f.path.split('/').pop() === name);
+                            return file ? Array.from(api.readFile(name)) : null;
+                        }""", name)
+                        if result:
+                            serialized = bytes(result)
+                            break
+                        p2.wait_for_timeout(250)
+                check(f"{editor}_fresh_reserialization_retains_geometry", serialized is not None and semantic(serialized))
+                if serialized is not None:
+                    with open(os.path.join(RESULTS, f"{editor}-reserialized." + name.rsplit('.', 1)[-1]), "wb") as out:
+                        out.write(serialized)
+                p2.screenshot(path=os.path.join(RESULTS, f"{editor}-reopened.png"))
+                check(f"{editor}_save_did_not_download", not downloads, f"downloads={len(downloads)}")
+            finally:
+                reopen.close()
+            return attach(ctx.new_page())
+
         def cadcraft_real_edit_flow(page, name, content, box, status, before):
             """Draw a circle with trusted CADCraft input, save via WOPI and reopen from Seahub."""
             host1 = find_frame(page, rs.BRIDGE + "/edit/", 5, name="office_frame", parent=page.main_frame)
@@ -1610,7 +1816,7 @@ def main():
                 made = fig.evaluate("""async () => {
                     const f = window.figcraft;
                     f.captureDownloads(true);
-                    try { await f.execute('node.create', {kind: 'frame', name: 'Home'}); } catch (e) {}
+                    await f.execute('node.create', {type: 'frame', name: 'Fixture Home', x: 0, y: 0, width: 80, height: 60});
                     // FigCraft's web build refuses a path ("no file system in the browser"): a plain
                     // Save goes through the download path, which captureDownloads keeps.
                     // ...and a path-less Save wants a path first: use the app's own shortcut through the
@@ -1685,7 +1891,9 @@ def main():
             app = editor
             downloads.clear()
             t0 = time.time()
-            if editor == "wordcraft":
+            if editor in ("vectorcraft", "figcraft"):
+                page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
+            elif editor == "wordcraft":
                 original = page
                 page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
                 if page is not original:
@@ -1756,6 +1964,9 @@ def main():
                 continue
             if editor == "cadcraft":
                 page = cadcraft_real_edit_flow(page, name, content, box, status, before)
+                continue
+            if editor in ("vectorcraft", "figcraft"):
+                page = geometry_real_edit_flow(page, name, editor, content, box, host, status, before)
                 continue
             # focus the editor canvas (below the host bar) and ask it to save
             page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 60 + (box["height"] - 60) / 2)
