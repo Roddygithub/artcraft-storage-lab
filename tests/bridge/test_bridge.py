@@ -12,6 +12,7 @@ import os
 import sys
 import threading
 import unittest
+from unittest.mock import patch
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -166,6 +167,26 @@ class BridgeTestCase(unittest.TestCase):
             self.assertNotIn("?", urlsrc, "Seahub appends ?WOPISrc= itself")
             self.assertTrue(urlsrc.startswith(self.bridge_origin))
 
+    def test_deployment_defaults_match_discovery_and_pinned_fetch_docs(self):
+        import runpy
+        from pathlib import Path
+        root = Path(ROOT)
+        settings = runpy.run_path(str(root / "deploy/bridge/seahub_settings.example.py"))
+        editors = json.loads((root / "deploy/bridge/editors.json").read_text())
+        cfg = Config(public_url=self.bridge_origin, seahub_origin=self.seahub.origin, editors=editors)
+        discovery = ET.fromstring(Bridge(cfg).discovery_xml())
+        for action in ("view", "edit"):
+            extensions = {a.get("ext") for a in discovery.iter("action") if a.get("name") == action}
+            key = "OFFICE_WEB_APP_EDIT_FILE_EXTENSION" if action == "edit" else "OFFICE_WEB_APP_FILE_EXTENSION"
+            self.assertEqual(extensions, set(settings[key]))
+            self.assertEqual(extensions, {"dxf"})
+        readme = (root / "deploy/bridge/README.md").read_text()
+        for app in ("cadcraft", "wordcraft", "gridcraft", "pdfcraft"):
+            provenance = dict(line.split(": ", 1) for line in
+                              (root / f"lab/real-seafile/static/{app}-PROVENANCE.txt").read_text().splitlines()
+                              if ": " in line)
+            self.assertIn(f"./fetch-editors.sh {app} {provenance['release_tag']} {provenance['sha256']}", readme)
+
     # -- open flow -----------------------------------------------------------
 
     def test_open_renders_host_page_with_csp_and_no_token_in_urls(self):
@@ -256,7 +277,7 @@ class BridgeTestCase(unittest.TestCase):
         self.assertEqual(f["last_modifier"], "alice")
         self.assertFalse(res["reconciled"])
 
-    def test_save_detects_external_change_and_does_not_overwrite(self):
+    def test_save_rejects_already_visible_external_change_without_overwrite(self):
         fid, token, src = self._file()
         v0 = self.seahub.files[fid]["version"]
         external = _docx(b"someone else")
@@ -267,6 +288,33 @@ class BridgeTestCase(unittest.TestCase):
         self.assertEqual(res["current"], v1)
         self.assertEqual(self.seahub.files[fid]["content"], external, "the newer version must survive")
         self.assertEqual(self.seahub.files[fid]["commits"], 2)
+
+    def test_save_overwrites_intervening_external_writer_despite_verified_readback(self):
+        """Document the residual race, not atomic protection: PutFile is unconditional."""
+        fid, token, src = self._file()
+        v0 = self.seahub.files[fid]["version"]
+        external, mine = _docx(b"intervening writer"), _docx(b"bridge writer")
+        put_file = self.app.wopi.put_file
+        injected = []
+
+        def intervening_write(src, token, data):
+            # Called only after the bridge's CheckFileInfo/version preflight has passed.
+            self.assertEqual(self.seahub.files[fid]["version"], v0)
+            injected.append(self.seahub.external_write(fid, external))
+            self.assertEqual(self.seahub.files[fid]["content"], external)
+            return put_file(src, token, data)
+
+        with patch.object(self.app.wopi, "put_file", side_effect=intervening_write):
+            status, _, body = self._save(token, src, mine, v0)
+        self.assertEqual(len(injected), 1, "the external write must actually occur")
+        self.assertEqual(status, 200, body)
+        result = json.loads(body)
+        self.assertTrue(result["verified"], "readback verifies our bytes despite the overwrite")
+        self.assertFalse(result["reconciled"])
+        self.assertEqual(self.seahub.files[fid]["content"], mine)
+        self.assertEqual(result["version"], self.seahub.files[fid]["version"])
+        self.assertNotEqual(result["version"], injected[0])
+        self.assertEqual(self.seahub.files[fid]["commits"], 3)
 
     def test_save_with_read_only_token_is_refused_by_bridge_not_seahub(self):
         fid, token, src = self._file(can_edit=False, user="bob")
