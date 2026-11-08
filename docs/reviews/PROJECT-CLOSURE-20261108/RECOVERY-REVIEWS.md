@@ -55,3 +55,9 @@ Browser 28/0 and HTTP 44/2 per run remain explicit. No independent rendering,
 runtime replay, project gate or ONLYOFFICE removal approval was granted.
 The reviewer could not reproduce the credential-value scan from the inspected
 inputs; that scan remains a parent observation, not independently established.
+
+HTTPS optional-origin source review R1 at `c6b6cb1` found P2 numeric IP alias
+normalization could defeat hostname isolation. `aa51632` rejects numeric/hex
+final labels (including decimal, octal, hex and mixed IPv4 aliases). Independent
+R2 returned bounded PASS with no findings; 10 offline tests passed. Runtime
+HTTPS follows separately and is not established by that source review.

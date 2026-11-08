@@ -1,6 +1,11 @@
 # Current project closure ledger
 
-## Candidate scope
+The owner requires replacement coverage for every currently configured
+ONLYOFFICE format: 15 viewing routes and 3 editing routes. The six-Craft
+candidate below is a verified subset, not the complete replacement scope.
+See `docs/ONLYOFFICE-REPLACEMENT-MATRIX.md`.
+
+## Current verified candidate subset
 
 The candidate follows AGENTS.md rule 6: no Seafile patch and no editor patch.
 It includes the released WordCraft, GridCraft, PdfCraft and CADCraft bundles,
