@@ -1462,13 +1462,16 @@ def main():
             with open(os.path.join(RESULTS, "pptx-original.pptx"), "wb") as output:
                 output.write(content)
             page.screenshot(path=os.path.join(RESULTS, "pptx-before-edit.png"))
-            page.mouse.dblclick(box["x"] + box["width"] * 0.54,
-                                box["y"] + box["height"] * 0.45, delay=100)
+            # Official 0.16 UI at 1400x900: the centered fixture title is at
+            # (819, 520), below the ribbon. Semantic payload checks reject a missed click.
+            page.mouse.dblclick(box["x"] + box["width"] * 0.585,
+                                box["y"] + box["height"] * 0.55, delay=100)
             page.wait_for_timeout(500)
             page.keyboard.press("Control+End")
             page.keyboard.type(marker, delay=35)
             page.mouse.click(box["x"] + box["width"] * 0.25,
                              box["y"] + box["height"] * 0.65)
+            page.screenshot(path=os.path.join(RESULTS, "pptx-typed.png"))
             payload, confirmed = save_and_capture(page, status, timeout=120)
             check("pptx_save_payload_contains_original_title_and_typed_marker", payload is not None and semantic(payload))
             check("pptx_save_confirmed_by_host", confirmed, f"status={status()!r}")
