@@ -50,6 +50,8 @@ Marker and original body-text assertions provide separate semantic checks.
 Independent GPT Sol 6.1 low source review passed candidate `8a6f07b` with no
 P1–P3 findings. Its record and the sanitized runtime evidence are in the
 [evidence bundle](../lab/real-seafile/results/2026-11-08-wordcraft-fidelity-edit/README.md).
+Independent evidence review R2 returned a bounded PASS on `c0690a9` with no
+P1–P3 findings; its record is retained in that bundle.
 Runtime chronology, rootless isolation and cleanup are parent observations;
 they have not been independently replayed. Screenshots corroborate the visible
 states. Raw logs/results remain private; public records contain their hashes.

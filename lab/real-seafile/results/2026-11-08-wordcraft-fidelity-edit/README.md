@@ -10,6 +10,7 @@ candidate `8a6f07bbe1ddecfd44852ea8adc85777901e1788`.
 | `candidate-provenance.json` | Ten matching source/config hashes, 26 served official asset hashes, fixture and screenshot hashes, private runner/compose hashes, failed-attempt boundary |
 | Five `wordcraft-*.png` files | Initial rendered content, typed edit, first save, fresh open, second save |
 | `SOURCE-REVIEW-R1.md` | Independent bounded GPT source review |
+| `EVIDENCE-REVIEW-R2.md` | Independent bounded GPT evidence PASS on c0690a9; runtime not replayed |
 | `SHA256SUMS` | Exact inventory of retained bundle artifacts |
 
 No raw WOPI URLs, capabilities, account/library identifiers or logs are retained
@@ -36,6 +37,9 @@ not distributed in this bundle. Runtime prerequisites are documented in
 `lab/real-seafile/README.md`.
 
 Offline check: `python3 tests/test_wordcraft_browser_fixture.py`.
+Source review R1 and evidence review R2 returned bounded GPT PASS without
+P1–P3 findings. The R2 record was added afterward; executable source and
+runtime artifacts are unchanged.
 This is main-text retention, not complete DOCX fidelity. The report lists the
 remaining limits. Project GPT **INCOMPLETE**; upstream **LOCKED**; direct parent
 work, not Aptarchy completion.
