@@ -139,3 +139,18 @@ screenshots and synthetic DOCX payloads are retained with a runnable verifier:
 This extends tested synthetic coverage; it does not prove arbitrary-document
 fidelity or authorize retiring ONLYOFFICE. Required real-use formats are being
 clarified before a replacement/migration plan is finalized.
+
+
+## Craft-only recovery replay — 2026-11-08
+
+At exact source `2fb30cd`, a fresh rootless lab passed HTTP **40/40** and
+WordCraft Chromium **28/28**, exited 0 and removed its containers. The six
+ONLYOFFICE HTTP checks were retired, not repaired or counted as passes.
+Two typed saves created attributed Seafile versions; a fresh file-list reopen
+between the saves loaded the first persisted bytes. Retained synthetic DOCX
+payloads, sanitized checks, screenshots and exact-source hashes are in
+[`2026-11-08-craft-only-wordcraft`](../lab/real-seafile/results/2026-11-08-craft-only-wordcraft/README.md).
+The structural verifier passes for both saved DOCX files. This is automated
+internal HTTP evidence, not HTTPS acceptance or an independent review.
+Next implementation priority: upstream DeckCraft PPTX same-format persistence.
+Project INCOMPLETE; upstream LOCKED.
