@@ -5,7 +5,21 @@
 > `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT — closure blocked by mixed-suite host behavior
+## CURRENT — legacy/OpenDocument viewing fixtures committed (GR-087)
+
+At `2c112fc`, one deterministic synthetic fixture now exists for every remaining
+ONLYOFFICE viewing format (DOC, ODT, FODT, XLS, ODS, FODS, CSV, PPT, ODP, FODP,
+PPS, PPSX), each carrying `GR-LEGACY-MARKER-20261108`. The bridge signature guard
+covers DOC/XLS/PPT/PPS, PPSX and FODT/FODS/FODP; an opt-in routing candidate
+maps only DOC/ODT (WordCraft) and ODS/CSV (GridCraft), the formats with a
+documented upstream import. Offline validation is 20/20; the bridge suite is 33
+tests. The independent free review returned PROVISIONAL PASS with no
+blocker/major; the GPT-5.6 Luna auditor was blocked by a provider usage limit and
+the Sol gate shares that provider. No runtime import or format replacement is
+claimed. See `docs/GR-087-LEGACY-VIEWING-FIXTURES.md`. Project INCOMPLETE;
+upstream LOCKED.
+
+## PREVIOUS — closure blocked by mixed-suite host behavior
 
 The previous completion/freeze claim is withdrawn. Recovery audit `2825f4c`
 found private-only evidence and source mismatches. The shim rewrite was replaced

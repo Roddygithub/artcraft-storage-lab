@@ -39,6 +39,23 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-087 — legacy / OpenDocument viewing fixtures and routing
+
+Candidate `2c112fc` adds one deterministic synthetic fixture per remaining
+ONLYOFFICE viewing format (DOC, ODT, FODT, XLS, ODS, FODS, CSV, PPT, ODP, FODP,
+PPS, PPSX), each carrying the marker `GR-LEGACY-MARKER-20261108`; extends the
+bridge name-to-bytes guard to DOC/XLS/PPT/PPS (OLE), PPSX (OPC) and
+FODT/FODS/FODP (flat ODF); and adds an opt-in routing candidate that maps only
+the formats with a documented upstream import (DOC/ODT to WordCraft, ODS/CSV to
+GridCraft). Offline validation is **20/20 command groups**; the bridge suite is
+**33 tests OK**. The independent `artcraft-reviewer` pass returned **PROVISIONAL
+PASS** with no blocker/major; the GPT-5.6 Luna auditor could not run (provider
+usage limit). No runtime Seafile/browser import, no format replacement and no
+human HTTPS acceptance is claimed; the eight import-less formats stay unrouted.
+Project GPT remains INCOMPLETE and upstream publication LOCKED. Evidence:
+`docs/GR-087-LEGACY-VIEWING-FIXTURES.md`,
+`lab/real-seafile/fixtures/legacy/`.
+
 ## GR-084 — PdfCraft AcroForm edit on synthetic Seafile
 
 The final isolated rootless-Podman run passed HTTP **48/48** and focused
