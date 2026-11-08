@@ -54,6 +54,46 @@ Review and redact evidence before copying anything into Git; this launcher does 
 Offline check: `python3 tests/lab/test_local.py`. The parent must run the real lab and obtain
 independent review before treating this candidate as final evidence.
 
+### Optional external HTTPS origins (offline candidate; runtime NOT VERIFIED)
+
+For the upcoming WordCraft replay, add both flags to the rootless command above:
+
+```bash
+  --seafile-public-url https://seafile.example.ts.net \
+  --bridge-public-url https://craft.example.ts.net \
+  --editor wordcraft --wordcraft-fixture fidelity-layout.docx
+```
+
+These must be HTTPS origins with distinct DNS hostnames, even when ports differ.
+Credentials, paths (including a trailing slash), query strings and fragments are rejected
+before creating the run directory or invoking Podman. Omit both for the unchanged internal
+HTTP lab. The launcher clears inherited public URL variables in that default mode.
+Compose falls back to `http://seafile.lab` and `http://bridge:8778`; with the flags it uses
+`SEAFILE_PUBLIC_URL` / `BRIDGE_PUBLIC_URL` for bridge origin checks and discovery URLs,
+and the slice/browser target URLs.
+
+Only the fresh project's generated Seahub settings gain public `SERVICE_URL`,
+`FILE_SERVER_ROOT` (`/seafhttp`), bridge discovery URL (`/wopi/discovery.xml`),
+`CSRF_TRUSTED_ORIGINS` (Seahub origin), and
+`SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')`.
+The Seafile and bridge published ports still bind to loopback; this adds no TLS listener,
+proxy, Tailscale configuration, daemon, SSH setup or hold mode. Existing production
+configuration and ONLYOFFICE routing are untouched. HTTP failure diagnostics and final
+project cleanup still apply, so the endpoints must already route to this fresh run's ports
+while the launcher is running.
+
+Remaining runtime prerequisites: independently provisioned authenticated desktop/PVE
+Tailscale HTTPS endpoints with separate DNS names and trusted certificates; routes to the
+launcher host's loopback Seafile/bridge ports; DNS, TLS trust and authenticated access from
+both lab containers and the desktop browser. The Seahub proxy must forward the original
+Host, strip untrusted forwarded-protocol headers and set `X-Forwarded-Proto: https`.
+Both bridge-to-Seahub and Seahub-to-bridge requests must pass endpoint authentication.
+Verified upstream WordCraft assets/manifest, rootless resources and the existing image/pip
+prerequisites are still required. None of these endpoints or runtime conditions have been
+verified by the offline tests. The pending evidence is a WordCraft browser open → typed edit
+→ save → Seafile version → close/reopen replay over HTTPS, plus independent review;
+no runtime PASS is claimed and no additional ONLYOFFICE replay is requested here.
+
 ## Run with Lima (existing workflow)
 
 

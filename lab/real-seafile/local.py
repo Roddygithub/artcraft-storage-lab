@@ -5,6 +5,7 @@ from contextlib import contextmanager
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import secrets
 import shutil
@@ -13,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -44,7 +46,20 @@ def snapshot(run, assets, expected):
     shutil.copyfile(run / 'app/lab/real-seafile/compose.yml', run / 'compose.yml')
 
 
-def render_settings(text, without_wopi=False):
+def https_origin(value):
+    """Accept an HTTPS origin only, with an unambiguous DNS hostname."""
+    parsed = urlsplit(value)
+    host = parsed.hostname
+    if (not re.fullmatch(r'https://[A-Za-z0-9.-]+(?::[0-9]+)?', value)
+            or not host or len(host) > 253
+            or any(not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', label)
+                   for label in host.split('.'))
+            or (parsed.port is not None and not 1 <= parsed.port <= 65535)):
+        raise ValueError('public URLs must be HTTPS origins with DNS hostnames (no credentials, path, query or fragment)')
+    return value.lower()
+
+
+def render_settings(text, without_wopi=False, seafile_public_url=None, bridge_public_url=None):
     """Managed lab block; ONLYOFFICE-only isolation is diagnostic, not coexistence.
 
     Explicitly override earlier WOPI assignments in the disposable generated
@@ -54,7 +69,14 @@ def render_settings(text, without_wopi=False):
     if without_wopi:
         lines = [line for line in lines
                  if not line.startswith(('ENABLE_OFFICE_WEB_APP', 'OFFICE_WEB_APP_'))]
-    return ''.join(lines) + ('\nENABLE_OFFICE_WEB_APP = False\n' if without_wopi else '')
+    text = ''.join(lines)
+    if seafile_public_url:
+        text += (f'\nSERVICE_URL = {seafile_public_url!r}\n'
+                 f'FILE_SERVER_ROOT = {seafile_public_url + "/seafhttp"!r}\n'
+                 f'OFFICE_WEB_APP_BASE_URL = {bridge_public_url + "/wopi/discovery.xml"!r}\n'
+                 f'CSRF_TRUSTED_ORIGINS = {[seafile_public_url]!r}\n'
+                 "SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')\n")
+    return text + ('\nENABLE_OFFICE_WEB_APP = False\n' if without_wopi else '')
 
 
 def stop(proc):
@@ -128,6 +150,8 @@ def main():
                         help='JSON object: relative POSIX filename -> lowercase SHA256')
     for name, default in [('seafile', 8000), ('onlyoffice', 8100), ('bridge', 8778)]:
         parser.add_argument(f'--{name}-port', type=int, default=default)
+    parser.add_argument('--seafile-public-url')
+    parser.add_argument('--bridge-public-url')
     parser.add_argument('--editor', default='')
     parser.add_argument('--wordcraft-fixture', default='')
     parser.add_argument('--onlyoffice-regression', action='store_true',
@@ -141,6 +165,16 @@ def main():
     args = parser.parse_args()
     if args.onlyoffice_regression and (args.editor or args.wordcraft_fixture):
         parser.error('ONLYOFFICE regression cannot select a Craft editor or fixture')
+    if (args.seafile_public_url is None) != (args.bridge_public_url is None):
+        parser.error('--seafile-public-url and --bridge-public-url are required together')
+    if args.seafile_public_url is not None or args.bridge_public_url is not None:
+        try:
+            args.seafile_public_url = https_origin(args.seafile_public_url)
+            args.bridge_public_url = https_origin(args.bridge_public_url)
+            if urlsplit(args.seafile_public_url).hostname == urlsplit(args.bridge_public_url).hostname:
+                raise ValueError('public origins require distinct hostnames for cookie isolation')
+        except ValueError as exc:
+            parser.error(str(exc))
     run = args.run_dir.expanduser().resolve()
     if run == ROOT or ROOT in run.parents:
         parser.error('run directory must be outside the repository')
@@ -163,6 +197,9 @@ def main():
     env.update(values)
     env.update({f'{name.upper()}_PORT': str(port) for name, port in
                 zip(('seafile', 'onlyoffice', 'bridge'), ports)})
+    # Explicitly clear inherited public origins for the default internal HTTP lab.
+    env.update(SEAFILE_PUBLIC_URL=args.seafile_public_url or '',
+               BRIDGE_PUBLIC_URL=args.bridge_public_url or '')
     # Determine editor config early for env
     if args.experimental:
         editor_config = run / 'app/lab/real-seafile/editors.experimental.json'
@@ -185,7 +222,8 @@ def main():
         config_path = run / 'app/lab/real-seafile/seahub_settings.extra.py'
     config = config_path.read_text()
     config = config.replace('__ONLYOFFICE_JWT_SECRET__', values['ONLYOFFICE_JWT_SECRET'])
-    config = render_settings(config, args.without_wopi)
+    config = render_settings(config, args.without_wopi,
+                             args.seafile_public_url, args.bridge_public_url)
     # editor_config is already defined above in both branches
     script = ("from pathlib import Path; import time\n"
               "p=Path('/shared/seafile/conf/seahub_settings.py')\n"

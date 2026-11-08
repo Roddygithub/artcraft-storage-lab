@@ -110,8 +110,8 @@ services:
     volumes:
       - ./app:/app:ro,z
     environment:
-      - BRIDGE_PUBLIC_URL=http://bridge:8778
-      - BRIDGE_SEAHUB_ORIGIN=http://seafile.lab
+      - BRIDGE_PUBLIC_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}
+      - BRIDGE_SEAHUB_ORIGIN=${SEAFILE_PUBLIC_URL:-http://seafile.lab}
       - BRIDGE_EDITORS=/app/lab/real-seafile/editors.json
       - BRIDGE_STATIC_DIR=/app/lab/real-seafile/static
       - BRIDGE_BIND=0.0.0.0
@@ -129,8 +129,8 @@ services:
       - ./app:/app:ro,z
       - ./results:/results:z
     environment:
-      - SEAFILE_URL=http://seafile.lab
-      - BRIDGE_URL=http://bridge:8778
+      - SEAFILE_URL=${SEAFILE_PUBLIC_URL:-http://seafile.lab}
+      - BRIDGE_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}
       - ONLYOFFICE_URL=http://onlyoffice
       - ONLYOFFICE_JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
@@ -151,8 +151,8 @@ services:
       - ./app:/app:ro,z
       - ./results:/results:z
     environment:
-      - SEAFILE_URL=http://seafile.lab
-      - BRIDGE_URL=http://bridge:8778
+      - SEAFILE_URL=${SEAFILE_PUBLIC_URL:-http://seafile.lab}
+      - BRIDGE_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}
       - ONLYOFFICE_URL=http://onlyoffice
       - ONLYOFFICE_JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
       - ADMIN_EMAIL=${ADMIN_EMAIL}

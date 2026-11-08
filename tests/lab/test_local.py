@@ -15,6 +15,62 @@ spec.loader.exec_module(local)
 
 
 class LauncherTest(unittest.TestCase):
+    def test_public_origins_rejected_before_run_directory_or_commands(self):
+        invalid = ['http://seafile.test', 'https://user:pass@seafile.test',
+                   'https://seafile.test/', 'https://seafile.test/path',
+                   'https://seafile.test?x', 'https://seafile.test#x',
+                   'https://seafile.test:0', 'https://seafile.test:65536',
+                   'https://seafile.test:abc', 'https://', 'https://bad_host.test',
+                   'https://seafile.test.', 'https://seafile.test\n',
+                   'https://seafile.test\\evil', 'https://[::1]',
+                   'https://seafile.test:443@bridge.test', 'https://seafile.test?#', '']
+        pairs = [(url, 'https://bridge.test') for url in invalid]
+        pairs += [('https://seafile.test', url) for url in invalid]
+        pairs += [('https://SAME.test:443', 'https://same.test:8443'),
+                  ('https://seafile.test', None), (None, 'https://bridge.test'),
+                  ('', None), (None, ''), ('', '')]
+        with tempfile.TemporaryDirectory() as directory:
+            run = Path(directory) / 'run'
+            for seafile, bridge in pairs:
+                argv = ['local.py', '--run-dir', str(run), '--static', '/unused',
+                        '--manifest', '/unused']
+                for flag, value in [('--seafile-public-url', seafile),
+                                    ('--bridge-public-url', bridge)]:
+                    if value is not None:
+                        argv += [flag, value]
+                with self.subTest(seafile=seafile, bridge=bridge), \
+                        patch.object(sys, 'argv', argv), \
+                        patch.object(local, 'command') as command, \
+                        patch('sys.stderr'):
+                    with self.assertRaises(SystemExit) as error:
+                        local.main()
+                    self.assertEqual(error.exception.code, 2)
+                    self.assertFalse(run.exists())
+                    command.assert_not_called()
+
+    def test_public_settings_and_compose_defaults(self):
+        seafile = local.https_origin('https://Seafile.test:8443')
+        bridge = local.https_origin('https://Bridge.test')
+        source = (local.ROOT / 'lab/real-seafile/seahub_settings.extra.py').read_text()
+        self.assertEqual(local.render_settings(source), source)
+        settings = {}
+        exec(local.render_settings(source, seafile_public_url=seafile,
+                                   bridge_public_url=bridge), settings)
+        self.assertEqual(settings['SERVICE_URL'], seafile)
+        self.assertEqual(settings['FILE_SERVER_ROOT'], seafile + '/seafhttp')
+        self.assertEqual(settings['OFFICE_WEB_APP_BASE_URL'], bridge + '/wopi/discovery.xml')
+        self.assertEqual(settings['CSRF_TRUSTED_ORIGINS'], [seafile])
+        self.assertEqual(settings['SECURE_PROXY_SSL_HEADER'], ('HTTP_X_FORWARDED_PROTO', 'https'))
+        self.assertTrue(settings['ENABLE_OFFICE_WEB_APP'])
+        self.assertTrue(settings['ENABLE_ONLYOFFICE'])
+        compose = (local.ROOT / 'lab/real-seafile/compose.yml').read_text()
+        for line in ['BRIDGE_PUBLIC_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}',
+                     'BRIDGE_SEAHUB_ORIGIN=${SEAFILE_PUBLIC_URL:-http://seafile.lab}']:
+            self.assertIn(line, compose)
+        self.assertEqual(compose.count('SEAFILE_URL=${SEAFILE_PUBLIC_URL:-http://seafile.lab}'), 2)
+        self.assertEqual(compose.count('BRIDGE_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}'), 2)
+        self.assertIn('127.0.0.1:${SEAFILE_PORT:-8000}:80', compose)
+
     def test_settings_can_omit_the_wopi_keys(self):
         text = ('ENABLE_ONLYOFFICE = True\nENABLE_OFFICE_WEB_APP = True\n'
                 'OFFICE_WEB_APP_BASE_URL = "http://bridge:8778/wopi/discovery.xml"\n'
@@ -137,6 +193,10 @@ class LauncherTest(unittest.TestCase):
                 os.umask(old_mask)
 
     def test_failure_cleanup_and_private_credentials(self):
+        self.check_failure_cleanup_and_private_credentials(False)
+        self.check_failure_cleanup_and_private_credentials(True)
+
+    def check_failure_cleanup_and_private_credentials(self, public):
         with tempfile.TemporaryDirectory() as d:
             base = Path(d)
             assets = base / 'assets'
@@ -149,19 +209,29 @@ class LauncherTest(unittest.TestCase):
 
             def fake(args, cwd, env, log, timeout=120):
                 calls.append(args)
+                self.assertEqual(env['SEAFILE_PUBLIC_URL'], 'https://seafile.test' if public else '')
+                self.assertEqual(env['BRIDGE_PUBLIC_URL'], 'https://bridge.test' if public else '')
+                if args[-2:-1] == ['-c'] and 'with p.open' in args[-1]:
+                    self.assertEqual('SERVICE_URL' in args[-1], public)
+                    self.assertEqual('https://bridge.test/wopi/discovery.xml' in args[-1], public)
                 if args[0] == 'podman':
                     log.write_text('true\n')
                 if args[-3:] == ['run', '--rm', 'browser']:
                     raise RuntimeError('synthetic browser failure')
 
             argv = ['local.py', '--run-dir', str(run), '--static', str(assets), '--manifest', str(manifest)]
+            if public:
+                argv += ['--seafile-public-url', 'https://seafile.test',
+                         '--bridge-public-url', 'https://bridge.test']
             old_mask = os.umask(0o077)
             @contextmanager
             def fake_backend(_run, _env):
                 yield ['synthetic-compose']
             try:
                 with patch.object(sys, 'argv', argv), patch.object(local, 'command', fake), \
-                        patch.object(local, 'compose_backend', fake_backend):
+                        patch.object(local, 'compose_backend', fake_backend), \
+                        patch.dict(os.environ, {'SEAFILE_PUBLIC_URL': 'https://inherited.test',
+                                                'BRIDGE_PUBLIC_URL': 'https://inherited-bridge.test'}):
                     with self.assertRaisesRegex(RuntimeError, 'synthetic browser failure'):
                         local.main()
                     self.assertEqual(calls[-1][-2:], ['down', '--remove-orphans'])
