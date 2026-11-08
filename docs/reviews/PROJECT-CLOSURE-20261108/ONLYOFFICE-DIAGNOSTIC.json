@@ -1,0 +1,62 @@
+{
+  "runtime": "FAIL",
+  "checks": [
+    {
+      "name": "authenticated_api_user",
+      "ok": true
+    },
+    {
+      "name": "fresh_synthetic_library",
+      "ok": true
+    },
+    {
+      "name": "fixture_has_baseline",
+      "ok": true
+    },
+    {
+      "name": "round1_history_available",
+      "ok": true
+    },
+    {
+      "name": "round1_actual_onlyoffice_frame",
+      "ok": true
+    },
+    {
+      "name": "round1_new_user_version_and_body_readback",
+      "ok": true
+    },
+    {
+      "name": "round1_no_browser_download",
+      "ok": true
+    },
+    {
+      "name": "round2_history_available",
+      "ok": true
+    },
+    {
+      "name": "round2_actual_onlyoffice_frame",
+      "ok": true
+    },
+    {
+      "name": "round2_new_user_version_and_body_readback",
+      "ok": true
+    },
+    {
+      "name": "round2_no_browser_download",
+      "ok": true
+    },
+    {
+      "name": "round3_history_available",
+      "ok": true
+    },
+    {
+      "name": "round3_actual_onlyoffice_frame",
+      "ok": true
+    }
+  ],
+  "error_type": "TimeoutError",
+  "failure_stage": "final fresh editor Find input remained hidden",
+  "raw_private_results_sha256": "86189e5c3843054070992d468d01a8295b9fa7d83ee23f82a73a8472da36ffa4",
+  "scope": "ONLYOFFICE-only diagnostic; not coexistence; final semantic reopen not established",
+  "cleanup": "parent observed no running lab containers after launcher exit 1"
+}

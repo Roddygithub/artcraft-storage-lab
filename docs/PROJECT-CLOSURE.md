@@ -92,3 +92,11 @@ The new combined six-Craft recovery replay records 119/119 browser assertions
 at source `664898f`. Its historical HTTP 46/46 includes two insufficient APIJS
 checks; both generated ONLYOFFICE pages fail the subsequently corrected gate.
 See `lab/real-seafile/results/2026-11-08-combined-core-recovery/`.
+
+The corrected ONLYOFFICE-only diagnostic completed both real typed saves with
+new attributed versions and current-body API readback. It then failed waiting
+for the native Find input in the final fresh editor (hidden UI control).
+Final fresh semantic reopen remains NOT VERIFIED; this is not a PASS.
+The launcher exited 1 and removed its lab containers. No further ONLYOFFICE
+replay is planned while priority shifts to WordCraft fidelity. Sanitized checks:
+`docs/reviews/PROJECT-CLOSURE-20261108/ONLYOFFICE-DIAGNOSTIC.json`.
