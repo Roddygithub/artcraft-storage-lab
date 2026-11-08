@@ -261,8 +261,11 @@ def _header(headers: dict, name: str) -> str:
 # --------------------------------------------------------------------------- #
 
 
-SIGNATURE_KNOWN = frozenset({"docx", "xlsx", "pptx", "odt", "ods", "odp", "pdf", "svg", "png", "jpg", "jpeg", "webp", "dxf", "drawio"})
-_OOXML_PART = {"docx": "word/", "xlsx": "xl/", "pptx": "ppt/"}
+SIGNATURE_KNOWN = frozenset({"docx", "xlsx", "pptx", "ppsx", "odt", "ods", "odp", "pdf", "svg", "png", "jpg", "jpeg", "webp", "dxf", "drawio",
+                             "doc", "xls", "ppt", "pps", "fodt", "fods", "fodp"})
+_OOXML_PART = {"docx": "word/", "xlsx": "xl/", "pptx": "ppt/", "ppsx": "ppt/"}
+_OLECF_MAGIC = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"
+_FLAT_ODF_EXT = ("fodt", "fods", "fodp")
 
 
 def _text_head(data: bytes, n: int = 65536) -> bytes:
@@ -278,7 +281,7 @@ def content_matches_extension(ext: str, data: bytes) -> bool:
     """A cheap check that the bytes are the kind of file the name says. Unknown extensions pass:
     the table is in SIGNATURE_KNOWN so a deployment can see which mappings are unguarded."""
     ext = ext.lower()
-    if ext in ("docx", "xlsx", "pptx", "odt", "ods", "odp"):
+    if ext in ("docx", "xlsx", "pptx", "ppsx", "odt", "ods", "odp"):
         if not data.startswith(b"PK\x03\x04"):
             return False
         try:
@@ -305,6 +308,13 @@ def content_matches_extension(ext: str, data: bytes) -> bool:
         return head.startswith(b"AutoCAD Binary DXF") or bool(re.match(rb"0\s*\r?\n\s*SECTION", head))
     if ext == "drawio":
         return _text_head(data).startswith(b"<")
+    if ext in ("doc", "xls", "ppt", "pps"):
+        # Legacy binary Office: an OLE compound file.
+        return data.startswith(_OLECF_MAGIC)
+    if ext in _FLAT_ODF_EXT:
+        # Flat OpenDocument: a single XML stream whose root is office:document.
+        head = _text_head(data)
+        return head.startswith(b"<") and b"office:document" in head
     return True
 
 

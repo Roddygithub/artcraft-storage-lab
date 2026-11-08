@@ -1,4 +1,5 @@
 docs/reviews/GR-016/patches/*.patch whitespace=-blank-at-eol
 docs/reviews/GR-057/runtime/synthetic.pdf binary
 lab/real-seafile/fixtures/*.pdf binary
+lab/real-seafile/fixtures/legacy/* binary
 docs/reviews/GR-084/runtime/*.pdf binary

@@ -28,6 +28,8 @@ Do not run the historical ONLYOFFICE campaigns below.
 2. Done (opt-in `--pptx`): official DeckCraft v0.16.0 same-format edit/save/reopen,
    focused 15/15 and combined seven-editor 132/132 browser checks; see validation checkpoint.
 3. Extend required viewing-format coverage and hardware/clipboard/font/unload checks.
+   Deterministic legacy/OpenDocument fixtures + routing candidate are committed and
+   checked offline; editor import in a real Seafile/browser session is NOT VERIFIED.
    Automated WordCraft HTTPS replay is done: HTTP 40/40, browser 28/28; TLS routes restored.
 4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
 

@@ -507,6 +507,23 @@ class BridgeTestCase(unittest.TestCase):
         self.assertFalse(m("docx", xlsx))                                          # xlsx bytes are not a docx
         self.assertTrue(m("xlsx", xlsx))
 
+    def test_signature_covers_legacy_office_and_opendocument(self):
+        from bridge.app import content_matches_extension as m, SIGNATURE_KNOWN
+        ole = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1" + b"rest"
+        for ext in ("doc", "xls", "ppt", "pps"):
+            self.assertTrue(m(ext, ole), ext)
+            self.assertFalse(m(ext, b"PK\x03\x04not-ole"), ext)
+        self.assertFalse(m("doc", b"plain text"), "a .doc must not be plain text")
+        ppsx = _zip({"[Content_Types].xml": b"<Types/>", "ppt/presentation.xml": b"<p/>"})
+        self.assertTrue(m("ppsx", ppsx))
+        self.assertFalse(m("ppsx", _zip({"[Content_Types].xml": b"<Types/>", "word/document.xml": b"<w/>"})))
+        self.assertFalse(m("ppsx", b"not a zip"))
+        for ext in ("fodt", "fods", "fodp"):
+            self.assertTrue(m(ext, b"<?xml version='1.0'?><office:document xmlns:office='x'/>"), ext)
+            self.assertTrue(m(ext, b"\xef\xbb\xbf<?xml?><office:document/>"), ext)   # BOM
+            self.assertFalse(m(ext, b"<html></html>"), ext)
+        self.assertTrue(SIGNATURE_KNOWN >= {"doc", "xls", "ppt", "pps", "ppsx", "fodt", "fods", "fodp"})
+
     def test_host_js_is_served_and_speaks_upstream_protocol(self):
         status, headers, body = _Http.call(f"{self.bridge_origin}/host.js")
         self.assertEqual(status, 200)

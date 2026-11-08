@@ -1,0 +1,54 @@
+Synthetic legacy / OpenDocument viewing fixtures
+================================================
+
+Purpose
+-------
+One deterministic synthetic file per currently configured ONLYOFFICE *viewing*
+format that the active zero-patch Craft candidate does not yet route:
+DOC, ODT, FODT, XLS, ODS, FODS, CSV, PPT, ODP, FODP, PPS, PPSX.
+
+Every file carries the same marker string in its real content:
+
+    GR-LEGACY-MARKER-20261108
+
+so a viewer that actually imports the file can be checked for the marker, and a
+file that merely downloads or fails to parse cannot.
+
+How they were produced
+----------------------
+Generated offline with LibreOffice (Writer / Calc / Impress) inside a disposable
+rootless Podman container; no network, no Seafile, no production system, no user
+document. Reproduce with:
+
+    scripts/make-legacy-fixtures.sh localhost/artcraft-fixture-tools:20261108 /some/out
+
+    container base  docker.io/library/debian:bookworm-slim
+    packages        libreoffice-writer libreoffice-calc libreoffice-impress fonts-liberation
+
+The container image id at generation time was
+`72717717d6ce022e13033e39fa4e96e837d0780ce7ecfc654a8c9e185d611316`.
+
+The committed bytes are the reviewed artifact; a rerun by the same LibreOffice
+is *equivalent*, not byte-identical, because the producer embeds creation
+timestamps. `SHA256SUMS` pins the committed bytes.
+
+Fixture map
+-----------
+    doc.doc     doc.odt    doc.fodt              WordCraft (writer family)
+    sheet.xls   sheet.ods  sheet.fods  sheet.csv  GridCraft (calc family)
+    slide.ppt   slide.odp  slide.fodp  slide.pps  slide.ppsx  DeckCraft (impress family)
+
+Known exactness limits (disclosed)
+----------------------------------
+* slide.pps and slide.ppt are byte-identical. This LibreOffice writes the same
+  OLE stream for both; the show mode is selected by the extension, not the
+  bytes. The set still exercises both extensions.
+* The marker is stored as UTF-16LE inside the OLE binaries (DOC/XLS/PPT/PPS),
+  in `content.xml` inside the ODF ZIPs, as plain XML in FODT/FODS/FODP, and as
+  plain text in CSV.
+
+Scope
+-----
+These fixtures are test input only. Their presence does not claim that any
+editor imports, views or replaces these formats; that is runtime evidence and is
+tracked separately in docs/ONLYOFFICE-REPLACEMENT-MATRIX.md.

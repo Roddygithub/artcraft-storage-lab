@@ -192,3 +192,23 @@ validation passed **19/19 command groups**. Earlier failed PPTX attempts remain
 recorded as failures, with their filter/click-target corrections. Independent
 review has not been performed. Continue from `docs/VALIDATION-STATE.md`.
 Project INCOMPLETE; upstream LOCKED.
+
+## Legacy/OpenDocument viewing fixtures — 2026-11-08
+
+Deterministic synthetic fixtures now exist for every remaining viewing format
+(DOC, ODT, FODT, XLS, ODS, FODS, CSV, PPT, ODP, FODP, PPS, PPSX), each
+carrying the marker `GR-LEGACY-MARKER-20261108` in its real content. They were
+produced offline with LibreOffice in a disposable rootless-Podman container and
+committed with `PROVENANCE.txt`, `SHA256SUMS` and
+`scripts/make-legacy-fixtures.sh`. The bridge's name-to-bytes signature guard
+now also covers DOC/XLS/PPT/PPS (OLE), PPSX (OPC) and FODT/FODS/FODP (flat ODF);
+an opt-in routing candidate (`lab/real-seafile/editors.viewing.json`) maps only
+the formats with a documented upstream import (DOC/ODT to WordCraft, ODS/CSV to
+GridCraft). All of this is covered offline by `tests/test_legacy_fixtures.py`
+and the bridge suite.
+
+This is fixture and routing evidence only. No Seafile route, browser open,
+editor import or format replacement is claimed, and the eight formats without a
+documented Craft import stay unrouted. The default six/seven-editor candidate is
+unchanged. Offline checks now number 20 command groups. Project INCOMPLETE;
+upstream LOCKED.

@@ -5,11 +5,11 @@ historical GR corpus to resume routine validation.
 
 | Scope | State | Evidence |
 | --- | --- | --- |
-| Active offline checks | 19/19 command groups PASS (PPTX fixture added) | `../lab/real-seafile/results/2026-11-08-pptx-official/offline.json` |
+| Active offline checks | 20/20 command groups PASS (legacy fixtures added) | local rerun; `tests/test_legacy_fixtures.py` |
 | Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
 | All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
 | Official DeckCraft PPTX opt-in | focused 15/15; combined HTTP 40/40, browser 132/132, exit 0 | `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
-| Remaining office viewing formats and broad fidelity | NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md` |
+| Remaining office viewing formats and broad fidelity | Fixtures + routing ready; runtime import NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md`, `fixtures/legacy/` |
 | Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent forensic review and final project GPT gate | NOT PERFORMED | `PROJECT-CLOSURE.md` |
@@ -46,8 +46,11 @@ prove full pagination or font fidelity.
 
 ## Next unresolved work
 
-1. Required legacy/OpenDocument viewing formats: the matrix still contains
-   unverified routes; DOCX/XLSX/PPTX synthetic edit coverage does not replace them.
+1. Required legacy/OpenDocument viewing formats: deterministic fixtures and an
+   opt-in routing candidate now exist for all twelve; only DOC/ODT (WordCraft)
+   and ODS/CSV (GridCraft) have a documented upstream import. A real Seafile and
+   browser probe of editor import is still NOT VERIFIED; DOCX/XLSX/PPTX
+   synthetic edit coverage does not replace the viewing formats.
 2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
 3. Independent forensic review and a fresh project GPT gate, in a context that
    did not implement this candidate. No global PASS has been granted.

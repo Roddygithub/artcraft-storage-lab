@@ -11,18 +11,39 @@ proof that every current ONLYOFFICE path works in practice.
 | DOCX | View + edit | WordCraft: three synthetic corpus edit/save/version/fresh-reopen cases, 28 checks each; bounded reviews PASS |
 | XLSX | View + edit | GridCraft: synthetic typed-cell edit/save/version/fresh-reopen evidence; broader workbook fidelity NOT VERIFIED |
 | PPTX | View + edit | Official DeckCraft v0.16.0: synthetic title edit, same-file PPTX save, attributed version and fresh reopen; 15/15 browser checks; broad fidelity NOT VERIFIED |
-| DOC | View | NOT VERIFIED |
-| PPT | View | NOT VERIFIED |
-| XLS | View | NOT VERIFIED |
-| ODT | View | NOT VERIFIED |
-| FODT | View | NOT VERIFIED |
-| ODP | View | NOT VERIFIED |
-| FODP | View | NOT VERIFIED |
-| ODS | View | NOT VERIFIED |
-| FODS | View | NOT VERIFIED |
-| CSV | View | NOT VERIFIED |
-| PPSX | View | NOT VERIFIED |
-| PPS | View | NOT VERIFIED |
+| DOC | View | Fixture ready; WordCraft documents DOC import — runtime import NOT VERIFIED |
+| PPT | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| XLS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| ODT | View | Fixture ready; WordCraft documents ODT import — runtime import NOT VERIFIED |
+| FODT | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| ODP | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| FODP | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| ODS | View | Fixture ready; GridCraft documents ODS import — runtime import NOT VERIFIED |
+| FODS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| CSV | View | Fixture ready; GridCraft documents CSV import — runtime import NOT VERIFIED |
+| PPSX | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| PPS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+
+## Deterministic viewing fixtures — 2026-11-08
+
+Every viewing format above now has one synthetic file that carries the marker
+`GR-LEGACY-MARKER-20261108` in its real content, produced offline with
+LibreOffice in a disposable container and committed with checksums and a
+regeneration script:
+
+* fixtures + `PROVENANCE.txt` + `SHA256SUMS`: `lab/real-seafile/fixtures/legacy/`
+* regenerate: `scripts/make-legacy-fixtures.sh <libreoffice-image> <outdir>`
+* opt-in routing candidate: `lab/real-seafile/editors.viewing.json`
+* offline check: `tests/test_legacy_fixtures.py` (fixture integrity, bridge
+  signature guard, routing only)
+
+The fixtures, the `content_matches_extension` signatures for DOC/XLS/PPT/PPS,
+PPSX and FODT/FODS/FODP, and the routing map are testable offline. That is
+**fixture and routing evidence only**: no Seafile route, browser open, editor
+import or format replacement is claimed. Only DOC, ODT (WordCraft) and ODS, CSV
+(GridCraft) have a documented upstream import path; the remaining eight formats
+have none and stay deliberately unrouted until proven. The replacement baseline
+therefore remains a partial, honest subset.
 
 The initial replacement baseline is **15 viewing formats and 3 editing
 formats**. Adding editing support for the currently view-only formats would be
