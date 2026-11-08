@@ -46,6 +46,22 @@ def odt_text(data):
         raise ValueError("unreadable ODT") from exc
 
 
+
+def find_fresh_document_text(frame, query):
+    """One query per newly opened editor: reject pre-existing search state."""
+    search = frame.locator("#search-adv-text input")
+    search.wait_for(state="visible", timeout=30000)
+    if search.input_value():
+        raise AssertionError("fresh editor search is not empty")
+    results = frame.locator("#search-adv-results-number")
+    results.filter(has_text=re.compile(r"^No search results$")).wait_for(
+        state="visible", timeout=30000)
+    search.fill(query)
+    search.press("Enter")
+    results.filter(has_text=re.compile(r"\b[1-9][0-9]*\b")).wait_for(
+        state="visible", timeout=30000)
+
+
 def persisted_revision(before, after, user):
     """A changed object alone is insufficient: require a new user-attributed commit."""
     return bool(before and after and after[0].get("id")
@@ -152,16 +168,7 @@ def main():
                             # downloaded through the storage API. Native Find searches
                             # the parsed current document without injecting editor APIs.
                             editor.keyboard.press("Control+f")
-                            search = frame.locator("#search-adv-text input")
-                            search.wait_for(state="visible", timeout=30000)
-                            frame.locator("#search-adv-results-number").filter(
-                                has_text=re.compile(r"^No search results$")
-                            ).wait_for(state="visible", timeout=30000)
-                            search.fill(query)
-                            search.press("Enter")
-                            frame.locator("#search-adv-results-number").filter(
-                                has_text=re.compile(r"\b[1-9][0-9]*\b")
-                            ).wait_for(state="visible", timeout=30000)
+                            find_fresh_document_text(frame, query)
                             require(f"final_reopen_current_text_{round_no - 3}", True)
                             editor.screenshot(path=str(results / f"onlyoffice-final-reopen-{round_no}.png"))
                             require(f"final_reopen_{round_no}_no_browser_download", not downloads)

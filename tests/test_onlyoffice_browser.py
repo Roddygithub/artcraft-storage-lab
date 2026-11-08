@@ -50,6 +50,33 @@ def main():
         z.writestr("content.xml", "<root/>")
     rejects(out.getvalue())
 
+    class FindFrame:
+        def __init__(self, present, initial="No search results"):
+            self.present, self.result, self.query = present, initial, ""
+        def locator(self, selector):
+            self.selector = selector
+            return self
+        def wait_for(self, **_):
+            if hasattr(self, "pattern") and not self.pattern.search(self.result):
+                raise TimeoutError("no matching search result")
+        def input_value(self):
+            return self.query
+        def filter(self, has_text):
+            self.pattern = has_text
+            return self
+        def fill(self, value):
+            self.query = value
+        def press(self, _):
+            self.result = "1 of 1" if self.query in self.present else "No search results"
+    runner.find_fresh_document_text(FindFrame({"marker"}), "marker")
+    for frame in (FindFrame(set()), FindFrame(set(), initial="1 of 1")):
+        try:
+            runner.find_fresh_document_text(frame, "absent")
+        except TimeoutError:
+            pass
+        else:
+            raise AssertionError("absent query or stale positive search accepted")
+
     before = [{"id": "commit1", "rev_file_id": "object1", "creator": "lab-user"}]
     after = [{"id": "commit2", "rev_file_id": "object2", "creator": "lab-user"}] + before
     assert runner.persisted_revision(before, after, "lab-user")
