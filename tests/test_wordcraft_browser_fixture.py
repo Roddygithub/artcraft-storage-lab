@@ -36,15 +36,13 @@ def main():
     assert run_browser.select_wordcraft_fidelity_fixture(base, "") is base
     assert base["test.docx"] == ("wordcraft", b"minimal", "")
 
-    selected = dict(base)
-    assert run_browser.select_wordcraft_fidelity_fixture(
-        selected, "fidelity-layout.docx"
-    ) is selected
-    assert "test.docx" not in selected
-    assert selected["test.xlsx"] == base["test.xlsx"]
-    assert selected["fidelity-layout.docx"] == (
-        "wordcraft", docx_fidelity_corpus.corpus()["fidelity-layout.docx"], ""
-    )
+    assert set(docx_fidelity_corpus.corpus()) == run_browser.WORDCRAFT_FIDELITY_FIXTURES
+    for name, data in docx_fidelity_corpus.corpus().items():
+        selected = dict(base)
+        assert run_browser.select_wordcraft_fidelity_fixture(selected, name) is selected
+        assert "test.docx" not in selected
+        assert selected["test.xlsx"] == base["test.xlsx"]
+        assert selected[name] == ("wordcraft", data, "")
 
     for invalid, mapping in (("missing.docx", dict(base)),
                              ("fidelity-layout.docx", {"fidelity-layout.docx": base["test.docx"]}),

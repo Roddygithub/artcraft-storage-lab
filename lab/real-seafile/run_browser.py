@@ -828,14 +828,17 @@ def wait_for_wordcraft_document(page, timeout=90):
     return False
 
 
+WORDCRAFT_FIDELITY_FIXTURES = {"fidelity-layout.docx", "fidelity-prose.docx", "fidelity-structure.docx"}
+
+
 def select_wordcraft_fidelity_fixture(fixtures, requested_name):
     """Replace the minimal DOCX with one corrected fidelity-corpus fixture when requested."""
     if not requested_name:
         return fixtures
-    if requested_name != "fidelity-layout.docx":
+    if requested_name not in WORDCRAFT_FIDELITY_FIXTURES:
         raise ValueError(f"unsupported WordCraft fidelity fixture: {requested_name}")
     if "test.docx" not in fixtures or requested_name in fixtures:
-        raise ValueError("WordCraft fixture map cannot safely select fidelity-layout.docx")
+        raise ValueError("WordCraft fixture map cannot safely select the requested corpus document")
     from docx_fidelity_corpus import corpus
 
     content = corpus().get(requested_name)
@@ -1034,7 +1037,7 @@ def main():
             phrase = f" The typed marker is {marker}. "
             phrase2 = f" Reopened here, typed again: {marker2}. "
 
-            if name == "fidelity-layout.docx":
+            if name in WORDCRAFT_FIDELITY_FIXTURES:
                 content_rendered = wait_for_wordcraft_document(page)
                 check("wordcraft_layout_fixture_rendered_before_first_edit", content_rendered)
                 page.screenshot(path=os.path.join(RESULTS, "wordcraft-before-edit.png"))
@@ -1115,7 +1118,7 @@ def main():
                   f"marker={marker} len={len(got)} bytes_identical_to_original={got == content}")
             check("wordcraft_save_is_not_identical_bytes", got != content, f"{len(content)} -> {len(got)} bytes")
             check("wordcraft_saved_docx_bytes_look_right", rs.content_matches(name, got), f"len={len(got)}")
-            if name == "fidelity-layout.docx":
+            if name in WORDCRAFT_FIDELITY_FIXTURES:
                 check("wordcraft_first_save_retains_fixture_text",
                       rs.docx_text(content) in rs.docx_text(got))
             page.screenshot(path=os.path.join(RESULTS, "wordcraft-saved.png"))
@@ -1169,7 +1172,7 @@ def main():
             check("wordcraft_reopen_bytes_identical_to_the_saved_version", body is not None and body == got,
                   f"len={len(body) if body else 0} vs saved {len(got)}")
 
-            if name == "fidelity-layout.docx":
+            if name in WORDCRAFT_FIDELITY_FIXTURES:
                 content_rendered2 = wait_for_wordcraft_document(p2) if body is not None else False
                 check("wordcraft_reopened_layout_fixture_rendered_before_second_edit",
                       content_rendered2)
@@ -1227,7 +1230,7 @@ def main():
                 check("wordcraft_reopen_seafile_holds_both_markers",
                       marker.lower() in rs.docx_text(got2).lower() and marker2.lower() in rs.docx_text(got2).lower(),
                       f"marker={marker2} len={len(got2)}")
-                if name == "fidelity-layout.docx":
+                if name in WORDCRAFT_FIDELITY_FIXTURES:
                     check("wordcraft_second_save_retains_fixture_text",
                           rs.docx_text(content) in rs.docx_text(got2))
             else:
