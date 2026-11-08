@@ -261,3 +261,24 @@ repository role definition; retried same stable round request with `high`.
 R2 returned PROVISIONAL PASS on final patch. No pending task was duplicated.
 No DeepSeek task used. Reports/results in
 `docs/reviews/GR-076/`; free verdicts remain PROVISIONAL.
+
+## 2026-11-08 — candidate 2c112fc independent review round
+
+Implementation: the resumed owner session. Independent review delegated through
+the configured `artcraft-reviewer` role (provider `nvidia`, model
+`nvidia/nvidia/nemotron-3-ultra-550b-a55b#high`) and the `artcraft-gpt-auditor`
+role (provider `openai`, model `gpt-5.6-luna`).
+
+Outcome:
+- `artcraft-gpt-auditor` (Luna) **failed**: "The usage limit has been reached".
+  No audit produced. Retry only after the provider quota resets; the Sol
+  final-reviewer role uses the same `openai` provider and is expected to be
+  unavailable for the same reason.
+- `artcraft-reviewer` (Nemotron) **completed**: ran the full bridge suite
+  (33 tests, all pass, including the documented intervening-writer race) and
+  returned a bounded review. Re-run in the foreground to capture the full
+  verdict text, because the harness only surfaced the closing sentence and the
+  subagent transcript is not persisted in the local store.
+
+No DeepSeek task was on the critical path. All free-model verdicts remain
+PROVISIONAL.
