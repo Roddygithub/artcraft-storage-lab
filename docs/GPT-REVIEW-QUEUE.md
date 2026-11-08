@@ -1418,6 +1418,61 @@ Evidence:    `docs/GR-036-PHOTOCRAFT-SEAFILE-E2E.md`, `docs/reviews/GR-036/`
 ```text
 Do not trust previous free-model PASS verdicts.
 
+## Zero-Patch Candidate — `51ff292ea` (2026-11-08)
+
+**Status:** AWAITING HUMAN HTTPS ACCEPTANCE → GPT GATE
+
+**Scope:** 7 editor paths on stock Seafile CE 13.0.28 + ONLYOFFICE 9.4
+- WordCraft v0.13.2 (DOCX)
+- GridCraft v0.14.2 (XLSX)
+- PdfCraft v0.16.1 (PDF AcroForm)
+- CADCraft v0.15.1 (DXF)
+- VectorCraft v0.19.0 (SVG, with lab shim)
+- FigCraft v0.13.1 (FigCraft, with lab shim)
+- ONLYOFFICE 9.4 (ODT)
+
+**Architecture:** Stateless WOPI editor bridge (`bridge/`) + upstream release bundles + Seahub configuration only (no Seafile patch, no editor patch).
+
+**Evidence:**
+- Lab HTTP slice: 46/46 checks × 7 paths
+- Lab browser slice: 28+27+18+20+20+21+12 = 146 checks; all pass
+- Bridge tests: 32/32 pass
+- Host/Shim test: 1/1 pass
+- Launcher offline tests: 6/6 pass
+- Forensic review: `docs/FORENSIC-REVIEW-20261108.md`
+
+**Accepted limitations (documented):**
+- CheckFileInfo/PutFile race: external writer can overwrite between preflight and unconditional PutFile
+- Seahub direct PutFile accepts read-only token (bridge enforces `UserCanWrite` on relay path only)
+- Token revocation window ≤ `WOPI_ACCESS_TOKEN_EXPIRATION` (default 30 min)
+- VectorCraft/FigCraft require lab shim (`host-shim.js`)
+- Same-origin editor bundles are trusted code
+
+**Next step:** Human HTTPS desktop acceptance per `lab/real-seafile/README.md` checklist (10 items, Chrome/Edge/Firefox). Then GPT gate on frozen candidate.
+
+---
+
+## Zero-Patch Candidate — `51ff292ea` — GPT GATE QUEUED
+
+**Frozen commit:** `51ff292ea843c01269f2626c3d011c29c915a1ec`
+**Branch:** `work/project-closure-20261108`
+**Forensic review:** `docs/FORENSIC-REVIEW-20261108.md`
+
+**Review scope for GPT:**
+- All lab evidence (HTTP slice, browser slice, test suites)
+- Architecture correctness (stateless bridge, WOPI relay, Seahub config)
+- Accepted limitations and trust model
+- Security model (CSP, frame-ancestors, token lifecycle, permission recheck)
+- Deployment model (deploy/bridge/, nginx, TLS requirement)
+- Licensing (upstream bundles: MIT/Apache-2.0; bridge: MIT; Seafile CE: AGPL-3.0; ONLYOFFICE: AGPL-3.0)
+
+**Required verdict:**
+- BLOCKER / MAJOR / MINOR / PASS
+
+**Upstream publication:** LOCKED until GPT REVIEW PASS + owner approval.
+
+---
+
 Independently inspect and verify:
 
 - Seafile integration assumptions
