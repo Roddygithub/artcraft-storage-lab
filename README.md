@@ -15,69 +15,53 @@ Seafile Web ──(WOPI form POST, access token)──▶ bridge (host page, sam
 Seahub WOPI host ◀──(CheckFileInfo/GetFile/PutFile/Lock, token in headers)── bridge /relay/*
 ```
 
-Status: **prototype, validated on a stock Seafile CE 13.0.28** in an isolated VM — HTTP slice
-48/48, browser slice 50/50 (`lab/real-seafile/results/`); independent review R2 of the bridge
-incorporated (30 fake-host tests). Not yet deployed anywhere real. Nothing
-published upstream.
+Status: **MVP candidate under final validation**. Current bridge evidence covers
+WordCraft DOCX, GridCraft XLSX, PdfCraft AcroForm and CADCraft DXF. VectorCraft
+and FigCraft semantic edit/reopen slices are implemented but still awaiting
+runtime validation. The exact closure criteria and remaining checks are in
+[`PROJECT-CLOSURE.md`](docs/PROJECT-CLOSURE.md).
 
-ROADMAP step 3 has current-bridge Seafile evidence for WordCraft DOCX and GridCraft
-XLSX, the five-route GR-078 replay (WordCraft, GridCraft, PdfCraft, VectorCraft and
-PhotoCraft), native DeckCraft `.deckcraft`, and CADCraft DXF. The DeckCraft and
-CADCraft runs are direct parent work, not Aptarchy completion. See
-[`GR-078`](docs/GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md),
-[`GR-081`](docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md), and
-[`GR-082`](docs/GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md). Remaining dispatched
-scenarios, foreign `.pptx` editing, broad CADCraft fidelity and production
-behavior still require separate validation.
+## Zero-patch candidate
 
-The bounded synthetic WordCraft/ONLYOFFICE DOCX comparison is recorded in
-[`GR-083`](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md). After R1's
-OOXML-order finding was fixed and passed source review R2, a fresh run opened
-three corrected fixtures in each editor with unchanged readback hashes and no
-downloads. It did not edit or save. R3's archive-only findings were corrected
-and R4 returned a bounded pass with no findings. The initial pre-remediation artifacts remain archived; earlier
-ONLYOFFICE manifest 502s did not recur, but their cause is unverified. This
-comparison does not replace the owner’s live ONLYOFFICE repair.
-
-GR-084 adds one isolated PdfCraft edit/save/version/readback/reopen using a
-synthetic AcroForm PDF. The focused browser slice passed 18/18 and HTTP passed
-48/48; relay-save bytes equaled Seafile readback. This direct parent run is not
-Aptarchy completion and does not establish broad PDF compatibility or project
-completion. See [`GR-084`](docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md).
-
-## What works today
-
-| File | Editor | How |
+| File | Editor | Adapter |
 | --- | --- | --- |
-| `.docx` | WordCraft 0.13.2 | upstream bundle, its own `host.rs` |
-| `.xlsx` | GridCraft 0.14.2 | upstream bundle, its own `host.rs` |
-| `.pdf` (`?edit_pdf=true`) | PdfCraft 0.16.1 | upstream bundle, its own bridge |
-| `.dxf` | CADCraft 0.15.1 | upstream bundle, its own `host.rs` |
-| `.svg` | VectorCraft 0.19.0 | upstream bundle + a one-line page-API shim (`lab/real-seafile/static/host-shim.js`) |
-| `.figcraft` | FigCraft 0.13.1 | upstream bundle + the same shim (`?control` enables its page API) |
-| `.pptx` / `.deckcraft` | DeckCraft 0.13.1 | upstream source + the lab's `host.rs` port (`docs/upstream-drafts/`), built in the lab |
-| `.png` / `.psd` / `.pcraft` | PhotoCraft 0.18.0 | same, with a dirty signal |
-| `.designcraft` | DesignCraft 0.15.2 | same |
-| `.scraft` / `.scraftz` | SoundCraft 0.15.0 | same |
-| ODF and the rest of Office | ONLYOFFICE | unchanged; Seahub picks per extension |
+| `.docx` | WordCraft 0.13.2 | unmodified upstream bundle, merged parent bridge |
+| `.xlsx` | GridCraft 0.14.2 | unmodified upstream bundle, merged parent bridge |
+| `.pdf` (`?edit_pdf=true`) | PdfCraft 0.16.1 | unmodified upstream bundle |
+| `.dxf` | CADCraft 0.15.1 | unmodified upstream bundle |
+| `.svg` | VectorCraft 0.19.0 | upstream bundle plus declared lab page-API shim |
+| `.figcraft` | FigCraft 0.13.1 | upstream bundle plus declared lab page-API shim |
+| PPTX, ODF and remaining office routes | ONLYOFFICE | existing integration preserved |
 
-A foreign format opened in a Craft app (a `.pptx` in DeckCraft, a `.png` in PhotoCraft) is saved by
-the app in its own format; the host page hands that over as a download and leaves the Seafile
-file untouched. In-place saves are verified by reading the file back from Seafile.
+The deployment example routes DXF by default; office extensions are operator
+opt-ins. The synthetic lab routes DOCX/XLSX/PDF to Craft for testing and keeps
+PPTX on ONLYOFFICE. No production deployment is claimed.
 
-Per-app coverage of all 13 Craft apps: report §7, step 4. Ports for the others:
-`docs/upstream-drafts/host-bridge-ports.md`.
+DeckCraft, SoundCraft, PhotoCraft and DesignCraft Rust host ports are
+experimental drafts outside this candidate's no-editor-patch requirement.
+Their retained runs and configurations remain available for research.
+GR-078 describes the retired `integration/` architecture and is not current
+bridge evidence. Media applications and the draw.io stub are not supported by
+this candidate. Broad document fidelity remains unverified.
 
-## What the bridge enforces that Seahub does not
+## Save and host limitations
 
-`UserCanWrite` on save (Seahub's `PutFile` accepts a read-only token — measured), an optimistic
-version precondition (409 on a concurrent change, nothing overwritten), file name and content
-signature, reconciliation after a lost response, WOPI locks. Details: `bridge/README.md`.
+The bridge checks the user's permission, file name, content signature and
+expected version, then verifies persisted bytes by readback. A version already
+changed before the write is rejected. Seahub's unconditional PutFile does not
+provide an atomic conditional write: an intervening external writer can still
+be overwritten. The owner explicitly accepted this documented host limitation
+for the zero-patch MVP; see the closure ledger and `bridge/README.md`.
+
+Seahub also accepts direct writes using an extracted read-only WOPI token.
+The bridge enforces read-only permission on its own path, not on that separate
+host endpoint. Editor bundles share the host origin and are trusted code.
+Upstream publication remains locked pending the project gate and owner approval.
 
 ## Repository layout
 
 ```text
-bridge/               the WOPI editor bridge (stdlib Python WSGI + host page JS); 21 unit tests in tests/bridge/
+bridge/               the WOPI editor bridge (stdlib Python WSGI + host page JS); 32 fake-host tests in tests/bridge/
 deploy/bridge/        Dockerfile, compose, Seahub settings, nginx snippet, bundle fetcher — run it next to your Seafile
 lab/real-seafile/     the validation lab: Seafile CE 13 + ONLYOFFICE + bridge + editor bundles in a Lima VM, HTTP and browser slices
 docs/REFOUNDATION-REPORT.md   the decision and its evidence

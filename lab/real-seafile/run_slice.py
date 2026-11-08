@@ -540,15 +540,14 @@ def main() -> int:
           (form_dxf or {}).get("action", "")[:120])
     st, page_pptx = file_page(sess, repo_id, "test.pptx")
     form_pptx = parse_wopi_form(page_pptx)
-    check("seahub_pptx_routes_to_wopi_deckcraft", st == 200 and form_pptx is not None and form_pptx["action"].startswith(BRIDGE + "/edit/deckcraft"),
-          (form_pptx or {}).get("action", "")[:120])
+    check("seahub_pptx_stays_on_onlyoffice", st == 200 and form_pptx is None and
+          "api/documents/api.js" in page_pptx, "PPTX remains on the existing ONLYOFFICE route")
     st, page_odt = file_page(sess, repo_id, "test.odt")
     check("seahub_odt_routes_to_onlyoffice", st == 200 and "api/documents/api.js" in page_odt and parse_wopi_form(page_odt) is None,
           "apijs referenced" if "api/documents/api.js" in page_odt else "no api.js reference")
     # every ArtCraft editor opens through the bridge with the right bundle
     for label, form, editor, fid in (("docx", form_docx, "wordcraft", docx_id), ("xlsx", form_xlsx, "gridcraft", xlsx_id),
-                                     ("pdf", form_pdf, "pdfcraft", pdf_id), ("dxf", form_dxf, "cadcraft", dxf_id),
-                                     ("pptx", form_pptx, "deckcraft", pptx_id)):
+                                     ("pdf", form_pdf, "pdfcraft", pdf_id), ("dxf", form_dxf, "cadcraft", dxf_id)):
         if not form:
             check(f"bridge_open_{label}", False, "no WOPI form")
             continue

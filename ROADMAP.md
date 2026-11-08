@@ -9,7 +9,7 @@ under `docs/reviews/` and `integration/` as evidence.
 | What | Evidence |
 | --- | --- |
 | Decision: zero-patch WOPI editor bridge, ONLYOFFICE kept for office | report §5 |
-| Bridge prototype + fake-host tests | `bridge/`, `tests/bridge/` (21) |
+| Bridge prototype + fake-host tests | `bridge/`, `tests/bridge/` (32) |
 | Real Seafile CE 13.0.28 + ONLYOFFICE 9.4 lab, HTTP slice | `lab/real-seafile/results/slice.json` (45/45) |
 | Real browser path: 4 unpatched upstream bundles, VectorCraft via shim, DeckCraft/SoundCraft/PhotoCraft/DesignCraft via local ports built in the lab | `results/browser.json` (50/50), screenshots |
 | Independent review R2 of the bridge, all HIGH/MEDIUM fixed | report §7, `tests/bridge/` (30) |
@@ -20,10 +20,10 @@ under `docs/reviews/` and `integration/` as evidence.
 
 | # | Step | Done when |
 | --- | --- | --- |
-| 1 | ~~DeckCraft, SoundCraft, PhotoCraft, DesignCraft ports~~ done | diffs under `docs/upstream-drafts/`, lab 45/46 |
-| 2 | ~~FigCraft through the shim~~ done | lab 50/50 |
-| 3 | A real edit before Save in each current bridge browser scenario | WordCraft DOCX and GridCraft XLSX passed a fresh isolated replay: file-list clicks, trusted edits, two user-attributed versions, confirmation, old-editor closure and fresh-session semantic reopen; HTTP 48/48, browser 48/48 ([evidence](lab/real-seafile/results/2026-11-03-gridcraft-pilot/README.md)). The combined GR-078 replay covers WordCraft, GridCraft, PdfCraft, VectorCraft and PhotoCraft ([report](docs/GR-078-COMBINED-SEAFILE-ROUTE-REPLAY.md)); GR-084 additionally covers one PdfCraft AcroForm edit/save/version and exact relay/readback/fresh-session equality ([report](docs/GR-084-PDFCRAFT-REAL-SEAFILE-ROUNDTRIP.md)). DeckCraft native `.deckcraft` passed 26/26 ([GR-081](docs/GR-081-DECKCRAFT-REAL-SEAFILE-ROUNDTRIP.md)); CADCraft DXF passed an isolated visible circle edit, save/version, exact relay/readback equality and fresh-session reopen in the 95/95 sequential browser run ([GR-082](docs/GR-082-CADCRAFT-REAL-SEAFILE-ROUNDTRIP.md)). DeckCraft and CADCraft were direct parent work, not Aptarchy. GR-085 now covers two real edits/saves and fresh-session reopen of the corrected GR-083 layout fixture, retaining its original main text (HTTP 48/48, browser 28/28; [report](docs/GR-085-WORDCRAFT-FIDELITY-REAL-EDIT.md)). Next, audit remaining dispatched scenarios; foreign `.pptx` and broad CADCraft DXF fidelity remain unverified |
-| 4 | Media apps (FilmCraft, EffectCraft, LightCraft) as export-only (`saveAs: true`) | decision recorded; at most one proof |
+| 1 | Retain experimental host ports | Historical Rust ports and evidence retained outside the zero-patch candidate. |
+| 2 | VectorCraft/FigCraft lab shims | Shim exists; durable-ACK/retry correction and semantic edit/reopen validation are in progress. |
+| 3 | Real edits and semantic reopen for the zero-patch candidate | Current WordCraft/GridCraft/PdfCraft/CADCraft evidence exists; VectorCraft/FigCraft runtime validation and exact final-candidate replay remain pending. Rust host ports are experimental and excluded. GR-078 is legacy integration evidence. See [closure ledger](docs/PROJECT-CLOSURE.md). |
+| 4 | Media scope | FilmCraft, EffectCraft and LightCraft are explicitly excluded from the candidate; no media route is shipped. |
 | 5 | Human pass on HTTPS in a desktop browser (WebGPU, clipboard, fonts, unload guard) | checklist in `lab/real-seafile/README.md`, run by the owner |
 | 6 | Bounded ONLYOFFICE vs WordCraft DOCX open/readback comparison | Corrected corpus opened in both editors (3 fixtures each), readback hashes unchanged, no downloads; limited screenshots retained. R2 source review passed; R3 archive findings were repaired and R4 returned a bounded PASS. No edit/save/version or full fidelity claim. Two WordCraft aborted requests remain unexplained; initial ONLYOFFICE 502 cause remains unverified ([GR-083](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md)) |
 | 7 | Second independent review (R2) of the report and the bridge | findings incorporated |

@@ -287,7 +287,7 @@ Lab (safe, isolated, no production, no upstream):
 
    **Independent review R2 of the bridge** (separate context, 2026-10-31): PASS_WITH_FIXES. Its HIGH findings — a 3xx or non-200 PutFile answer was reported as a save (urllib follows redirects and turns PutFile into a GET), a refused save left the host page "clean" so the tab could close without a prompt, a save whose answer was lost could never be retried (409 forever), and the README claimed `UserCanWrite`/locks as an authorization boundary — are fixed: redirects refused, every save read back and compared before 200, reconciliation on lost answer/5xx/redirect and on a stale expected version when the stored bytes already match, `X-Expected-Version` mandatory, refused saves keep the page dirty, expired tokens download the document instead of losing it, full CSP (`connect-src 'self'`, inline bootstrap by hash) on editor pages, `WOPISrc` restricted to the WOPI file endpoint, forged top-level `/edit` POSTs refused, per-route caching with ETag/304 and streamed bundles. What the bridge cannot fix and the READMEs now say plainly: Seahub's `PutFile` remains writable to anyone holding a token (U2), and the race window is the PutFile round-trip, not milliseconds.
 
-   The shim is a lab adapter: it drives the app through the control protocol the capabilities audit (§2.5) said not to use as *the* host contract. It is honest about that in its header, it needs no app change, and it is what makes an unpatched VectorCraft usable now; the upstream `host.rs` stays the proposal. The GR-083 WordCraft/ONLYOFFICE comparison opened three corrected DOCX fixtures in both editors with unchanged readback and no downloads. R1's OOXML-order finding was fixed; R2 source review passed and R3 evidence review is pending. No edit/save/version or full fidelity claim is made. Two WordCraft requests aborted; the initial ONLYOFFICE plugin/theme 502s did not recur, but both causes remain NOT VERIFIED. A non-headless HTTPS pass (WebGPU, clipboard, fonts and unload guard) by a human remains open.
+   The shim is a lab adapter: it drives the app through the control protocol the capabilities audit (§2.5) said not to use as *the* host contract. It is honest about that in its header, it needs no app change, and it is what makes an unpatched VectorCraft usable now; the upstream `host.rs` stays the proposal. The GR-083 WordCraft/ONLYOFFICE comparison opened three corrected DOCX fixtures in both editors with unchanged readback and no downloads. R1's OOXML-order finding was fixed; R2 source review passed; R3 archive findings were repaired and R4 returned bounded PASS. No edit/save/version or full fidelity claim is made. Two WordCraft requests aborted; the initial ONLYOFFICE plugin/theme 502s did not recur, but both causes remain NOT VERIFIED. A non-headless HTTPS pass (WebGPU, clipboard, fonts and unload guard) by a human remains open.
 5. Re-target GR-049/052 tests at the relay; add a protocol contract test for the upstream bridge messages.
 6. Rewrite `README.md`, `ROADMAP.md`, `AGENTS.md` to the new product form; archive the GR corpus under `docs/history/`.
 7. Prepare (do not publish) the ArtCraft `saveResult` RFC and a note on Seahub WOPI PutFile findings.
@@ -304,7 +304,7 @@ WHY=zero patches either side, public CE protocol, stateless, upgrade-resilient, 
 COMPONENTS_TO_KEEP=Seafile API knowledge, host-page save discipline, reconciliation/retry logic+tests, fixtures, bounded zip tooling, saveResult RFC draft
 COMPONENTS_TO_REMOVE=gateway sessions/capabilities/custom HTTP, Seahub+C patches (and live deployment), craft-platform fork, 13 app patches, VectorCraft polling, Nextcloud/ownCloud scope, GR review loop
 MAJOR_UNCERTAINTIES=U1–U7 above, minus U2/U3/U4 (resolved on CE 13.0.28, §7)
-NEXT_EXECUTABLE_STEP=review corrected GR-083 runtime evidence; continue remaining bridge browser-slice audits and owner-only prerequisites (ONLYOFFICE api.js 404, GR-015 rollback, Seafile 13 upgrade); human HTTPS pass; then final independent report/bridge review and project GPT gate
+NEXT_EXECUTABLE_STEP=close the zero-patch candidate ledger in docs/PROJECT-CLOSURE.md: exact six-editor replay, ONLYOFFICE regression, human HTTPS acceptance, frozen-candidate forensic review, then fresh final GPT gate. Production maintenance remains separate owner work.
 PRODUCTION_STATUS=UNTOUCHED
 UPSTREAM_STATUS=LOCKED
 ```
@@ -323,3 +323,15 @@ earlier failed private attempts. Bounded independent source review passed.
 Full layout/header/footer fidelity and independent runtime replay remain
 unverified. See [GR-085](GR-085-WORDCRAFT-FIDELITY-REAL-EDIT.md).
 Direct parent work, not Aptarchy completion; project GPT INCOMPLETE, upstream LOCKED.
+
+
+### Closure scope correction — 2026-11-08
+
+The candidate follows AGENTS.md rule 6: four unmodified upstream editors plus
+the declared VectorCraft/FigCraft JavaScript shims. Local Rust host ports stay
+experimental, outside this candidate. Default lab routing now preserves PPTX
+on ONLYOFFICE; the former experimental configuration is retained separately.
+GR-078 is retired integration evidence and does not close current bridge gaps.
+The owner accepted the documented non-atomic CheckFileInfo/PutFile host limit.
+The authoritative remaining requirements are [PROJECT-CLOSURE.md](PROJECT-CLOSURE.md).
+Project GPT remains INCOMPLETE; upstream remains LOCKED.
