@@ -22,11 +22,11 @@ This is a scope correction required by rule 6, not validation of those ports.
 | Requirement | Current evidence/state |
 | --- | --- |
 | WordCraft real edits and semantic fresh reopen | GR-085; safety replay GR-086, HTTP 48/48 + browser 28/28 |
-| GridCraft real edits and semantic fresh reopen | 2026-11-03 pilot; exact final-candidate replay pending |
-| PdfCraft field edit/save/reopen | GR-084; explicit PDF editor route, final-candidate replay pending |
-| CADCraft circle edit/save/reopen | GR-082; final-candidate replay pending |
-| VectorCraft and FigCraft semantic edits/reopen | Implemented, offline assertions pass; runtime and review pending |
-| ONLYOFFICE browser edit/save/version regression | Pending; API/conversion and opening checks alone are insufficient |
+| GridCraft real edits and semantic fresh reopen | 2026-11-08 closure run, HTTP 46/46 + browser 27/27 |
+| PdfCraft field edit/save/reopen | 2026-11-08 closure run, HTTP 46/46 + browser 18/18 |
+| CADCraft circle edit/save/reopen | 2026-11-08 closure run, HTTP 46/46 + browser 20/20 |
+| VectorCraft and FigCraft semantic edits/reopen | 2026-11-08 closure runs, HTTP 46/46 + browser 20/20 (VC), 21/21 (FC) |
+| ONLYOFFICE browser edit/save/version regression | 2026-11-08 closure run, 2 rounds, 12/12 checks |
 | Reproducible rootless launcher with exact asset identity | Implemented, five offline tests, bounded source review PASS; successful WordCraft real run retained in GR-086 |
 | Human HTTPS desktop acceptance | Pending: `lab/real-seafile/README.md` checklist |
 | Frozen clean candidate, exact SHA, forensic review | Pending |

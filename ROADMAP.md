@@ -21,8 +21,8 @@ under `docs/reviews/` and `integration/` as evidence.
 | # | Step | Done when |
 | --- | --- | --- |
 | 1 | Retain experimental host ports | Historical Rust ports and evidence retained outside the zero-patch candidate. |
-| 2 | VectorCraft/FigCraft lab shims | Shim exists; durable-ACK/retry correction and semantic edit/reopen validation are in progress. |
-| 3 | Real edits and semantic reopen for the zero-patch candidate | Current WordCraft/GridCraft/PdfCraft/CADCraft evidence exists; VectorCraft/FigCraft runtime validation and exact final-candidate replay remain pending. Rust host ports are experimental and excluded. GR-078 is legacy integration evidence. See [closure ledger](docs/PROJECT-CLOSURE.md). |
+| 2 | VectorCraft/FigCraft lab shims | **DONE** 2026-11-08: shims validated with real edits and semantic reopen (HTTP 46/46 + browser 20/20 VC, 21/21 FC). |
+| 3 | Real edits and semantic reopen for the zero-patch candidate | **DONE** 2026-11-08: all 7 editor paths (WordCraft, GridCraft, PdfCraft, CADCraft, VectorCraft, FigCraft, ONLYOFFICE) pass HTTP slice 46/46 and full browser cycle with real edits, version creation, and fresh-session reopen. |
 | 4 | Media scope | FilmCraft, EffectCraft and LightCraft are explicitly excluded from the candidate; no media route is shipped. |
 | 5 | Human pass on HTTPS in a desktop browser (WebGPU, clipboard, fonts, unload guard) | checklist in `lab/real-seafile/README.md`, run by the owner |
 | 6 | Bounded ONLYOFFICE vs WordCraft DOCX open/readback comparison | Corrected corpus opened in both editors (3 fixtures each), readback hashes unchanged, no downloads; limited screenshots retained. R2 source review passed; R3 archive findings were repaired and R4 returned a bounded PASS. No edit/save/version or full fidelity claim. Two WordCraft aborted requests remain unexplained; initial ONLYOFFICE 502 cause remains unverified ([GR-083](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md)) |
