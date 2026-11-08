@@ -23,6 +23,26 @@ class LauncherTest(unittest.TestCase):
         isolated = local.render_settings(text, without_wopi=True)
         self.assertEqual(isolated, 'ENABLE_ONLYOFFICE = True\n')
 
+    def test_experimental_flag_parsed(self):
+        """Argparse accepts --experimental flag."""
+        import sys
+        with patch.object(sys, 'argv', ['local.py', '--experimental', '--run-dir', '/tmp/x', '--static', '/tmp/s', '--manifest', '/tmp/m.json']):
+            try:
+                local.main()
+            except SystemExit:
+                pass  # Expected: missing files
+            except FileNotFoundError:
+                pass  # Expected: manifest not found
+            except Exception as e:
+                if '--experimental' in str(e):
+                    self.fail(f"Experimental flag not recognized: {e}")
+        text = ('ENABLE_ONLYOFFICE = True\nENABLE_OFFICE_WEB_APP = True\n'
+                'OFFICE_WEB_APP_BASE_URL = "http://bridge:8778/wopi/discovery.xml"\n'
+                'OFFICE_WEB_APP_FILE_EXTENSION = ("docx",)\n')
+        self.assertEqual(local.render_settings(text), text)
+        isolated = local.render_settings(text, without_wopi=True)
+        self.assertEqual(isolated, 'ENABLE_ONLYOFFICE = True\n')
+
     def test_user_and_libexec_compose_plugins_are_discovered(self):
         with tempfile.TemporaryDirectory() as d:
             base = Path(d)

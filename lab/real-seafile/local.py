@@ -137,6 +137,8 @@ def main():
                         help='run the ODT edit/save/reopen regression instead of Craft scenarios')
     parser.add_argument('--without-wopi', action='store_true',
                         help='omit the bridge WOPI keys to isolate stock ONLYOFFICE (diagnostic only)')
+    parser.add_argument('--experimental', action='store_true',
+                        help='use experimental editors.json and Seahub settings (Rust ports)')
     args = parser.parse_args()
     if args.onlyoffice_regression and (args.editor or args.wordcraft_fixture):
         parser.error('ONLYOFFICE regression cannot select a Craft editor or fixture')
@@ -162,9 +164,15 @@ def main():
     env.update(values)
     env.update({f'{name.upper()}_PORT': str(port) for name, port in
                 zip(('seafile', 'onlyoffice', 'bridge'), ports)})
+    # Determine editor config early for env
+    if args.experimental:
+        editor_config = run / 'app/lab/real-seafile/editors.experimental.json'
+    else:
+        editor_config = run / 'app/lab/real-seafile/editors.json'
     env.update(BROWSER_ONLY_EDITOR=args.editor,
                BROWSER_WORDCRAFT_FIXTURE=args.wordcraft_fixture,
-               BROWSER_SCRIPT='run_onlyoffice_browser.py' if args.onlyoffice_regression else 'run_browser.py')
+               BROWSER_SCRIPT='run_onlyoffice_browser.py' if args.onlyoffice_regression else 'run_browser.py',
+               BROWSER_EDITOR_CONFIG=str(editor_config))
     log = run / 'launcher.log'
     command(['podman', '--remote=false', 'info', '--format', '{{.Host.Security.Rootless}}'], run, env, log)
     if log.read_text().strip() != 'true':
@@ -172,9 +180,14 @@ def main():
     (run / 'project.txt').write_text(project + '\n')
     (run / 'results').mkdir()
     # Configure only the Seafile container belonging to this new project.
-    config = (run / 'app/lab/real-seafile/seahub_settings.extra.py').read_text()
+    if args.experimental:
+        config_path = run / 'app/lab/real-seafile/seahub_settings.experimental.py'
+    else:
+        config_path = run / 'app/lab/real-seafile/seahub_settings.extra.py'
+    config = config_path.read_text()
     config = config.replace('__ONLYOFFICE_JWT_SECRET__', values['ONLYOFFICE_JWT_SECRET'])
     config = render_settings(config, args.without_wopi)
+    # editor_config is already defined above in both branches
     script = ("from pathlib import Path; import time\n"
               "p=Path('/shared/seafile/conf/seahub_settings.py')\n"
               "for _ in range(120):\n"
