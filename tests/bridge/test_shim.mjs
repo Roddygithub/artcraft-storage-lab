@@ -4,10 +4,12 @@ import vm from 'node:vm';
 
 const messages = [], handlers = {};
 let saved = new Uint8Array([1]);
+let editorDirty = false;
 const origin = 'https://bridge.invalid';
 const parent = { location: { origin }, postMessage: message => messages.push(message) };
 const window = { parent, vectorcraft: {
   commands: async () => [], captureDownloads() {},
+  request: async () => ({ dirty: editorDirty }),
   execute: async () => ({}), files: () => [{ path: 'test.svg' }], readFile: () => saved
 }, addEventListener: (kind, fn) => { handlers[kind] = fn; } };
 vm.runInNewContext(readFileSync(new URL('../../lab/real-seafile/static/host-shim.js', import.meta.url), 'utf8'), {
@@ -35,6 +37,22 @@ deliver({ type: 'vectorcraft:saveResult', ticket: first.ticket, ok: true, versio
 assert.equal(messages.some(m => m.type === 'vectorcraft:dirty' && !m.dirty), false,
   'stale acknowledgement must not clear pending state');
 deliver({ type: 'vectorcraft:saveResult', ticket: saves[1].ticket, ok: true, version: '2' });
+await settle();
 assert.equal(messages.at(-1).type, 'vectorcraft:dirty');
 assert.equal(messages.at(-1).dirty, false);
+
+saved = new Uint8Array([3]);
+shortcut(); await settle();
+const third = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
+editorDirty = true; // B is edited after A was serialized, while A waits for the host.
+deliver({ type: 'vectorcraft:saveResult', ticket: third.ticket, ok: true, version: '3' });
+await settle();
+assert.equal(messages.at(-1).dirty, true, 'verified A cannot clear newer unsaved B');
+saved = new Uint8Array([4]); // The next explicit save serializes B.
+shortcut(); await settle();
+const fourth = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
+editorDirty = false;
+deliver({ type: 'vectorcraft:saveResult', ticket: fourth.ticket, ok: true, version: '4' });
+await settle();
+assert.equal(messages.at(-1).dirty, false, 'the later verified save can recover normally');
 console.log('PASS: shim waits for matching storage ACK and permits identical-byte retry');

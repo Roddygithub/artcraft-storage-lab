@@ -21,7 +21,7 @@
   try { if (parent.location.origin !== origin) return; } catch (e) { return; }
 
   var api = null, openedName = null, lastHash = null, ready = false, dirtyReported = null;
-  var pending = null, nextTicket = 0, saveFailed = false;
+  var pending = null, nextTicket = 0, saveFailed = false, lastAck = null;
 
   function post(type, payload, transfer) {
     var m = { type: app + ':' + type };
@@ -61,15 +61,25 @@
     if (d.type === app + ':saveResult') {
       if (!pending || d.ticket !== pending.ticket) return;
       clearTimeout(pending.timer);
+      var saved = pending;
+      pending = null;
       if (d.ok === true) {
-        lastHash = pending.hash;
+        lastHash = saved.hash;
         saveFailed = false;
-        setDirty(false);
+        lastAck = d.ticket;
+        // The ACK verifies the captured bytes, not edits made after serialization.
+        // Keep the guard until the current editor state itself reports clean.
+        if (typeof api.request === 'function') {
+          api.request('document.inspect', { depth: 0 }).then(function (result) {
+            if (pending || lastAck !== d.ticket) return;
+            var dirty = findFlag(result, ['modified', 'dirty', 'unsaved', 'unsavedChanges'], 0);
+            setDirty(dirty !== false, dirty !== false);
+          }, function () { setDirty(true, true); });
+        } else setDirty(true, true);
       } else {
         saveFailed = true;
         setDirty(true);
       }
-      pending = null;
       return;
     }
     if (d.type !== app + ':open') return;
@@ -164,8 +174,8 @@
     }
   }
 
-  function setDirty(v) {
-    if (dirtyReported === v) return;
+  function setDirty(v, force) {
+    if (dirtyReported === v && !force) return;
     if (post('dirty', { dirty: v })) dirtyReported = v;
   }
 
@@ -174,7 +184,7 @@
     if (!ready || typeof api.request !== 'function') return;
     api.request('document.inspect', { depth: 0 }).then(function (r) {
       var v = findFlag(r, ['modified', 'dirty', 'unsaved', 'unsavedChanges'], 0);
-      if (typeof v === 'boolean' && (v || (!pending && !saveFailed))) setDirty(v);
+      if (typeof v === 'boolean' && (v || (!pending && !saveFailed))) setDirty(v, v && !!pending);
     }, function () {});
   }
   function findFlag(o, keys, depth) {

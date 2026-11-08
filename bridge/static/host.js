@@ -218,6 +218,8 @@
       if (d.dirty) {
         state.dirty = true;
         state.dirtyRevision++;
+      } else if (!state.failedSave && !state.saving) {
+        state.dirty = false;
       }
       if (state.dirty && !state.saving && !state.failedSave) status('unsaved changes', 'warn');
     } else if (kind === 'save') {

@@ -136,14 +136,25 @@ def svg_has_rectangle(data, geometry):
         root = ET.fromstring(data)
         x, y, w, h = (geometry[k] for k in ("x", "y", "width", "height"))
         corners = {(x, y), (x+w, y), (x+w, y+h), (x, y+h)}
-        def visit(node):
-            tag = node.tag.rsplit("}", 1)[-1]
-            if tag in ("metadata", "defs", "clipPath", "mask", "symbol") or "transform" in node.attrib:
+        if any(n.tag.rsplit("}", 1)[-1] == "style" for n in root.iter()):
+            return False
+        def visit(node, fill="black", stroke="none", stroke_width="1", fill_opacity="1", stroke_opacity="1"):
+            if not node.tag.startswith("{http://www.w3.org/2000/svg}"):
                 return False
-            if tag == "rect":
+            tag = node.tag.rsplit("}", 1)[-1]
+            if tag in ("metadata", "defs", "clipPath", "mask", "symbol") or any(
+                key in node.attrib for key in ("transform", "style", "class", "filter", "mask", "clip-path")
+            ) or node.get("display") == "none" or node.get("visibility") in ("hidden", "collapse") or float(node.get("opacity", "1")) <= 0:
+                return False
+            fill, stroke = node.get("fill", fill), node.get("stroke", stroke)
+            stroke_width = node.get("stroke-width", stroke_width)
+            fill_opacity, stroke_opacity = node.get("fill-opacity", fill_opacity), node.get("stroke-opacity", stroke_opacity)
+            painted = (fill not in ("none", "transparent") and float(fill_opacity) > 0) or (
+                stroke not in ("none", "transparent") and float(stroke_width) > 0 and float(stroke_opacity) > 0)
+            if tag == "rect" and painted:
                 if all(float(node.get(k, "0")) == geometry[k] for k in geometry):
                     return True
-            if tag == "path":
+            if tag == "path" and painted:
                 d = node.get("d", "")
                 tokens = re.findall(r"[A-Za-z]|[-+]?(?:\d*\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?", d)
                 # One closed, four-corner, straight-edged rectangle; no curves or metadata search.
@@ -158,7 +169,7 @@ def svg_has_rectangle(data, geometry):
                         a[0] == b[0] or a[1] == b[1] for a, b in zip(points, points[1:]+points[:1])
                     ):
                         return True
-            return any(visit(child) for child in node)
+            return any(visit(child, fill, stroke, stroke_width, fill_opacity, stroke_opacity) for child in node)
         return root.tag == "{http://www.w3.org/2000/svg}svg" and visit(root)
     except (ET.ParseError, ValueError, TypeError):
         return False
@@ -187,6 +198,12 @@ def figcraft_has_frame(data, marker, geometry):
         )
     except (KeyError, TypeError, ValueError, zipfile.BadZipFile):
         return False
+
+
+def select_active_browser_fixtures(fixtures, editors):
+    """Assets on disk cannot opt an experimental route into the active candidate."""
+    return {name: fixture for name, fixture in fixtures.items()
+            if fixture[0] in editors and name.rsplit('.', 1)[-1] in editors[fixture[0]]["extensions"]}
 
 
 def scene_has_geometry(scene, geometry, marker=None):
@@ -828,6 +845,9 @@ def frames_dump(page):
 
 def main():
     os.makedirs(RESULTS, exist_ok=True)
+    config_path = os.environ.get("BROWSER_EDITOR_CONFIG", os.path.join(os.path.dirname(__file__), "editors.json"))
+    with open(config_path) as source:
+        active_editors = json.load(source)
     admin = rs.api_token(rs.ADMIN, rs.ADMIN_PW)
     st, me = rs.api(admin, "GET", "/api2/account/info/")
     admin_username = me.get("email", rs.ADMIN)
@@ -847,7 +867,10 @@ def main():
     fixtures = select_wordcraft_fidelity_fixture(
         fixtures, os.environ.get("BROWSER_WORDCRAFT_FIXTURE", "").strip()
     )
+    fixtures = select_active_browser_fixtures(fixtures, active_editors)
     only_editor = os.environ.get("BROWSER_ONLY_EDITOR", "").strip()
+    if only_editor and only_editor not in active_editors:
+        raise ValueError("requested browser editor is not in the active configuration")
     fixtures = select_browser_fixtures(fixtures, only_editor)
     STATIC = "/app/lab/real-seafile/static"
     # Editors whose bundle is not in the lab (not built yet) are skipped, not failed.
@@ -1790,6 +1813,8 @@ def main():
         # Apps with no hand-writable format and no page API: let the standalone app save a new
         # document as a browser download, and use those bytes as the Seafile fixture.
         for editor, fname, ext in (("soundcraft", "test.scraft", "scraft"), ("designcraft", "test.designcraft", "designcraft")):
+            if editor not in active_editors:
+                continue
             if only_editor and editor != only_editor:
                 continue
             if not os.path.isdir(os.path.join(STATIC, editor)):
@@ -1815,7 +1840,7 @@ def main():
 
         # FigCraft has no file format we can write by hand: let the app make one through its page
         # API on the standalone editor page, then upload it to Seafile and run the host flow on it.
-        if (not only_editor or only_editor == "figcraft") and os.path.isdir(os.path.join(STATIC, "figcraft")):
+        if "figcraft" in active_editors and (not only_editor or only_editor == "figcraft") and os.path.isdir(os.path.join(STATIC, "figcraft")):
             try:
                 fig = fixctx.new_page()
                 fig.goto(f"{rs.BRIDGE}/editors/figcraft/index.html?control", wait_until="commit", timeout=60000)   # ?control: opt-in page API
@@ -1857,7 +1882,7 @@ def main():
 
         # Generate a valid native fixture with DeckCraft itself. The HTTP slice separately
         # asserts the .pptx route; this browser slice is specifically the native edit workflow.
-        if (not only_editor or only_editor == "deckcraft") and os.path.isdir(os.path.join(STATIC, "deckcraft")):
+        if "deckcraft" in active_editors and (not only_editor or only_editor == "deckcraft") and os.path.isdir(os.path.join(STATIC, "deckcraft")):
             try:
                 sp = fixctx.new_page()
                 sp.goto(f"{rs.BRIDGE}/editors/deckcraft/index.html", wait_until="domcontentloaded", timeout=60000)

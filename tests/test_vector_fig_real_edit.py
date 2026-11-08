@@ -15,7 +15,7 @@ import zipfile
 # Load only the pure helpers: no credentials, Playwright, services or network.
 source = Path(__file__).resolve().parents[1] / 'lab/real-seafile/run_browser.py'
 tree = ast.parse(source.read_text())
-names = {'svg_has_rectangle', 'figcraft_has_frame', 'scene_has_geometry', 'page_api'}
+names = {'svg_has_rectangle', 'figcraft_has_frame', 'scene_has_geometry', 'page_api', 'select_active_browser_fixtures'}
 namespace = dict(BytesIO=BytesIO, json=json, re=re, ET=ET, zipfile=zipfile)
 exec(compile(ast.Module(body=[n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in names],
                         type_ignores=[]), str(source), 'exec'), namespace)
@@ -32,6 +32,10 @@ assert svg_has_rectangle(svg('<rect width="137" height="91"/>'), g)
 for body in (f'<metadata>{shape}</metadata>', f'<defs>{shape}</defs>',
              shape.replace('137', '136'), shape.replace(' L137 91', ' C137 91'),
              shape.replace(' Z', ''), f'<g transform="translate(3 4)">{shape}</g>',
+             f'<g display="none">{shape}</g>', f'<g opacity="0">{shape}</g>',
+             f'<g fill-opacity="0">{shape}</g>', '<rect xmlns="urn:other" width="137" height="91"/>',
+             '<rect width="137" height="91" fill="none" stroke="none"/>',
+             f'<g fill="none" stroke="none">{shape}</g>',
              '<metadata>width=137 height=91</metadata>'):
     assert not svg_has_rectangle(svg(body), g), body
 assert not svg_has_rectangle(b'not SVG', g)
@@ -62,6 +66,8 @@ assert not scene_has_geometry({'pages': [{'id': 1, 'type': 'PAGE', 'pluginData':
 assert not scene_has_geometry({'layers': [], 'metadata': {'id': 2, 'kind': 'Path', 'bounds': g}}, g)
 assert not scene_has_geometry({'layers': [{'id': 2, 'kind': 'Path', 'bounds': g, 'visible': False}]}, g)
 assert not scene_has_geometry({'id': 2, 'type': 'FRAME', 'name': 'wrong', 'absoluteBounds': g}, g, 'unique-frame')
+fixtures = {'a.docx': ('wordcraft', b'x', ''), 'a.png': ('photocraft', b'x', '')}
+assert namespace['select_active_browser_fixtures'](fixtures, {'wordcraft': {'extensions': ['docx']}}) == {'a.docx': fixtures['a.docx']}
 
 class Host:
     def evaluate(self, script, args):
