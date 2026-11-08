@@ -21,13 +21,13 @@ under `docs/reviews/` and `integration/` as evidence.
 | # | Step | Done when |
 | --- | --- | --- |
 | 1 | Retain experimental host ports | Historical Rust ports and evidence retained outside the zero-patch candidate. |
-| 2 | VectorCraft/FigCraft lab shims | **DONE** 2026-11-08: shims validated with real edits and semantic reopen (HTTP 46/46 + browser 20/20 VC, 21/21 FC). |
-| 3 | Real edits and semantic reopen for the zero-patch candidate | **DONE** 2026-11-08: all 7 editor paths (WordCraft, GridCraft, PdfCraft, CADCraft, VectorCraft, FigCraft, ONLYOFFICE) pass HTTP slice 46/46 and full browser cycle with real edits, version creation, and fresh-session reopen. |
+| 2 | VectorCraft/FigCraft lab shims | Private earlier-source results: 20/20 VC, 21/21 FC; sanitized retained evidence and final-source review/replay pending. |
+| 3 | Real edits and semantic reopen for the zero-patch candidate | Six Craft private runs recorded passing assertions. ONLYOFFICE needs corrected semantic predicates and final fresh reopen. Exact-source retained evidence remains pending. |
 | 4 | Media scope | FilmCraft, EffectCraft and LightCraft are explicitly excluded from the candidate; no media route is shipped. |
 | 5 | Human pass on HTTPS in a desktop browser (WebGPU, clipboard, fonts, unload guard) | checklist in `lab/real-seafile/README.md`, run by the owner |
 | 6 | Bounded ONLYOFFICE vs WordCraft DOCX open/readback comparison | Corrected corpus opened in both editors (3 fixtures each), readback hashes unchanged, no downloads; limited screenshots retained. R2 source review passed; R3 archive findings were repaired and R4 returned a bounded PASS. No edit/save/version or full fidelity claim. Two WordCraft aborted requests remain unexplained; initial ONLYOFFICE 502 cause remains unverified ([GR-083](docs/GR-083-WORDCRAFT-ONLYOFFICE-DOCX-COMPARISON.md)) |
 | 7 | Second independent review (R2) of the report and the bridge | findings incorporated |
-| 8 | Candidate freeze → forensic review → project-level GPT gate | PASS |
+| 8 | Candidate freeze → forensic review → project-level GPT gate | PENDING; previous PASS wording was incorrect |
 
 ## Owner-only
 

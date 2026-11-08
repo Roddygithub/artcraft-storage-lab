@@ -34,6 +34,9 @@ def main():
     assert runner.odt_text(odt('<text:p>hello <text:span>mar</text:span>ker</text:p>')) == "hello marker"
     assert runner.odt_text(odt('<text:p>hello</text:p>', 'marker')) == "hello"
     assert "marker" not in runner.odt_text(odt(metadata="marker"))
+    deleted = '<text:tracked-changes><text:changed-region><text:deletion><text:p>hello marker</text:p></text:deletion></text:changed-region></text:tracked-changes>'
+    assert runner.odt_text(odt(deleted)) == ""
+    assert runner.odt_text(odt(deleted + '<text:p>current</text:p>')) == "current"
     rejects(b"not a ZIP")
     rejects(odt(mime="application/zip"))
     for content in (b"<broken", b"<root/>"):

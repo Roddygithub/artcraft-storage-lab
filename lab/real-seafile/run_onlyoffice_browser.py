@@ -10,6 +10,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import re
 from pathlib import Path
 import time
 import traceback
@@ -34,6 +35,11 @@ def odt_text(data):
         body = root.find(f"{{{OFFICE}}}body/{{{OFFICE}}}text")
         if root.tag != f"{{{OFFICE}}}document-content" or body is None:
             raise ValueError("missing ODF text body")
+        # Deleted revisions are stored under the body but are not current text.
+        for parent in body.iter():
+            for child in list(parent):
+                if child.tag == f"{{{TEXT}}}tracked-changes":
+                    parent.remove(child)
         return "\n".join("".join(p.itertext()) for p in body.iter()
                          if p.tag in (f"{{{TEXT}}}p", f"{{{TEXT}}}h"))
     except (zipfile.BadZipFile, KeyError, ET.ParseError, RuntimeError) as exc:
@@ -89,7 +95,7 @@ def main():
         with sync_playwright() as p:
             browser = p.chromium.launch(args=["--disable-dev-shm-usage"])
             try:
-                for round_no, marker in enumerate(markers, 1):
+                for round_no, marker in enumerate([*markers, None], 1):
                     before = rs.history(token, repo_id, name)
                     require(f"round{round_no}_history_available", bool(before))
                     ctx = browser.new_context(viewport={"width": 1400, "height": 900},
@@ -137,6 +143,23 @@ def main():
                             raise
                         frame.locator("#editor_sdk").wait_for(state="visible", timeout=30000)
                         frame.locator("#toolbar").wait_for(state="visible", timeout=30000)
+                        if marker is None:
+                            # Final output must be opened by a new editor, not merely
+                            # downloaded through the storage API. Native Find searches
+                            # the parsed current document without injecting editor APIs.
+                            editor.keyboard.press("Control+f")
+                            search = frame.locator("#search-adv-text input")
+                            search.wait_for(state="visible", timeout=30000)
+                            for index, value in enumerate([baseline, *markers]):
+                                search.fill(value)
+                                search.press("Enter")
+                                frame.locator("#search-adv-results-number").filter(
+                                    has_text=re.compile(r"\b[1-9][0-9]*\b")
+                                ).wait_for(state="visible", timeout=30000)
+                                require(f"final_reopen_current_text_{index}", True)
+                            editor.screenshot(path=str(results / "onlyoffice-final-reopen.png"))
+                            require("final_reopen_no_browser_download", not downloads)
+                            continue
                         # Canvas readiness plus actual mutation/readback is mandatory; a
                         # missing frame/canvas cannot turn into a conditional pass.
                         # The overlay canvas above #id_viewer owns pointer input.

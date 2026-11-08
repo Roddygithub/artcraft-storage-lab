@@ -1,17 +1,19 @@
-# 2026-11-08 — Zero-Patch Candidate complete (7 editor paths)
+# 2026-11-08 — closure audit correction
 
-**Frozen commit:** `51ff292ea843c01269f2626c3d011c29c915a1ec` (branch `work/project-closure-20261108`)
+The earlier completion/freeze declaration for `51ff292` is withdrawn.
+The independent bounded recovery audit of `2825f4c` found private-only evidence,
+source identity mismatches, incorrect HTTP coverage categories, and ONLYOFFICE
+11 assertions rather than 12 with no final fresh reopen after the second save.
+The purported forensic review was a parent inventory, not an independent gate.
+See `docs/FORENSIC-REVIEW-20261108.md` and `docs/PROJECT-CLOSURE.md`.
 
-- All 7 editor paths demonstrate real edit → save → new version → fresh reopen on stock Seafile CE 13.0.28:
-  WordCraft (28/28), GridCraft (27/27), PdfCraft (18/18), CADCraft (20/20), VectorCraft (20/20), FigCraft (21/21), ONLYOFFICE (12/12)
-- HTTP slice 46/46 for all paths
-- Bridge tests 32/32, Host/Shim 1/1, Launcher offline 6/6
-- Architecture: stateless WOPI bridge + upstream bundles + Seahub config only (no Seafile patch, no editor patch)
-- Accepted limitations documented: CheckFileInfo/PutFile race, Seahub direct PutFile with read-only token, token revocation window, VectorCraft/FigCraft shim, same-origin trust model
-- Forensic review: `docs/FORENSIC-REVIEW-20261108.md`
-- GPT queue: `docs/GPT-REVIEW-QUEUE.md`
-
-**Next:** Human HTTPS desktop acceptance (10-point checklist, `deploy/bridge/` + TLS), then GPT gate.
+The subsequent shim rewrite failed its existing regression. Restored the prior
+implementation; the standalone shim, host, and coupled lifecycle checks pass.
+Tracked legacy files moved to an ignored archive are restored byte-for-byte;
+the archive copies remain, preserving historical evidence and test paths.
+ONLYOFFICE tracked-deletion filtering and final native Find-based fresh reopen
+are implemented but await source review and new runtime evidence.
+Project INCOMPLETE; upstream LOCKED. No production changes.
 
 # 2026-11-08 — completion candidate preparation
 

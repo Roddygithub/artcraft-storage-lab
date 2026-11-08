@@ -19,6 +19,10 @@ This is a scope correction required by rule 6, not validation of those ports.
 
 ## Evidence still required before freeze
 
+The recovery audit of `2825f4c` invalidated the previous freeze/completion claim.
+Private closure counts below are diagnostic until committed with exact source
+identities and independently reviewed. See `FORENSIC-REVIEW-20261108.md`.
+
 | Requirement | Current evidence/state |
 | --- | --- |
 | WordCraft real edits and semantic fresh reopen | GR-085; safety replay GR-086, HTTP 48/48 + browser 28/28 |
@@ -26,7 +30,7 @@ This is a scope correction required by rule 6, not validation of those ports.
 | PdfCraft field edit/save/reopen | 2026-11-08 closure run, HTTP 46/46 + browser 18/18 |
 | CADCraft circle edit/save/reopen | 2026-11-08 closure run, HTTP 46/46 + browser 20/20 |
 | VectorCraft and FigCraft semantic edits/reopen | 2026-11-08 closure runs, HTTP 46/46 + browser 20/20 (VC), 21/21 (FC) |
-| ONLYOFFICE browser edit/save/version regression | 2026-11-08 closure run, 2 rounds, 12/12 checks |
+| ONLYOFFICE browser edit/save/version regression | Earlier private run: 11 assertions, no final reopen after save two; corrected parser/reopen needs review and replay |
 | Reproducible rootless launcher with exact asset identity | Implemented, five offline tests, bounded source review PASS; successful WordCraft real run retained in GR-086 |
 | Human HTTPS desktop acceptance | Pending: `lab/real-seafile/README.md` checklist |
 | Frozen clean candidate, exact SHA, forensic review | Pending |
