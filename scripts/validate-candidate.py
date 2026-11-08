@@ -20,7 +20,7 @@ PYTHON_CHECKS = [
     'tests/test_pdfcraft_real_edit.py', 'tests/test_cadcraft_real_edit.py',
     'tests/test_vector_fig_real_edit.py', 'tests/test_docx_fidelity_corpus.py',
     'tests/test_wordcraft_browser_fixture.py', 'tests/test_wordcraft_reopen_wait.py',
-    'tests/test_deckcraft_real_edit.py', 'tests/test_deckcraft_render_wait.py',
+    'tests/test_pptx_roundtrip_fixture.py', 'tests/test_deckcraft_real_edit.py', 'tests/test_deckcraft_render_wait.py',
     'tests/test_xlsx_fixture.py', 'tests/test_gr041_craft_zip_limits.py',
 ]
 NODE_CHECKS = ['tests/bridge/test_host.mjs', 'tests/bridge/test_host_shim.mjs',

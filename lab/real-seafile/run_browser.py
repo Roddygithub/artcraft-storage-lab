@@ -874,6 +874,9 @@ def main():
         "test.svg": ("vectorcraft", rs.SVG_V1, ""),          # page-API shim, not an upstream bridge
         "test.png": ("photocraft", rs.MINIMAL_PNG, ""),       # lab host.rs port, built from upstream source
     }
+    if 'pptx' in active_editors.get('deckcraft', {}).get('extensions', []):
+        from pptx_roundtrip_fixture import synthetic_pptx
+        fixtures['synthetic.pptx'] = ('deckcraft', synthetic_pptx(), '')
     fixtures = select_wordcraft_fidelity_fixture(
         fixtures, os.environ.get("BROWSER_WORDCRAFT_FIXTURE", "").strip()
     )
@@ -1439,6 +1442,83 @@ def main():
             reopen.close()
             return page
 
+        def pptx_real_edit_flow(page, name, content, box, host, status, before):
+            """One real PPTX edit, same-file host save and fresh authenticated reopen."""
+            from pptx_roundtrip_fixture import TITLE, slide_texts
+
+            marker = "pptxtyped" + os.urandom(5).hex()
+
+            def semantic(data):
+                try:
+                    paragraphs = "\n".join(text for slide in slide_texts(data) for text in slide)
+                    return TITLE in paragraphs and marker in paragraphs
+                except ValueError:
+                    return False
+
+            baseline = _wait_for_deckcraft_canvas(host, 90, lambda image: bool(image)) if host else None
+            check("pptx_canvas_ready_before_typing", baseline is not None)
+            if baseline is None:
+                return page
+            with open(os.path.join(RESULTS, "pptx-original.pptx"), "wb") as output:
+                output.write(content)
+            page.screenshot(path=os.path.join(RESULTS, "pptx-before-edit.png"))
+            page.mouse.dblclick(box["x"] + box["width"] * 0.54,
+                                box["y"] + box["height"] * 0.45, delay=100)
+            page.wait_for_timeout(500)
+            page.keyboard.press("Control+End")
+            page.keyboard.type(marker, delay=35)
+            page.mouse.click(box["x"] + box["width"] * 0.25,
+                             box["y"] + box["height"] * 0.65)
+            payload, confirmed = save_and_capture(page, status, timeout=120)
+            check("pptx_save_payload_contains_original_title_and_typed_marker", payload is not None and semantic(payload))
+            check("pptx_save_confirmed_by_host", confirmed, f"status={status()!r}")
+            after = before
+            deadline = time.monotonic() + 60
+            while time.monotonic() < deadline:
+                after = rs.history(admin, repo_id, name)
+                if len(after) > len(before):
+                    break
+                page.wait_for_timeout(250)
+            check("pptx_new_version_attributed_to_user", len(after) > len(before) and after[0]["creator"] == admin_username)
+            got, _ = rs.download(admin, repo_id, name)
+            check("pptx_same_file_readback_equals_relay", payload is not None and got == payload and got != content)
+            check("pptx_readback_retains_title_and_typed_marker", semantic(got))
+            for filename, data in (("pptx-first-relay.pptx", payload), ("pptx-readback.pptx", got)):
+                if data is not None:
+                    with open(os.path.join(RESULTS, filename), "wb") as output:
+                        output.write(data)
+            page.screenshot(path=os.path.join(RESULTS, "pptx-saved.png"))
+            page.close()
+            check("pptx_old_page_closed", page.is_closed())
+            fresh = browser.new_context(viewport={"width": 1400, "height": 900}, ignore_https_errors=True)
+            track_downloads(fresh, downloads)
+            fresh.on("page", attach)
+            responses = []
+
+            def capture(response):
+                if response.url.endswith("/relay/file"):
+                    responses.append((response.status, response.body()))
+
+            fresh.on("response", capture)
+            try:
+                reopened = fresh.new_page()
+                reopened.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
+                reopened.fill("input[name=login]", rs.ADMIN)
+                reopened.fill("input[name=password]", rs.ADMIN_PW)
+                reopened.click("button[type=submit], input[type=submit]")
+                reopened.wait_for_url(lambda url: "/accounts/login" not in url, timeout=30000)
+                reopened = open_from_seafile_list(reopened, rs.SEAFILE, repo_id, name)
+                check("pptx_fresh_session_file_list_reopen", True)
+                host2 = find_frame(reopened, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=reopened.main_frame)
+                body = wait_for_saved_response(reopened, responses, 180)
+                canvas = _wait_for_deckcraft_canvas(host2, 90, lambda image: bool(image)) if host2 else None
+                check("pptx_fresh_editor_loaded_persisted_edit", body is not None and body == got and semantic(body) and canvas is not None)
+                reopened.screenshot(path=os.path.join(RESULTS, "pptx-reopened.png"))
+                check("pptx_save_did_not_download", not downloads, f"downloads={len(downloads)}")
+            finally:
+                fresh.close()
+            return attach(ctx.new_page())
+
         def deckcraft_real_edit_flow(page, name, content, box, status, before):
             """Edit a native DeckCraft document with trusted browser input, save through WOPI,
             then reopen in a fresh Seafile session and make a second semantic edit. DeckCraft's
@@ -1903,7 +1983,7 @@ def main():
 
         # Generate a valid native fixture with DeckCraft itself. The HTTP slice separately
         # asserts the .pptx route; this browser slice is specifically the native edit workflow.
-        if "deckcraft" in active_editors and (not only_editor or only_editor == "deckcraft") and os.path.isdir(os.path.join(STATIC, "deckcraft")):
+        if "synthetic.pptx" not in fixtures and "deckcraft" in active_editors and (not only_editor or only_editor == "deckcraft") and os.path.isdir(os.path.join(STATIC, "deckcraft")):
             try:
                 sp = fixctx.new_page()
                 sp.goto(f"{rs.BRIDGE}/editors/deckcraft/index.html", wait_until="domcontentloaded", timeout=60000)
@@ -1962,7 +2042,7 @@ def main():
                 if page is not original:
                     attach(page)
                 check("gridcraft_opened_from_seafile_file_list", True)
-            elif editor == "deckcraft" and name.endswith(".deckcraft"):
+            elif editor == "deckcraft":
                 original = page
                 page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
                 if page is not original:
@@ -2014,6 +2094,9 @@ def main():
             if editor == "pdfcraft":
                 # A fillable synthetic AcroForm gives PdfCraft an actual content edit to save.
                 page = pdfcraft_real_edit_flow(page, name, content, box, status, before)
+                continue
+            if editor == "deckcraft" and name.endswith(".pptx"):
+                page = pptx_real_edit_flow(page, name, content, box, host, status, before)
                 continue
             if editor == "deckcraft" and name.endswith(".deckcraft"):
                 # Native DeckCraft data gets the explicit edit/save/version/reopen slice.

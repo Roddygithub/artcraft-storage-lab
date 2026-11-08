@@ -159,9 +159,13 @@ def main():
     parser.add_argument('--wordcraft-fixture', default='')
     parser.add_argument('--diagnostic-browser-after-http-failure', action='store_true',
                         help='collect browser diagnostics after a failing HTTP slice; exit remains failure')
+    parser.add_argument('--pptx', action='store_true',
+                        help='opt in to the official DeckCraft PPTX validation candidate')
     parser.add_argument('--experimental', action='store_true',
                         help='use experimental editors.json and Seahub settings (Rust ports)')
     args = parser.parse_args()
+    if args.pptx and args.experimental:
+        parser.error("--pptx cannot use experimental editor ports")
     if (args.seafile_public_url is None) != (args.bridge_public_url is None):
         parser.error('--seafile-public-url and --bridge-public-url are required together')
     if args.seafile_public_url is not None or args.bridge_public_url is not None:
@@ -202,6 +206,11 @@ def main():
         editor_config = run / 'app/lab/real-seafile/editors.experimental.json'
     else:
         editor_config = run / 'app/lab/real-seafile/editors.json'
+    if args.pptx:
+        editors = json.loads(editor_config.read_text())
+        editors['deckcraft'] = dict(app='deckcraft', label='DeckCraft v0.16.0 (upstream, unpatched)',
+                                    extensions=['pptx'], url='/editors/deckcraft/index.html?host=parent')
+        editor_config.write_text(json.dumps(editors, indent=2) + '\n')
     # Seahub settings.py reapplies these Docker values after user settings.
     # They must match the external origin or minted WOPISrc stays internal.
     env.update(LAB_SEAFILE_HOSTNAME=urlsplit(args.seafile_public_url).netloc if args.seafile_public_url else 'seafile.lab',
@@ -222,6 +231,9 @@ def main():
     else:
         config_path = run / 'app/lab/real-seafile/seahub_settings.extra.py'
     config = config_path.read_text()
+    if args.pptx:
+        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('pptx',)\n"
+                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('pptx',)\n")
     config += '\nENABLE_ONLYOFFICE = False\n'
     config = render_settings(config, False,
                              args.seafile_public_url, args.bridge_public_url)

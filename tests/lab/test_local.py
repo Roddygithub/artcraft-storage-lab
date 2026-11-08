@@ -222,8 +222,9 @@ class LauncherTest(unittest.TestCase):
     def test_failure_cleanup_and_private_credentials(self):
         self.check_failure_cleanup_and_private_credentials(False)
         self.check_failure_cleanup_and_private_credentials(True)
+        self.check_failure_cleanup_and_private_credentials(False, pptx=True)
 
-    def check_failure_cleanup_and_private_credentials(self, public):
+    def check_failure_cleanup_and_private_credentials(self, public, pptx=False):
         with tempfile.TemporaryDirectory() as d:
             base = Path(d)
             assets = base / 'assets'
@@ -239,6 +240,9 @@ class LauncherTest(unittest.TestCase):
                 self.assertNotIn('onlyoffice', args)
                 if args[-2:-1] == ['-c'] and 'with p.open' in args[-1]:
                     self.assertIn('ENABLE_ONLYOFFICE = False', args[-1])
+                    self.assertEqual("OFFICE_WEB_APP_FILE_EXTENSION += ('pptx',)" in args[-1], pptx)
+                    editors = json.loads((run / 'app/lab/real-seafile/editors.json').read_text())
+                    self.assertEqual('deckcraft' in editors, pptx)
                 self.assertEqual(env['SEAFILE_PUBLIC_URL'], 'https://seafile.test' if public else '')
                 self.assertEqual(env['BRIDGE_PUBLIC_URL'], 'https://bridge.test' if public else '')
                 if args[-2:-1] == ['-c'] and 'with p.open' in args[-1]:
@@ -250,6 +254,8 @@ class LauncherTest(unittest.TestCase):
                     raise RuntimeError('synthetic browser failure')
 
             argv = ['local.py', '--run-dir', str(run), '--static', str(assets), '--manifest', str(manifest)]
+            if pptx:
+                argv.append('--pptx')
             if public:
                 argv += ['--seafile-public-url', 'https://seafile.test',
                          '--bridge-public-url', 'https://bridge.test']
