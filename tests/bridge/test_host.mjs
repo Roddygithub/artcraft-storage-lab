@@ -84,4 +84,7 @@ edited.send('dirty', { dirty: true });
 edited.send('dirty', { dirty: false });
 finish(verified()); await settle();
 assert.equal(edited.guarded(), true, 'new edits survive clean notifications during an older save');
+edited.send('dirty', { dirty: false });
+assert.equal(edited.guarded(), false, 'current clean state can resolve a verified save');
+assert.equal(edited.status(), 'saved to Seafile', 'visible confirmation must recover with the guard');
 console.log('PASS: verified host saves and failed-save unload protection');

@@ -30,6 +30,7 @@
     lockId: null,
     opened: false,
     failedSave: false,
+    savedStatus: null,
     lastBytes: null
   };
 
@@ -174,13 +175,14 @@
       if (res.status === 200 && res.body && res.body.verified === true &&
           typeof res.body.version === 'string' && res.body.version.trim()) {
         state.version = res.body.version;
+        state.savedStatus = res.body.reconciled ? 'saved (reconciled after a lost response)' : 'saved to Seafile';
         if (state.dirtyRevision === revision) {
           state.failedSave = false;
           state.dirty = false;
         }
         if (state.failedSave) status('earlier save verified; newer save failed, save again before closing', 'error');
         else if (state.dirty) status('saved earlier edits to Seafile; unsaved changes remain', 'warn');
-        else status(res.body.reconciled ? 'saved (reconciled after a lost response)' : 'saved to Seafile', 'ok');
+        else status(state.savedStatus, 'ok');
         if (ticket) post('saveResult', { ticket: ticket, ok: true, version: res.body.version });
         return;
       }
@@ -219,7 +221,9 @@
         state.dirty = true;
         state.dirtyRevision++;
       } else if (!state.failedSave && !state.saving) {
+        var wasDirty = state.dirty;
         state.dirty = false;
+        if (wasDirty && state.savedStatus && !tokenExpired()) status(state.savedStatus, 'ok');
       }
       if (state.dirty && !state.saving && !state.failedSave) status('unsaved changes', 'warn');
     } else if (kind === 'save') {
