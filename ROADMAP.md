@@ -18,6 +18,8 @@ under `docs/reviews/` and `integration/` as evidence.
 
 ## Active next steps — owner override, 2026-11-08
 
+Compact validation/continuation entry point: `docs/VALIDATION-STATE.md`.
+
 ONLYOFFICE is retired by owner instruction (`docs/ONLYOFFICE-RETIREMENT-20261108.md`).
 Do not run the historical ONLYOFFICE campaigns below.
 

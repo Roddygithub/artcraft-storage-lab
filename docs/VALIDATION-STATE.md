@@ -1,0 +1,39 @@
+# Validation checkpoint — 2026-11-08
+
+This short checkpoint is the continuation entry point. Do not re-read the
+historical GR corpus to resume routine validation.
+
+| Scope | State | Evidence |
+| --- | --- | --- |
+| Active offline checks | 18/18 command groups PASS | `../lab/real-seafile/results/2026-11-08-all-craft-validation/offline.json` |
+| Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
+| All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
+| Required remaining office formats, especially PPTX | NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md` |
+| HTTPS desktop/WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
+| Independent forensic review and final project GPT gate | NOT PERFORMED | `PROJECT-CLOSURE.md` |
+
+ONLYOFFICE is retired; do not restart compatibility campaigns. Production is
+outside this validation run. Upstream remains LOCKED. An automated subset PASS
+must never be presented as full format coverage or project approval.
+
+## Repeat checks with compact output
+
+```sh
+# With Playwright, Pillow and its Chromium already installed in the Python environment:
+python3 scripts/validate-candidate.py --output /absolute/new/private-check-dir
+# Or use an isolated dependency environment (Chromium still required):
+uv run --with playwright --with pillow python scripts/validate-candidate.py \
+  --output /absolute/new/private-check-dir
+# Real Seafile/browser run: no editor filter means all six default editors.
+python3 lab/real-seafile/local.py --run-dir /absolute/new/private-lab-dir \
+  --static /absolute/verified-static --manifest /absolute/verified-manifest.json
+```
+
+The compact runner uses four workers, captures full per-command private logs,
+prints only totals and failing command names, returns nonzero on any failure,
+and records command exits/source SHA in `summary.json`. It does not run legacy
+integration tests, mutate production or confer independent review approval.
+
+To save tokens: read this file and `git status --short`; run the compact runner;
+inspect only failed logs; retain sanitized runtime totals and exact provenance.
+Do not repeatedly dump successful logs, historical reports or bundle contents.

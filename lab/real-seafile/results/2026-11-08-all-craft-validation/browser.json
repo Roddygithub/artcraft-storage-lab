@@ -1,0 +1,483 @@
+{
+  "passed": 119,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "browser_login",
+      "ok": true
+    },
+    {
+      "name": "figcraft_fixture_made_by_the_app",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_request_carries_the_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saved_docx_contains_the_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_is_not_identical_bytes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saved_docx_bytes_look_right",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_fresh_seafile_session",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_bytes_identical_to_the_saved_version",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_second_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_seafile_holds_both_markers",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_holds_the_original_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_holds_the_second_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saves_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_save_request_carries_the_typed_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_semantically_contains_the_typed_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_keeps_the_fixture_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_save_is_not_identical_bytes",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_saved_xlsx_bytes_look_right",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_fresh_seafile_session",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_bytes_identical_to_the_saved_version",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_parsed_the_saved_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_holds_the_original_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_editor_holds_the_second_typed_value",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_second_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_reopen_seafile_holds_both_values",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_second_save_is_not_identical_bytes",
+      "ok": true
+    },
+    {
+      "name": "gridcraft_saves_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_typed_form_edit_is_dirty_before_save",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_save_request_contains_the_typed_name_field_value",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_relay_save_bytes_match_seafile_readback",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_saved_pdf_name_field_contains_typed_value",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_saved_pdf_differs_from_fixture",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_saved_pdf_bytes_look_right",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_fresh_seafile_session",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_reopened_from_seafile_pdf_edit_route",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_reopen_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_fresh_open_loaded_the_saved_pdf_field_value",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_reopen_status_reports_opened_document",
+      "ok": true
+    },
+    {
+      "name": "pdfcraft_save_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_opened_dxf_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_initial_fixture_has_no_circle",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_initial_drawing_canvas_captured",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_user_circle_edit_marks_host_dirty",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_circle_is_visible_before_save",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_save_payload_contains_circle_entity",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_circle_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_seafile_readback_contains_circle_entity",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_relay_save_bytes_match_seafile_readback",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_saved_canvas_still_renders_circle",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_save_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_fresh_session_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_fresh_session_reads_saved_dxf",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_fresh_session_renders_saved_circle",
+      "ok": true
+    },
+    {
+      "name": "cadcraft_edits_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_fixture_lacks_new_geometry",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_fixture_parsed_before_edit",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_edited_scene_contains_geometry",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_relay_save_contains_actual_geometry",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_edit_creates_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_relay_bytes_equal_seafile",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_saved_geometry_differs_from_fixture",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_old_page_closed",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_fresh_authenticated_session",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_fresh_relay_bytes_equal_saved",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_fresh_api_scene_retains_geometry",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_fresh_serialization_has_no_stale_capture",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_fresh_reserialization_retains_geometry",
+      "ok": true
+    },
+    {
+      "name": "vectorcraft_save_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "figcraft_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "figcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "figcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "figcraft_fixture_lacks_new_geometry",
+      "ok": true
+    },
+    {
+      "name": "figcraft_fixture_parsed_before_edit",
+      "ok": true
+    },
+    {
+      "name": "figcraft_edited_scene_contains_geometry",
+      "ok": true
+    },
+    {
+      "name": "figcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "figcraft_relay_save_contains_actual_geometry",
+      "ok": true
+    },
+    {
+      "name": "figcraft_edit_creates_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "figcraft_relay_bytes_equal_seafile",
+      "ok": true
+    },
+    {
+      "name": "figcraft_saved_geometry_differs_from_fixture",
+      "ok": true
+    },
+    {
+      "name": "figcraft_old_page_closed",
+      "ok": true
+    },
+    {
+      "name": "figcraft_fresh_authenticated_session",
+      "ok": true
+    },
+    {
+      "name": "figcraft_fresh_relay_bytes_equal_saved",
+      "ok": true
+    },
+    {
+      "name": "figcraft_fresh_api_scene_retains_geometry",
+      "ok": true
+    },
+    {
+      "name": "figcraft_fresh_serialization_has_no_stale_capture",
+      "ok": true
+    },
+    {
+      "name": "figcraft_fresh_reserialization_retains_geometry",
+      "ok": true
+    },
+    {
+      "name": "figcraft_save_did_not_download",
+      "ok": true
+    }
+  ],
+  "raw_private_sha256": "fde26094d8384c7a452960022f0ee1b4d5ebd99e9480f6fa693934c05b2397a8"
+}

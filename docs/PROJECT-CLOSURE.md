@@ -154,3 +154,13 @@ The structural verifier passes for both saved DOCX files. This is automated
 internal HTTP evidence, not HTTPS acceptance or an independent review.
 Next implementation priority: upstream DeckCraft PPTX same-format persistence.
 Project INCOMPLETE; upstream LOCKED.
+
+## Full default-candidate replay — 2026-11-08
+
+Exact source `8369e8f`: all six default editors passed **119/119** browser
+assertions after **40/40** HTTP checks; launcher exit 0, project containers
+removed. Compact offline validation passed **18/18 command groups**. Retained
+sanitary summaries, synthetic payloads, provenance and integrity verifier:
+`lab/real-seafile/results/2026-11-08-all-craft-validation/`. This closes the
+combined current-source six-editor replay, not missing formats, HTTPS acceptance
+or independent review. Continue from `docs/VALIDATION-STATE.md`.

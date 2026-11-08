@@ -1,0 +1,116 @@
+{
+  "source": "8369e8fafc327ec241b75b5562794ee939faa459",
+  "scope": "active offline checks only",
+  "passed": 18,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "tests/bridge/test_bridge.py",
+      "exit": 0,
+      "seconds": 1.37,
+      "log": "tests_bridge_test_bridge.py.log"
+    },
+    {
+      "name": "tests/lab/test_local.py",
+      "exit": 0,
+      "seconds": 0.37,
+      "log": "tests_lab_test_local.py.log"
+    },
+    {
+      "name": "tests/test_candidate_scope.py",
+      "exit": 0,
+      "seconds": 0.07,
+      "log": "tests_test_candidate_scope.py.log"
+    },
+    {
+      "name": "tests/test_gridcraft_real_edit.py",
+      "exit": 0,
+      "seconds": 0.16,
+      "log": "tests_test_gridcraft_real_edit.py.log"
+    },
+    {
+      "name": "tests/test_pdfcraft_real_edit.py",
+      "exit": 0,
+      "seconds": 0.46,
+      "log": "tests_test_pdfcraft_real_edit.py.log"
+    },
+    {
+      "name": "tests/test_cadcraft_real_edit.py",
+      "exit": 0,
+      "seconds": 1.17,
+      "log": "tests_test_cadcraft_real_edit.py.log"
+    },
+    {
+      "name": "tests/test_vector_fig_real_edit.py",
+      "exit": 0,
+      "seconds": 0.11,
+      "log": "tests_test_vector_fig_real_edit.py.log"
+    },
+    {
+      "name": "tests/test_docx_fidelity_corpus.py",
+      "exit": 0,
+      "seconds": 0.11,
+      "log": "tests_test_docx_fidelity_corpus.py.log"
+    },
+    {
+      "name": "tests/test_wordcraft_browser_fixture.py",
+      "exit": 0,
+      "seconds": 0.37,
+      "log": "tests_test_wordcraft_browser_fixture.py.log"
+    },
+    {
+      "name": "tests/test_wordcraft_reopen_wait.py",
+      "exit": 0,
+      "seconds": 19.85,
+      "log": "tests_test_wordcraft_reopen_wait.py.log"
+    },
+    {
+      "name": "tests/test_deckcraft_real_edit.py",
+      "exit": 0,
+      "seconds": 0.11,
+      "log": "tests_test_deckcraft_real_edit.py.log"
+    },
+    {
+      "name": "tests/test_deckcraft_render_wait.py",
+      "exit": 0,
+      "seconds": 6.27,
+      "log": "tests_test_deckcraft_render_wait.py.log"
+    },
+    {
+      "name": "tests/test_xlsx_fixture.py",
+      "exit": 0,
+      "seconds": 0.06,
+      "log": "tests_test_xlsx_fixture.py.log"
+    },
+    {
+      "name": "tests/test_gr041_craft_zip_limits.py",
+      "exit": 0,
+      "seconds": 0.17,
+      "log": "tests_test_gr041_craft_zip_limits.py.log"
+    },
+    {
+      "name": "tests/bridge/test_host.mjs",
+      "exit": 0,
+      "seconds": 0.12,
+      "log": "tests_bridge_test_host.mjs.log"
+    },
+    {
+      "name": "tests/bridge/test_host_shim.mjs",
+      "exit": 0,
+      "seconds": 0.12,
+      "log": "tests_bridge_test_host_shim.mjs.log"
+    },
+    {
+      "name": "tests/bridge/test_shim.mjs",
+      "exit": 0,
+      "seconds": 0.12,
+      "log": "tests_bridge_test_shim.mjs.log"
+    },
+    {
+      "name": "shell-syntax",
+      "exit": 0,
+      "seconds": 0.01,
+      "log": "shell-syntax.log"
+    }
+  ]
+}
