@@ -214,7 +214,7 @@
       openDocument();
     } else if (kind === 'dirty') {
       // Only new edits advance the save snapshot. A clean notification is not
-      // storage verification and must not erase edits or a failed save.
+      // storage verification and must not resolve a pending or failed save.
       if (d.dirty) {
         state.dirty = true;
         state.dirtyRevision++;

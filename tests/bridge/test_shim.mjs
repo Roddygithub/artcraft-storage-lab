@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const messages = [], handlers = {};
+const intervals = [];
 let saved = new Uint8Array([1]);
 let editorDirty = false;
 const origin = 'https://bridge.invalid';
@@ -15,7 +16,7 @@ const window = { parent, vectorcraft: {
 vm.runInNewContext(readFileSync(new URL('../../lab/real-seafile/static/host-shim.js', import.meta.url), 'utf8'), {
   window, document: { currentScript: { dataset: { app: 'vectorcraft' } } },
   location: { origin, search: '?host=parent' }, URLSearchParams, Uint8Array, ArrayBuffer,
-  setInterval() {}, setTimeout() {}, clearTimeout() {}
+  setInterval(fn, milliseconds) { intervals.push([fn, milliseconds]); }, setTimeout() {}, clearTimeout() {}
 });
 const settle = () => new Promise(resolve => setImmediate(resolve));
 const deliver = data => handlers.message({ origin, source: parent, data });
@@ -45,6 +46,10 @@ saved = new Uint8Array([3]);
 shortcut(); await settle();
 const third = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
 editorDirty = true; // B is edited after A was serialized, while A waits for the host.
+const dirtyCount = messages.filter(m => m.type === 'vectorcraft:dirty' && m.dirty).length;
+intervals.find(([, milliseconds]) => milliseconds === 1000)[0](); await settle();
+assert.equal(messages.filter(m => m.type === 'vectorcraft:dirty' && m.dirty).length, dirtyCount + 1,
+  'dirty observations must advance parent state even while already marked dirty');
 deliver({ type: 'vectorcraft:saveResult', ticket: third.ticket, ok: true, version: '3' });
 await settle();
 assert.equal(messages.at(-1).dirty, true, 'verified A cannot clear newer unsaved B');

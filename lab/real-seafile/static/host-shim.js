@@ -22,6 +22,7 @@
 
   var api = null, openedName = null, lastHash = null, ready = false, dirtyReported = null;
   var pending = null, nextTicket = 0, saveFailed = false, lastAck = null;
+  var inspectSerial = 0;
 
   function post(type, payload, transfer) {
     var m = { type: app + ':' + type };
@@ -70,11 +71,14 @@
         // The ACK verifies the captured bytes, not edits made after serialization.
         // Keep the guard until the current editor state itself reports clean.
         if (typeof api.request === 'function') {
+          var serial = ++inspectSerial;
           api.request('document.inspect', { depth: 0 }).then(function (result) {
-            if (pending || lastAck !== d.ticket) return;
+            if (serial !== inspectSerial || pending || lastAck !== d.ticket) return;
             var dirty = findFlag(result, ['modified', 'dirty', 'unsaved', 'unsavedChanges'], 0);
             setDirty(dirty !== false, dirty !== false);
-          }, function () { setDirty(true, true); });
+          }, function () {
+            if (serial === inspectSerial && !pending && lastAck === d.ticket) setDirty(true, true);
+          });
         } else setDirty(true, true);
       } else {
         saveFailed = true;
@@ -182,9 +186,11 @@
   // Dirty state, when the app's inspect result carries one (key names differ per app).
   function pollDirty() {
     if (!ready || typeof api.request !== 'function') return;
+    var serial = ++inspectSerial;
     api.request('document.inspect', { depth: 0 }).then(function (r) {
+      if (serial !== inspectSerial) return;
       var v = findFlag(r, ['modified', 'dirty', 'unsaved', 'unsavedChanges'], 0);
-      if (typeof v === 'boolean' && (v || (!pending && !saveFailed))) setDirty(v, v && !!pending);
+      if (typeof v === 'boolean' && (v || (!pending && !saveFailed))) setDirty(v, v);
     }, function () {});
   }
   function findFlag(o, keys, depth) {
