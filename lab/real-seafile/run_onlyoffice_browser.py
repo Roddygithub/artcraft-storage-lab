@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import time
+import traceback
 import uuid
 import xml.etree.ElementTree as ET
 import zipfile
@@ -153,6 +154,8 @@ def main():
                 browser.close()
     except Exception as exc:
         # Playwright/API exceptions can contain credential-bearing URLs or bodies.
+        # The launcher results directory is private; this file must never be published.
+        (results / "onlyoffice-private-error.txt").write_text(traceback.format_exc())
         evidence["runtime"] = "FAIL"
         evidence["error_type"] = type(exc).__name__
         print("FAIL onlyoffice_browser (details suppressed; inspect private evidence)", flush=True)

@@ -117,7 +117,11 @@ def main():
         parser.add_argument(f'--{name}-port', type=int, default=default)
     parser.add_argument('--editor', default='')
     parser.add_argument('--wordcraft-fixture', default='')
+    parser.add_argument('--onlyoffice-regression', action='store_true',
+                        help='run the ODT edit/save/reopen regression instead of Craft scenarios')
     args = parser.parse_args()
+    if args.onlyoffice_regression and (args.editor or args.wordcraft_fixture):
+        parser.error('ONLYOFFICE regression cannot select a Craft editor or fixture')
     run = args.run_dir.expanduser().resolve()
     if run == ROOT or ROOT in run.parents:
         parser.error('run directory must be outside the repository')
@@ -141,7 +145,8 @@ def main():
     env.update({f'{name.upper()}_PORT': str(port) for name, port in
                 zip(('seafile', 'onlyoffice', 'bridge'), ports)})
     env.update(BROWSER_ONLY_EDITOR=args.editor,
-               BROWSER_WORDCRAFT_FIXTURE=args.wordcraft_fixture)
+               BROWSER_WORDCRAFT_FIXTURE=args.wordcraft_fixture,
+               BROWSER_SCRIPT='run_onlyoffice_browser.py' if args.onlyoffice_regression else 'run_browser.py')
     log = run / 'launcher.log'
     command(['podman', '--remote=false', 'info', '--format', '{{.Host.Security.Rootless}}'], run, env, log)
     if log.read_text().strip() != 'true':

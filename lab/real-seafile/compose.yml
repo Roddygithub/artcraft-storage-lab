@@ -144,7 +144,7 @@ services:
     image: mcr.microsoft.com/playwright/python:v1.49.0-noble
     profiles: [test]
     working_dir: /app
-    command: ["bash", "-c", "pip install -q --break-system-packages playwright==1.49.0 Pillow==13.0.0 && python3 lab/real-seafile/run_browser.py"]
+    command: ["bash", "-c", "pip install -q --break-system-packages playwright==1.49.0 Pillow==13.0.0 && python3 \"lab/real-seafile/$${BROWSER_SCRIPT}\""]
     ipc: private
     shm_size: 1gb
     volumes:
@@ -159,6 +159,7 @@ services:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - RESULTS_DIR=/results
       - BROWSER_ONLY_EDITOR=${BROWSER_ONLY_EDITOR:-}
+      - BROWSER_SCRIPT=${BROWSER_SCRIPT:-run_browser.py}
       - BROWSER_WORDCRAFT_FIXTURE=${BROWSER_WORDCRAFT_FIXTURE:-}
     networks: [seafile-net]
 
