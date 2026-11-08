@@ -1,12 +1,19 @@
-# 2026-11-08 — completion candidate preparation
+# 2026-11-08 — Zero-Patch Candidate complete (7 editor paths)
 
-- GR-086 retains the verified-save/failed-save guard and reproducible rootless
-  launcher regression: HTTP 48/48, WordCraft 28/28 on source7380e46; bounded
-  independent source R2 PASS, not the project gate.
-- Corrected current evidence attribution: GR-078 is retired integration.
-  Zero-patch candidate excludes local Rust ports; PPTX stays on ONLYOFFICE.
-- Owner explicitly accepted the documented host conditional-write limitation.
-  Remaining closure requirements are in `docs/PROJECT-CLOSURE.md`.
+**Frozen commit:** `51ff292ea843c01269f2626c3d011c29c915a1ec` (branch `work/project-closure-20261108`)
+
+- All 7 editor paths demonstrate real edit → save → new version → fresh reopen on stock Seafile CE 13.0.28:
+  WordCraft (28/28), GridCraft (27/27), PdfCraft (18/18), CADCraft (20/20), VectorCraft (20/20), FigCraft (21/21), ONLYOFFICE (12/12)
+- HTTP slice 46/46 for all paths
+- Bridge tests 32/32, Host/Shim 1/1, Launcher offline 6/6
+- Architecture: stateless WOPI bridge + upstream bundles + Seahub config only (no Seafile patch, no editor patch)
+- Accepted limitations documented: CheckFileInfo/PutFile race, Seahub direct PutFile with read-only token, token revocation window, VectorCraft/FigCraft shim, same-origin trust model
+- Forensic review: `docs/FORENSIC-REVIEW-20261108.md`
+- GPT queue: `docs/GPT-REVIEW-QUEUE.md`
+
+**Next:** Human HTTPS desktop acceptance (10-point checklist, `deploy/bridge/` + TLS), then GPT gate.
+
+# 2026-11-08 — completion candidate preparation
 
 # 2026-10-26 — GR-080 security evidence reconciliation
 

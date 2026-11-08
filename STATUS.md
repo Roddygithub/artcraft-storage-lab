@@ -160,31 +160,54 @@ remediated, and R2 found no new findings. See
 ## PREVIOUS GR: GR-076 — bounded PhotoCraft host adapter
 
 Source candidate `5637bf2` is committed on `main`; runtime follow-up docs/evidence
-are committed and pushed on `main`. Based on local main
-`dc105220ae934f9779eb357a4cda901ee0aa0c0b`.
-Reuses exact GR-026/GR-032 PhotoCraft base and transport; adds payload/decoded
-bounds, nested-command and direct API guards, idle ACK/deadline repaint, and
-focused lifecycle/standalone regressions. Retained patches omitted the engine
-snapshot test module; repaired explicitly. Rust 1.95 locked snapshot/host/file-open/inbox tests (4/7/47/2), format, Web
-WASM, clean-base patch application and whitespace checks PASS. Independent
-R1/R2 source reviews returned PROVISIONAL PASS. **GPT REVIEW PENDING**; no GPT
-PASS. Exact GR-076 WASM completed a low-optimization browser Open/edit/save/ACK/
-fresh-iframe-reopen smoke. The exact bundle also completed synthetic Seafile
-open/edit/save/version/readback/close/reopen; current file hash matches the
-latest of three history versions. The tracked dispatcher now includes the
-verified `pcraft` route, and the synthetic library extension allowlist and
-PhotoCraft static bundle were updated for the runtime. ONLYOFFICE
-settings/service were untouched. The post-change ONLYOFFICE attempt did not
-instantiate its editor: the configured client `api.js` URL returned 404 while
-the Document Server API and healthcheck returned 200 on direct probes; this
-check remains INCONCLUSIVE/NOT VERIFIED. WordCraft DOCX was re-opened after the allowlist
-change, edited, saved as a new version and reopened with the marker intact.
-Independent runtime/docs R1 findings were closed; R2 and R3 returned
-PROVISIONAL PASS. The tracked dispatcher route received an independent
-PROVISIONAL PASS. GPT review remains pending.
-No production data or upstream publication.
-See `docs/GR-076-PHOTOCRAFT-BOUNDED-HOST-ADAPTER.md` and
-`docs/reviews/GR-076/`.
+are comm## CURRENT: Zero-Patch Candidate — `51ff292ea` (2026-11-08)
+
+**Status:** LAB EVIDENCE COMPLETE — AWAITING HUMAN HTTPS ACCEPTANCE → GPT GATE
+
+**Architecture:** Stateless WOPI editor bridge (`bridge/`) + upstream Craft web bundles + Seahub configuration only. **No Seafile patch, no editor patch** (AGENTS.md rule 6).
+
+**Frozen commit:** `51ff292ea843c01269f2626c3d011c29c915a1ec` (branch `work/project-closure-20261108`)
+
+### Lab Evidence (all synthetic Seafile CE 13.0.28, rootless Podman)
+
+| Editor | HTTP Slice | Browser Slice | Key Result |
+|--------|------------|---------------|------------|
+| WordCraft v0.13.2 | 46/46 | 28/28 | `fidelity-layout.docx` corpus; 2-round edit/save/version/reopen; exact readback=open bytes |
+| GridCraft v0.14.2 | 46/46 | 27/27 | XLSX cell edit; new version; fresh reopen |
+| PdfCraft v0.16.1 | 46/46 | 18/18 | AcroForm field edit; `?edit_pdf=true`; relay=readback byte-for-byte |
+| CADCraft v0.15.1 | 46/46 | 20/20 | Circle command; DXF geometry; relay=readback |
+| VectorCraft v0.19.0 | 46/46 | 20/20 | SVG rectangle via shim; geometry diff; relay=readback |
+| FigCraft v0.13.1 | 46/46 | 21/21 | FigCraft geometry via shim (`?control`); relay=readback |
+| ONLYOFFICE 9.4 | 46/46 | 12/12 | 2-round ODT regression; user-attributed versions; markers in readback |
+
+**Test suites:** Bridge 32/32 ✅ | Host/Shim 1/1 ✅ | Launcher offline 6/6 ✅
+
+### Accepted Limitations (documented)
+
+- CheckFileInfo/PutFile race: external writer can overwrite between preflight and unconditional PutFile
+- Seahub direct PutFile accepts read-only token (bridge enforces `UserCanWrite` on relay path only)
+- Token revocation window ≤ `WOPI_ACCESS_TOKEN_EXPIRATION` (30 min default)
+- VectorCraft/FigCraft require lab shim (`host-shim.js`)
+- Same-origin editor bundles are trusted code
+
+### Forensic Review
+
+`docs/FORENSIC-REVIEW-20261108.md` — complete evidence compilation at frozen SHA.
+
+### GPT Review Queue
+
+`docs/GPT-REVIEW-QUEUE.md` — candidate `51ff292ea` queued.
+
+### Outstanding
+
+1. **Human HTTPS desktop acceptance** — 10-point checklist (`lab/real-seafile/README.md`), requires TLS deployment (`deploy/bridge/`), domain, certs, Chrome/Edge/Firefox
+2. **GPT gate** — independent review of frozen candidate after HTTPS acceptance
+
+**Upstream publication:** LOCKED (AGENTS.md rule 7)
+
+---
+
+## PREVIOUS GR: GR-076 — PhotoCraft bounded host adapter
 
 
 ## PREVIOUS GR: GR-075 — gateway request-body deadline
