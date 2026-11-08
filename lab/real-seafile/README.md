@@ -7,9 +7,11 @@ dedicated Lima VM with Docker. Nothing here touches a production system; the VM 
 
 `local.py` uses the same Compose file as Lima. Prerequisites: Linux, Python 3.11+,
 working **rootless** local Podman (subuid/subgid mappings, rootless networking and storage),
-`podman-compose` supporting `--podman-args`, Compose profiles and `down --remove-orphans`,
+`podman-compose` supporting `--podman-args`, or the Docker Compose v2 plugin,
 free loopback ports 8000/8100/8778, and enough disk/RAM for Seafile, ONLYOFFICE and Chromium.
-Images and browser pip packages require network access on the eventual real run. No socket or
+Images and browser pip packages require network access on the eventual real run. The Docker
+Compose fallback starts and removes its own private Podman API socket; the shared user socket
+and its service are untouched. No global socket or
 systemd unit is started, stopped or reused; Podman is explicitly local (`--remote=false`).
 
 Supply static assets previously acquired through `scripts/craft_web_zip.py` or

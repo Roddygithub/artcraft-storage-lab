@@ -1,5 +1,6 @@
 """Offline launcher checks; never executes Podman."""
 import importlib.util
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,30 @@ spec.loader.exec_module(local)
 
 
 class LauncherTest(unittest.TestCase):
+    def test_compose_fallback_owns_only_its_private_api(self):
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d)
+            process = object()
+            calls = []
+            def fake_popen(args, **kwargs):
+                calls.append(args)
+                Path(args[-1].removeprefix('unix://')).touch()
+                return process
+            env = {'DOCKER_HOST': 'must-be-replaced'}
+            with patch.object(local.shutil, 'which', side_effect=[None, '/synthetic/docker-compose']), \
+                    patch.object(local.subprocess, 'Popen', fake_popen), \
+                    patch.object(local, 'stop') as stop:
+                with self.assertRaisesRegex(ValueError, 'synthetic'):
+                    with local.compose_backend(base, env) as backend:
+                        self.assertEqual(backend, ['/synthetic/docker-compose'])
+                        self.assertEqual(calls[0][:5], ['podman', '--remote=false', 'system', 'service', '--time=0'])
+                        self.assertEqual(env['DOCKER_HOST'], calls[0][-1])
+                        socket = Path(env['DOCKER_HOST'].removeprefix('unix://'))
+                        self.assertEqual(socket.parent.stat().st_mode & 0o777, 0o700)
+                        raise ValueError('synthetic interruption')
+                stop.assert_called_once_with(process)
+            self.assertFalse(socket.parent.exists())
+
     def test_exact_snapshot(self):
         with tempfile.TemporaryDirectory() as d:
             base = Path(d)
@@ -29,6 +54,9 @@ class LauncherTest(unittest.TestCase):
                 if label == 'ok':
                     local.snapshot(run, assets, supplied)
                     self.assertFalse((run / 'app/lab/real-seafile/results').exists())
+                    for name in ('host.js', 'host.html'):
+                        self.assertEqual((run / 'app/bridge/static' / name).read_bytes(),
+                                         (local.ROOT / 'bridge/static' / name).read_bytes())
                 else:
                     with self.assertRaises(ValueError):
                         local.snapshot(run, assets, supplied)
@@ -82,8 +110,12 @@ class LauncherTest(unittest.TestCase):
 
             argv = ['local.py', '--run-dir', str(run), '--static', str(assets), '--manifest', str(manifest)]
             old_mask = os.umask(0o077)
+            @contextmanager
+            def fake_backend(_run, _env):
+                yield ['synthetic-compose']
             try:
-                with patch.object(sys, 'argv', argv), patch.object(local, 'command', fake):
+                with patch.object(sys, 'argv', argv), patch.object(local, 'command', fake), \
+                        patch.object(local, 'compose_backend', fake_backend):
                     with self.assertRaisesRegex(RuntimeError, 'synthetic browser failure'):
                         local.main()
                     self.assertEqual(calls[-1][-2:], ['down', '--remove-orphans'])

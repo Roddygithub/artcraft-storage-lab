@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """One fresh, private rootless Podman lab; no user socket required."""
 import argparse
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -10,6 +11,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,8 +33,8 @@ def snapshot(run, assets, expected):
     # Copy first, then verify the bytes that services will actually read.
     for name in ('bridge', 'lab'):
         shutil.copytree(ROOT / name, run / 'app' / name,
-                        ignore=shutil.ignore_patterns('results', 'static', 'cache',
-                                                     '__pycache__', '.cache'))
+                        ignore=shutil.ignore_patterns('results', 'cache', '__pycache__',
+                                                     '.cache', *(['static'] if name == 'lab' else [])))
     target = run / 'app/lab/real-seafile/static'
     shutil.copytree(assets, target, symlinks=True)
     actual = manifest(target)
@@ -42,6 +44,53 @@ def snapshot(run, assets, expected):
     shutil.copyfile(run / 'app/lab/real-seafile/compose.yml', run / 'compose.yml')
 
 
+def stop(proc):
+    if proc.poll() is not None:
+        return
+    try:
+        os.killpg(proc.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        return
+    try:
+        proc.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        os.killpg(proc.pid, signal.SIGKILL)
+        proc.wait(timeout=10)
+
+
+@contextmanager
+def compose_backend(run, env):
+    native = shutil.which('podman-compose')
+    if native:
+        yield [native, '--podman-args=--remote=false']
+        return
+    plugin = shutil.which('docker-compose')
+    if not plugin:
+        plugin = next((p for p in ('/usr/lib/docker/cli-plugins/docker-compose',
+                                  '/usr/local/lib/docker/cli-plugins/docker-compose')
+                       if os.path.isfile(p) and os.access(p, os.X_OK)), None)
+    if not plugin:
+        raise RuntimeError('install podman-compose or the Docker Compose v2 plugin')
+    # A private API socket avoids starting or changing the user's shared Podman service.
+    with tempfile.TemporaryDirectory(prefix='craftlab-api-') as directory:
+        socket = Path(directory) / 'podman.sock'
+        address = 'unix://' + str(socket)
+        env['DOCKER_HOST'] = address
+        with (run / 'api.log').open('ab') as output:
+            proc = subprocess.Popen(['podman', '--remote=false', 'system', 'service',
+                                     '--time=0', address], env=env, stdout=output,
+                                    stderr=subprocess.STDOUT, start_new_session=True)
+            try:
+                deadline = time.monotonic() + 15
+                while not socket.exists():
+                    if proc.poll() is not None or time.monotonic() >= deadline:
+                        raise RuntimeError('private Podman API did not start; see api.log')
+                    time.sleep(0.1)
+                yield [plugin]
+            finally:
+                stop(proc)
+
+
 def command(args, cwd, env, log, timeout=120):
     with log.open('ab') as output:
         proc = subprocess.Popen(args, cwd=cwd, env=env, stdout=output,
@@ -49,12 +98,7 @@ def command(args, cwd, env, log, timeout=120):
         try:
             code = proc.wait(timeout=timeout)
         except BaseException:
-            os.killpg(proc.pid, signal.SIGTERM)
-            try:
-                proc.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                os.killpg(proc.pid, signal.SIGKILL)
-                proc.wait(timeout=10)
+            stop(proc)
             raise
         if code:
             raise RuntimeError(f'{args[0]} failed ({code}); see private {log.name}')
@@ -99,8 +143,6 @@ def main():
     command(['podman', '--remote=false', 'info', '--format', '{{.Host.Security.Rootless}}'], run, env, log)
     if log.read_text().strip() != 'true':
         raise RuntimeError('Podman must report rootless=true')
-    compose = ['podman-compose', '--podman-args=--remote=false', '-f', str(run / 'compose.yml'), '-p', project,
-               '--profile', 'test']
     (run / 'project.txt').write_text(project + '\n')
     (run / 'results').mkdir()
     # Configure only the Seafile container belonging to this new project.
@@ -113,18 +155,20 @@ def main():
               " time.sleep(5)\n"
               "else: raise SystemExit('Seahub config never appeared')\n"
               f"with p.open('a') as f: f.write('\\n' + {config!r})\n")
-    try:
-        command(compose + ['up', '-d', 'db', 'redis', 'seafile', 'onlyoffice', 'bridge'],
-                run, env, log, 900)
-        command(compose + ['exec', '-T', 'seafile', 'python3', '-c', script], run, env, log, 630)
-        command(compose + ['restart', 'seafile'], run, env, log)
-        for service in ('slice', 'browser'):
-            command(compose + ['run', '--rm', service], run, env, log, 3600)
-    finally:
+    with compose_backend(run, env) as backend:
+        compose = backend + ['-f', str(run / 'compose.yml'), '-p', project, '--profile', 'test']
         try:
-            command(compose + ['logs', '--no-color'], run, env, run / 'services.log')
+            command(compose + ['up', '-d', 'db', 'redis', 'seafile', 'onlyoffice', 'bridge'],
+                    run, env, log, 900)
+            command(compose + ['exec', '-T', 'seafile', 'python3', '-c', script], run, env, log, 630)
+            command(compose + ['restart', 'seafile'], run, env, log)
+            for service in ('slice', 'browser'):
+                command(compose + ['run', '--rm', service], run, env, log, 3600)
         finally:
-            command(compose + ['down', '--remove-orphans'], run, env, log, 180)
+            try:
+                command(compose + ['logs', '--no-color'], run, env, run / 'services.log')
+            finally:
+                command(compose + ['down', '--remove-orphans'], run, env, log, 180)
     print(f'Private evidence: {run / "results"}')
 
 
