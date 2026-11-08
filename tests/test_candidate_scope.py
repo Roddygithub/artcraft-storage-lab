@@ -39,3 +39,10 @@ assert not ready("api/documents/api.js; err: 'Office Online failed'")
 assert not ready("api/documents/api.js")
 assert not ready("err: ''")
 print('PASS: ONLYOFFICE HTTP gate rejects blocking Seahub error')
+
+nginx = (root / 'deploy/bridge/nginx.conf.example').read_text()
+dockerfile = (root / 'deploy/bridge/Dockerfile').read_text()
+assert 'access_log off;' in nginx
+assert not any('add_header X-Frame-Options' in line for line in nginx.splitlines())
+assert '--access-logfile' not in dockerfile and '--access-logformat' not in dockerfile
+print('PASS: deployment omits capability-bearing access logs and conflicting frame header')

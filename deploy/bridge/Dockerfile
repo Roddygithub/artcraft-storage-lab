@@ -27,6 +27,7 @@ EXPOSE 8778
 USER appuser
 
 # gunicorn: bounded workers/threads, header timeouts; long request timeout for large PutFile + commit.
+# Access logs are disabled: request queries/referrers may contain WOPI capabilities.
 # --max-requests prevents memory leaks; --worker-tmp-dir /dev/shm uses tmpfs for worker heartbeats.
 CMD ["gunicorn", \
      "--bind", "0.0.0.0:8778", \
@@ -37,6 +38,4 @@ CMD ["gunicorn", \
      "--max-requests", "1000", \
      "--max-requests-jitter", "100", \
      "--worker-tmp-dir", "/dev/shm", \
-     "--access-logfile", "-", \
-     "--access-logformat", "%(h)s %(l)s %(u)s %(t)s \"%(r)s\" %(s)s %(b)s \"%(f)s\" \"%(a)s\" %(L)s %(D)s", \
      "bridge.wsgi:application"]
