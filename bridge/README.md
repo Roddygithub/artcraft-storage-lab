@@ -84,7 +84,7 @@ server. The bridge keeps no state between requests, so several workers are fine.
 
 ```bash
 BRIDGE_PUBLIC_URL=http://127.0.0.1:8778 BRIDGE_SEAHUB_ORIGIN=https://seafile.example \
-BRIDGE_EDITORS=bridge/editors.example.json BRIDGE_STATIC_DIR=integration/static python3 -m bridge
+BRIDGE_EDITORS=bridge/editors.example.json BRIDGE_STATIC_DIR=lab/real-seafile/static python3 -m bridge
 ```
 
 ```bash

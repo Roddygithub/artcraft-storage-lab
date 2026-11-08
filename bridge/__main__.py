@@ -3,7 +3,7 @@
     BRIDGE_PUBLIC_URL=https://craft.example \
     BRIDGE_SEAHUB_ORIGIN=https://seafile.example \
     BRIDGE_EDITORS=bridge/editors.example.json \
-    BRIDGE_STATIC_DIR=integration/static \
+    BRIDGE_STATIC_DIR=lab/real-seafile/static \
     python3 -m bridge
 
 Behind a real reverse proxy, run it with any WSGI server (gunicorn, waitress).
