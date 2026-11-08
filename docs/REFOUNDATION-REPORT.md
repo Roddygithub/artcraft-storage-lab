@@ -343,3 +343,19 @@ GR-078 is retired integration evidence and does not close current bridge gaps.
 The owner accepted the documented non-atomic CheckFileInfo/PutFile host limit.
 The authoritative remaining requirements are [PROJECT-CLOSURE.md](PROJECT-CLOSURE.md).
 Project GPT remains INCOMPLETE; upstream remains LOCKED.
+
+
+### Current validation follow-up — 2026-11-08
+
+Owner-authorized ONLYOFFICE retirement supersedes the former regression and
+coexistence requirements in §7. Application source `4f4b2dc` now has retained
+opt-in seven-editor evidence: HTTP 40/40 and browser 132/132, including official
+DeckCraft v0.16.0 PPTX same-file edit/save/version/fresh-reopen. Current automated
+WordCraft HTTPS also passed HTTP 40/40 and browser 28/28; temporary TLS routes
+were restored exactly. Offline validation: 19/19 command groups. See
+`docs/VALIDATION-STATE.md` for source/evidence links and efficient replay commands.
+
+Remaining work is required viewing-format coverage, device/clipboard/font/unload
+acceptance, then independent forensic and project GPT review. Broad fidelity,
+full office replacement and final approval are not established. Production
+Seafile remained untouched; no editor/Seafile patch was introduced; upstream LOCKED.

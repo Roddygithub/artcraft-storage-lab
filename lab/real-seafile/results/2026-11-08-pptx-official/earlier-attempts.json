@@ -1,0 +1,26 @@
+[
+  {
+    "source": "8c6a84e",
+    "reason": "static PPTX discarded by legacy dynamic-editor filter; native fixture had no route",
+    "passed": 5,
+    "failed": 1,
+    "failed_checks": [
+      "deckcraft_host_frame_from_seahub"
+    ],
+    "raw_private_sha256": "784776035764e8511ed0a731e75616b504dfe6cd1adb8c0873a310b17dc69cec",
+    "launcher_exit": 1
+  },
+  {
+    "source": "995fc11",
+    "reason": "typing missed title; same-format save succeeded but semantic marker checks failed",
+    "passed": 12,
+    "failed": 3,
+    "failed_checks": [
+      "pptx_save_payload_contains_original_title_and_typed_marker",
+      "pptx_readback_retains_title_and_typed_marker",
+      "pptx_fresh_editor_loaded_persisted_edit"
+    ],
+    "raw_private_sha256": "bdfa4a338f2615a7942631cf6ea720434d66ba4253729b05555dbb8a34c24b09",
+    "launcher_exit": 1
+  }
+]

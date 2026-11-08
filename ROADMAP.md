@@ -25,8 +25,10 @@ Do not run the historical ONLYOFFICE campaigns below.
 
 1. Done: ONLYOFFICE removed from active lab; fresh WordCraft replay HTTP 40/40,
    browser 28/28, exit 0 (`lab/real-seafile/results/2026-11-08-craft-only-wordcraft/`).
-2. Validate the separately pinned upstream DeckCraft PPTX same-format save/reopen.
-3. Extend required viewing-format coverage and repeat HTTPS acceptance.
+2. Done (opt-in `--pptx`): official DeckCraft v0.16.0 same-format edit/save/reopen,
+   focused 15/15 and combined seven-editor 132/132 browser checks; see validation checkpoint.
+3. Extend required viewing-format coverage and hardware/clipboard/font/unload checks.
+   Automated WordCraft HTTPS replay is done: HTTP 40/40, browser 28/28; TLS routes restored.
 4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
 
 ## Historical next steps (superseded where they require ONLYOFFICE)

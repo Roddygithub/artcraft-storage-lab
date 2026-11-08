@@ -10,7 +10,7 @@ proof that every current ONLYOFFICE path works in practice.
 | --- | --- | --- |
 | DOCX | View + edit | WordCraft: three synthetic corpus edit/save/version/fresh-reopen cases, 28 checks each; bounded reviews PASS |
 | XLSX | View + edit | GridCraft: synthetic typed-cell edit/save/version/fresh-reopen evidence; broader workbook fidelity NOT VERIFIED |
-| PPTX | View + edit | NOT VERIFIED; historical DeckCraft foreign import exported native format rather than saving PPTX in place |
+| PPTX | View + edit | Official DeckCraft v0.16.0: synthetic title edit, same-file PPTX save, attributed version and fresh reopen; 15/15 browser checks; broad fidelity NOT VERIFIED |
 | DOC | View | NOT VERIFIED |
 | PPT | View | NOT VERIFIED |
 | XLS | View | NOT VERIFIED |
@@ -30,8 +30,9 @@ an additional capability, not something established by the existing settings.
 Changing an extension, exporting another format or downloading a file cannot
 satisfy same-file edit/save/new-version validation for the three editing routes.
 
-The shipped zero-patch candidate currently validates only DOCX/XLSX among the
-required office formats. PDF/DXF/SVG/FIGCRAFT are additional Craft routes, not
+The shipped zero-patch candidate currently validates DOCX/XLSX among the
+required office formats; PPTX now has a validated opt-in `--pptx` lab candidate
+(`lab/real-seafile/results/2026-11-08-pptx-official/`). PDF/DXF/SVG/FIGCRAFT are additional Craft routes, not
 substitutes for the missing office coverage. Experimental DeckCraft Rust ports
 remain outside the zero-patch default. The owner subsequently authorized ONLYOFFICE retirement independently of this
 coverage; see `ONLYOFFICE-RETIREMENT-20261108.md`. Missing formats remain NOT VERIFIED.
@@ -61,3 +62,8 @@ WordCraft v0.16.0 documents DOC import and ODT import/export; GridCraft v0.17.0
 documents CSV/TSV and ODS data import using cached values rather than formulas.
 No FODT/FODS support or faithful legacy/OpenDocument viewing is inferred from
 those statements. All missing viewing routes still require actual tests.
+
+PPTX update: the earlier documentary-only claim is superseded by the focused
+2026-11-08 runtime above. One title-box fixture passed; Arial fallback was
+visible, so exact font fidelity remains NOT VERIFIED. Combined replay passed HTTP 40/40 and browser 132/132 across seven editors
+(`lab/real-seafile/results/2026-11-08-seven-craft-validation/`).

@@ -5,11 +5,13 @@ historical GR corpus to resume routine validation.
 
 | Scope | State | Evidence |
 | --- | --- | --- |
-| Active offline checks | 18/18 command groups PASS | `../lab/real-seafile/results/2026-11-08-all-craft-validation/offline.json` |
+| Active offline checks | 19/19 command groups PASS (PPTX fixture added) | `../lab/real-seafile/results/2026-11-08-pptx-official/offline.json` |
 | Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
 | All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
-| Required remaining office formats, especially PPTX | NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md` |
-| HTTPS desktop/WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
+| Official DeckCraft PPTX opt-in | focused 15/15; combined HTTP 40/40, browser 132/132, exit 0 | `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
+| Remaining office viewing formats and broad fidelity | NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md` |
+| Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
+| Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent forensic review and final project GPT gate | NOT PERFORMED | `PROJECT-CLOSURE.md` |
 
 ONLYOFFICE is retired; do not restart compatibility campaigns. Production is
@@ -37,3 +39,18 @@ integration tests, mutate production or confer independent review approval.
 To save tokens: read this file and `git status --short`; run the compact runner;
 inspect only failed logs; retain sanitized runtime totals and exact provenance.
 Do not repeatedly dump successful logs, historical reports or bundle contents.
+
+The HTTPS reopened-saved screenshot was inspected: both typed markers are
+visible with the table and the saved-to-Seafile host status. This does not
+prove full pagination or font fidelity.
+
+## Next unresolved work
+
+1. Required legacy/OpenDocument viewing formats: the matrix still contains
+   unverified routes; DOCX/XLSX/PPTX synthetic edit coverage does not replace them.
+2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
+3. Independent forensic review and a fresh project GPT gate, in a context that
+   did not implement this candidate. No global PASS has been granted.
+
+The default six-editor candidate remains unchanged. Add `--pptx` and the
+verified official DeckCraft assets for the validated seven-editor option.

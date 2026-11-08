@@ -23,8 +23,9 @@ Seahub WOPI host ◀──(CheckFileInfo/GetFile/PutFile/Lock, token in headers)
 
 Status: **MVP candidate under final validation**. Current bridge evidence covers
 WordCraft DOCX, GridCraft XLSX, PdfCraft AcroForm and CADCraft DXF. VectorCraft
-and FigCraft semantic edit/reopen slices are implemented but still awaiting
-runtime validation. The exact closure criteria and remaining checks are in
+and FigCraft semantic edit/reopen slices passed the combined six-editor replay.
+An opt-in official DeckCraft v0.16.0 candidate also passed a real PPTX title
+edit/save/new-version/fresh-reopen slice; broad presentation fidelity is unverified. The exact closure criteria and remaining checks are in
 [`PROJECT-CLOSURE.md`](docs/PROJECT-CLOSURE.md).
 
 ## Zero-patch candidate
@@ -37,7 +38,8 @@ runtime validation. The exact closure criteria and remaining checks are in
 | `.dxf` | CADCraft 0.15.1 | unmodified upstream bundle |
 | `.svg` | VectorCraft 0.19.0 | upstream bundle plus declared lab page-API shim |
 | `.figcraft` | FigCraft 0.13.1 | upstream bundle plus declared lab page-API shim |
-| PPTX, ODF and remaining office routes | pending | ArtCraft replacement NOT VERIFIED |
+| `.pptx` (lab `--pptx`) | DeckCraft 0.16.0 | unmodified upstream bundle; focused same-format edit/save/reopen verified |
+| ODF and remaining legacy office routes | pending | ArtCraft replacement NOT VERIFIED |
 
 The deployment example routes DXF by default; office extensions are operator
 opt-ins. The synthetic lab routes DOCX/XLSX/PDF to Craft for testing and leaves

@@ -1,0 +1,8 @@
+{
+  "lab_exit": 0,
+  "routes_restored": {
+    "desktop": true,
+    "proxmox": true
+  },
+  "cleanup_errors": []
+}

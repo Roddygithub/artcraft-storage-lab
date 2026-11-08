@@ -8,6 +8,15 @@ current acceptance plan. Unsupported office formats remain NOT VERIFIED.
 A stock Seafile CE 13 + the bridge + upstream Craft web bundles, in a
 dedicated Lima VM with Docker. Nothing here touches a production system; the VM is disposable.
 
+## Optional official DeckCraft PPTX candidate
+
+With the verified official v0.16.0 bundle under `static/deckcraft/`, pass
+`--pptx --editor deckcraft` to validate same-format PPTX persistence, or just
+`--pptx` to exercise all seven editors. This modifies only the fresh private
+lab snapshot. The default six-editor configuration is unchanged; the option
+cannot be combined with experimental Rust ports. Focused retained evidence:
+`results/2026-11-08-pptx-official/`. Broader PPTX/font fidelity is unverified.
+
 ## Linux rootless Podman candidate
 
 `local.py` uses the same Compose file as Lima. Prerequisites: Linux, Python 3.11+,

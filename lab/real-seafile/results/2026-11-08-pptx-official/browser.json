@@ -1,0 +1,67 @@
+{
+  "passed": 15,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "browser_login",
+      "ok": true
+    },
+    {
+      "name": "browser_editor_filter_selects_requested_editor",
+      "ok": true
+    },
+    {
+      "name": "pptx_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "deckcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "deckcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "pptx_canvas_ready_before_typing",
+      "ok": true
+    },
+    {
+      "name": "pptx_save_payload_contains_original_title_and_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "pptx_save_confirmed_by_host",
+      "ok": true
+    },
+    {
+      "name": "pptx_new_version_attributed_to_user",
+      "ok": true
+    },
+    {
+      "name": "pptx_same_file_readback_equals_relay",
+      "ok": true
+    },
+    {
+      "name": "pptx_readback_retains_title_and_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "pptx_old_page_closed",
+      "ok": true
+    },
+    {
+      "name": "pptx_fresh_session_file_list_reopen",
+      "ok": true
+    },
+    {
+      "name": "pptx_fresh_editor_loaded_persisted_edit",
+      "ok": true
+    },
+    {
+      "name": "pptx_save_did_not_download",
+      "ok": true
+    }
+  ],
+  "raw_private_sha256": "b17c3e89448d8951e78662c0b162c173da316737b9fae18f836bdfad47994789"
+}

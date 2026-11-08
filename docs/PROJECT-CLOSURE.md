@@ -164,3 +164,31 @@ sanitary summaries, synthetic payloads, provenance and integrity verifier:
 `lab/real-seafile/results/2026-11-08-all-craft-validation/`. This closes the
 combined current-source six-editor replay, not missing formats, HTTPS acceptance
 or independent review. Continue from `docs/VALIDATION-STATE.md`.
+
+
+## Official PPTX and HTTPS recovery — 2026-11-08
+
+At application source `4f4b2dc`, official unmodified DeckCraft v0.16.0 passed
+one synthetic title edit → same-file PPTX save → attributed new version →
+close → fresh authenticated file-list reopen: **15/15** focused browser checks.
+The opt-in `--pptx` combined seven-editor replay passed **132/132** browser
+checks after **40/40** HTTP checks. Default routing remains the six-editor
+candidate; experimental Rust ports are not involved. The title/marker payloads
+and relay/readback equality are retained with provenance and an integrity check.
+An Arial fallback warning remains visible; full PPTX fidelity is not claimed.
+
+Current Craft-only WordCraft HTTPS passed HTTP **40/40** and browser **28/28**,
+including two attributed saves with a fresh reopen between them. Temporary TLS
+routes on desktop/Proxmox were restored by exact before/after comparison. No
+production Seafile settings or user documents were changed. The saved screenshot
+was inspected and the DOCX structural verifier passed. HTTPS automation does not
+replace hardware WebGPU/clipboard/font/unload acceptance. No final reopen after
+the second WordCraft save is claimed.
+
+Retained evidence under `lab/real-seafile/results/`: `2026-11-08-pptx-official/`,
+`2026-11-08-seven-craft-validation/`, `2026-11-08-wordcraft-https-current/`.
+All three launchers exited 0; their project containers are absent. Offline
+validation passed **19/19 command groups**. Earlier failed PPTX attempts remain
+recorded as failures, with their filter/click-target corrections. Independent
+review has not been performed. Continue from `docs/VALIDATION-STATE.md`.
+Project INCOMPLETE; upstream LOCKED.

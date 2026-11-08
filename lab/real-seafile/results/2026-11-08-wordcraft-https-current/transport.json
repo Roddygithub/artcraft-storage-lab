@@ -1,0 +1,8 @@
+{
+  "seafile_https": true,
+  "bridge_https": true,
+  "distinct_origin_hostnames": true,
+  "http_slice_uses_default_urllib_tls_verification": true,
+  "browser_ignore_https_errors": true,
+  "hardware_webgpu_clipboard_fonts_unload_acceptance": "NOT VERIFIED"
+}
