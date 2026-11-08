@@ -44,6 +44,22 @@ def snapshot(run, assets, expected):
     shutil.copyfile(run / 'app/lab/real-seafile/compose.yml', run / 'compose.yml')
 
 
+def render_settings(text, without_wopi=False):
+    """Managed Seahub block. ``without_wopi`` isolates stock ONLYOFFICE.
+
+    Upstream Seahub 13 runs its WOPI branch whenever ENABLE_OFFICE_WEB_APP is
+    true, even for extensions absent from OFFICE_WEB_APP_FILE_EXTENSION, and
+    records an error that the ONLYOFFICE page then renders instead of the
+    editor. Dropping the WOPI keys is the only configuration-only way to
+    observe the stock ONLYOFFICE path on that host.
+    """
+    lines = text.splitlines(keepends=True)
+    if without_wopi:
+        lines = [line for line in lines
+                 if not line.startswith(('ENABLE_OFFICE_WEB_APP', 'OFFICE_WEB_APP_'))]
+    return ''.join(lines)
+
+
 def stop(proc):
     if proc.poll() is not None:
         return
@@ -119,6 +135,8 @@ def main():
     parser.add_argument('--wordcraft-fixture', default='')
     parser.add_argument('--onlyoffice-regression', action='store_true',
                         help='run the ODT edit/save/reopen regression instead of Craft scenarios')
+    parser.add_argument('--without-wopi', action='store_true',
+                        help='omit the bridge WOPI keys to isolate stock ONLYOFFICE (diagnostic only)')
     args = parser.parse_args()
     if args.onlyoffice_regression and (args.editor or args.wordcraft_fixture):
         parser.error('ONLYOFFICE regression cannot select a Craft editor or fixture')
@@ -156,6 +174,7 @@ def main():
     # Configure only the Seafile container belonging to this new project.
     config = (run / 'app/lab/real-seafile/seahub_settings.extra.py').read_text()
     config = config.replace('__ONLYOFFICE_JWT_SECRET__', values['ONLYOFFICE_JWT_SECRET'])
+    config = render_settings(config, args.without_wopi)
     script = ("from pathlib import Path; import time\n"
               "p=Path('/shared/seafile/conf/seahub_settings.py')\n"
               "for _ in range(120):\n"
@@ -170,7 +189,16 @@ def main():
                     run, env, log, 900)
             command(compose + ['exec', '-T', 'seafile', 'python3', '-c', script], run, env, log, 630)
             command(compose + ['restart', 'seafile'], run, env, log)
-            for service in ('slice', 'browser'):
+            ready = ("import time, urllib.request\n"
+                     "for _ in range(90):\n"
+                     " try:\n"
+                     "  if urllib.request.urlopen('http://127.0.0.1:8000/api2/ping/', timeout=5).status == 200: break\n"
+                     " except Exception: pass\n"
+                     " time.sleep(2)\n"
+                     "else: raise SystemExit('Seahub did not become ready')\n")
+            command(compose + ['exec', '-T', 'seafile', 'python3', '-c', ready], run, env, log, 240)
+            services = ('browser',) if args.onlyoffice_regression else ('slice', 'browser')
+            for service in services:
                 command(compose + ['run', '--rm', service], run, env, log, 3600)
         finally:
             try:

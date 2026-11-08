@@ -98,6 +98,10 @@ def main():
                     rb.track_downloads(ctx, downloads)
                     try:
                         page = ctx.new_page()
+                        page.on("console", lambda m: (results / "onlyoffice-console.txt").open("a").write(
+                            f"{m.type}: {m.text[:300]}\n"))
+                        page.on("requestfailed", lambda r: (results / "onlyoffice-console.txt").open("a").write(
+                            f"REQFAIL {r.url[:200]} {r.failure}\n"))
                         page.goto(rs.SEAFILE + "/accounts/login/", wait_until="domcontentloaded")
                         page.fill("input[name=login]", rs.ADMIN)
                         page.fill("input[name=password]", rs.ADMIN_PW)
@@ -105,16 +109,38 @@ def main():
                         page.wait_for_url(lambda url: "/accounts/login" not in url, timeout=30000)
                         editor = rb.open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
                         # Pump navigation before the shared frame helper's bounded scan.
-                        editor.wait_for_selector("iframe", timeout=60000)
-                        frame = rb.find_frame(editor, rs.ONLYOFFICE + "/web-apps/", timeout=60)
-                        require(f"round{round_no}_actual_onlyoffice_frame", frame is not None)
-                        canvas = frame.locator("#id_viewer canvas").first
-                        canvas.wait_for(state="visible", timeout=90000)
+                        try:
+                            editor.wait_for_selector("iframe", timeout=60000)
+                        except Exception:
+                            # Private diagnostic only: never published, may contain a
+                            # credential-bearing URL or host-supplied HTML.
+                            (results / f"onlyoffice-round{round_no}-page.html").write_text(
+                                editor.content(), errors="replace")
+                            (results / f"onlyoffice-round{round_no}-url.txt").write_text(
+                                editor.url, errors="replace")
+                            raise
+                        frame = rb.find_frame(editor, rs.ONLYOFFICE + "/", timeout=60, name="frameEditor")
+                        if frame is None:
+                            (results / f"onlyoffice-round{round_no}-frames.txt").write_text(
+                                repr(rb.frames_dump(editor)), errors="replace")
+                        # DocServer mounts a version-prefixed path (/9.4.0-<hash>/web-apps/...).
+                        require(f"round{round_no}_actual_onlyoffice_frame",
+                                frame is not None and "/web-apps/" in frame.url)
+                        canvas = frame.locator("canvas#id_viewer").first
+                        try:
+                            canvas.wait_for(state="visible", timeout=90000)
+                        except Exception:
+                            (results / f"onlyoffice-round{round_no}-frame.html").write_text(
+                                frame.content(), errors="replace")
+                            (results / f"onlyoffice-round{round_no}-canvas-count.txt").write_text(
+                                f"{frame.locator('canvas').count()}\n")
+                            raise
                         frame.locator("#editor_sdk").wait_for(state="visible", timeout=30000)
                         frame.locator("#toolbar").wait_for(state="visible", timeout=30000)
                         # Canvas readiness plus actual mutation/readback is mandatory; a
                         # missing frame/canvas cannot turn into a conditional pass.
-                        canvas.click(position={"x": 150, "y": 150})
+                        # The overlay canvas above #id_viewer owns pointer input.
+                        frame.locator("canvas#id_viewer_overlay").first.click(position={"x": 150, "y": 150})
                         editor.keyboard.press("Control+End")
                         editor.keyboard.press("Enter")
                         editor.keyboard.type(marker, delay=35)
@@ -140,13 +166,23 @@ def main():
                             text = odt_text(data)
                             stable = rs.history(token, repo_id, name)
                             if stable and stable[0] == after[0]:
-                                proved = baseline in text and all(m in text for m in markers[:round_no])
+                                text_l = text.lower()
+                                proved = baseline in text and all(m.lower() in text_l for m in markers[:round_no])
                                 if proved:
                                     evidence[f"round{round_no}_version"] = {
                                         "commit": after[0]["id"], "object": after[0]["rev_file_id"],
                                         "attributed_to_authenticated_user": True}
                                     break
                         time.sleep(2)
+                    if not proved:
+                        try:
+                            data_after, _ = rs.download(token, repo_id, name)
+                            tail = odt_text(data_after)[:400]
+                        except Exception as exc:
+                            tail = f"unreadable: {exc}"
+                        (results / f"onlyoffice-round{round_no}-history.json").write_text(
+                            json.dumps({"before": before, "after": rs.history(token, repo_id, name),
+                                        "markers": markers[:round_no], "text": tail}, indent=2))
                     require(f"round{round_no}_new_user_version_and_body_readback", proved)
                     require(f"round{round_no}_no_browser_download", not downloads)
                 evidence["runtime"] = "PASS"

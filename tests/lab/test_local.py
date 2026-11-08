@@ -15,6 +15,14 @@ spec.loader.exec_module(local)
 
 
 class LauncherTest(unittest.TestCase):
+    def test_settings_can_omit_the_wopi_keys(self):
+        text = ('ENABLE_ONLYOFFICE = True\nENABLE_OFFICE_WEB_APP = True\n'
+                'OFFICE_WEB_APP_BASE_URL = "http://bridge:8778/wopi/discovery.xml"\n'
+                'OFFICE_WEB_APP_FILE_EXTENSION = ("docx",)\n')
+        self.assertEqual(local.render_settings(text), text)
+        isolated = local.render_settings(text, without_wopi=True)
+        self.assertEqual(isolated, 'ENABLE_ONLYOFFICE = True\n')
+
     def test_user_and_libexec_compose_plugins_are_discovered(self):
         with tempfile.TemporaryDirectory() as d:
             base = Path(d)
