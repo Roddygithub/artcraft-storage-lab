@@ -1,5 +1,13 @@
 # Re-Foundation Report — ArtCraft Storage Lab
 
+> **2026-11-08 closure correction:** the project remains **INCOMPLETE**.
+> Packaged Seahub CE 13.0.28 can block ONLYOFFICE pages when WOPI is enabled
+> for other extensions. APIJS-only checks missed this; the HTTP gate now
+> rejects the error. Do not deploy the mixed configuration. Earlier private
+> passing Craft assertions and isolated ONLYOFFICE results do not establish
+> coexistence or final approval. See [the current closure ledger](PROJECT-CLOSURE.md).
+
+
 Date: 2026-10-31. Mandate: `Claude.md` (commit `f30d39c`). Status of this document: **draft for owner review**. Nothing in this report has been published, and no production system was touched while producing it.
 
 ```text

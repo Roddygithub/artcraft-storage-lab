@@ -1,5 +1,13 @@
 # ArtCraft Storage Lab
 
+> **2026-11-08 closure correction:** the project remains **INCOMPLETE**.
+> Packaged Seahub CE 13.0.28 can block ONLYOFFICE pages when WOPI is enabled
+> for other extensions. APIJS-only checks missed this; the HTTP gate now
+> rejects the error. Do not deploy the mixed configuration. Earlier private
+> passing Craft assertions and isolated ONLYOFFICE results do not establish
+> coexistence or final approval. See [the current closure ledger](docs/PROJECT-CLOSURE.md).
+
+
 > Open a file in Seafile Web, edit it in a Craft web editor, save, and get a normal Seafile
 > version — with **no patch to Seafile, no patch to the editors, no SeaDrive, no download/upload,
 > no desktop app**.
