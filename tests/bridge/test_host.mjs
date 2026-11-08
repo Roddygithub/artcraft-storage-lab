@@ -88,3 +88,23 @@ edited.send('dirty', { dirty: false });
 assert.equal(edited.guarded(), false, 'current clean state can resolve a verified save');
 assert.equal(edited.status(), 'saved to Seafile', 'visible confirmation must recover with the guard');
 console.log('PASS: verified host saves and failed-save unload protection');
+
+// Current upstream craft-web-host IDs receive ACK only after verified storage.
+let finishNative;
+const nativeReply = new Promise(resolve => { finishNative = resolve; });
+const native = host([() => nativeReply, () => response({ version: '3' }), verified]);
+native.send('dirty', { dirty: true });
+native.send('save', { bytes: new Uint8Array([1]), name: 'test.docx', id: 'native:1' });
+await settle();
+assert.equal(native.acknowledgements.some(m => m.type === 'wordcraft:saved'), false);
+finishNative(verified()); await settle();
+assert.deepEqual(native.acknowledgements.filter(m => m.type === 'wordcraft:saved').map(m => m.id), ['native:1']);
+native.send('save', { bytes: new Uint8Array([2]), name: 'test.docx', id: 'native:2' });
+await settle();
+assert.equal(native.guarded(), true);
+assert.equal(native.acknowledgements.some(m => m.id === 'native:2'), false);
+native.send('save', { bytes: new Uint8Array([2]), name: 'test.docx', id: 'native:3' });
+await settle();
+assert.equal(native.acknowledgements.at(-1).id, 'native:3');
+assert.equal(native.guarded(), false);
+console.log('PASS: upstream save IDs acknowledged only after verified storage');

@@ -3,12 +3,13 @@
  * Speaks the ArtCraft `?host=parent` postMessage protocol (as merged upstream in
  * WordCraft #3822, GridCraft, PdfCraft, CADCraft):
  *   child -> host : `${app}:ready` {version}
- *                   `${app}:save`  {name, bytes, saveAs, ticket?}
+ *                   `${app}:save`  {name, bytes, saveAs, ticket?, id?}
  *                   `${app}:dirty` {dirty}
  *                   `${app}:failed`{error}
  *   host  -> child: `${app}:open`  {name, bytes}
  *                   `${app}:saveResult` {ticket, ok, version?, error?}   (only if the
- *                   editor sent a ticket — upstream bridges do not yet; the lab's RFC)
+ *                   editor sent a ticket — compatibility with the lab shim)
+ *                   `${app}:saved` {id} (shared upstream craft-web-host save ID)
  *
  * The WOPI access token lives only in this page's memory and travels to the
  * same-origin relay in request headers, never in URLs.
@@ -132,6 +133,7 @@
   // ---- save
   function handleSave(d) {
     var ticket = typeof d.ticket === 'string' ? d.ticket : null;
+    var saveId = typeof d.id === 'string' && d.id ? d.id : null;
     function reject(err) {
       // A refused save means the editor's content is NOT in Seafile: the page stays dirty (unload
       // guard) whatever the editor believes, until a later save succeeds.
@@ -184,6 +186,7 @@
         else if (state.dirty) status('saved earlier edits to Seafile; unsaved changes remain', 'warn');
         else status(state.savedStatus, 'ok');
         if (ticket) post('saveResult', { ticket: ticket, ok: true, version: res.body.version });
+        if (saveId) post('saved', { id: saveId });
         return;
       }
       if (res.status === 200) return reject('save failed: the bridge did not verify the stored document');
