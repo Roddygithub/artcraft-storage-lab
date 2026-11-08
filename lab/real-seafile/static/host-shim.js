@@ -68,12 +68,16 @@
         lastHash = saved.hash;
         saveFailed = false;
         lastAck = d.ticket;
+        pollSaves(); // A newer local serialization may already be waiting behind this ACK.
+        if (pending) return;
         // The ACK verifies the captured bytes, not edits made after serialization.
         // Keep the guard until the current editor state itself reports clean.
         if (typeof api.request === 'function') {
           var serial = ++inspectSerial;
           api.request('document.inspect', { depth: 0 }).then(function (result) {
             if (serial !== inspectSerial || pending || lastAck !== d.ticket) return;
+            pollSaves();
+            if (pending) return;
             var dirty = findFlag(result, ['modified', 'dirty', 'unsaved', 'unsavedChanges'], 0);
             setDirty(dirty !== false, dirty !== false);
           }, function () {
@@ -106,6 +110,7 @@
     if (!ready || !openedName) return;
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key === 's' || e.key === 'S')) {
       seen[openedName] = null; // An explicit retry may resend the same refused bytes.
+      if (pending) setDirty(true, true);
       if (pathSaveUnsupported) return;
       e.preventDefault(); e.stopPropagation();
       saveInPlace();
@@ -114,6 +119,7 @@
   var saving = false;
   function saveInPlace() {
     if (saving || typeof api.execute !== 'function') return;
+    if (pending) setDirty(true, true);
     seen[openedName] = null;
     saving = true;
     // With a path the app writes the file directly (VectorCraft). An app whose web build refuses
@@ -140,7 +146,7 @@
   // Captured saves: the app keeps them in the page; forward each new or changed file to the host.
   var seen = {};
   function pollSaves() {
-    if (!ready || pending) return;
+    if (!ready) return;
     var list;
     try { list = api.files() || []; } catch (e) { return; }
     for (var i = 0; i < list.length; i++) {
@@ -149,6 +155,10 @@
       try { bytes = api.readFile(name); } catch (e) { continue; }
       if (!(bytes instanceof Uint8Array)) continue;
       var h = fnv(bytes);
+      if (pending) {
+        if (name === openedName && h !== pending.hash) setDirty(true, true);
+        continue;
+      }
       if (seen[name] === h) continue;
       seen[name] = h;
       if (name === openedName && h === lastHash) continue;   // nothing new
@@ -160,7 +170,7 @@
       }
       var ticket = app + ':shim:' + (++nextTicket);
       pending = { ticket: ticket, hash: h, timer: null };
-      setDirty(true);
+      setDirty(true, true);
       if (!post('save', { name: name, saveAs: false, bytes: buf, ticket: ticket }, [buf])) {
         pending = null;
         saveFailed = true;

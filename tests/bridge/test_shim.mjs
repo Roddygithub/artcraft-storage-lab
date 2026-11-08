@@ -60,4 +60,21 @@ editorDirty = false;
 deliver({ type: 'vectorcraft:saveResult', ticket: fourth.ticket, ok: true, version: '4' });
 await settle();
 assert.equal(messages.at(-1).dirty, false, 'the later verified save can recover normally');
+
+saved = new Uint8Array([5]); shortcut(); await settle();
+const fifth = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
+const beforeQueued = messages.length;
+saved = new Uint8Array([6]); shortcut(); await settle();
+editorDirty = false; // B was serialized locally, but A is the only storage request so far.
+assert.equal(messages.filter(m => m.type === 'vectorcraft:save').at(-1).ticket, fifth.ticket);
+deliver({ type: 'vectorcraft:saveResult', ticket: fifth.ticket, ok: true, version: '5' });
+await settle();
+const sixth = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
+assert.notEqual(sixth.ticket, fifth.ticket, 'captured B must be forwarded immediately after A');
+assert.deepEqual(Array.from(new Uint8Array(sixth.bytes)), [6]);
+assert.equal(messages.slice(beforeQueued).some(m => m.type === 'vectorcraft:dirty' && !m.dirty), false,
+  'clean editor state cannot clear captured B before its storage ACK');
+deliver({ type: 'vectorcraft:saveResult', ticket: sixth.ticket, ok: true, version: '6' });
+await settle();
+assert.equal(messages.at(-1).dirty, false);
 console.log('PASS: shim waits for matching storage ACK and permits identical-byte retry');
