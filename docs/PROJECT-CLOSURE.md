@@ -100,3 +100,20 @@ Final fresh semantic reopen remains NOT VERIFIED; this is not a PASS.
 The launcher exited 1 and removed its lab containers. No further ONLYOFFICE
 replay is planned while priority shifts to WordCraft fidelity. Sanitized checks:
 `docs/reviews/PROJECT-CLOSURE-20261108/ONLYOFFICE-DIAGNOSTIC.json`.
+
+## WordCraft replacement readiness follow-up
+
+The focused layout-fixture recovery run records browser **28/28** with actual
+DOCX original, first relay/readback and second readback retained. The first
+relay equals Seafile readback. Both readbacks preserve referenced header/footer
+text, PAGE instructions, table-cell text, explicit page breaks, page geometry
+and paragraph style references. The runnable structural verifier and three
+parent-inspected screenshots are in
+`lab/real-seafile/results/2026-11-08-wordcraft-structure-recovery/`.
+
+This is one synthetic document, not full visual or general DOCX compatibility.
+HTTP correctly reports 44 passes and 2 ONLYOFFICE failures; diagnostic collection
+does not hide that failure and the runner exits 1 after cleanup. Replacement
+readiness still requires the prose/list-format corpus, broader document features,
+HTTPS desktop acceptance and final independent gate. No ONLYOFFICE removal or
+production change has been performed.
