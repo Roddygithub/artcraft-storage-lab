@@ -208,6 +208,10 @@ def main():
         editor_config = run / 'app/lab/real-seafile/editors.experimental.json'
     else:
         editor_config = run / 'app/lab/real-seafile/editors.json'
+    # Seahub settings.py reapplies these Docker values after user settings.
+    # They must match the external origin or minted WOPISrc stays internal.
+    env.update(LAB_SEAFILE_HOSTNAME=urlsplit(args.seafile_public_url).netloc if args.seafile_public_url else 'seafile.lab',
+               LAB_SEAFILE_PROTOCOL='https' if args.seafile_public_url else 'http')
     env.update(BROWSER_ONLY_EDITOR=args.editor,
                BROWSER_WORDCRAFT_FIXTURE=args.wordcraft_fixture,
                BROWSER_SCRIPT='run_onlyoffice_browser.py' if args.onlyoffice_regression else 'run_browser.py',

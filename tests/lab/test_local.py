@@ -50,6 +50,28 @@ class LauncherTest(unittest.TestCase):
                     self.assertFalse(run.exists())
                     command.assert_not_called()
 
+    def test_public_origin_reaches_docker_seahub_overrides(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            assets = base / 'assets'
+            assets.mkdir()
+            (assets / 'index.html').write_text('synthetic')
+            manifest = base / 'manifest.json'
+            manifest.write_text(json.dumps(local.manifest(assets)))
+            def inspect(args, cwd, env, log, timeout=120):
+                self.assertEqual(env['LAB_SEAFILE_HOSTNAME'], 'seafile.test:8443')
+                self.assertEqual(env['LAB_SEAFILE_PROTOCOL'], 'https')
+                raise RuntimeError('captured environment without starting services')
+            argv = ['local.py', '--run-dir', str(base / 'run'), '--static', str(assets), '--manifest', str(manifest),
+                    '--seafile-public-url', 'https://seafile.test:8443', '--bridge-public-url', 'https://bridge.test:8443']
+            old_mask = os.umask(0o077)
+            try:
+                with patch.object(sys, 'argv', argv), patch.object(local, 'command', inspect):
+                    with self.assertRaisesRegex(RuntimeError, 'captured environment'):
+                        local.main()
+            finally:
+                os.umask(old_mask)
+
     def test_public_settings_and_compose_defaults(self):
         seafile = local.https_origin('https://Seafile.test:8443')
         bridge = local.https_origin('https://Bridge.test')
@@ -72,6 +94,8 @@ class LauncherTest(unittest.TestCase):
         self.assertEqual(compose.count('SEAFILE_URL=${SEAFILE_PUBLIC_URL:-http://seafile.lab}'), 2)
         self.assertEqual(compose.count('BRIDGE_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}'), 2)
         self.assertIn('127.0.0.1:${SEAFILE_PORT:-8000}:80', compose)
+        self.assertIn('SEAFILE_SERVER_HOSTNAME=${LAB_SEAFILE_HOSTNAME:-seafile.lab}', compose)
+        self.assertIn('SEAFILE_SERVER_PROTOCOL=${LAB_SEAFILE_PROTOCOL:-http}', compose)
 
     def test_settings_can_omit_the_wopi_keys(self):
         text = ('ENABLE_ONLYOFFICE = True\nENABLE_OFFICE_WEB_APP = True\n'
