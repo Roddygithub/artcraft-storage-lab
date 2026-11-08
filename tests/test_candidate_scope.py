@@ -18,14 +18,14 @@ def settings(path):
 lab = settings(root / 'lab/real-seafile/seahub_settings.extra.py')
 for name in ('OFFICE_WEB_APP_FILE_EXTENSION', 'OFFICE_WEB_APP_EDIT_FILE_EXTENSION'):
     assert set(lab[name]) == extensions
-assert lab['ENABLE_ONLYOFFICE'] is True
-assert 'pptx' in lab['ONLYOFFICE_FILE_EXTENSION']
-assert 'pptx' in lab['ONLYOFFICE_EDIT_FILE_EXTENSION']
+assert lab['ENABLE_ONLYOFFICE'] is False
+assert not any(name.startswith('ONLYOFFICE_') for name in lab)
+assert 'onlyoffice:' not in (root / 'lab/real-seafile/compose.yml').read_text()
 deploy = settings(root / 'deploy/bridge/seahub_settings.example.py')
 shipped = json.loads((root / 'deploy/bridge/editors.json').read_text())
 assert {ext for entry in shipped.values() for ext in entry['extensions']} == set(deploy['OFFICE_WEB_APP_FILE_EXTENSION'])
 assert deploy['OFFICE_WEB_APP_EDIT_FILE_EXTENSION'] == deploy['OFFICE_WEB_APP_FILE_EXTENSION']
-print('PASS: zero-patch candidate scope, consistent discovery, PPTX on ONLYOFFICE')
+print('PASS: zero-patch candidate scope, consistent discovery, ONLYOFFICE retired; PPTX replacement remains unverified')
 
 # Execute the pure HTTP predicate without importing network runner state.
 import re
