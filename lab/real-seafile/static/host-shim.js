@@ -21,6 +21,7 @@
   try { if (parent.location.origin !== origin) return; } catch (e) { return; }
 
   var api = null, openedName = null, lastHash = null, ready = false, dirtyReported = null;
+  var pending = null, nextTicket = 0, saveFailed = false;
 
   function post(type, payload, transfer) {
     var m = { type: app + ':' + type };
@@ -57,6 +58,20 @@
   window.addEventListener('message', function (e) {
     if (e.origin !== origin || e.source !== parent) return;
     var d = e.data || {};
+    if (d.type === app + ':saveResult') {
+      if (!pending || d.ticket !== pending.ticket) return;
+      clearTimeout(pending.timer);
+      if (d.ok === true) {
+        lastHash = pending.hash;
+        saveFailed = false;
+        setDirty(false);
+      } else {
+        saveFailed = true;
+        setDirty(true);
+      }
+      pending = null;
+      return;
+    }
     if (d.type !== app + ':open') return;
     var bytes = d.bytes instanceof ArrayBuffer ? new Uint8Array(d.bytes) : d.bytes;
     if (!(bytes instanceof Uint8Array)) return;
@@ -74,8 +89,10 @@
   // host would refuse; so the shortcut is taken here and turned into `file.save {path}`.
   var pathSaveUnsupported = false;   // FigCraft web: "no file system in the browser" -- its own Save shortcut then runs
   window.addEventListener('keydown', function (e) {
-    if (!ready || !openedName || pathSaveUnsupported) return;
+    if (!ready || !openedName) return;
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key === 's' || e.key === 'S')) {
+      seen[openedName] = null; // An explicit retry may resend the same refused bytes.
+      if (pathSaveUnsupported) return;
       e.preventDefault(); e.stopPropagation();
       saveInPlace();
     }
@@ -83,6 +100,7 @@
   var saving = false;
   function saveInPlace() {
     if (saving || typeof api.execute !== 'function') return;
+    seen[openedName] = null;
     saving = true;
     // With a path the app writes the file directly (VectorCraft). An app whose web build refuses
     // paths ("no file system in the browser": FigCraft) saves through its download path instead,
@@ -108,7 +126,7 @@
   // Captured saves: the app keeps them in the page; forward each new or changed file to the host.
   var seen = {};
   function pollSaves() {
-    if (!ready) return;
+    if (!ready || pending) return;
     var list;
     try { list = api.files() || []; } catch (e) { return; }
     for (var i = 0; i < list.length; i++) {
@@ -122,7 +140,27 @@
       if (name === openedName && h === lastHash) continue;   // nothing new
       var saveAs = openedName !== null && name !== openedName;
       var buf = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-      if (post('save', { name: name, saveAs: saveAs, bytes: buf }, [buf]) && !saveAs) { lastHash = h; setDirty(false); }
+      if (saveAs) {
+        post('save', { name: name, saveAs: true, bytes: buf }, [buf]);
+        continue;
+      }
+      var ticket = app + ':shim:' + (++nextTicket);
+      pending = { ticket: ticket, hash: h, timer: null };
+      setDirty(true);
+      if (!post('save', { name: name, saveAs: false, bytes: buf, ticket: ticket }, [buf])) {
+        pending = null;
+        saveFailed = true;
+        post('failed', { error: 'could not send save to host; retry Save' });
+        return;
+      }
+      pending.timer = setTimeout(function () {
+        if (!pending || pending.ticket !== ticket) return;
+        pending = null;
+        saveFailed = true;
+        setDirty(true);
+        post('failed', { error: 'host save confirmation timed out; retry Save' });
+      }, 120000);
+      return;
     }
   }
 
@@ -136,7 +174,7 @@
     if (!ready || typeof api.request !== 'function') return;
     api.request('document.inspect', { depth: 0 }).then(function (r) {
       var v = findFlag(r, ['modified', 'dirty', 'unsaved', 'unsavedChanges'], 0);
-      if (typeof v === 'boolean') setDirty(v);
+      if (typeof v === 'boolean' && (v || (!pending && !saveFailed))) setDirty(v);
     }, function () {});
   }
   function findFlag(o, keys, depth) {
