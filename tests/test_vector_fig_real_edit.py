@@ -9,14 +9,16 @@ from io import BytesIO
 import json
 from pathlib import Path
 import re
+import time
+from types import SimpleNamespace
 import xml.etree.ElementTree as ET
 import zipfile
 
 # Load only the pure helpers: no credentials, Playwright, services or network.
 source = Path(__file__).resolve().parents[1] / 'lab/real-seafile/run_browser.py'
 tree = ast.parse(source.read_text())
-names = {'svg_has_rectangle', 'figcraft_has_frame', 'scene_has_geometry', 'page_api', 'select_active_browser_fixtures'}
-namespace = dict(BytesIO=BytesIO, json=json, re=re, ET=ET, zipfile=zipfile)
+names = {'svg_has_rectangle', 'figcraft_has_frame', 'scene_has_geometry', 'page_api', 'select_active_browser_fixtures', 'open_from_seafile_list'}
+namespace = dict(BytesIO=BytesIO, json=json, re=re, time=time, ET=ET, zipfile=zipfile)
 exec(compile(ast.Module(body=[n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in names],
                         type_ignores=[]), str(source), 'exec'), namespace)
 svg_has_rectangle = namespace['svg_has_rectangle']
@@ -76,4 +78,26 @@ class Host:
         assert args == ['vectorcraft', 'engine.execute', {'command': 'shape.rectangle', 'params': g}]
         return {'id': 2}
 assert namespace['page_api'](Host(), 'vectorcraft', 'engine.execute', {'command': 'shape.rectangle', 'params': g}) == {'id': 2}
+
+actions = []
+class Element:
+    def __init__(self, label, page): self.label, self.page = label, page
+    def click(self, **kwargs):
+        actions.append((self.label, 'click', kwargs.get('button', 'left')))
+        if self.label == 'Default': self.page.context.pages.append(Popup())
+    def hover(self, **_kwargs): actions.append((self.label, 'hover'))
+class Popup:
+    def wait_for_load_state(self, state, **_kwargs): assert state == 'domcontentloaded'
+class Listing:
+    def __init__(self): self.context, self.url = SimpleNamespace(pages=[self]), 'about:blank'
+    def goto(self, url, **_kwargs): self.url = url
+    def get_by_role(self, role, name, exact):
+        assert (role, name, exact) == ('link', 'test.svg', True)
+        return Element(name, self)
+    def get_by_text(self, text, exact):
+        assert exact
+        return Element(text, self)
+listing = Listing()
+assert isinstance(namespace['open_from_seafile_list'](listing, 'https://synthetic.invalid', 'library', 'test.svg', default_editor=True), Popup)
+assert actions == [('test.svg', 'click', 'right'), ('Open with', 'hover'), ('Default', 'click', 'left')]
 print('PASS offline VectorCraft/FigCraft geometry assertions; runtime NOT RUN')
