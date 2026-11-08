@@ -1,0 +1,130 @@
+{
+  "slice": {
+    "raw_private_sha256": "f9b3a8757fe5c6f5a1d27e7f81874757cd70fd16c363ecc3404406fbd02b2658",
+    "checks": [
+      {
+        "name": "seafile_up",
+        "ok": true
+      },
+      {
+        "name": "bridge_up",
+        "ok": true
+      },
+      {
+        "name": "onlyoffice_up",
+        "ok": true
+      },
+      {
+        "name": "seahub_server_info",
+        "ok": true
+      },
+      {
+        "name": "reader_user_ready",
+        "ok": true
+      },
+      {
+        "name": "reader_share_readonly",
+        "ok": true
+      },
+      {
+        "name": "seahub_svg_routes_to_wopi",
+        "ok": true
+      },
+      {
+        "name": "seahub_docx_routes_to_wopi_wordcraft",
+        "ok": true
+      },
+      {
+        "name": "seahub_xlsx_routes_to_wopi_gridcraft",
+        "ok": true
+      },
+      {
+        "name": "seahub_pdf_default_is_viewer_not_wopi",
+        "ok": true
+      },
+      {
+        "name": "seahub_pdf_edit_pdf_routes_to_wopi_pdfcraft",
+        "ok": true
+      },
+      {
+        "name": "seahub_dxf_routes_to_wopi_cadcraft",
+        "ok": true
+      },
+      {
+        "name": "seahub_pptx_stays_on_onlyoffice",
+        "ok": false
+      },
+      {
+        "name": "seahub_odt_routes_to_onlyoffice",
+        "ok": false
+      },
+      {
+        "name": "bridge_open_docx_wordcraft",
+        "ok": false
+      },
+      {
+        "name": "bridge_open_xlsx_gridcraft",
+        "ok": false
+      },
+      {
+        "name": "bridge_open_pdf_pdfcraft",
+        "ok": false
+      },
+      {
+        "name": "bridge_open_dxf_cadcraft",
+        "ok": false
+      },
+      {
+        "name": "discovery_form_token_not_in_url",
+        "ok": true
+      },
+      {
+        "name": "discovery_wopisrc_is_seahub",
+        "ok": false
+      },
+      {
+        "name": "bridge_open_host_page",
+        "ok": false
+      },
+      {
+        "name": "bridge_host_page_frame_ancestors_seahub",
+        "ok": false
+      }
+    ],
+    "passed": 13,
+    "failed": 9
+  },
+  "browser": {
+    "raw_private_sha256": "a95b9eff3ac2e004245b65eb933e2acbcf31183758463ebec60ac2e257639efc",
+    "checks": [
+      {
+        "name": "browser_login",
+        "ok": true
+      },
+      {
+        "name": "browser_editor_filter_selects_requested_editor",
+        "ok": true
+      },
+      {
+        "name": "wordcraft_opened_from_seafile_file_list",
+        "ok": true
+      },
+      {
+        "name": "wordcraft_host_frame_from_seahub",
+        "ok": true
+      },
+      {
+        "name": "wordcraft_editor_ready_and_document_opened",
+        "ok": false
+      }
+    ],
+    "passed": 4,
+    "failed": 1
+  },
+  "result": "FAIL; WOPISrc retained internal origin because Docker settings overwrite user SERVICE_URL",
+  "cleanup": {
+    "desktop_serve_restored": true,
+    "proxmox_serve_restored": true
+  },
+  "scope": "synthetic diagnostic; no production Seafile/ONLYOFFICE changes; temporary TLS routes restored; no HTTPS PASS"
+}

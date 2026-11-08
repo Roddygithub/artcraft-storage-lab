@@ -61,3 +61,12 @@ normalization could defeat hostname isolation. `aa51632` rejects numeric/hex
 final labels (including decimal, octal, hex and mixed IPv4 aliases). Independent
 R2 returned bounded PASS with no findings; 10 offline tests passed. Runtime
 HTTPS follows separately and is not established by that source review.
+
+The first HTTPS diagnostic failed: generated WOPISrc retained the internal
+origin because packaged Seahub reapplies Docker host/protocol variables after
+user settings. Temporary desktop/PVE HTTPS routes were restored exactly.
+`9ef7067` passes public origin host/protocol through those Docker variables.
+`0e4f37a` adds native upstream `saved {id}` acknowledgements only after verified
+storage. Independent bounded review returned PASS with no findings; three Node
+suites, 11 launcher tests and 32 bridge tests passed. HTTPS and new DeckCraft
+runtime were not independently verified by that source review.
