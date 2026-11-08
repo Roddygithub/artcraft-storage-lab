@@ -190,14 +190,23 @@ def figcraft_has_frame(data, marker, geometry):
 
 
 def scene_has_geometry(scene, geometry, marker=None):
-    """Match actual inspect nodes with bounds, not a JSON substring."""
-    if isinstance(scene, dict):
-        bounds = scene.get("absoluteBounds" if marker else "bounds")
-        if "id" in scene and isinstance(bounds, dict) and all(bounds.get(k) == v for k, v in geometry.items()):
-            if (marker is None and str(scene.get("kind", "")).lower() in ("path", "rectangle")) or (scene.get("name") == marker and scene.get("type") == "FRAME"):
+    """Traverse only the documented inspect layer/page tree, excluding plugin metadata."""
+    if not isinstance(scene, dict):
+        return False
+    roots = scene.get("pages" if marker else "layers")
+    if not isinstance(roots, list):
+        return False
+    def visit(node):
+        if not isinstance(node, dict) or node.get("visible") is False:
+            return False
+        bounds = node.get("absoluteBounds" if marker else "bounds")
+        if "id" in node and isinstance(bounds, dict) and all(bounds.get(k) == v for k, v in geometry.items()):
+            if (marker is None and str(node.get("kind", "")).lower() in ("path", "rectangle")) or (node.get("name") == marker and node.get("type") == "FRAME"):
                 return True
-        return any(scene_has_geometry(v, geometry, marker) for v in scene.values())
-    return isinstance(scene, list) and any(scene_has_geometry(v, geometry, marker) for v in scene)
+        children = node.get("children", [])
+        return isinstance(children, list) and any(visit(child) for child in children)
+    return any(visit(node) for node in roots if not marker or
+               (isinstance(node, dict) and "id" in node and node.get("type") == "PAGE"))
 
 
 def page_api(host, app, method, params):

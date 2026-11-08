@@ -55,7 +55,12 @@ assert not figcraft_has_frame(b'unique-frame width=137 height=91', 'unique-frame
 assert not figcraft_has_frame(native(dict(doc, version=2)), 'unique-frame', g)
 assert scene_has_geometry({'layers': [{'id': 2, 'kind': 'Rectangle', 'bounds': g}]}, g)
 assert not scene_has_geometry({'bounds': g}, g)
-assert scene_has_geometry({'pages': [{'id': 2, 'type': 'FRAME', 'name': 'unique-frame', 'absoluteBounds': g}]}, g, 'unique-frame')
+node = {'id': 2, 'type': 'FRAME', 'name': 'unique-frame', 'absoluteBounds': g}
+assert scene_has_geometry({'pages': [{'id': 1, 'type': 'PAGE', 'children': [node]}]}, g, 'unique-frame')
+assert not scene_has_geometry({'pages': [], 'metadata': node}, g, 'unique-frame')
+assert not scene_has_geometry({'pages': [{'id': 1, 'type': 'PAGE', 'pluginData': node}]}, g, 'unique-frame')
+assert not scene_has_geometry({'layers': [], 'metadata': {'id': 2, 'kind': 'Path', 'bounds': g}}, g)
+assert not scene_has_geometry({'layers': [{'id': 2, 'kind': 'Path', 'bounds': g, 'visible': False}]}, g)
 assert not scene_has_geometry({'id': 2, 'type': 'FRAME', 'name': 'wrong', 'absoluteBounds': g}, g, 'unique-frame')
 
 class Host:
