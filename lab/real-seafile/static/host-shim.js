@@ -20,7 +20,7 @@
   if (origin === 'null') return;
   try { if (parent.location.origin !== origin) return; } catch (e) { return; }
 
-  var api = null, openedName = null, lastHash = null, ready = false, dirtyReported = null;
+  var api = null, openedName = null, lastBytes = null, ready = false, dirtyReported = null;
   var pending = null, nextTicket = 0, saveFailed = false, lastAck = null;
   var inspectSerial = 0;
 
@@ -30,10 +30,10 @@
     try { parent.postMessage(m, origin, transfer || []); return true; } catch (e) { return false; }
   }
 
-  function fnv(bytes) { // cheap content fingerprint
-    var h = 0x811c9dc5;
-    for (var i = 0; i < bytes.length; i++) { h ^= bytes[i]; h = Math.imul(h, 0x01000193) >>> 0; }
-    return bytes.length + ':' + h;
+  function sameBytes(a, b) {
+    if (!a || !b || a.length !== b.length) return false;
+    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
   }
 
   function fileName(p) { return String(p).split(/[\\/]/).pop() || String(p); }
@@ -65,7 +65,7 @@
       var saved = pending;
       pending = null;
       if (d.ok === true) {
-        lastHash = saved.hash;
+        lastBytes = saved.bytes;
         saveFailed = false;
         lastAck = d.ticket;
         pollSaves(); // A newer local serialization may already be waiting behind this ACK.
@@ -94,7 +94,7 @@
     var bytes = d.bytes instanceof ArrayBuffer ? new Uint8Array(d.bytes) : d.bytes;
     if (!(bytes instanceof Uint8Array)) return;
     openedName = (d.name && String(d.name).trim()) || ('document.' + app);
-    lastHash = fnv(bytes);           // what the host already has: a re-save of identical bytes is not a save
+    lastBytes = bytes.slice(); // Only exact bytes can establish an already-persisted capture.
     (function tryOpen(n) {
       var ok = false;
       try { ok = api && api.openFile(openedName, bytes); } catch (err) { ok = false; }
@@ -154,14 +154,13 @@
       var bytes;
       try { bytes = api.readFile(name); } catch (e) { continue; }
       if (!(bytes instanceof Uint8Array)) continue;
-      var h = fnv(bytes);
       if (pending) {
-        if (name === openedName && h !== pending.hash) setDirty(true, true);
+        if (name === openedName && !sameBytes(bytes, pending.bytes)) setDirty(true, true);
         continue;
       }
-      if (seen[name] === h) continue;
-      seen[name] = h;
-      if (name === openedName && h === lastHash) continue;   // nothing new
+      if (sameBytes(seen[name], bytes)) continue;
+      seen[name] = bytes.slice();
+      if (name === openedName && sameBytes(bytes, lastBytes)) continue;
       var saveAs = openedName !== null && name !== openedName;
       var buf = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
       if (saveAs) {
@@ -169,7 +168,7 @@
         continue;
       }
       var ticket = app + ':shim:' + (++nextTicket);
-      pending = { ticket: ticket, hash: h, timer: null };
+      pending = { ticket: ticket, bytes: seen[name], timer: null };
       setDirty(true, true);
       if (!post('save', { name: name, saveAs: false, bytes: buf, ticket: ticket }, [buf])) {
         pending = null;

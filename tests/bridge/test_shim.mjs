@@ -96,4 +96,17 @@ inspectionQueue = null;
 deliver({ type: 'vectorcraft:saveResult', ticket: eighth.ticket, ok: true, version: '8' });
 await settle();
 assert.equal(messages.at(-1).dirty, false);
+
+// Equal-length content with the same old FNV-1a fingerprint must still be saved.
+saved = new Uint8Array([128, 206, 0, 0, 128, 70, 169, 191]);
+shortcut(); await settle();
+let collisionSave = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
+deliver({ type: 'vectorcraft:saveResult', ticket: collisionSave.ticket, ok: true, version: '9' });
+await settle();
+saved = new Uint8Array([22, 207, 1, 0, 54, 148, 219, 237]);
+shortcut(); await settle();
+const distinct = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
+assert.notEqual(distinct.ticket, collisionSave.ticket, 'fingerprint collision must not discard changed bytes');
+deliver({ type: 'vectorcraft:saveResult', ticket: distinct.ticket, ok: true, version: '10' });
+await settle();
 console.log('PASS: shim waits for matching storage ACK and permits identical-byte retry');
