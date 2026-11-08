@@ -174,6 +174,38 @@ class LauncherTest(unittest.TestCase):
             finally:
                 os.umask(old_mask)
 
+    def test_diagnostic_browser_never_hides_http_failure(self):
+        for diagnostic in (False, True):
+            with tempfile.TemporaryDirectory() as directory:
+                base = Path(directory)
+                assets = base / 'assets'
+                assets.mkdir()
+                (assets / 'index.html').write_text('synthetic')
+                manifest = base / 'manifest.json'
+                manifest.write_text(json.dumps(local.manifest(assets)))
+                calls = []
+                def fake(args, cwd, env, log, timeout=120):
+                    calls.append(args)
+                    if args[0] == 'podman':
+                        log.write_text('true\n')
+                    if args[-3:] == ['run', '--rm', 'slice']:
+                        raise RuntimeError('synthetic HTTP failure')
+                @contextmanager
+                def backend(*_):
+                    yield ['synthetic-compose']
+                argv = ['local.py', '--run-dir', str(base / 'run'), '--static', str(assets), '--manifest', str(manifest)]
+                if diagnostic:
+                    argv.append('--diagnostic-browser-after-http-failure')
+                old_mask = os.umask(0o077)
+                try:
+                    with patch.object(sys, 'argv', argv), patch.object(local, 'command', fake), patch.object(local, 'compose_backend', backend):
+                        with self.assertRaisesRegex(RuntimeError, 'synthetic HTTP failure'):
+                            local.main()
+                    self.assertEqual(any(c[-3:] == ['run', '--rm', 'browser'] for c in calls), diagnostic)
+                    self.assertEqual(calls[-1][-2:], ['down', '--remove-orphans'])
+                finally:
+                    os.umask(old_mask)
+
 
 if __name__ == '__main__':
     unittest.main()

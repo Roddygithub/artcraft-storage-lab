@@ -1102,6 +1102,14 @@ def main():
 
             # -- Seafile now holds the specific new text ---------------------------
             got, _ = rs.download(admin, repo_id, name)
+            # Private synthetic artifacts for fidelity inspection; never publish
+            # these bytes without the evidence privacy review.
+            for label, data in (("original", content), ("first-readback", got)):
+                with open(os.path.join(RESULTS, f"wordcraft-{label}.docx"), "wb") as output:
+                    output.write(data)
+            if save_bodies:
+                with open(os.path.join(RESULTS, "wordcraft-first-relay.docx"), "wb") as output:
+                    output.write(save_bodies[0])
             check("wordcraft_saved_docx_contains_the_typed_marker",
                   marker.lower() in rs.docx_text(got).lower(),
                   f"marker={marker} len={len(got)} bytes_identical_to_original={got == content}")
@@ -1214,6 +1222,8 @@ def main():
                       ok2 and len(after2) > before2 and after2[0]["creator"] == admin_username,
                       f"history {before2}->{len(after2)} top={after2[0] if after2 else None} status={status2()!r}")
                 got2, _ = rs.download(admin, repo_id, name)
+                with open(os.path.join(RESULTS, "wordcraft-second-readback.docx"), "wb") as output:
+                    output.write(got2)
                 check("wordcraft_reopen_seafile_holds_both_markers",
                       marker.lower() in rs.docx_text(got2).lower() and marker2.lower() in rs.docx_text(got2).lower(),
                       f"marker={marker2} len={len(got2)}")

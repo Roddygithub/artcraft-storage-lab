@@ -132,6 +132,8 @@ def main():
     parser.add_argument('--wordcraft-fixture', default='')
     parser.add_argument('--onlyoffice-regression', action='store_true',
                         help='run the ODT edit/save/reopen regression instead of Craft scenarios')
+    parser.add_argument('--diagnostic-browser-after-http-failure', action='store_true',
+                        help='collect browser diagnostics after a failing HTTP slice; exit remains failure')
     parser.add_argument('--without-wopi', action='store_true',
                         help='omit the bridge WOPI keys to isolate stock ONLYOFFICE (diagnostic only)')
     parser.add_argument('--experimental', action='store_true',
@@ -192,6 +194,7 @@ def main():
               " time.sleep(5)\n"
               "else: raise SystemExit('Seahub config never appeared')\n"
               f"with p.open('a') as f: f.write('\\n' + {config!r})\n")
+    slice_failure = None
     with compose_backend(run, env) as backend:
         compose = backend + ['-f', str(run / 'compose.yml'), '-p', project, '--profile', 'test']
         try:
@@ -209,12 +212,20 @@ def main():
             command(compose + ['exec', '-T', 'seafile', 'python3', '-c', ready], run, env, log, 240)
             services = ('browser',) if args.onlyoffice_regression else ('slice', 'browser')
             for service in services:
-                command(compose + ['run', '--rm', service], run, env, log, 3600)
+                try:
+                    command(compose + ['run', '--rm', service], run, env, log, 3600)
+                except RuntimeError as exc:
+                    if service != 'slice' or not args.diagnostic_browser_after_http_failure:
+                        raise
+                    slice_failure = exc
+                    print('HTTP stage failed; collecting diagnostics only; final exit remains failure', flush=True)
         finally:
             try:
                 command(compose + ['logs', '--no-color'], run, env, run / 'services.log')
             finally:
                 command(compose + ['down', '--remove-orphans'], run, env, log, 180)
+    if slice_failure is not None:
+        raise slice_failure
     print(f'Private evidence: {run / "results"}')
 
 
