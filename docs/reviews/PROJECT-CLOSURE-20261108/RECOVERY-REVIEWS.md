@@ -33,3 +33,15 @@ preserves the HTTP failure after cleanup. Private synthetic DOCX capture does
 not alter edits or assertions. The reviewer also verified four combined-run
 checksums, 33 source hashes against `664898f`, and 119 browser assertions.
 No runtime or document-fidelity verdict was granted.
+
+The independent evidence review of `e49da48` returned bounded PASS with no
+material findings. It verified all 33 source hashes against `c909252`, raw JSON
+and static-manifest hashes, structural invariants and first relay/readback byte
+equality, and inspected all three screenshots and four DOCX packages. It found
+no visible secrets, external relationships or credential matches. No independent
+rendering/runtime replay, full-fidelity verdict or removal approval was granted.
+
+The independent source review of `04ac568` against `e49da48` returned bounded
+PASS with no findings. The explicit three-document allowlist, pre-edit waits,
+body-text retention and fail-closed fixture selection passed the offline test.
+Runtime for the added prose and structure cases follows separately.
