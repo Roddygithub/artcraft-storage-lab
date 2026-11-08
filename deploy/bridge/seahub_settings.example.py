@@ -1,3 +1,6 @@
+# WARNING: Mixed WOPI/ONLYOFFICE routing is NOT validated on CE 13.0.28.
+# A blocking host error was found; see docs/PROJECT-CLOSURE.md. Do not deploy
+# this split until coexistence is verified. Production settings stay unchanged.
 # Append to seahub_settings.py (Seafile CE or Pro, Seahub >= 13 for non-office extensions), then
 # restart Seahub. Only the extensions listed here go to the bridge; ONLYOFFICE keeps the rest.
 # Match the extensions EXACTLY with your editors.json — both tuples must be identical.

@@ -26,3 +26,16 @@ shipped = json.loads((root / 'deploy/bridge/editors.json').read_text())
 assert {ext for entry in shipped.values() for ext in entry['extensions']} == set(deploy['OFFICE_WEB_APP_FILE_EXTENSION'])
 assert deploy['OFFICE_WEB_APP_EDIT_FILE_EXTENSION'] == deploy['OFFICE_WEB_APP_FILE_EXTENSION']
 print('PASS: zero-patch candidate scope, consistent discovery, PPTX on ONLYOFFICE')
+
+# Execute the pure HTTP predicate without importing network runner state.
+import re
+source = ast.parse((root / 'lab/real-seafile/run_slice.py').read_text())
+node = next(n for n in source.body if isinstance(n, ast.FunctionDef) and n.name == 'onlyoffice_page_ready')
+namespace = {'re': re}
+exec(compile(ast.Module(body=[node], type_ignores=[]), '<onlyoffice predicate>', 'exec'), namespace)
+ready = namespace['onlyoffice_page_ready']
+assert ready("api/documents/api.js; err: ''")
+assert not ready("api/documents/api.js; err: 'Office Online failed'")
+assert not ready("api/documents/api.js")
+assert not ready("err: ''")
+print('PASS: ONLYOFFICE HTTP gate rejects blocking Seahub error')

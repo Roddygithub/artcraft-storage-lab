@@ -1,3 +1,7 @@
+> **Deployment blocked:** packaged Seahub CE 13.0.28 can break ONLYOFFICE
+> pages when WOPI is enabled. See `docs/PROJECT-CLOSURE.md`; this split is not
+> production-ready. Isolated ONLYOFFICE-only tests do not prove coexistence.
+
 # Deploying the bridge next to an existing Seafile
 
 What you get: Seafile Web opens `.dxf` by default in a Craft web editor,

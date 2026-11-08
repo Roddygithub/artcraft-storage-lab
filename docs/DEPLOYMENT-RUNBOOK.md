@@ -1,3 +1,7 @@
+> **Deployment blocked:** packaged Seahub CE 13.0.28 can break ONLYOFFICE
+> pages when WOPI is enabled. See `docs/PROJECT-CLOSURE.md`; this split is not
+> production-ready. Isolated ONLYOFFICE-only tests do not prove coexistence.
+
 # Deployment Runbook — WOPI Editor Bridge
 
 For the zero-patch candidate (`bridge/` + upstream bundles + Seahub config only).  

@@ -60,3 +60,21 @@ Production upgrades/rollback, live ONLYOFFICE diagnosis and deployment are
 separate owner-controlled work, not actions required to close the isolated
 lab MVP. Upstream remains LOCKED until a project GPT PASS and separate owner
 publication approval. Direct parent work is not Aptarchy completion.
+
+## Blocking coexistence defect found in packaged Seahub 13.0.28
+
+The default mixed WOPI/ONLYOFFICE configuration can leave an Office Online
+error in an otherwise generated ONLYOFFICE page. APIJS is present but React
+renders the error instead of the editor. Previous HTTP route checks only
+looked for APIJS and therefore missed this defect; they now require an empty
+Seahub error field. The isolated `--without-wopi` test is diagnostic only and
+cannot establish coexistence. Do not deploy the current split configuration.
+
+Local packaged-source audit: `seahub/views/file.py:824–878` attempts WOPI even
+for an extension absent from its tuples, sets `return_dict['err']`, and then
+passes it to ONLYOFFICE. `frontend/src/view-file-onlyoffice.js:49–50` renders
+an error instead of the editor. No standard per-extension configuration fix
+was found. The multiple-suite API is Pro-gated and chooses per library rather
+than per extension. A compatible unmodified host or another verified native
+configuration is required before closure; no host patch or production change
+is authorized by this finding.

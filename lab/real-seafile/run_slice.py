@@ -46,6 +46,16 @@ RESULTS = os.environ.get("RESULTS_DIR", ".")
 checks: list[dict] = []
 
 
+def onlyoffice_page_ready(page):
+    """Initial page declares ONLYOFFICE without Seahub's blocking error.
+
+    This is not a browser edit/save assertion. APIJS alone can coexist with
+    an error that prevents the ONLYOFFICE React view from mounting.
+    """
+    error = re.search(r"\berr:\s*(['\"])(.*?)\1", page, re.S)
+    return bool("api/documents/api.js" in page and error and not error.group(2))
+
+
 def check(name: str, ok: bool, detail=""):
     checks.append({"name": name, "ok": bool(ok), "detail": str(detail)[:2000]})
     print(("PASS " if ok else "FAIL ") + name + (f"  -- {detail}" if detail else ""), flush=True)
@@ -541,10 +551,10 @@ def main() -> int:
     st, page_pptx = file_page(sess, repo_id, "test.pptx")
     form_pptx = parse_wopi_form(page_pptx)
     check("seahub_pptx_stays_on_onlyoffice", st == 200 and form_pptx is None and
-          "api/documents/api.js" in page_pptx, "PPTX remains on the existing ONLYOFFICE route")
+          onlyoffice_page_ready(page_pptx), "ONLYOFFICE page must have no blocking Seahub error")
     st, page_odt = file_page(sess, repo_id, "test.odt")
-    check("seahub_odt_routes_to_onlyoffice", st == 200 and "api/documents/api.js" in page_odt and parse_wopi_form(page_odt) is None,
-          "apijs referenced" if "api/documents/api.js" in page_odt else "no api.js reference")
+    check("seahub_odt_routes_to_onlyoffice", st == 200 and onlyoffice_page_ready(page_odt) and parse_wopi_form(page_odt) is None,
+          "ONLYOFFICE page must have no blocking Seahub error")
     # every ArtCraft editor opens through the bridge with the right bundle
     for label, form, editor, fid in (("docx", form_docx, "wordcraft", docx_id), ("xlsx", form_xlsx, "gridcraft", xlsx_id),
                                      ("pdf", form_pdf, "pdfcraft", pdf_id), ("dxf", form_dxf, "cadcraft", dxf_id)):
