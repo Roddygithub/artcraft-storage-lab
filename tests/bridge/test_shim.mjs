@@ -6,11 +6,12 @@ const messages = [], handlers = {};
 const intervals = [];
 let saved = new Uint8Array([1]);
 let editorDirty = false;
+let inspectionQueue = null;
 const origin = 'https://bridge.invalid';
 const parent = { location: { origin }, postMessage: message => messages.push(message) };
 const window = { parent, vectorcraft: {
   commands: async () => [], captureDownloads() {},
-  request: async () => ({ dirty: editorDirty }),
+  request: () => inspectionQueue ? new Promise(resolve => inspectionQueue.push(resolve)) : Promise.resolve({ dirty: editorDirty }),
   execute: async () => ({}), files: () => [{ path: 'test.svg' }], readFile: () => saved
 }, addEventListener: (kind, fn) => { handlers[kind] = fn; } };
 vm.runInNewContext(readFileSync(new URL('../../lab/real-seafile/static/host-shim.js', import.meta.url), 'utf8'), {
@@ -75,6 +76,24 @@ assert.deepEqual(Array.from(new Uint8Array(sixth.bytes)), [6]);
 assert.equal(messages.slice(beforeQueued).some(m => m.type === 'vectorcraft:dirty' && !m.dirty), false,
   'clean editor state cannot clear captured B before its storage ACK');
 deliver({ type: 'vectorcraft:saveResult', ticket: sixth.ticket, ok: true, version: '6' });
+await settle();
+assert.equal(messages.at(-1).dirty, false);
+
+saved = new Uint8Array([7]); shortcut(); await settle();
+const seventh = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
+inspectionQueue = [];
+deliver({ type: 'vectorcraft:saveResult', ticket: seventh.ticket, ok: true, version: '7' });
+const beforePeriodic = messages.length;
+saved = new Uint8Array([8]); // B finishes asynchronous serialization before the next capture poll.
+intervals.find(([, milliseconds]) => milliseconds === 1000)[0]();
+assert.equal(inspectionQueue.length, 2);
+inspectionQueue[1]({ dirty: false }); await settle();
+const eighth = messages.filter(m => m.type === 'vectorcraft:save').at(-1);
+assert.notEqual(eighth.ticket, seventh.ticket, 'periodic clean inspection must first drain B');
+assert.equal(messages.slice(beforePeriodic).some(m => m.type === 'vectorcraft:dirty' && !m.dirty), false);
+inspectionQueue[0]({ dirty: false }); await settle();
+inspectionQueue = null;
+deliver({ type: 'vectorcraft:saveResult', ticket: eighth.ticket, ok: true, version: '8' });
 await settle();
 assert.equal(messages.at(-1).dirty, false);
 console.log('PASS: shim waits for matching storage ACK and permits identical-byte retry');

@@ -189,6 +189,12 @@
   }
 
   function setDirty(v, force) {
+    // Every path to "clean" must reconcile the latest local capture first,
+    // including periodic inspections that race a delayed storage ACK.
+    if (!v) {
+      pollSaves();
+      if (pending || saveFailed) return;
+    }
     if (dirtyReported === v && !force) return;
     if (post('dirty', { dirty: v })) dirtyReported = v;
   }
