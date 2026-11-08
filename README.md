@@ -1,11 +1,9 @@
 # ArtCraft Storage Lab
 
-> **2026-11-08 closure correction:** the project remains **INCOMPLETE**.
-> Packaged Seahub CE 13.0.28 can block ONLYOFFICE pages when WOPI is enabled
-> for other extensions. APIJS-only checks missed this; the HTTP gate now
-> rejects the error. Do not deploy the mixed configuration. Earlier private
-> passing Craft assertions and isolated ONLYOFFICE results do not establish
-> coexistence or final approval. See [the current closure ledger](docs/PROJECT-CLOSURE.md).
+> **2026-11-08:** project **INCOMPLETE**. The owner authorized ONLYOFFICE
+> retirement; the active lab now targets Craft only. Required office-format
+> coverage, HTTPS acceptance and the final independent gate remain open.
+> See [the closure ledger](docs/PROJECT-CLOSURE.md).
 
 
 > Open a file in Seafile Web, edit it in a Craft web editor, save, and get a normal Seafile
@@ -39,11 +37,11 @@ runtime validation. The exact closure criteria and remaining checks are in
 | `.dxf` | CADCraft 0.15.1 | unmodified upstream bundle |
 | `.svg` | VectorCraft 0.19.0 | upstream bundle plus declared lab page-API shim |
 | `.figcraft` | FigCraft 0.13.1 | upstream bundle plus declared lab page-API shim |
-| PPTX, ODF and remaining office routes | ONLYOFFICE | existing integration preserved |
+| PPTX, ODF and remaining office routes | pending | ArtCraft replacement NOT VERIFIED |
 
 The deployment example routes DXF by default; office extensions are operator
-opt-ins. The synthetic lab routes DOCX/XLSX/PDF to Craft for testing and keeps
-PPTX on ONLYOFFICE. No production deployment is claimed.
+opt-ins. The synthetic lab routes DOCX/XLSX/PDF to Craft for testing and leaves
+unverified office formats without an editor route. No production deployment is claimed.
 
 DeckCraft, SoundCraft, PhotoCraft and DesignCraft Rust host ports are
 experimental drafts outside this candidate's no-editor-patch requirement.
@@ -71,7 +69,7 @@ Upstream publication remains locked pending the project gate and owner approval.
 ```text
 bridge/               the WOPI editor bridge (stdlib Python WSGI + host page JS); 32 fake-host tests in tests/bridge/
 deploy/bridge/        Dockerfile, compose, Seahub settings, nginx snippet, bundle fetcher — run it next to your Seafile
-lab/real-seafile/     the validation lab: Seafile CE 13 + ONLYOFFICE + bridge + editor bundles in a Lima VM, HTTP and browser slices
+lab/real-seafile/     the validation lab: Seafile CE 13 + bridge + editor bundles in a Lima VM, HTTP and browser slices
 docs/REFOUNDATION-REPORT.md   the decision and its evidence
 docs/upstream-drafts/ what we would propose to Seahub and storytold — prepared, NOT published
 docs/                 earlier research (host contract, capabilities audit, Seafile integration points) and the GR review corpus
@@ -100,8 +98,7 @@ Deploy next to a real Seafile: `deploy/bridge/README.md`.
 
 ## What this project is not
 
-Not an official ArtCraft or Seafile project. Not a SeaDrive or WebDAV client. Not a replacement
-for ONLYOFFICE. Not a re-implementation of Seafile.
+Not an official ArtCraft or Seafile project. Not a SeaDrive or WebDAV client. Full office replacement remains unverified. Not a re-implementation of Seafile.
 
 ## License
 

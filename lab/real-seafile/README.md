@@ -1,14 +1,19 @@
 # Real-Seafile lab
 
-A stock Seafile CE 13 + ONLYOFFICE Docs CE + the bridge + upstream Craft web bundles, in a
+ONLYOFFICE was retired by owner instruction on 2026-11-08. The active Compose
+file and launchers no longer start it; its regression runner is historical.
+Earlier mixed-suite instructions/results below are retained history, not the
+current acceptance plan. Unsupported office formats remain NOT VERIFIED.
+
+A stock Seafile CE 13 + the bridge + upstream Craft web bundles, in a
 dedicated Lima VM with Docker. Nothing here touches a production system; the VM is disposable.
 
-## Linux rootless Podman candidate (offline-tested; real run NOT VERIFIED)
+## Linux rootless Podman candidate
 
 `local.py` uses the same Compose file as Lima. Prerequisites: Linux, Python 3.11+,
 working **rootless** local Podman (subuid/subgid mappings, rootless networking and storage),
 `podman-compose` supporting `--podman-args`, or the Docker Compose v2 plugin,
-free loopback ports 8000/8100/8778, and enough disk/RAM for Seafile, ONLYOFFICE and Chromium.
+free loopback ports 8000/8778, and enough disk/RAM for Seafile and Chromium.
 Images and browser pip packages require network access on the eventual real run. The Docker
 Compose fallback starts and removes its own private Podman API socket; the shared user socket
 and its service are untouched. No global socket or
@@ -35,8 +40,8 @@ mode 0700; fresh random synthetic credentials are written mode 0600 in its `.env
 `bridge/` and `lab/` source are copied there excluding `results`, `static`, `cache`, `.cache`
 and `__pycache__`; supplied static assets are copied and then verified. No private runner or
 second Compose YAML is needed. Every project gets a random name, including its network and
-containers. Ports bind only to loopback; override all three with `--seafile-port`,
-`--onlyoffice-port`, `--bridge-port` if needed. Browser IPC is private with 1 GiB shared memory.
+containers. Ports bind only to loopback; override both with `--seafile-port`,
+`--bridge-port` if needed. Browser IPC is private with 1 GiB shared memory.
 
 The launcher starts the disposable stack, appends the managed Seahub configuration through
 that project's Seafile service only, restarts it, runs slice then browser, and always attempts

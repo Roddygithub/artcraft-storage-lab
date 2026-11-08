@@ -151,23 +151,17 @@ def main():
     parser.add_argument('--static', type=Path, required=True)
     parser.add_argument('--manifest', type=Path, required=True,
                         help='JSON object: relative POSIX filename -> lowercase SHA256')
-    for name, default in [('seafile', 8000), ('onlyoffice', 8100), ('bridge', 8778)]:
+    for name, default in [('seafile', 8000), ('bridge', 8778)]:
         parser.add_argument(f'--{name}-port', type=int, default=default)
     parser.add_argument('--seafile-public-url')
     parser.add_argument('--bridge-public-url')
     parser.add_argument('--editor', default='')
     parser.add_argument('--wordcraft-fixture', default='')
-    parser.add_argument('--onlyoffice-regression', action='store_true',
-                        help='run the ODT edit/save/reopen regression instead of Craft scenarios')
     parser.add_argument('--diagnostic-browser-after-http-failure', action='store_true',
                         help='collect browser diagnostics after a failing HTTP slice; exit remains failure')
-    parser.add_argument('--without-wopi', action='store_true',
-                        help='omit the bridge WOPI keys to isolate stock ONLYOFFICE (diagnostic only)')
     parser.add_argument('--experimental', action='store_true',
                         help='use experimental editors.json and Seahub settings (Rust ports)')
     args = parser.parse_args()
-    if args.onlyoffice_regression and (args.editor or args.wordcraft_fixture):
-        parser.error('ONLYOFFICE regression cannot select a Craft editor or fixture')
     if (args.seafile_public_url is None) != (args.bridge_public_url is None):
         parser.error('--seafile-public-url and --bridge-public-url are required together')
     if args.seafile_public_url is not None or args.bridge_public_url is not None:
@@ -181,8 +175,8 @@ def main():
     run = args.run_dir.expanduser().resolve()
     if run == ROOT or ROOT in run.parents:
         parser.error('run directory must be outside the repository')
-    ports = [args.seafile_port, args.onlyoffice_port, args.bridge_port]
-    if len(set(ports)) != 3 or any(not 1 <= p <= 65535 for p in ports):
+    ports = [args.seafile_port, args.bridge_port]
+    if len(set(ports)) != 2 or any(not 1 <= p <= 65535 for p in ports):
         parser.error('ports must be distinct and between 1 and 65535')
     expected = json.loads(args.manifest.read_text())
     os.umask(0o077)
@@ -191,7 +185,7 @@ def main():
     project = 'craftlab-' + secrets.token_hex(8)
     values = {key: secrets.token_hex(32) for key in (
         'SEAFILE_MYSQL_DB_PASSWORD', 'INIT_SEAFILE_MYSQL_ROOT_PASSWORD',
-        'REDIS_PASSWORD', 'JWT_PRIVATE_KEY', 'ONLYOFFICE_JWT_SECRET', 'ADMIN_PASSWORD')}
+        'REDIS_PASSWORD', 'JWT_PRIVATE_KEY', 'ADMIN_PASSWORD')}
     values['ADMIN_EMAIL'] = 'synthetic-' + secrets.token_hex(8) + '@lab.test'
     (run / '.env').write_text(''.join(f'{k}={v}\n' for k, v in values.items()))
     # Do not inherit remote Podman/Docker targets or compose overrides.
@@ -199,7 +193,7 @@ def main():
            if not k.startswith(('CONTAINER_', 'DOCKER_', 'COMPOSE_', 'PODMAN_'))}
     env.update(values)
     env.update({f'{name.upper()}_PORT': str(port) for name, port in
-                zip(('seafile', 'onlyoffice', 'bridge'), ports)})
+                zip(('seafile', 'bridge'), ports)})
     # Explicitly clear inherited public origins for the default internal HTTP lab.
     env.update(SEAFILE_PUBLIC_URL=args.seafile_public_url or '',
                BRIDGE_PUBLIC_URL=args.bridge_public_url or '')
@@ -214,7 +208,7 @@ def main():
                LAB_SEAFILE_PROTOCOL='https' if args.seafile_public_url else 'http')
     env.update(BROWSER_ONLY_EDITOR=args.editor,
                BROWSER_WORDCRAFT_FIXTURE=args.wordcraft_fixture,
-               BROWSER_SCRIPT='run_onlyoffice_browser.py' if args.onlyoffice_regression else 'run_browser.py',
+               BROWSER_SCRIPT='run_browser.py',
                BROWSER_EDITOR_CONFIG=str(editor_config))
     log = run / 'launcher.log'
     command(['podman', '--remote=false', 'info', '--format', '{{.Host.Security.Rootless}}'], run, env, log)
@@ -228,8 +222,8 @@ def main():
     else:
         config_path = run / 'app/lab/real-seafile/seahub_settings.extra.py'
     config = config_path.read_text()
-    config = config.replace('__ONLYOFFICE_JWT_SECRET__', values['ONLYOFFICE_JWT_SECRET'])
-    config = render_settings(config, args.without_wopi,
+    config += '\nENABLE_ONLYOFFICE = False\n'
+    config = render_settings(config, False,
                              args.seafile_public_url, args.bridge_public_url)
     # editor_config is already defined above in both branches
     script = ("from pathlib import Path; import time\n"
@@ -243,7 +237,7 @@ def main():
     with compose_backend(run, env) as backend:
         compose = backend + ['-f', str(run / 'compose.yml'), '-p', project, '--profile', 'test']
         try:
-            command(compose + ['up', '-d', 'db', 'redis', 'seafile', 'onlyoffice', 'bridge'],
+            command(compose + ['up', '-d', 'db', 'redis', 'seafile', 'bridge'],
                     run, env, log, 900)
             command(compose + ['exec', '-T', 'seafile', 'python3', '-c', script], run, env, log, 630)
             command(compose + ['restart', 'seafile'], run, env, log)
@@ -255,7 +249,7 @@ def main():
                      " time.sleep(2)\n"
                      "else: raise SystemExit('Seahub did not become ready')\n")
             command(compose + ['exec', '-T', 'seafile', 'python3', '-c', ready], run, env, log, 240)
-            services = ('browser',) if args.onlyoffice_regression else ('slice', 'browser')
+            services = ('slice', 'browser')
             for service in services:
                 try:
                     command(compose + ['run', '--rm', service], run, env, log, 3600)

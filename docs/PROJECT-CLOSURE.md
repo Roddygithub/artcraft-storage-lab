@@ -1,5 +1,11 @@
 # Current project closure ledger
 
+**Current override (2026-11-08):** the owner authorized ONLYOFFICE retirement;
+see [retirement evidence](ONLYOFFICE-RETIREMENT-20261108.md). Its regression
+and coexistence requirements below are historical and no longer block closure.
+The active lab now targets Craft only. Missing office-format coverage, HTTPS
+acceptance, exact-source evidence and independent final review remain open.
+
 The owner requires replacement coverage for every currently configured
 ONLYOFFICE format: 15 viewing routes and 3 editing routes. The six-Craft
 candidate below is a verified subset, not the complete replacement scope.

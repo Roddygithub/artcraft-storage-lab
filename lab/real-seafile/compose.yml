@@ -1,4 +1,4 @@
-# Real-Seafile validation slice: stock Seafile CE 13 + ONLYOFFICE Docs CE + the WOPI bridge.
+# Real-Seafile validation slice: stock Seafile CE 13 + the WOPI bridge (ONLYOFFICE retired).
 # Derived from the official Seafile 13.0 compose (seafile-server.yml); caddy and seadoc dropped,
 # everything talks on the internal network by service name (Seafile's setup script insists on a
 # dotted hostname, hence the seafile.lab alias). Nothing here touches production.
@@ -82,22 +82,6 @@ services:
       seafile-net:
         aliases: [seafile.lab]
 
-  onlyoffice:
-    mem_limit: 1280m
-    cpus: 1
-    image: docker.io/onlyoffice/documentserver:9.4
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:${ONLYOFFICE_PORT:-8100}:80"
-    environment:
-      - JWT_ENABLED=true
-      - JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
-      - JWT_HEADER=Authorization
-      # Docs blocks private/meta IPs by default; Seafile lives on the private compose network.
-      - ALLOW_PRIVATE_IP_ADDRESS=true
-      - ALLOW_META_IP_ADDRESS=true
-    networks: [seafile-net]
-
   bridge:
     mem_limit: 128m
     cpus: 0.5
@@ -131,8 +115,6 @@ services:
     environment:
       - SEAFILE_URL=${SEAFILE_PUBLIC_URL:-http://seafile.lab}
       - BRIDGE_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}
-      - ONLYOFFICE_URL=http://onlyoffice
-      - ONLYOFFICE_JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - RESULTS_DIR=/results
@@ -153,8 +135,6 @@ services:
     environment:
       - SEAFILE_URL=${SEAFILE_PUBLIC_URL:-http://seafile.lab}
       - BRIDGE_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}
-      - ONLYOFFICE_URL=http://onlyoffice
-      - ONLYOFFICE_JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - RESULTS_DIR=/results

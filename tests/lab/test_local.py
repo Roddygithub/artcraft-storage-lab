@@ -86,7 +86,8 @@ class LauncherTest(unittest.TestCase):
         self.assertEqual(settings['CSRF_TRUSTED_ORIGINS'], [seafile])
         self.assertEqual(settings['SECURE_PROXY_SSL_HEADER'], ('HTTP_X_FORWARDED_PROTO', 'https'))
         self.assertTrue(settings['ENABLE_OFFICE_WEB_APP'])
-        self.assertTrue(settings['ENABLE_ONLYOFFICE'])
+        self.assertFalse(settings['ENABLE_ONLYOFFICE'])
+        self.assertNotIn('  onlyoffice:', (local.ROOT / 'lab/real-seafile/compose.yml').read_text())
         compose = (local.ROOT / 'lab/real-seafile/compose.yml').read_text()
         for line in ['BRIDGE_PUBLIC_URL=${BRIDGE_PUBLIC_URL:-http://bridge:8778}',
                      'BRIDGE_SEAHUB_ORIGIN=${SEAFILE_PUBLIC_URL:-http://seafile.lab}']:
@@ -235,6 +236,9 @@ class LauncherTest(unittest.TestCase):
 
             def fake(args, cwd, env, log, timeout=120):
                 calls.append(args)
+                self.assertNotIn('onlyoffice', args)
+                if args[-2:-1] == ['-c'] and 'with p.open' in args[-1]:
+                    self.assertIn('ENABLE_ONLYOFFICE = False', args[-1])
                 self.assertEqual(env['SEAFILE_PUBLIC_URL'], 'https://seafile.test' if public else '')
                 self.assertEqual(env['BRIDGE_PUBLIC_URL'], 'https://bridge.test' if public else '')
                 if args[-2:-1] == ['-c'] and 'with p.open' in args[-1]:

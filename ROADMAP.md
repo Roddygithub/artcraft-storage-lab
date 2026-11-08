@@ -16,7 +16,17 @@ under `docs/reviews/` and `integration/` as evidence.
 | Deployment kit | `deploy/bridge/` |
 | Upstream drafts (unpublished) | `docs/upstream-drafts/` |
 
-## Next (lab, no production, no upstream)
+## Active next steps — owner override, 2026-11-08
+
+ONLYOFFICE is retired by owner instruction (`docs/ONLYOFFICE-RETIREMENT-20261108.md`).
+Do not run the historical ONLYOFFICE campaigns below.
+
+1. Remove ONLYOFFICE from active lab launch/configuration and retain a fresh Craft-only replay.
+2. Validate the separately pinned upstream DeckCraft PPTX same-format save/reopen.
+3. Extend required viewing-format coverage and repeat HTTPS acceptance.
+4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
+
+## Historical next steps (superseded where they require ONLYOFFICE)
 
 | # | Step | Done when |
 | --- | --- | --- |

@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 """Real-Seafile validation slice (HTTP level, no browser).
 
-Runs inside the compose network against a stock Seafile CE 13, ONLYOFFICE Docs CE and the
+Runs inside the compose network against a stock Seafile CE 13 and the
 bridge. Stdlib only. Writes RESULTS_DIR/slice.json and leaves raw HTML pages next to it.
 
 What it proves, step by step (each step is a named check in the JSON):
-  seahub_*      Seahub config/version, the WOPI branch really fires for .docx/.svg, the
-                ONLYOFFICE branch really fires for .xlsx, on this Seahub version.
+  seahub_*      Seahub config/version and WOPI routing for the configured Craft formats.
   discovery_*   Seahub fetched the bridge discovery XML and built a form POST to the bridge.
   bridge_*      opening through the bridge, relay info/file/save, version precondition,
                 external-writer conflict, idempotent save, read-only refusal.
   seahub_putfile_ignores_can_edit   Seahub itself accepts PutFile with a read-only token
                 (the gap the fake host reproduces) -- measured, not assumed.
   history_*     Seafile version history shows the save, attributed to the editing user.
-  onlyoffice_*  Docs server healthy, api.js served, JWT accepted, and it can fetch a file
-                from Seahub (conversion round-trip).
 """
 from __future__ import annotations
 
@@ -37,7 +34,7 @@ import zipfile
 
 SEAFILE = os.environ["SEAFILE_URL"].rstrip("/")
 BRIDGE = os.environ["BRIDGE_URL"].rstrip("/")
-ONLYOFFICE = os.environ["ONLYOFFICE_URL"].rstrip("/")
+ONLYOFFICE = os.environ.get("ONLYOFFICE_URL", "").rstrip("/")
 OO_SECRET = os.environ.get("ONLYOFFICE_JWT_SECRET", "")
 ADMIN = os.environ["ADMIN_EMAIL"]
 ADMIN_PW = os.environ["ADMIN_PASSWORD"]
@@ -484,8 +481,6 @@ def main() -> int:
     print("waiting for Seafile ...", flush=True)
     check("seafile_up", wait_for(f"{SEAFILE}/api2/ping/", b"pong"), SEAFILE)
     check("bridge_up", wait_for(f"{BRIDGE}/healthz", tries=12), BRIDGE)
-    oo_up = wait_for(f"{ONLYOFFICE}/healthcheck", b"true", tries=60)
-    check("onlyoffice_up", oo_up, ONLYOFFICE)
 
     st, info = api(api_token(ADMIN, ADMIN_PW), "GET", "/api2/server-info/")
     check("seahub_server_info", st == 200, json.dumps(info)[:300])
@@ -504,8 +499,6 @@ def main() -> int:
     xlsx_id = upload(admin, repo_id, "test.xlsx", minimal_xlsx())
     pdf_id = upload(admin, repo_id, "test.pdf", MINIMAL_PDF)
     dxf_id = upload(admin, repo_id, "test.dxf", MINIMAL_DXF)
-    pptx_id = upload(admin, repo_id, "test.pptx", minimal_pptx())
-    odt_id = upload(admin, repo_id, "test.odt", minimal_odt())
 
     # second user, read-only share
     reader = "reader@lab.test"
@@ -548,13 +541,6 @@ def main() -> int:
     form_dxf = parse_wopi_form(page_dxf)
     check("seahub_dxf_routes_to_wopi_cadcraft", st == 200 and form_dxf is not None and form_dxf["action"].startswith(BRIDGE + "/edit/cadcraft"),
           (form_dxf or {}).get("action", "")[:120])
-    st, page_pptx = file_page(sess, repo_id, "test.pptx")
-    form_pptx = parse_wopi_form(page_pptx)
-    check("seahub_pptx_stays_on_onlyoffice", st == 200 and form_pptx is None and
-          onlyoffice_page_ready(page_pptx), "ONLYOFFICE page must have no blocking Seahub error")
-    st, page_odt = file_page(sess, repo_id, "test.odt")
-    check("seahub_odt_routes_to_onlyoffice", st == 200 and onlyoffice_page_ready(page_odt) and parse_wopi_form(page_odt) is None,
-          "ONLYOFFICE page must have no blocking Seahub error")
     # every ArtCraft editor opens through the bridge with the right bundle
     for label, form, editor, fid in (("docx", form_docx, "wordcraft", docx_id), ("xlsx", form_xlsx, "gridcraft", xlsx_id),
                                      ("pdf", form_pdf, "pdfcraft", pdf_id), ("dxf", form_dxf, "cadcraft", dxf_id)):
@@ -651,35 +637,6 @@ def main() -> int:
         hist_r = history(admin, repo_id, "test.svg")
         check("seahub_putfile_ignores_can_edit", st == 200 and now2 == SVG_V1 and hist_r[0]["creator"] == reader_username,
               f"status={st} overwritten={now2 == SVG_V1} top_creator={hist_r[0]['creator'] if hist_r else None}  (ok=True means the Seahub gap is real)")
-
-    # ---- ONLYOFFICE ---------------------------------------------------------------
-    if oo_up:
-        st, _, body = Http().req("GET", f"{ONLYOFFICE}/web-apps/apps/api/documents/api.js")
-        check("onlyoffice_apijs_200", st == 200 and len(body) > 1000, f"status={st} len={len(body)}")
-        tok = jwt({"c": "version"})
-        st, _, body = Http().req("POST", f"{ONLYOFFICE}/coauthoring/CommandService.ashx",
-                                 json.dumps({"c": "version", "token": tok}).encode(),
-                                 {"Content-Type": "application/json", "Authorization": f"Bearer {tok}"})
-        try:
-            r = json.loads(body)
-        except ValueError:
-            r = {"raw": body[:200].decode("utf-8", "replace")}
-        check("onlyoffice_jwt_command_ok", st == 200 and r.get("error") == 0, json.dumps(r)[:200])
-        # Conversion round-trip: ONLYOFFICE fetches the docx from Seahub (same fetch path its editor uses).
-        st, dl = api(admin, "GET", f"/api2/repos/{repo_id}/file/?p=/test.docx&reuse=1")   # fresh, reusable link
-        payload = {"async": False, "filetype": "docx", "key": uuid.uuid4().hex, "outputtype": "pdf", "title": "test.docx", "url": dl}
-        payload["token"] = jwt(payload)
-        st, _, body = Http().req("POST", f"{ONLYOFFICE}/ConvertService.ashx", json.dumps(payload).encode(),
-                                 {"Content-Type": "application/json", "Accept": "application/json", "Authorization": f"Bearer {payload['token']}"}, timeout=180)
-        try:
-            r = json.loads(body)
-        except ValueError:
-            r = {"raw": body[:300].decode("utf-8", "replace")}
-        ok = st == 200 and r.get("endConvert") is True and r.get("fileUrl")
-        if ok:
-            st2, _, pdf = Http().req("GET", r["fileUrl"])
-            ok = st2 == 200 and pdf.startswith(b"%PDF")
-        check("onlyoffice_fetches_from_seahub_and_converts", bool(ok), json.dumps(r)[:200])
 
     summary = {"seafile_version": seafile_version, "repo_id": repo_id, "ran_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                "passed": sum(c["ok"] for c in checks), "failed": sum(not c["ok"] for c in checks), "checks": checks}

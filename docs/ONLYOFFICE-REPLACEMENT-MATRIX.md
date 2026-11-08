@@ -33,7 +33,8 @@ satisfy same-file edit/save/new-version validation for the three editing routes.
 The shipped zero-patch candidate currently validates only DOCX/XLSX among the
 required office formats. PDF/DXF/SVG/FIGCRAFT are additional Craft routes, not
 substitutes for the missing office coverage. Experimental DeckCraft Rust ports
-remain outside the zero-patch default. No ONLYOFFICE removal is justified yet.
+remain outside the zero-patch default. The owner subsequently authorized ONLYOFFICE retirement independently of this
+coverage; see `ONLYOFFICE-RETIREMENT-20261108.md`. Missing formats remain NOT VERIFIED.
 
 Next: establish pinned upstream import/export capabilities without assuming
 support, prioritize PPTX same-format persistence, then validate the remaining

@@ -20,7 +20,6 @@ sync_files() {
       echo INIT_SEAFILE_MYSQL_ROOT_PASSWORD=\$(openssl rand -hex 16)
       echo REDIS_PASSWORD=\$(openssl rand -hex 16)
       echo JWT_PRIVATE_KEY=\$(openssl rand -hex 32)
-      echo ONLYOFFICE_JWT_SECRET=\$(openssl rand -hex 24)
       echo ADMIN_EMAIL=admin@lab.test
       echo ADMIN_PASSWORD=\$(openssl rand -hex 12)
     } > .env && chmod 600 .env"
@@ -30,7 +29,7 @@ sync_files() {
 case "$cmd" in
   up)
     sync_files
-    vm "cd $REMOTE && docker compose up -d db redis seafile onlyoffice bridge"
+    vm "cd $REMOTE && docker compose up -d db redis seafile bridge"
     ;;
   configure)
     # (Re)apply the managed settings block once Seafile has written its config, then restart.
@@ -40,7 +39,7 @@ case "$cmd" in
         for i in \$(seq 1 60); do sudo test -f \$conf && break; sleep 5; done
         sudo test -f \$conf || { echo 'seahub_settings.py never appeared' >&2; exit 1; }
         sudo sed -i '/^# >>> artcraft-lab/,/^# <<< artcraft-lab/d' \$conf
-        sed \"s|__ONLYOFFICE_JWT_SECRET__|\$ONLYOFFICE_JWT_SECRET|\" app/lab/real-seafile/seahub_settings.extra.py | sudo tee -a \$conf >/dev/null
+        cat app/lab/real-seafile/seahub_settings.extra.py | sudo tee -a \$conf >/dev/null
         docker compose restart seafile >/dev/null 2>&1
         sudo grep -E 'FILE_EXTENSION' \$conf"
     ;;
