@@ -16,6 +16,8 @@ services:
     volumes:
       - ./editors.json:/config/editors.json:ro
       - ./editors:/editors:ro
+      # Optional: mount a log directory for persistent access logs
+      # - ./logs:/var/log/bridge:rw
     environment:
       - BRIDGE_PUBLIC_URL=${BRIDGE_PUBLIC_URL:?e.g. https://craft.example.org}
       - BRIDGE_SEAHUB_ORIGIN=${BRIDGE_SEAHUB_ORIGIN:?e.g. https://seafile.example.org}
@@ -24,3 +26,9 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
