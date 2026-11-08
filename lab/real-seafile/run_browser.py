@@ -58,7 +58,7 @@ def find_frame(page, prefix, timeout=60, name=None, parent=None):
                 return f
             if parent is not None and f.parent_frame == parent and name is None:
                 return f
-        time.sleep(0.5)
+        page.wait_for_timeout(500)
     return None
 
 
@@ -126,6 +126,7 @@ def open_from_seafile_list(page, base, repo_id, name, timeout=30, middle_click=F
         opened = [p for p in page.context.pages if p not in previous_pages]
         target = opened[-1] if opened else page
         if opened or page.url != previous_url:
+            target.wait_for_url(lambda url: url != "about:blank", timeout=timeout * 1000)
             target.wait_for_load_state("domcontentloaded", timeout=timeout * 1000)
             return target
         page.wait_for_timeout(50)

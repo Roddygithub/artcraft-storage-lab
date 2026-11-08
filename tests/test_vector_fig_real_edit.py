@@ -17,7 +17,7 @@ import zipfile
 # Load only the pure helpers: no credentials, Playwright, services or network.
 source = Path(__file__).resolve().parents[1] / 'lab/real-seafile/run_browser.py'
 tree = ast.parse(source.read_text())
-names = {'svg_has_rectangle', 'figcraft_has_frame', 'scene_has_geometry', 'page_api', 'select_active_browser_fixtures', 'open_from_seafile_list'}
+names = {'svg_has_rectangle', 'figcraft_has_frame', 'scene_has_geometry', 'page_api', 'select_active_browser_fixtures', 'open_from_seafile_list', 'find_frame'}
 namespace = dict(BytesIO=BytesIO, json=json, re=re, time=time, ET=ET, zipfile=zipfile)
 exec(compile(ast.Module(body=[n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in names],
                         type_ignores=[]), str(source), 'exec'), namespace)
@@ -86,7 +86,12 @@ class Element:
         actions.append((self.label, 'click', kwargs.get('button', 'left')))
         if self.label == 'test.svg' and kwargs.get('button') == 'middle': self.page.context.pages.append(Popup())
 class Popup:
-    def wait_for_load_state(self, state, **_kwargs): assert state == 'domcontentloaded'
+    def wait_for_url(self, predicate, **_kwargs):
+        assert not predicate('about:blank')
+        assert predicate('https://synthetic.invalid/file/test.svg')
+        self.navigated = True
+    def wait_for_load_state(self, state, **_kwargs):
+        assert self.navigated and state == 'domcontentloaded'
 class Listing:
     def __init__(self): self.context, self.url = SimpleNamespace(pages=[self]), 'about:blank'
     def goto(self, url, **_kwargs): self.url = url
@@ -96,4 +101,10 @@ class Listing:
 listing = Listing()
 assert isinstance(namespace['open_from_seafile_list'](listing, 'https://synthetic.invalid', 'library', 'test.svg', middle_click=True), Popup)
 assert actions == [('test.svg', 'click', 'middle')]
+class LazyFrames:
+    frames = []
+    def wait_for_timeout(self, milliseconds):
+        assert milliseconds == 500
+        self.frames = [SimpleNamespace(url='https://synthetic.invalid/editor')]
+assert namespace['find_frame'](LazyFrames(), 'https://synthetic.invalid/editor', timeout=0.1) is not None
 print('PASS offline VectorCraft/FigCraft geometry assertions; runtime NOT RUN')
