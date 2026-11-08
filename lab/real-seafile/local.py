@@ -66,8 +66,11 @@ def compose_backend(run, env):
         return
     plugin = shutil.which('docker-compose')
     if not plugin:
-        plugin = next((p for p in ('/usr/lib/docker/cli-plugins/docker-compose',
-                                  '/usr/local/lib/docker/cli-plugins/docker-compose')
+        plugin = next((str(p) for p in (Path.home() / '.docker/cli-plugins/docker-compose',
+                                  '/usr/lib/docker/cli-plugins/docker-compose',
+                                  '/usr/local/lib/docker/cli-plugins/docker-compose',
+                                  '/usr/libexec/docker/cli-plugins/docker-compose',
+                                  '/usr/local/libexec/docker/cli-plugins/docker-compose')
                        if os.path.isfile(p) and os.access(p, os.X_OK)), None)
     if not plugin:
         raise RuntimeError('install podman-compose or the Docker Compose v2 plugin')

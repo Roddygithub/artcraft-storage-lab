@@ -213,8 +213,12 @@
     } else if (kind === 'openRequest') {
       openDocument();
     } else if (kind === 'dirty') {
-      state.dirty = state.failedSave || !!d.dirty;
-      state.dirtyRevision++;
+      // Only new edits advance the save snapshot. A clean notification is not
+      // storage verification and must not erase edits or a failed save.
+      if (d.dirty) {
+        state.dirty = true;
+        state.dirtyRevision++;
+      }
       if (state.dirty && !state.saving && !state.failedSave) status('unsaved changes', 'warn');
     } else if (kind === 'save') {
       handleSave(d);

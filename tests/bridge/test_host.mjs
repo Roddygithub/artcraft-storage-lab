@@ -55,7 +55,9 @@ for (const reply of [
   page.send('dirty', { dirty: false });
   assert.equal(page.guarded(), true, 'editor clean signal must not hide a rejected save');
   assert.equal(page.status(), failure, 'the actionable failure must stay visible');
-  page.save('save:2'); await settle();
+  page.save('save:2');
+  page.send('dirty', { dirty: false });
+  await settle();
   assert.equal(page.acknowledgements.at(-1).ok, true);
   assert.equal(page.guarded(), false, 'verified retry can clear the guard');
 }
@@ -73,4 +75,13 @@ page.send('dirty', { dirty: false });
 assert.equal(page.guarded(), true, 'older success must not erase the newer rejected save');
 page.save('retry'); await settle();
 assert.equal(page.guarded(), false);
+
+let finish;
+const delayed = new Promise(resolve => { finish = resolve; });
+const edited = host([() => delayed]);
+edited.send('dirty', { dirty: true }); edited.save();
+edited.send('dirty', { dirty: true });
+edited.send('dirty', { dirty: false });
+finish(verified()); await settle();
+assert.equal(edited.guarded(), true, 'new edits survive clean notifications during an older save');
 console.log('PASS: verified host saves and failed-save unload protection');

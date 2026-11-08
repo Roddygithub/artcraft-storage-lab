@@ -15,6 +15,24 @@ spec.loader.exec_module(local)
 
 
 class LauncherTest(unittest.TestCase):
+    def test_user_and_libexec_compose_plugins_are_discovered(self):
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d)
+            for expected in (str(base / 'home/.docker/cli-plugins/docker-compose'),
+                             '/usr/libexec/docker/cli-plugins/docker-compose',
+                             '/usr/local/libexec/docker/cli-plugins/docker-compose'):
+                def fake_popen(args, **_kwargs):
+                    Path(args[-1].removeprefix('unix://')).touch()
+                    return object()
+                with patch.object(local.shutil, 'which', return_value=None), \
+                        patch.object(local.Path, 'home', return_value=base / 'home'), \
+                        patch.object(local.os.path, 'isfile', side_effect=lambda p: str(p) == expected), \
+                        patch.object(local.os, 'access', return_value=True), \
+                        patch.object(local.subprocess, 'Popen', fake_popen), \
+                        patch.object(local, 'stop'):
+                    with local.compose_backend(base, {}) as backend:
+                        self.assertEqual(backend, [expected])
+
     def test_compose_fallback_owns_only_its_private_api(self):
         with tempfile.TemporaryDirectory() as d:
             base = Path(d)
