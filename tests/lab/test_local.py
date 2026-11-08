@@ -16,7 +16,9 @@ spec.loader.exec_module(local)
 
 class LauncherTest(unittest.TestCase):
     def test_public_origins_rejected_before_run_directory_or_commands(self):
-        invalid = ['http://seafile.test', 'https://user:pass@seafile.test',
+        invalid = ['https://127.1', 'https://127.0.0.1', 'https://2130706433',
+                   'https://0177.0.0.1', 'https://0x7f000001', 'https://127.0.0x1', 'https://0x',
+                   'http://seafile.test', 'https://user:pass@seafile.test',
                    'https://seafile.test/', 'https://seafile.test/path',
                    'https://seafile.test?x', 'https://seafile.test#x',
                    'https://seafile.test:0', 'https://seafile.test:65536',

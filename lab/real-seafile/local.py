@@ -52,6 +52,9 @@ def https_origin(value):
     host = parsed.hostname
     if (not re.fullmatch(r'https://[A-Za-z0-9.-]+(?::[0-9]+)?', value)
             or not host or len(host) > 253
+            # WHATWG URLs normalize decimal/octal/hex IPv4 aliases. DNS-only
+            # origins exclude all numeric final labels, including bare 0x.
+            or re.fullmatch(r"(?:[0-9]+|0x[0-9a-f]*)", host.rsplit(".", 1)[-1])
             or any(not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', label)
                    for label in host.split('.'))
             or (parsed.port is not None and not 1 <= parsed.port <= 65535)):
