@@ -45,3 +45,13 @@ The independent source review of `04ac568` against `e49da48` returned bounded
 PASS with no findings. The explicit three-document allowlist, pre-edit waits,
 body-text retention and fail-closed fixture selection passed the offline test.
 Runtime for the added prose and structure cases follows separately.
+
+The independent evidence review of `aec6c937bb6e266237e25ff136deaa3607cc19cf`
+returned bounded PASS with no actionable findings. It verified both 33-file
+source inventories against `9a71dff`, private-result/static-manifest hashes,
+retained asset equality and the verifier. Four screenshots and all package
+parts of eight DOCX files support the bounded formatting/list/structure claims.
+Browser 28/0 and HTTP 44/2 per run remain explicit. No independent rendering,
+runtime replay, project gate or ONLYOFFICE removal approval was granted.
+The reviewer could not reproduce the credential-value scan from the inspected
+inputs; that scan remains a parent observation, not independently established.
