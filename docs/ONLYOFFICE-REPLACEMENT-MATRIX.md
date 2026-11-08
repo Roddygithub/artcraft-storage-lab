@@ -40,3 +40,23 @@ support, prioritize PPTX same-format persistence, then validate the remaining
 viewing formats with deterministic synthetic files and observed browser output.
 Preserve DOCX/XLSX successes while broadening fidelity and HTTPS acceptance.
 Production stays unchanged; upstream LOCKED; project INCOMPLETE.
+
+## New upstream releases staged separately
+
+Read-only GitHub release inspection identified DeckCraft **v0.16.0**, WordCraft
+**v0.16.0** and GridCraft **v0.17.0**. Their official Web ZIPs were downloaded
+and extracted through `scripts/craft_web_zip.py`; each archive matches its GitHub
+asset SHA-256. Exact URLs, hashes, sizes and bundled-documentation hashes are
+retained in `docs/reviews/PROJECT-CLOSURE-20261108/upstream-release-pins.json`.
+These staged files do not replace the already validated bundles yet.
+
+DeckCraft v0.16.0's bundled `HOSTING.md` now documents the upstream parent-host
+protocol and preserving a host-opened PPTX's name/format on Save. Its pinned
+`craft-web-host` protocol uses `saved {id}` acknowledgements; the bridge now
+answers those only after verified storage (bounded source review PASS).
+This is documentary capability evidence, **not a successful PPTX runtime**.
+
+WordCraft v0.16.0 documents DOC import and ODT import/export; GridCraft v0.17.0
+documents CSV/TSV and ODS data import using cached values rather than formulas.
+No FODT/FODS support or faithful legacy/OpenDocument viewing is inferred from
+those statements. All missing viewing routes still require actual tests.

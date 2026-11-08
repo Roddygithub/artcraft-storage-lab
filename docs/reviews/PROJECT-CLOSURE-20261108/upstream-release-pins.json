@@ -1,0 +1,43 @@
+{
+  "deckcraft": {
+    "tag": "v0.16.0",
+    "release_url": "https://github.com/storytold/deckcraft/releases/tag/v0.16.0",
+    "asset_url": "https://github.com/storytold/deckcraft/releases/download/v0.16.0/deckcraft-web-0.16.0.zip",
+    "github_asset_sha256": "8795d58ab02c30ad25f38525a79ee0e69c40b3d122e223dc04d2703827621f55",
+    "archive_sha256": "8795d58ab02c30ad25f38525a79ee0e69c40b3d122e223dc04d2703827621f55",
+    "archive_bytes": 11810397,
+    "bundled_markdown_sha256": {
+      "HOSTING.md": "ddeedfcba8fcb4bb42ee74f3dc540e69d9ef3373979caaaba9e9fd38321a9ddb",
+      "README.md": "439cab25aa6809bb410ca7f377ed0081ea81c47234bd94f23951e951aa7a3aea"
+    },
+    "status": "downloaded and extracted via scripts/craft_web_zip.py; no release runtime validation yet; previous validated candidate unchanged"
+  },
+  "wordcraft": {
+    "tag": "v0.16.0",
+    "release_url": "https://github.com/storytold/wordcraft/releases/tag/v0.16.0",
+    "asset_url": "https://github.com/storytold/wordcraft/releases/download/v0.16.0/wordcraft-web-0.16.0.zip",
+    "github_asset_sha256": "612fcbe9c4fd8c8a2538e4b711dd78eb448859bbdb7f0f4517b26e99511d6f0e",
+    "archive_sha256": "612fcbe9c4fd8c8a2538e4b711dd78eb448859bbdb7f0f4517b26e99511d6f0e",
+    "archive_bytes": 22269466,
+    "bundled_markdown_sha256": {
+      "HOSTING.md": "22432595042e4a5497a08dbac994ae1ec4bbaa38bcb068900ea54f8f492fa584",
+      "README.md": "d28499d98a7f64be5fc15cbf251dd30b29b77d013219208b3d654dfc46e87583",
+      "ATTRIBUTION.md": "3fc09b7189d078901db77a477bc2dc2007d9a139d59057c67cd5d46e8491d435"
+    },
+    "status": "downloaded and extracted via scripts/craft_web_zip.py; no release runtime validation yet; previous validated candidate unchanged"
+  },
+  "gridcraft": {
+    "tag": "v0.17.0",
+    "release_url": "https://github.com/storytold/gridcraft/releases/tag/v0.17.0",
+    "asset_url": "https://github.com/storytold/gridcraft/releases/download/v0.17.0/gridcraft-web-0.17.0.zip",
+    "github_asset_sha256": "6fcd15c008b80945bc1a1d04757baed0800c69cc58525e62b9820c67b791176b",
+    "archive_sha256": "6fcd15c008b80945bc1a1d04757baed0800c69cc58525e62b9820c67b791176b",
+    "archive_bytes": 9488811,
+    "bundled_markdown_sha256": {
+      "HOSTING.md": "c7d5d8fdc67c906394733e3d4ffd9361201a93aea3d51938fcc05a46175a3f82",
+      "README.md": "48d0f080921f9b38970423db37dce5c0838da88826034fdf4a1b9da4144503ab",
+      "ATTRIBUTION.md": "1c78f894b54a4f778757d3c3323678c613d08825c9c46b26ca1d4d74565965f7"
+    },
+    "status": "downloaded and extracted via scripts/craft_web_zip.py; no release runtime validation yet; previous validated candidate unchanged"
+  }
+}
