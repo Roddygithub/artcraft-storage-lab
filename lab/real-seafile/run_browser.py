@@ -685,6 +685,51 @@ def stable_deckcraft_canvas(page, timeout=90):
     return None
 
 
+def wordcraft_canvas_shows_document(image_data):
+    """Reject WordCraft's blank page while the DOCX is still being parsed/rendered."""
+    try:
+        image = Image.open(BytesIO(image_data)).convert("L")
+        width, height = image.size
+        page_region = image.crop((int(width * 0.20), int(height * 0.31),
+                                  int(width * 0.83), int(height * 0.98)))
+        return sum(page_region.histogram()[:100]) >= 300
+    except (OSError, ValueError):
+        return False
+
+
+def wait_for_wordcraft_document(page, timeout=90):
+    """Require visible page content in two successive captures before editing."""
+    end = time.monotonic() + timeout
+    rendered_frames = 0
+    while time.monotonic() < end:
+        if wordcraft_canvas_shows_document(page.screenshot()):
+            rendered_frames += 1
+            if rendered_frames >= 2:
+                return True
+        else:
+            rendered_frames = 0
+        page.wait_for_timeout(500)
+    return False
+
+
+def select_wordcraft_fidelity_fixture(fixtures, requested_name):
+    """Replace the minimal DOCX with one corrected fidelity-corpus fixture when requested."""
+    if not requested_name:
+        return fixtures
+    if requested_name != "fidelity-layout.docx":
+        raise ValueError(f"unsupported WordCraft fidelity fixture: {requested_name}")
+    if "test.docx" not in fixtures or requested_name in fixtures:
+        raise ValueError("WordCraft fixture map cannot safely select fidelity-layout.docx")
+    from docx_fidelity_corpus import corpus
+
+    content = corpus().get(requested_name)
+    if not content:
+        raise ValueError(f"WordCraft fidelity fixture is missing: {requested_name}")
+    del fixtures["test.docx"]
+    fixtures[requested_name] = ("wordcraft", content, "")
+    return fixtures
+
+
 def frames_dump(page):
     return [(f.name, f.url[:70], (f.parent_frame.name if f.parent_frame else None)) for f in page.frames]
 
@@ -707,6 +752,9 @@ def main():
         "test.svg": ("vectorcraft", rs.SVG_V1, ""),          # page-API shim, not an upstream bridge
         "test.png": ("photocraft", rs.MINIMAL_PNG, ""),       # lab host.rs port, built from upstream source
     }
+    fixtures = select_wordcraft_fidelity_fixture(
+        fixtures, os.environ.get("BROWSER_WORDCRAFT_FIXTURE", "").strip()
+    )
     only_editor = os.environ.get("BROWSER_ONLY_EDITOR", "").strip()
     fixtures = select_browser_fixtures(fixtures, only_editor)
     STATIC = "/app/lab/real-seafile/static"
@@ -864,6 +912,13 @@ def main():
             phrase = f" The typed marker is {marker}. "
             phrase2 = f" Reopened here, typed again: {marker2}. "
 
+            if name == "fidelity-layout.docx":
+                content_rendered = wait_for_wordcraft_document(page)
+                check("wordcraft_layout_fixture_rendered_before_first_edit", content_rendered)
+                page.screenshot(path=os.path.join(RESULTS, "wordcraft-before-edit.png"))
+                if not content_rendered:
+                    return page
+
             # -- a real typed edit before Save: the marker is always INSERTED FIRST, and only
             #    then is the dirty state checked (an already-dirty editor cannot skip it) ----
             page.mouse.click(box["x"] + box["width"] / 2, box["y"] + 60 + (box["height"] - 60) / 2)
@@ -930,6 +985,9 @@ def main():
                   f"marker={marker} len={len(got)} bytes_identical_to_original={got == content}")
             check("wordcraft_save_is_not_identical_bytes", got != content, f"{len(content)} -> {len(got)} bytes")
             check("wordcraft_saved_docx_bytes_look_right", rs.content_matches(name, got), f"len={len(got)}")
+            if name == "fidelity-layout.docx":
+                check("wordcraft_first_save_retains_fixture_text",
+                      rs.docx_text(content) in rs.docx_text(got))
             page.screenshot(path=os.path.join(RESULTS, "wordcraft-saved.png"))
 
             # -- close the old editor, reopen from Seafile in a fresh session ---------
@@ -975,12 +1033,22 @@ def main():
                 except Exception as e:  # noqa: BLE001
                     return f"<{e}>"
             body = wait_for_saved_response(p2, relay_file, 180)
-            p2.screenshot(path=os.path.join(RESULTS, "wordcraft-reopened.png"))
             check("wordcraft_reopen_editor_ready_and_document_opened", body is not None,
                   f"relay/file responses={len(relay_file)} after {time.time()-t0:.0f}s")
             # the bytes the editor received on its own open path are the saved version
             check("wordcraft_reopen_bytes_identical_to_the_saved_version", body is not None and body == got,
                   f"len={len(body) if body else 0} vs saved {len(got)}")
+
+            if name == "fidelity-layout.docx":
+                content_rendered2 = wait_for_wordcraft_document(p2) if body is not None else False
+                check("wordcraft_reopened_layout_fixture_rendered_before_second_edit",
+                      content_rendered2)
+                p2.screenshot(path=os.path.join(RESULTS, "wordcraft-reopened.png"))
+                if not content_rendered2:
+                    reopen.close()
+                    return page
+            else:
+                p2.screenshot(path=os.path.join(RESULTS, "wordcraft-reopened.png"))
 
             # Receiving bytes is not enough: the reopened editor must parse, display and
             # accept an interactive edit of what it loaded, and save it again. Type marker2
@@ -1027,6 +1095,9 @@ def main():
                 check("wordcraft_reopen_seafile_holds_both_markers",
                       marker.lower() in rs.docx_text(got2).lower() and marker2.lower() in rs.docx_text(got2).lower(),
                       f"marker={marker2} len={len(got2)}")
+                if name == "fidelity-layout.docx":
+                    check("wordcraft_second_save_retains_fixture_text",
+                          rs.docx_text(content) in rs.docx_text(got2))
             else:
                 check("wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes", False,
                       f"no editor/box/open bytes: host={host2 is not None} opened={body is not None} box={box2 is not None}")
