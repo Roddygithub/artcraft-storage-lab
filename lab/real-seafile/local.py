@@ -45,19 +45,16 @@ def snapshot(run, assets, expected):
 
 
 def render_settings(text, without_wopi=False):
-    """Managed Seahub block. ``without_wopi`` isolates stock ONLYOFFICE.
+    """Managed lab block; ONLYOFFICE-only isolation is diagnostic, not coexistence.
 
-    Upstream Seahub 13 runs its WOPI branch whenever ENABLE_OFFICE_WEB_APP is
-    true, even for extensions absent from OFFICE_WEB_APP_FILE_EXTENSION, and
-    records an error that the ONLYOFFICE page then renders instead of the
-    editor. Dropping the WOPI keys is the only configuration-only way to
-    observe the stock ONLYOFFICE path on that host.
+    Explicitly override earlier WOPI assignments in the disposable generated
+    configuration. Never apply this to an existing production instance.
     """
     lines = text.splitlines(keepends=True)
     if without_wopi:
         lines = [line for line in lines
                  if not line.startswith(('ENABLE_OFFICE_WEB_APP', 'OFFICE_WEB_APP_'))]
-    return ''.join(lines)
+    return ''.join(lines) + ('\nENABLE_OFFICE_WEB_APP = False\n' if without_wopi else '')
 
 
 def stop(proc):

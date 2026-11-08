@@ -21,7 +21,7 @@ class LauncherTest(unittest.TestCase):
                 'OFFICE_WEB_APP_FILE_EXTENSION = ("docx",)\n')
         self.assertEqual(local.render_settings(text), text)
         isolated = local.render_settings(text, without_wopi=True)
-        self.assertEqual(isolated, 'ENABLE_ONLYOFFICE = True\n')
+        self.assertEqual(isolated, 'ENABLE_ONLYOFFICE = True\n\nENABLE_OFFICE_WEB_APP = False\n')
 
     def test_experimental_flag_parsed(self):
         """Argparse accepts --experimental flag."""
@@ -41,7 +41,7 @@ class LauncherTest(unittest.TestCase):
                 'OFFICE_WEB_APP_FILE_EXTENSION = ("docx",)\n')
         self.assertEqual(local.render_settings(text), text)
         isolated = local.render_settings(text, without_wopi=True)
-        self.assertEqual(isolated, 'ENABLE_ONLYOFFICE = True\n')
+        self.assertEqual(isolated, 'ENABLE_ONLYOFFICE = True\n\nENABLE_OFFICE_WEB_APP = False\n')
 
     def test_user_and_libexec_compose_plugins_are_discovered(self):
         with tempfile.TemporaryDirectory() as d:

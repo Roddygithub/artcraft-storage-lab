@@ -5,7 +5,23 @@
 > `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT — zero-patch project closure in progress
+## CURRENT — closure blocked by mixed-suite host behavior
+
+The previous completion/freeze claim is withdrawn. Recovery audit `2825f4c`
+found private-only evidence and source mismatches. The shim rewrite was replaced
+with the earlier implementation; standalone shim, host, coupled lifecycle,
+32 bridge tests and seven launcher tests pass. ONLYOFFICE's deleted-text and
+final-reopen assertions are corrected; bounded source review at `664898f` passes,
+but fresh runtime is pending.
+
+Packaged Seahub CE 13.0.28 sets a blocking WOPI error on some ONLYOFFICE pages
+under the default split. Earlier APIJS-only HTTP checks missed this; the check
+now rejects the error. ONLYOFFICE-only runs cannot prove coexistence. No
+production settings were changed. See `docs/PROJECT-CLOSURE.md` and the corrected
+parent inventory `docs/FORENSIC-REVIEW-20261108.md`. Project INCOMPLETE; upstream
+LOCKED. Earlier entries below retain historical results and limitations.
+
+## Earlier closure preparation
 
 Save safety and the new rootless launcher passed bounded source review at
 7380e46 and a real WordCraft replay: HTTP 48/48, browser 28/28 (GR-086).
