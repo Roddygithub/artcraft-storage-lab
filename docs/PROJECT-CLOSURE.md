@@ -78,3 +78,17 @@ was found. The multiple-suite API is Pro-gated and chooses per library rather
 than per extension. A compatible unmodified host or another verified native
 configuration is required before closure; no host patch or production change
 is authorized by this finding.
+
+## Replacement objective clarified by the owner
+
+The owner intends to retire ONLYOFFICE if WordCraft meets the required needs.
+It remains the fallback during validation; no removal has been performed.
+Priority is now WordCraft durability and document fidelity, then a reviewable
+migration/rollback plan. Mixed-suite coexistence is a limitation of the current
+host configuration, not evidence that WordCraft's own edit/save chain fails.
+It must remain disclosed while ONLYOFFICE is retained.
+
+The new combined six-Craft recovery replay records 119/119 browser assertions
+at source `664898f`. Its historical HTTP 46/46 includes two insufficient APIJS
+checks; both generated ONLYOFFICE pages fail the subsequently corrected gate.
+See `lab/real-seafile/results/2026-11-08-combined-core-recovery/`.
