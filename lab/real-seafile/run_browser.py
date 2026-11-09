@@ -972,8 +972,9 @@ def main():
                         saved.append(body)
                     route.abort()
 
-                # Set up listeners BEFORE navigation so we catch /relay/file
-                ctx.on("response", on_response)
+                # The /relay/file request comes from inside the host iframe; listen on the
+                # page (which propagates to frames) and also on the specific frame once found.
+                page.on("response", on_response)
                 ctx.route("**/relay/save", on_save)
                 try:
                     try:
@@ -989,6 +990,18 @@ def main():
                     if not routed:
                         page.screenshot(path=os.path.join(RESULTS, f"viewing-{slug}-no-host.png"))
                         continue
+                    # The /relay/file request comes from the editor iframe inside office_frame.
+                    # Find it and listen there.
+                    editor_frame = None
+                    for f in page.frames:
+                        if f != host and f.parent_frame == host:
+                            editor_frame = f
+                            break
+                    if editor_frame is None:
+                        check(f"viewing_{slug}_editor_iframe_found", False,
+                              f"no child frame of office_frame")
+                        continue
+                    editor_frame.on("response", on_response)
                     end = time.time() + 90
                     while time.time() < end and not relay:
                         time.sleep(0.5)
@@ -1020,7 +1033,21 @@ def main():
                           f"downloads={len(downloads)}")
                     page.screenshot(path=os.path.join(RESULTS, f"viewing-{slug}.png"))
                 finally:
-                    ctx.remove_listener("response", on_response)
+                    # Clean up listeners safely; page may have been replaced
+                    try:
+                        if editor_frame is not None:
+                            editor_frame.remove_listener("response", on_response)
+                    except Exception:
+                        pass
+                    try:
+                        if host is not None:
+                            host.remove_listener("response", on_response)
+                    except Exception:
+                        pass
+                    try:
+                        page.remove_listener("response", on_response)
+                    except Exception:
+                        pass
                     ctx.unroute("**/relay/save", on_save)
                     if page is not base:
                         page.close()
