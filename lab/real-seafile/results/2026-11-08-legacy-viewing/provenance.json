@@ -1,0 +1,16 @@
+{
+  "source_reference": "4fe3fc4fa66609df94294f9043330697d4446a28",
+  "seafile_version": "13.0.28",
+  "mode": "--viewing (opt-in documented-import legacy routes)",
+  "static_manifest_sha256": "5f0cef84fe03efb916496be2df103b9661ee293a19f7e7771233c5260a9963b9",
+  "run_directory": "~/.cache/artcraft-storage-lab/office-view-20261108-run2 (private; not retained)",
+  "retained": [
+    "slice.json (sanitized: no repo id, tokens, WOPISrc or accounts)"
+  ],
+  "fixtures": "lab/real-seafile/fixtures/legacy/ (SHA256SUMS pinned)",
+  "limits": [
+    "route evidence only; no browser open or editor import of a legacy fixture",
+    "browser replay in this run is the unchanged six-editor candidate (119/119)",
+    "FODT/FODS/FODP/PPT/ODP/PPS/PPSX intentionally have no route"
+  ]
+}

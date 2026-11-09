@@ -11,16 +11,16 @@ proof that every current ONLYOFFICE path works in practice.
 | DOCX | View + edit | WordCraft: three synthetic corpus edit/save/version/fresh-reopen cases, 28 checks each; bounded reviews PASS |
 | XLSX | View + edit | GridCraft: synthetic typed-cell edit/save/version/fresh-reopen evidence; broader workbook fidelity NOT VERIFIED |
 | PPTX | View + edit | Official DeckCraft v0.16.0: synthetic title edit, same-file PPTX save, attributed version and fresh reopen; 15/15 browser checks; broad fidelity NOT VERIFIED |
-| DOC | View | Fixture ready; WordCraft documents DOC import — runtime import NOT VERIFIED |
-| PPT | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| XLS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| ODT | View | Fixture ready; WordCraft documents ODT import — runtime import NOT VERIFIED |
+| DOC | View | Fixture + route ready; WordCraft v0.16.0 README:99/128 documents legacy 97-2003 .doc **import** — runtime import NOT VERIFIED |
+| PPT | View | Fixture ready; DeckCraft v0.16.0 documents only .pptx (README:22) — NOT VERIFIED |
+| XLS | View | Fixture + route ready; GridCraft v0.17.0 README:94 documents legacy 97-2003 .xls **open** (values, formulas, number formats) — runtime import NOT VERIFIED |
+| ODT | View | Fixture + route ready; WordCraft v0.16.0 README:99 documents .odt import/export — runtime import NOT VERIFIED |
 | FODT | View | Fixture ready; no documented Craft import — NOT VERIFIED |
 | ODP | View | Fixture ready; no documented Craft import — NOT VERIFIED |
 | FODP | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| ODS | View | Fixture ready; GridCraft documents ODS import — runtime import NOT VERIFIED |
+| ODS | View | Fixture + route ready; GridCraft v0.17.0 README:96 documents ODS **data** import (saved values, not formulas) — runtime import NOT VERIFIED |
 | FODS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| CSV | View | Fixture ready; GridCraft documents CSV import — runtime import NOT VERIFIED |
+| CSV | View | Fixture + route ready; GridCraft v0.17.0 README:93 documents CSV/TSV — runtime import NOT VERIFIED |
 | PPSX | View | Fixture ready; no documented Craft import — NOT VERIFIED |
 | PPS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
 
@@ -40,10 +40,25 @@ regeneration script:
 The fixtures, the `content_matches_extension` signatures for DOC/XLS/PPT/PPS,
 PPSX and FODT/FODS/FODP, and the routing map are testable offline. That is
 **fixture and routing evidence only**: no Seafile route, browser open, editor
-import or format replacement is claimed. Only DOC, ODT (WordCraft) and ODS, CSV
-(GridCraft) have a documented upstream import path; the remaining eight formats
-have none and stay deliberately unrouted until proven. The replacement baseline
-therefore remains a partial, honest subset.
+import or format replacement is claimed. Only DOC, ODT (WordCraft v0.16.0
+README:99/128) and XLS, ODS, CSV (GridCraft v0.17.0 README:93/94/96) have a
+documented upstream import path; the remaining seven formats have none and stay
+deliberately unrouted until proven. DeckCraft v0.16.0 documents only `.pptx`
+(README:22), so PPT/PPS/PPSX/ODP/FODP have no candidate route. The replacement
+baseline therefore remains a partial, honest subset.
+
+### Real Seafile routing replay — 2026-11-08 (opt-in `--viewing`)
+
+At application source `4fe3fc4`, a fresh rootless lab with `--viewing` passed
+HTTP **57/57** (17 of them legacy viewing-route checks) and browser **119/119**,
+exit 0, on stock synthetic Seafile CE 13.0.28. The slice uploaded every legacy
+fixture through the real Seahub API and confirmed: DOC and ODT reach
+`/edit/wordcraft`, XLS, ODS and CSV reach `/edit/gridcraft`, the bridge answers
+each with the matching `editorId`, and FODT, FODS, FODP, PPT, ODP, PPS and PPSX
+carry **no WOPI route**. Sanitized retained evidence and a runnable verifier:
+`lab/real-seafile/results/2026-11-08-legacy-viewing/`. This is **routing**
+evidence on real Seafile; it still does not prove that any editor imports or
+renders these documents.
 
 The initial replacement baseline is **15 viewing formats and 3 editing
 formats**. Adding editing support for the currently view-only formats would be

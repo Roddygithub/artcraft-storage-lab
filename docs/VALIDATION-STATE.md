@@ -46,11 +46,11 @@ prove full pagination or font fidelity.
 
 ## Next unresolved work
 
-1. Required legacy/OpenDocument viewing formats: deterministic fixtures and an
-   opt-in routing candidate now exist for all twelve; only DOC/ODT (WordCraft)
-   and ODS/CSV (GridCraft) have a documented upstream import. A real Seafile and
-   browser probe of editor import is still NOT VERIFIED; DOCX/XLSX/PPTX
-   synthetic edit coverage does not replace the viewing formats.
+1. Required legacy/OpenDocument viewing formats: deterministic fixtures, an
+   opt-in routing candidate and a real-Seafile routing replay now exist for all
+   twelve; DOC/ODT (WordCraft) and XLS/ODS/CSV (GridCraft) have a documented
+   upstream import and a proven route. Browser **import** of a legacy fixture is
+   still NOT VERIFIED, and seven formats have no documented import at all.
 2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
 3. Independent forensic review and a fresh project GPT gate, in a context that
    did not implement this candidate. No global PASS has been granted.

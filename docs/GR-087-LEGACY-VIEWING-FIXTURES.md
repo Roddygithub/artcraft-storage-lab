@@ -2,11 +2,11 @@
 
 **State: GPT REVIEW PENDING. Project INCOMPLETE. Upstream LOCKED.**
 
-Candidate reviewed by the free pass: `2c112fc` (branch
-`work/project-closure-20261108`). The source that produced the retained runtime
-evidence is `4f4b2dc`; `0dd3d25` and `2c112fc` add documentation, fixtures, a
-bridge signature extension and tests only. This claim is verifiable with
-`git diff 4f4b2dc 2c112fc -- bridge/ lab/`.
+Candidate reviewed by the free pass: `2c112fc`; the retained real-Seafile
+routing replay ran at `4fe3fc4`. The source that produced the earlier runtime
+evidence is `4f4b2dc`; the later commits add documentation, fixtures, a bridge
+signature extension, tests and the opt-in `--viewing` lab mode only. This claim
+is verifiable with `git diff 4f4b2dc 4fe3fc4 -- bridge/ lab/`.
 
 ## What this work item produces
 
@@ -37,15 +37,33 @@ OpenDocument `office:document`). CSV stays deliberately unguarded — it has no
 strong signature — and remains listed as unguarded in `SIGNATURE_KNOWN`.
 
 The routing candidate maps only formats with a documented upstream import:
-DOC/ODT to WordCraft, ODS/CSV to GridCraft. The other eight formats have no
-documented Craft import and stay unrouted.
+DOC/ODT to WordCraft and XLS/ODS/CSV to GridCraft. The other seven formats have
+no documented Craft import and stay unrouted.
+
+Documented-import evidence, cited from the pinned release bundles (hashes in
+`docs/reviews/PROJECT-CLOSURE-20261108/upstream-release-pins.json`):
+
+| Format | Upstream statement |
+| --- | --- |
+| DOC | WordCraft v0.16.0 `README.md:99` "opens legacy 97-2003 .doc"; `:128` "legacy 97-2003 .doc import" |
+| ODT | WordCraft v0.16.0 `README.md:99` "and also .odt, .rtf, .html, .md, .tex (LaTeX), .txt" |
+| XLS | GridCraft v0.17.0 `README.md:94` "Legacy 97-2003 .xls workbooks open with their values, formulas and number formats" |
+| ODS | GridCraft v0.17.0 `README.md:96` "ODS worksheet data can be imported … using saved values instead of formulas" |
+| CSV | GridCraft v0.17.0 `README.md:93` "CSV and TSV too" |
+| PPT/PPS/PPSX/ODP/FODP | DeckCraft v0.16.0 `README.md:22` documents only "open and save .pptx" — no route |
 
 ## Evidence
 
-* Offline validation at `2c112fc`: **20/20 command groups PASS**
+* Offline validation at `4fe3fc4`: **20/20 command groups PASS**
   (`scripts/validate-candidate.py`), which now includes
   `tests/test_legacy_fixtures.py`.
 * `tests/bridge/test_bridge.py`: **33 tests OK** (was 32).
+* `tests/lab/test_local.py`: **13 tests OK**, including the `--viewing` flag and
+  the opt-in map not replacing the default candidate.
+* Real Seafile routing replay at `4fe3fc4`: HTTP **57/57** (17 legacy
+  viewing-route checks) and browser **119/119**, launcher exit 0, on stock
+  synthetic Seafile CE 13.0.28. Sanitized evidence and verifier:
+  `lab/real-seafile/results/2026-11-08-legacy-viewing/`.
 * Fixture bytes and their SHA-256 are committed; `PROVENANCE.txt` records the
   exact container image id (`72717717d6ce…`) and the disclosed limit that
   `slide.pps` and `slide.ppt` are byte-identical under this LibreOffice.
@@ -63,20 +81,22 @@ documented Craft import and stay unrouted.
 
 ## Explicit limits (NOT VERIFIED)
 
-* No runtime import of any legacy/OpenDocument format in a real Seafile +
-  browser session. The fixtures and routing are offline-only evidence.
-* No format is declared replaced; the eight formats with no documented Craft
-  import remain without a candidate route.
+* No runtime **import** of any legacy/OpenDocument format in a browser. The
+  real-Seafile replay proves routing only: it never opens a legacy fixture in an
+  editor, asserts rendered content, or saves one. The browser replay in that run
+  is the unchanged six-editor candidate.
+* No format is declared replaced; the seven formats with no documented Craft
+  import (FODT, FODS, FODP, PPT, ODP, PPS, PPSX) remain without a route.
 * Human HTTPS desktop acceptance remains pending.
 * The project-level GPT gate cannot run while the `openai` provider quota is
   exhausted (the Sol final reviewer uses the same provider).
 
 ## Next steps
 
-1. Add a bounded lab viewing probe: run the four documented-import routes
-   (DOC/ODT via WordCraft ≥ 0.16.0, ODS/CSV via GridCraft ≥ 0.17.0) through a
-   real Seafile click and assert the marker is rendered, not downloaded.
-2. Keep the eight import-less formats unrouted and disclosed.
+1. Add a bounded browser import probe: open DOC/ODT/XLS/ODS/CSV in the staged
+   WordCraft v0.16.0 / GridCraft v0.17.0 bundles through a real Seafile click and
+   assert the marker is rendered, not downloaded.
+2. Keep the seven import-less formats unrouted and disclosed.
 3. Run the GPT final gate once the provider quota resets.
 
 Project INCOMPLETE; upstream publication LOCKED.
