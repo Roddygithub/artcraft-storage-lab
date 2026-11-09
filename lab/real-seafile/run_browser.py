@@ -972,8 +972,10 @@ def main():
                         saved.append(body)
                     route.abort()
 
-                # The /relay/file request comes from inside the host iframe; listen on the
-                # page (which propagates to frames) and also on the specific frame once found.
+                # Set up a page-level request interceptor to capture the /relay/file response
+                # This fires on the request *before* the response, so we can't get the body,
+                # but we can verify the request was made. The response body will need the
+                # page.wait_for_response approach. Try both: page listener + wait_for_response.
                 page.on("response", on_response)
                 ctx.route("**/relay/save", on_save)
                 try:
@@ -990,22 +992,20 @@ def main():
                     if not routed:
                         page.screenshot(path=os.path.join(RESULTS, f"viewing-{slug}-no-host.png"))
                         continue
-                    # The /relay/file request comes from the editor iframe inside office_frame.
-                    # Find it and listen there.
-                    editor_frame = None
-                    for f in page.frames:
-                        if f != host and f.parent_frame == host:
-                            editor_frame = f
-                            break
-                    if editor_frame is None:
-                        check(f"viewing_{slug}_editor_iframe_found", False,
-                              f"no child frame of office_frame")
-                        continue
-                    editor_frame.on("response", on_response)
-                    end = time.time() + 90
-                    while time.time() < end and not relay:
-                        time.sleep(0.5)
-                    got = relay[-1][1] if relay else None
+
+                    # Wait for the /relay/file response using page.wait_for_response
+                    # The page event should fire for all frames including nested ones.
+                    try:
+                        resp = page.wait_for_response(
+                            lambda r: r.url.endswith("/relay/file"),
+                            timeout=90000
+                        )
+                        try:
+                            got = resp.body()
+                        except Exception:
+                            got = None
+                    except Exception:
+                        got = None
                     check(f"viewing_{slug}_delivers_the_exact_legacy_bytes", got == content,
                           f"{len(got) if got else 0} vs fixture {len(content)} bytes")
                     box = page.locator("#office-frame").bounding_box()
@@ -1034,16 +1034,6 @@ def main():
                     page.screenshot(path=os.path.join(RESULTS, f"viewing-{slug}.png"))
                 finally:
                     # Clean up listeners safely; page may have been replaced
-                    try:
-                        if editor_frame is not None:
-                            editor_frame.remove_listener("response", on_response)
-                    except Exception:
-                        pass
-                    try:
-                        if host is not None:
-                            host.remove_listener("response", on_response)
-                    except Exception:
-                        pass
                     try:
                         page.remove_listener("response", on_response)
                     except Exception:

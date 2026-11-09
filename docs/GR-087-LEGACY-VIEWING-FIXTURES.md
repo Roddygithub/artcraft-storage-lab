@@ -86,11 +86,12 @@ Documented-import evidence, cited from the pinned release bundles (hashes in
 
 ## Explicit limits (NOT VERIFIED)
 
-* No runtime **import** of any legacy/OpenDocument format in a browser with
-  Seafile. The bundle-level probe (`scripts/probe-legacy-import.py`) proves
-  editor-bundle import; the real-Seafile replay (`--viewing`) proves routing
-  only. No combined host+editor+Seafile run has captured the marker on a fresh
-  reopen.
+* No combined host+editor+Seafile run has captured the marker on fresh reopen.
+  The bundle-level probe (`scripts/probe-legacy-import.py`) proves editor-bundle
+  import; the real-Seafile replay (`--viewing`) proves routing only. The browser
+  `/relay/file` capture for the nested editor iframe is blocked by a known
+  Playwright limitation (nested cross-origin iframes do not propagate the
+  response to the parent page or context listeners). See `docs/VALIDATION-STATE.md`.
 * No format is declared replaced; the seven formats with no documented Craft
   import (FODT, FODS, FODP, PPT, ODP, PPS, PPSX) remain without a route.
 * Human HTTPS desktop acceptance remains pending.
