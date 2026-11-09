@@ -207,8 +207,39 @@ the formats with a documented upstream import (DOC/ODT to WordCraft, ODS/CSV to
 GridCraft). All of this is covered offline by `tests/test_legacy_fixtures.py`
 and the bridge suite.
 
-This is fixture and routing evidence only. No Seafile route, browser open,
-editor import or format replacement is claimed, and the eight formats without a
-documented Craft import stay unrouted. The default six/seven-editor candidate is
-unchanged. Offline checks now number 20 command groups. Project INCOMPLETE;
-upstream LOCKED.
+This is fixture and routing evidence. A real browser replay later added the
+Seafile file-list open, documented route, no-download and no-version-write
+checks; the seven formats without a documented Craft import stay unrouted. The
+default six/seven-editor candidate is unchanged. Offline checks now number 20
+command groups.
+
+## Final evidence freeze — 2026-11-10
+
+Source: branch `work/project-closure-20261108` at `864fc77` (80 commits ahead of
+`main`/`ae903ac`). No runtime code changed after the `--viewing` replay source
+`53c7e22`; the later commits add the retained run, its verifier and this
+documentation.
+
+| Check (re-run 2026-11-10 at `864fc77`) | Result |
+| --- | --- |
+| `scripts/validate-candidate.py` (documented `uv` Playwright environment) | 20/20 command groups PASS |
+| `tests/bridge/test_bridge.py` | 33 tests OK |
+| `tests/test_legacy_fixtures.py` | 9 tests OK (1 skipped) |
+| `tests/lab/test_local.py` | 13 tests OK |
+| `results/2026-11-09-legacy-viewing-browser/verify.py` | PASS: HTTP 57/57, browser 140/140, 21 viewing checks |
+| `scripts/probe-legacy-import.py` | 5/5 routed legacy fixtures imported |
+| Default, `--pptx` and six-editor replays (earlier, retained) | 119/119; seven-editor 132/132; PPTX focused 15/15 |
+
+Scope frozen: the default six unmodified Craft bundles, the opt-in DeckCraft
+PPTX candidate, and the opt-in documented-import legacy routes (DOC/ODT to
+WordCraft, XLS/ODS/CSV to GridCraft).
+
+Still NOT VERIFIED: rendered legacy content inside one combined host+browser
+session, the seven formats with no documented Craft import, broad document
+fidelity, human HTTPS/hardware acceptance, production behavior and any
+independent or project-level PASS.
+
+Verdict: implementation and evidence are **frozen** at `864fc77`. Project
+**INCOMPLETE** until the owner-controlled gates close (independent forensic and
+project GPT gate, human HTTPS desktop acceptance). Upstream publication remains
+**LOCKED**. This freeze is not a global PASS and must not be presented as one.

@@ -27,11 +27,14 @@ Do not run the historical ONLYOFFICE campaigns below.
    browser 28/28, exit 0 (`lab/real-seafile/results/2026-11-08-craft-only-wordcraft/`).
 2. Done (opt-in `--pptx`): official DeckCraft v0.16.0 same-format edit/save/reopen,
    focused 15/15 and combined seven-editor 132/132 browser checks; see validation checkpoint.
-3. Extend required viewing-format coverage and hardware/clipboard/font/unload checks.
-   Deterministic legacy/OpenDocument fixtures + routing candidate are committed and
-   checked offline; editor import in a real Seafile/browser session is NOT VERIFIED.
-   Automated WordCraft HTTPS replay is done: HTTP 40/40, browser 28/28; TLS routes restored.
+3. Done: legacy/OpenDocument coverage evidence. Deterministic fixtures, offline
+   signature/routing checks, an opt-in `--viewing` browser replay (HTTP 57/57,
+   browser 140/140, 21 viewing checks) and a bundle import probe (5/5) are
+   committed. Rendered legacy content in the combined run and the seven
+   import-less formats remain NOT VERIFIED. Hardware WebGPU/clipboard/font/unload
+   acceptance is still pending.
 4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
+   Evidence is frozen at `864fc77` (2026-11-10); the gate itself is pending.
 
 ## Historical next steps (superseded where they require ONLYOFFICE)
 

@@ -5,11 +5,11 @@ historical GR corpus to resume routine validation.
 
 | Scope | State | Evidence |
 | --- | --- | --- |
-| Active offline checks | 20/20 command groups PASS (legacy fixtures added) | local rerun; `tests/test_legacy_fixtures.py` |
+| Active offline checks | 20/20 command groups PASS, re-verified 2026-11-10 at `864fc77` | `uv run --with playwright --with pillow python scripts/validate-candidate.py` |
 | Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
 | All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
 | Official DeckCraft PPTX opt-in | focused 15/15; combined HTTP 40/40, browser 132/132, exit 0 | `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
-| Remaining office viewing formats and broad fidelity | Fixtures + routing + bundle import ready; full runtime import NOT VERIFIED (nested iframe capture blocked) | `ONLYOFFICE-REPLACEMENT-MATRIX.md`, `fixtures/legacy/` |
+| Remaining office viewing formats and broad fidelity | Fixtures; `--viewing` browser routing 140/140 (21 viewing checks); bundle import 5/5; rendered content in the combined run NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md`, `results/2026-11-09-legacy-viewing-browser/` |
 | Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent forensic review and final project GPT gate | NOT PERFORMED | `PROJECT-CLOSURE.md` |
@@ -46,16 +46,16 @@ prove full pagination or font fidelity.
 
 ## Next unresolved work
 
-1. Required legacy/OpenDocument viewing formats: deterministic fixtures, an
-   opt-in routing candidate, a real-Seafile routing replay and a **bundle-level
-   import probe** (5/5 passed, `scripts/probe-legacy-import.py`) now exist for
-   the five routed formats; DOC/ODT (WordCraft) and XLS/ODS/CSV (GridCraft)
-   have a documented upstream import and proven route/import. Browser **import
-   on Seafile** of a legacy fixture is still NOT VERIFIED due to a known
-   Playwright limitation: nested cross-origin iframes do not propagate the
-   `/relay/file` response to page or context listeners, preventing verification
-   of the exact legacy bytes delivery. Seven formats have no documented import
-   at all.
+1. Required legacy/OpenDocument viewing formats: deterministic fixtures, the
+   opt-in routing candidate, a real-Seafile browser routing replay (HTTP 57/57,
+   browser 140/140, 21 viewing checks at `53c7e22`) and a **bundle-level import
+   probe** (5/5 passed, `scripts/probe-legacy-import.py`) now exist for the five
+   routed formats; DOC/ODT (WordCraft) and XLS/ODS/CSV (GridCraft) have a
+   documented upstream import, a browser-verified route and proven bundle
+   import. Rendered legacy content inside the combined host+browser session is
+   still NOT VERIFIED: the nested same-origin `/relay/file` request fires before
+   a listener can attach. Seven formats have no documented import at all and
+   stay unrouted.
 2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
 3. Independent forensic review and a fresh project GPT gate, in a context that
    did not implement this candidate. No global PASS has been granted.

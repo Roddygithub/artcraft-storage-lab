@@ -2,7 +2,12 @@
 
 **State: GPT REVIEW PENDING. Project INCOMPLETE. Upstream LOCKED.**
 
-Candidate reviewed by the free pass: `2c112fc`; the retained real-Seafile
+Evidence freeze 2026-11-10 at `864fc77`: the `--viewing` browser replay, the
+bundle-level import probe and the offline checks below were all re-run or
+re-verified at that commit. Only documentation changed after the replay source
+`53c7e22`.
+
+Candidate reviewed by the free pass: `2c112fc`; the first retained real-Seafile
 routing replay ran at `4fe3fc4`. The source that produced the earlier runtime
 evidence is `4f4b2dc`; the later commits add documentation, fixtures, a bridge
 signature extension, tests and the opt-in `--viewing` lab mode only. This claim
@@ -60,10 +65,21 @@ Documented-import evidence, cited from the pinned release bundles (hashes in
 * `tests/bridge/test_bridge.py`: **33 tests OK** (was 32).
 * `tests/lab/test_local.py`: **13 tests OK**, including the `--viewing` flag and
   the opt-in map not replacing the default candidate.
-* Real Seafile routing replay at `4fe3fc4`: HTTP **57/57** (17 legacy
+* First Real Seafile routing replay at `4fe3fc4`: HTTP **57/57** (17 legacy
   viewing-route checks) and browser **119/119**, launcher exit 0, on stock
   synthetic Seafile CE 13.0.28. Sanitized evidence and verifier:
   `lab/real-seafile/results/2026-11-08-legacy-viewing/`.
+* Browser routing replay at `53c7e22` (committed as `864fc77`): HTTP **57/57**
+  and browser **140/140**, including **21** viewing checks. In one authenticated
+  Seafile session each of DOC/ODT (WordCraft) and XLS/ODS/CSV (GridCraft) opens
+  from the file-list click, routes to the documented editor, downloads nothing
+  and writes no version; FODT/FODS/FODP/PPT/ODP/PPS/PPSX have no WOPI route.
+  Launcher exit 0, containers removed; `verify.py` PASS. Sanitized evidence:
+  `lab/real-seafile/results/2026-11-09-legacy-viewing-browser/`.
+* Re-verified 2026-11-10 at `864fc77`: offline **20/20** command groups with
+  `uv run --with playwright --with pillow python scripts/validate-candidate.py`,
+  bridge **33** tests OK, legacy fixtures **9** tests OK (1 skipped), lab **13**
+  tests OK, and the bundle import probe **5/5 PASS**.
 * Bundle-level import probe: the pinned WordCraft v0.16.0 and GridCraft v0.17.0
   bundles import all five routed legacy fixtures (DOC, ODT, XLS, ODS, CSV) and
   serialize the marker in their native format (DOCX text, ODT content.xml,
@@ -86,12 +102,13 @@ Documented-import evidence, cited from the pinned release bundles (hashes in
 
 ## Explicit limits (NOT VERIFIED)
 
-* No combined host+editor+Seafile run has captured the marker on fresh reopen.
-  The bundle-level probe (`scripts/probe-legacy-import.py`) proves editor-bundle
-  import; the real-Seafile replay (`--viewing`) proves routing only. The browser
-  `/relay/file` capture for the nested editor iframe is blocked by a known
-  Playwright limitation (nested cross-origin iframes do not propagate the
-  response to the parent page or context listeners). See `docs/VALIDATION-STATE.md`.
+* No combined host+editor+Seafile run has captured the marker on fresh reopen or
+  the rendered legacy document. The bundle-level probe
+  (`scripts/probe-legacy-import.py`) proves editor-bundle import; the
+  real-Seafile `--viewing` replay proves routing and safety only. The
+  `/relay/file` capture inside the combined run is blocked by iframe load order:
+  the nested same-origin request fires before any listener can attach. See
+  `docs/VALIDATION-STATE.md`.
 * No format is declared replaced; the seven formats with no documented Craft
   import (FODT, FODS, FODP, PPT, ODP, PPS, PPSX) remain without a route.
 * Human HTTPS desktop acceptance remains pending.
@@ -100,10 +117,12 @@ Documented-import evidence, cited from the pinned release bundles (hashes in
 
 ## Next steps
 
-1. Add a bounded browser import probe: open DOC/ODT/XLS/ODS/CSV in the staged
-   WordCraft v0.16.0 / GridCraft v0.17.0 bundles through a real Seafile click and
-   assert the marker is rendered, not downloaded.
+1. Optional: capture the rendered legacy content in one host+browser session by
+   attaching the relay listener before the nested iframe load. Not required for
+   the routing/import evidence above, which is already split across the
+   real-Seafile replay and the bundle probe.
 2. Keep the seven import-less formats unrouted and disclosed.
-3. Run the GPT final gate once the provider quota resets.
+3. Obtain independent review of the 2026-11-09 browser routing run (NOT
+   PERFORMED), then run the GPT final gate once the provider quota resets.
 
 Project INCOMPLETE; upstream publication LOCKED.

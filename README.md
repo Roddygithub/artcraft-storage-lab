@@ -1,9 +1,9 @@
 # ArtCraft Storage Lab
 
-> **2026-11-08:** project **INCOMPLETE**. The owner authorized ONLYOFFICE
-> retirement; the active lab now targets Craft only. Required office-format
-> coverage, HTTPS acceptance and the final independent gate remain open.
-> See [the closure ledger](docs/PROJECT-CLOSURE.md).
+> **2026-11-10:** project **INCOMPLETE**. Evidence is frozen at `864fc77`; the
+> owner authorized ONLYOFFICE retirement and the active lab targets Craft only.
+> Rendered legacy content, HTTPS/hardware acceptance and the final independent
+> gate remain open. See [the closure ledger](docs/PROJECT-CLOSURE.md).
 
 
 > Open a file in Seafile Web, edit it in a Craft web editor, save, and get a normal Seafile
@@ -21,7 +21,7 @@ Seafile Web ──(WOPI form POST, access token)──▶ bridge (host page, sam
 Seahub WOPI host ◀──(CheckFileInfo/GetFile/PutFile/Lock, token in headers)── bridge /relay/*
 ```
 
-Status: **MVP candidate under final validation**. Current bridge evidence covers
+Status: **MVP candidate frozen at `864fc77` for independent review**. Current bridge evidence covers
 WordCraft DOCX, GridCraft XLSX, PdfCraft AcroForm and CADCraft DXF. VectorCraft
 and FigCraft semantic edit/reopen slices passed the combined six-editor replay.
 An opt-in official DeckCraft v0.16.0 candidate also passed a real PPTX title
@@ -39,7 +39,7 @@ edit/save/new-version/fresh-reopen slice; broad presentation fidelity is unverif
 | `.svg` | VectorCraft 0.19.0 | upstream bundle plus declared lab page-API shim |
 | `.figcraft` | FigCraft 0.13.1 | upstream bundle plus declared lab page-API shim |
 | `.pptx` (lab `--pptx`) | DeckCraft 0.16.0 | unmodified upstream bundle; focused same-format edit/save/reopen verified |
-| ODF and remaining legacy office routes | pending | ArtCraft replacement NOT VERIFIED |
+| ODF / legacy office (lab `--viewing`) | DOC/ODT → WordCraft, XLS/ODS/CSV → GridCraft | browser-verified routing + bundle import; rendered content unverified; 7 formats unrouted |
 
 The deployment example routes DXF by default; office extensions are operator
 opt-ins. The synthetic lab routes DOCX/XLSX/PDF to Craft for testing and leaves
@@ -69,7 +69,7 @@ Upstream publication remains locked pending the project gate and owner approval.
 ## Repository layout
 
 ```text
-bridge/               the WOPI editor bridge (stdlib Python WSGI + host page JS); 32 fake-host tests in tests/bridge/
+bridge/               the WOPI editor bridge (stdlib Python WSGI + host page JS); 33 fake-host tests in tests/bridge/
 deploy/bridge/        Dockerfile, compose, Seahub settings, nginx snippet, bundle fetcher — run it next to your Seafile
 lab/real-seafile/     the validation lab: Seafile CE 13 + bridge + editor bundles in a Lima VM, HTTP and browser slices
 docs/REFOUNDATION-REPORT.md   the decision and its evidence

@@ -50,10 +50,18 @@ the formats with a documented upstream import (DOC/ODT to WordCraft, ODS/CSV to
 GridCraft). Offline validation is **20/20 command groups**; the bridge suite is
 **33 tests OK**. The independent `artcraft-reviewer` pass returned **PROVISIONAL
 PASS** with no blocker/major; the GPT-5.6 Luna auditor could not run (provider
-usage limit). No runtime Seafile/browser import, no format replacement and no
-human HTTPS acceptance is claimed; the eight import-less formats stay unrouted.
-Project GPT remains INCOMPLETE and upstream publication LOCKED. Evidence:
-`docs/GR-087-LEGACY-VIEWING-FIXTURES.md`,
+usage limit).
+
+**2026-11-10 update at `864fc77`.** The opt-in `--viewing` replay now includes a
+real browser session: HTTP **57/57**, browser **140/140** with **21** viewing
+checks (file-list open, documented route, no download, no version write; seven
+import-less formats have no route), launcher exit 0, `verify.py` PASS
+(`lab/real-seafile/results/2026-11-09-legacy-viewing-browser/`). The bundle
+import probe passes **5/5** and offline validation is **20/20** at the same
+commit. Rendered legacy content inside the combined run, the seven import-less
+formats, human HTTPS acceptance and independent review of this run remain NOT
+VERIFIED. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+Evidence: `docs/GR-087-LEGACY-VIEWING-FIXTURES.md`,
 `lab/real-seafile/fixtures/legacy/`.
 
 ## GR-084 — PdfCraft AcroForm edit on synthetic Seafile

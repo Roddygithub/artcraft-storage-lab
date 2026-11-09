@@ -11,16 +11,16 @@ proof that every current ONLYOFFICE path works in practice.
 | DOCX | View + edit | WordCraft: three synthetic corpus edit/save/version/fresh-reopen cases, 28 checks each; bounded reviews PASS |
 | XLSX | View + edit | GridCraft: synthetic typed-cell edit/save/version/fresh-reopen evidence; broader workbook fidelity NOT VERIFIED |
 | PPTX | View + edit | Official DeckCraft v0.16.0: synthetic title edit, same-file PPTX save, attributed version and fresh reopen; 15/15 browser checks; broad fidelity NOT VERIFIED |
-| DOC | View | Fixture + route ready; WordCraft v0.16.0 README:99/128 documents legacy 97-2003 .doc **import** — runtime import NOT VERIFIED |
+| DOC | View | Fixture; browser-verified route (140/140 run) and WordCraft v0.16.0 bundle import (README:99/128); rendered content NOT VERIFIED |
 | PPT | View | Fixture ready; DeckCraft v0.16.0 documents only .pptx (README:22) — NOT VERIFIED |
-| XLS | View | Fixture + route ready; GridCraft v0.17.0 README:94 documents legacy 97-2003 .xls **open** (values, formulas, number formats) — runtime import NOT VERIFIED |
-| ODT | View | Fixture + route ready; WordCraft v0.16.0 README:99 documents .odt import/export — runtime import NOT VERIFIED |
+| XLS | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:94, values/formulas/number formats); rendered content NOT VERIFIED |
+| ODT | View | Fixture; browser-verified route and WordCraft v0.16.0 bundle import (README:99, .odt import/export); rendered content NOT VERIFIED |
 | FODT | View | Fixture ready; no documented Craft import — NOT VERIFIED |
 | ODP | View | Fixture ready; no documented Craft import — NOT VERIFIED |
 | FODP | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| ODS | View | Fixture + route ready; GridCraft v0.17.0 README:96 documents ODS **data** import (saved values, not formulas) — runtime import NOT VERIFIED |
+| ODS | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:96, saved values not formulas); rendered content NOT VERIFIED |
 | FODS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| CSV | View | Fixture + route ready; GridCraft v0.17.0 README:93 documents CSV/TSV — runtime import NOT VERIFIED |
+| CSV | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:93, CSV/TSV); rendered content NOT VERIFIED |
 | PPSX | View | Fixture ready; no documented Craft import — NOT VERIFIED |
 | PPS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
 
@@ -39,26 +39,28 @@ regeneration script:
 
 The fixtures, the `content_matches_extension` signatures for DOC/XLS/PPT/PPS,
 PPSX and FODT/FODS/FODP, and the routing map are testable offline. That is
-**fixture and routing evidence only**: no Seafile route, browser open, editor
-import or format replacement is claimed. Only DOC, ODT (WordCraft v0.16.0
+**fixture and routing evidence**: the browser replay below adds a real Seafile
+open/route/no-download/no-write check and the bundle probe adds editor import,
+but no format replacement or rendered-content equivalence is claimed. Only DOC, ODT (WordCraft v0.16.0
 README:99/128) and XLS, ODS, CSV (GridCraft v0.17.0 README:93/94/96) have a
 documented upstream import path; the remaining seven formats have none and stay
 deliberately unrouted until proven. DeckCraft v0.16.0 documents only `.pptx`
 (README:22), so PPT/PPS/PPSX/ODP/FODP have no candidate route. The replacement
 baseline therefore remains a partial, honest subset.
 
-### Real Seafile routing replay — 2026-11-08 (opt-in `--viewing`)
+### Real Seafile routing replay — 2026-11-09 (opt-in `--viewing`)
 
-At application source `4fe3fc4`, a fresh rootless lab with `--viewing` passed
-HTTP **57/57** (17 of them legacy viewing-route checks) and browser **119/119**,
-exit 0, on stock synthetic Seafile CE 13.0.28. The slice uploaded every legacy
-fixture through the real Seahub API and confirmed: DOC and ODT reach
-`/edit/wordcraft`, XLS, ODS and CSV reach `/edit/gridcraft`, the bridge answers
-each with the matching `editorId`, and FODT, FODS, FODP, PPT, ODP, PPS and PPSX
-carry **no WOPI route**. Sanitized retained evidence and a runnable verifier:
-`lab/real-seafile/results/2026-11-08-legacy-viewing/`. This is **routing**
-evidence on real Seafile; it still does not prove that any editor imports or
-renders these documents.
+At source `53c7e22` (commit `864fc77`), a fresh rootless lab with `--viewing`
+passed HTTP **57/57** (17 of them legacy viewing-route checks) and browser
+**140/140**, including **21** viewing checks, exit 0, on stock synthetic Seafile
+CE 13.0.28. In one authenticated session each of DOC/ODT and XLS/ODS/CSV opens
+from the Seafile file-list click, routes to the documented editor, downloads
+nothing and writes no version; FODT, FODS, FODP, PPT, ODP, PPS and PPSX carry
+**no WOPI route**. Sanitized retained evidence and a runnable verifier:
+`lab/real-seafile/results/2026-11-09-legacy-viewing-browser/` (verifier PASS).
+This supersedes the first routing replay at `4fe3fc4` (browser **119/119**,
+`results/2026-11-08-legacy-viewing/`). It remains **routing and safety**
+evidence; rendered content is not asserted.
 
 ### Bundle-level import probe — 2026-11-08 (offline)
 
@@ -81,10 +83,9 @@ substitutes for the missing office coverage. Experimental DeckCraft Rust ports
 remain outside the zero-patch default. The owner subsequently authorized ONLYOFFICE retirement independently of this
 coverage; see `ONLYOFFICE-RETIREMENT-20261108.md`. Missing formats remain NOT VERIFIED.
 
-Next: establish pinned upstream import/export capabilities without assuming
-support, prioritize PPTX same-format persistence, then validate the remaining
-viewing formats with deterministic synthetic files and observed browser output.
-Preserve DOCX/XLSX successes while broadening fidelity and HTTPS acceptance.
+Remaining: rendered-content capture for the five routed legacy formats inside a
+combined host+browser session, an upstream import path for the seven unrouted
+formats, human HTTPS/hardware acceptance and the independent project gate.
 Production stays unchanged; upstream LOCKED; project INCOMPLETE.
 
 ## New upstream releases staged separately
