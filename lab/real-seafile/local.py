@@ -244,8 +244,8 @@ def main():
     if args.viewing:
         # Only the formats with a documented upstream import are routed; the lab
         # slice asserts the other viewing formats have no WOPI route.
-        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('doc', 'odt', 'ods', 'csv')\n"
-                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('doc', 'odt', 'ods', 'csv')\n")
+        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('doc', 'odt', 'xls', 'ods', 'csv')\n"
+                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('doc', 'odt', 'xls', 'ods', 'csv')\n")
     config += '\nENABLE_ONLYOFFICE = False\n'
     config = render_settings(config, False,
                              args.seafile_public_url, args.bridge_public_url)

@@ -32,7 +32,7 @@ LEGACY = {
     "doc":   ("doc.doc",     "wordcraft"),
     "odt":   ("doc.odt",     "wordcraft"),
     "fodt":  ("doc.fodt",    None),
-    "xls":   ("sheet.xls",   None),
+    "xls":   ("sheet.xls",   "gridcraft"),
     "ods":   ("sheet.ods",   "gridcraft"),
     "fods":  ("sheet.fods",  None),
     "csv":   ("sheet.csv",   "gridcraft"),

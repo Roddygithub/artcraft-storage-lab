@@ -476,7 +476,7 @@ def content_matches(name: str, data: bytes) -> bool:
 # route. Fixture file -> (extension, expected editor or None).
 LEGACY_VIEWING = {
     "doc.doc": ("doc", "wordcraft"), "doc.odt": ("odt", "wordcraft"), "doc.fodt": ("fodt", None),
-    "sheet.xls": ("xls", None), "sheet.ods": ("ods", "gridcraft"), "sheet.fods": ("fods", None),
+    "sheet.xls": ("xls", "gridcraft"), "sheet.ods": ("ods", "gridcraft"), "sheet.fods": ("fods", None),
     "sheet.csv": ("csv", "gridcraft"),
     "slide.ppt": ("ppt", None), "slide.odp": ("odp", None), "slide.fodp": ("fodp", None),
     "slide.pps": ("pps", None), "slide.ppsx": ("ppsx", None),
