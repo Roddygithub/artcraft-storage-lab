@@ -161,11 +161,15 @@ def main():
                         help='collect browser diagnostics after a failing HTTP slice; exit remains failure')
     parser.add_argument('--pptx', action='store_true',
                         help='opt in to the official DeckCraft PPTX validation candidate')
+    parser.add_argument('--viewing', action='store_true',
+                        help='opt in to the documented-import legacy/OpenDocument viewing routes')
     parser.add_argument('--experimental', action='store_true',
                         help='use experimental editors.json and Seahub settings (Rust ports)')
     args = parser.parse_args()
     if args.pptx and args.experimental:
         parser.error("--pptx cannot use experimental editor ports")
+    if args.viewing and args.experimental:
+        parser.error("--viewing cannot use experimental editor ports")
     if (args.seafile_public_url is None) != (args.bridge_public_url is None):
         parser.error('--seafile-public-url and --bridge-public-url are required together')
     if args.seafile_public_url is not None or args.bridge_public_url is not None:
@@ -206,6 +210,8 @@ def main():
         editor_config = run / 'app/lab/real-seafile/editors.experimental.json'
     else:
         editor_config = run / 'app/lab/real-seafile/editors.json'
+    if args.viewing:
+        shutil.copyfile(run / 'app/lab/real-seafile/editors.viewing.json', editor_config)
     if args.pptx:
         editors = json.loads(editor_config.read_text())
         editors['deckcraft'] = dict(app='deckcraft', label='DeckCraft v0.16.0 (upstream, unpatched)',
@@ -218,7 +224,8 @@ def main():
     env.update(BROWSER_ONLY_EDITOR=args.editor,
                BROWSER_WORDCRAFT_FIXTURE=args.wordcraft_fixture,
                BROWSER_SCRIPT='run_browser.py',
-               BROWSER_EDITOR_CONFIG=str(editor_config))
+               BROWSER_EDITOR_CONFIG=str(editor_config),
+               VIEWING_FORMATS='1' if args.viewing else '')
     log = run / 'launcher.log'
     command(['podman', '--remote=false', 'info', '--format', '{{.Host.Security.Rootless}}'], run, env, log)
     if log.read_text().strip() != 'true':
@@ -234,6 +241,11 @@ def main():
     if args.pptx:
         config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('pptx',)\n"
                    "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('pptx',)\n")
+    if args.viewing:
+        # Only the formats with a documented upstream import are routed; the lab
+        # slice asserts the other viewing formats have no WOPI route.
+        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('doc', 'odt', 'ods', 'csv')\n"
+                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('doc', 'odt', 'ods', 'csv')\n")
     config += '\nENABLE_ONLYOFFICE = False\n'
     config = render_settings(config, False,
                              args.seafile_public_url, args.bridge_public_url)

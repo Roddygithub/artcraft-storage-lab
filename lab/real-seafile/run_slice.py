@@ -471,6 +471,45 @@ def content_matches(name: str, data: bytes) -> bool:
     return True
 
 
+# Opt-in (VIEWING_FORMATS=1) legacy/OpenDocument viewing routes. Only the formats
+# with a documented upstream import are routed; the rest must stay without a WOPI
+# route. Fixture file -> (extension, expected editor or None).
+LEGACY_VIEWING = {
+    "doc.doc": ("doc", "wordcraft"), "doc.odt": ("odt", "wordcraft"), "doc.fodt": ("fodt", None),
+    "sheet.xls": ("xls", None), "sheet.ods": ("ods", "gridcraft"), "sheet.fods": ("fods", None),
+    "sheet.csv": ("csv", "gridcraft"),
+    "slide.ppt": ("ppt", None), "slide.odp": ("odp", None), "slide.fodp": ("fodp", None),
+    "slide.pps": ("pps", None), "slide.ppsx": ("ppsx", None),
+}
+
+
+def check_viewing_routes(admin, repo_id, sess):
+    """Real Seafile routing for the legacy/OpenDocument viewing formats. This is route
+    evidence only: it does not open a browser, import a document or save anything."""
+    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "legacy")
+    for name, (ext, editor) in sorted(LEGACY_VIEWING.items()):
+        path = os.path.join(base, name)
+        if not os.path.isfile(path):
+            check(f"viewing_fixture_{ext}_present", False, path)
+            continue
+        with open(path, "rb") as fh:
+            upload(admin, repo_id, name, fh.read())
+        st, text = file_page(sess, repo_id, name)
+        form = parse_wopi_form(text)
+        action = (form or {}).get("action", "")
+        if editor:
+            check(f"seahub_{ext}_routes_to_wopi_{editor}",
+                  st == 200 and form is not None and action.startswith(BRIDGE + "/edit/" + editor),
+                  f"status={st} action={action[:120]}")
+            if form:
+                bst, _, _, c = bridge_open(form)
+                check(f"bridge_open_{ext}_{editor}",
+                      bst == 200 and c is not None and c.get("editorId") == editor,
+                      f"status={bst} editorId={(c or {}).get('editorId')}")
+        else:
+            check(f"seahub_{ext}_has_no_wopi_route", form is None, f"status={st} action={action[:120]}")
+
+
 SVG_V1 = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10" fill="red"/></svg>'
 SVG_V2 = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10" fill="blue"/></svg>'
 SVG_EXT = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle r="5" cx="5" cy="5" fill="green"/></svg>'
@@ -637,6 +676,10 @@ def main() -> int:
         hist_r = history(admin, repo_id, "test.svg")
         check("seahub_putfile_ignores_can_edit", st == 200 and now2 == SVG_V1 and hist_r[0]["creator"] == reader_username,
               f"status={st} overwritten={now2 == SVG_V1} top_creator={hist_r[0]['creator'] if hist_r else None}  (ok=True means the Seahub gap is real)")
+
+    if os.environ.get("VIEWING_FORMATS"):
+        print("checking legacy/OpenDocument viewing routes ...", flush=True)
+        check_viewing_routes(admin, repo_id, sess)
 
     summary = {"seafile_version": seafile_version, "repo_id": repo_id, "ran_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                "passed": sum(c["ok"] for c in checks), "failed": sum(not c["ok"] for c in checks), "checks": checks}

@@ -1,6 +1,8 @@
 """Offline launcher checks; never executes Podman."""
+import contextlib
 import importlib.util
 from contextlib import contextmanager
+import io
 import json
 import os
 from pathlib import Path
@@ -125,6 +127,27 @@ class LauncherTest(unittest.TestCase):
         self.assertEqual(local.render_settings(text), text)
         isolated = local.render_settings(text, without_wopi=True)
         self.assertEqual(isolated, 'ENABLE_ONLYOFFICE = True\n\nENABLE_OFFICE_WEB_APP = False\n')
+
+    def test_viewing_flag_parsed_and_rejected_with_experimental(self):
+        """--viewing is accepted alone and refused with --experimental."""
+        base = ['local.py', '--run-dir', '/tmp/x', '--static', '/tmp/s', '--manifest', '/tmp/m.json']
+        with patch.object(sys, 'argv', base + ['--viewing']):
+            try:
+                local.main()
+            except (SystemExit, FileNotFoundError, OSError, ValueError, RuntimeError):
+                pass  # expected: the fixture paths do not exist
+        with patch.object(sys, 'argv', base + ['--viewing', '--experimental']), \
+             contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                local.main()
+
+    def test_viewing_map_loads_and_is_not_the_default_candidate(self):
+        import json as _json
+        viewing = _json.loads((Path(__file__).resolve().parents[2] / 'lab/real-seafile/editors.viewing.json').read_text())
+        default = _json.loads((Path(__file__).resolve().parents[2] / 'lab/real-seafile/editors.json').read_text())
+        self.assertNotEqual(viewing, default, 'the viewing map is opt-in and must not replace the default')
+        self.assertEqual([e for e, s in viewing.items() if 'doc' in s['extensions']], ['wordcraft'])
+        self.assertEqual([e for e, s in viewing.items() if 'csv' in s['extensions']], ['gridcraft'])
 
     def test_user_and_libexec_compose_plugins_are_discovered(self):
         with tempfile.TemporaryDirectory() as d:
