@@ -47,14 +47,14 @@ def _zip(parts: dict[str, str]) -> bytes:
             archive.writestr(name, text)
     return buf.getvalue()
 
-# matrix format -> (fixture file, expected editor or None when no documented Craft import exists)
+# matrix format -> (fixture file, expected editor or None when no import is documented or probe-proven)
 LEGACY = {
     "doc":   ("doc.doc",     "wordcraft"),
     "odt":   ("doc.odt",     "wordcraft"),
     "fodt":  ("doc.fodt",    None),
     "xls":   ("sheet.xls",   "gridcraft"),
     "ods":   ("sheet.ods",   "gridcraft"),
-    "fods":  ("sheet.fods",  None),
+    "fods":  ("sheet.fods",  "gridcraft"),
     "csv":   ("sheet.csv",   "gridcraft"),
     "ppt":   ("slide.ppt",   None),
     "odp":   ("slide.odp",   None),
@@ -101,7 +101,7 @@ class LegacyFixtureTests(unittest.TestCase):
             data = (FIXTURES / name).read_bytes()
             self.assertTrue(content_matches_extension(ext, data), ext)
 
-    def test_viewing_map_is_loadable_and_routes_only_documented_imports(self):
+    def test_viewing_map_is_loadable_and_routes_only_documented_or_probe_proven_imports(self):
         editors = load_editors(str(VIEWING_MAP))
         cfg = Config(public_url="https://bridge.example",
                      seahub_origin="https://seafile.example", editors=editors)
@@ -111,7 +111,7 @@ class LegacyFixtureTests(unittest.TestCase):
         for ext, (_, editor) in LEGACY.items():
             if editor is None:
                 self.assertNotIn(ext, cfg.extension_editor,
-                                 f"{ext} has no documented Craft import; it must stay unrouted")
+                                 f"{ext} has no documented or probe-proven Craft import; it must stay unrouted")
 
     def test_viewing_map_keeps_the_base_routes(self):
         cfg = Config(public_url="https://bridge.example", seahub_origin="https://seafile.example",
@@ -132,6 +132,9 @@ class LegacyFixtureTests(unittest.TestCase):
         ok, kind = rs.viewing_payload_has_marker(xlsx)
         self.assertTrue(ok, kind)
         self.assertTrue(kind.startswith("xlsx cells"), kind)
+        pptx = _zip({"ppt/slides/slide1.xml": f"<p:sld><a:t>{MARKER_TEXT}</a:t></p:sld>"})
+        self.assertEqual(rs.viewing_payload_has_marker(pptx),
+                         (True, "opc ppt/slides/slide1.xml"))
         self.assertEqual(rs.viewing_payload_has_marker(MARKER_TEXT.encode()), (True, "plain text"))
 
     def test_serialized_payload_detection_rejects_a_missing_marker(self):

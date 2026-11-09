@@ -12,17 +12,17 @@ proof that every current ONLYOFFICE path works in practice.
 | XLSX | View + edit | GridCraft: synthetic typed-cell edit/save/version/fresh-reopen evidence; broader workbook fidelity NOT VERIFIED |
 | PPTX | View + edit | Official DeckCraft v0.16.0: synthetic title edit, same-file PPTX save, attributed version and fresh reopen; 15/15 browser checks; broad fidelity NOT VERIFIED |
 | DOC | View | Fixture; browser-verified route (140/140 run) and WordCraft v0.16.0 bundle import (README:99/128); rendered content NOT VERIFIED |
-| PPT | View | Fixture ready; DeckCraft v0.16.0 documents only .pptx (README:22) — NOT VERIFIED |
+| PPT | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
 | XLS | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:94, values/formulas/number formats); rendered content NOT VERIFIED |
 | ODT | View | Fixture; browser-verified route and WordCraft v0.16.0 bundle import (README:99, .odt import/export); rendered content NOT VERIFIED |
-| FODT | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| ODP | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| FODP | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| FODT | View | Fixture; GR-088 probe: WordCraft rejects it (no save) — NOT VERIFIED |
+| ODP | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
+| FODP | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
 | ODS | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:96, saved values not formulas); rendered content NOT VERIFIED |
-| FODS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| FODS | View | Fixture; GR-088 probe: GridCraft imports it (196 cells); opt-in route configured, browser route NOT VERIFIED |
 | CSV | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:93, CSV/TSV); rendered content NOT VERIFIED |
-| PPSX | View | Fixture ready; no documented Craft import — NOT VERIFIED |
-| PPS | View | Fixture ready; no documented Craft import — NOT VERIFIED |
+| PPSX | View | Fixture; GR-088 probe: DeckCraft imports it (marker in slide1), but DeckCraft is not a viewing-candidate editor — route NOT VERIFIED |
+| PPS | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
 
 ## Deterministic viewing fixtures — 2026-11-08
 
@@ -43,10 +43,12 @@ PPSX and FODT/FODS/FODP, and the routing map are testable offline. That is
 open/route/no-download/no-write check and the bundle probe adds editor import,
 but no format replacement or rendered-content equivalence is claimed. Only DOC, ODT (WordCraft v0.16.0
 README:99/128) and XLS, ODS, CSV (GridCraft v0.17.0 README:93/94/96) have a
-documented upstream import path; the remaining seven formats have none and stay
-deliberately unrouted until proven. DeckCraft v0.16.0 documents only `.pptx`
-(README:22), so PPT/PPS/PPSX/ODP/FODP have no candidate route. The replacement
-baseline therefore remains a partial, honest subset.
+documented upstream import path. GR-088 adds probe-proven imports for FODS
+(GridCraft, now in the opt-in route with its browser route NOT VERIFIED) and PPSX
+(DeckCraft, still unrouted because DeckCraft is not a viewing-candidate editor).
+PPT, PPS, ODP and FODP only produce a blank deck and FODT produces no save, so
+those five stay unrouted. The replacement baseline therefore remains a partial,
+honest subset.
 
 ### Real Seafile routing replay — 2026-11-09 (opt-in `--viewing`)
 
@@ -55,8 +57,9 @@ passed HTTP **57/57** (17 of them legacy viewing-route checks) and browser
 **140/140**, including **21** viewing checks, exit 0, on stock synthetic Seafile
 CE 13.0.28. In one authenticated session each of DOC/ODT and XLS/ODS/CSV opens
 from the Seafile file-list click, routes to the documented editor, downloads
-nothing and writes no version; FODT, FODS, FODP, PPT, ODP, PPS and PPSX carry
-**no WOPI route**. Sanitized retained evidence and a runnable verifier:
+nothing and writes no version; FODT, FODS, FODP, PPT, ODP, PPS and PPSX carried
+**no WOPI route at that source** (the later GR-088 `fods` route is not part of
+this replay). Sanitized retained evidence and a runnable verifier:
 `lab/real-seafile/results/2026-11-09-legacy-viewing-browser/` (verifier PASS).
 This supersedes the first routing replay at `4fe3fc4` (browser **119/119**,
 `results/2026-11-08-legacy-viewing/`). It remains **routing and safety**

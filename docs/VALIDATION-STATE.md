@@ -9,7 +9,7 @@ historical GR corpus to resume routine validation.
 | Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
 | All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
 | Official DeckCraft PPTX opt-in | focused 15/15; combined HTTP 40/40, browser 132/132, exit 0 | `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
-| Remaining office viewing formats and broad fidelity | Fixtures; `--viewing` browser routing 140/140 (21 viewing checks); bundle import 5/5; rendered content in the combined run NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md`, `results/2026-11-09-legacy-viewing-browser/` |
+| Remaining office viewing formats and broad fidelity | Fixtures; `--viewing` browser routing 140/140 (21 viewing checks); bundle import 5/5 documented + 2/7 undocumented (FODS, PPSX); FODS route configured, runtime route NOT VERIFIED | `GR-088-UNDOCUMENTED-LEGACY-IMPORT-PROBE.md`, `results/2026-11-09-legacy-viewing-browser/` |
 | Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent review / final project GPT gate | free review PROVISIONAL PASS at `265897f`; GPT gate NOT PERFORMED (quota) | `reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md` |
@@ -54,8 +54,11 @@ prove full pagination or font fidelity.
    documented upstream import, a browser-verified route and proven bundle
    import. Rendered legacy content inside the combined host+browser session is
    still NOT VERIFIED: the nested same-origin `/relay/file` request fires before
-   a listener can attach. Seven formats have no documented import at all and
-   stay unrouted.
+   a listener can attach. GR-088 then probed the other seven: FODS (GridCraft)
+   and PPSX (DeckCraft) import at bundle level, while PPT, PPS, ODP and FODP only
+   open a blank deck and FODT does not save. FODS is now in the opt-in route
+   with its real-Seafile route NOT VERIFIED; PPSX stays unrouted and six formats
+   remain unrouted.
 2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
 3. Project GPT gate (Luna auditor and Sol final reviewer). An independent free
    review at `265897f` returned PROVISIONAL PASS with two Playwright-dependency

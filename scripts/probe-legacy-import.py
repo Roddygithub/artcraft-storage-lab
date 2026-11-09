@@ -18,12 +18,20 @@ usage:
       --static ~/.cache/artcraft-storage-lab/pptx-candidate-20261108/static \
       --output ~/.cache/artcraft-storage-lab/legacy-import-bundle
 
-Exit 0 only when every routed fixture is imported and carries the marker.
+Explore formats without a documented import by naming explicit pairs and
+shortening the waits, for example:
+
+  uv run --with playwright --with pillow python scripts/probe-legacy-import.py \
+      --static <static> --output <dir> --open-timeout 30 --dirty-timeout 20 \
+      --save-timeout 20 --cases slide.ppt=deckcraft --cases doc.fodt=wordcraft
+
+Exit 0 only when every selected fixture is imported and carries the marker.
 """
 from __future__ import annotations
 
 import argparse
 import functools
+import hashlib
 import http.server
 import json
 import os
@@ -89,7 +97,21 @@ def main() -> int:
     parser.add_argument("--static", type=Path, required=True, help="directory holding the <app>/ bundles")
     parser.add_argument("--fixtures", type=Path, default=ROOT / "lab/real-seafile/fixtures/legacy")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--cases", action="append", default=None, metavar="FIXTURE=EDITOR",
+                        help="probe explicit fixture/editor pairs instead of the routed defaults")
+    parser.add_argument("--open-timeout", type=float, default=180)
+    parser.add_argument("--dirty-timeout", type=float, default=120)
+    parser.add_argument("--save-timeout", type=float, default=60)
     args = parser.parse_args()
+
+    cases = CASES
+    if args.cases:
+        cases = {}
+        for item in args.cases:
+            name, sep, editor = item.partition("=")
+            if not sep or not name or not editor:
+                parser.error(f"bad --cases value: {item}")
+            cases[name] = editor
 
     handler = functools.partial(Handler, directory=str(args.static))
     server = Server(("127.0.0.1", 0), handler)
@@ -105,7 +127,7 @@ def main() -> int:
         browser = p.chromium.launch(args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader",
                                           "--ignore-gpu-blocklist", "--disable-dev-shm-usage"])
         context = browser.new_context(viewport={"width": 1440, "height": 900})
-        for name, editor in CASES.items():
+        for name, editor in cases.items():
             record = {"fixture": name, "editor": editor, "ok": False}
             path = args.fixtures / name
             if not path.is_file():
@@ -117,7 +139,7 @@ def main() -> int:
             page = context.new_page()
             page.goto(f"http://127.0.0.1:{port}/__probe.html?app={editor}", wait_until="domcontentloaded")
             try:
-                deadline = time.monotonic() + 180
+                deadline = time.monotonic() + args.open_timeout
                 while time.monotonic() < deadline:
                     if any(m["type"] == f"{editor}:ready" for m in page.evaluate("window.__msgs")):
                         break
@@ -129,7 +151,7 @@ def main() -> int:
                     frame.postMessage({type: app + ':open', name, bytes: Uint8Array.from(bytes).buffer},
                                       location.origin);
                 }""", [editor, name, list(content)])
-                deadline = time.monotonic() + 120
+                deadline = time.monotonic() + args.dirty_timeout
                 while time.monotonic() < deadline:
                     if any(m["type"] == f"{editor}:dirty" for m in page.evaluate("window.__msgs")):
                         break
@@ -143,7 +165,7 @@ def main() -> int:
                     page.keyboard.press("Enter")
                     time.sleep(1)
                 page.keyboard.press("Control+s")
-                deadline = time.monotonic() + 60
+                deadline = time.monotonic() + args.save_timeout
                 saves = []
                 while time.monotonic() < deadline:
                     saves = page.evaluate("window.__saves")
@@ -151,6 +173,10 @@ def main() -> int:
                         break
                     time.sleep(0.5)
                 record["save_payloads"] = [len(s) for s in saves]
+                if saves:
+                    payload = bytes(saves[0])
+                    (args.output / f"{name}.saved").write_bytes(payload)
+                    record["save_sha256"] = hashlib.sha256(payload).hexdigest()
                 kinds = []
                 for saved in saves:
                     ok, kind = rs.viewing_payload_has_marker(bytes(saved))
@@ -173,7 +199,8 @@ def main() -> int:
         browser.close()
     server.shutdown()
 
-    summary = {"cases": results, "passed": sum(r["ok"] for r in results), "failed": failed}
+    summary = {"cases": results, "cases_requested": len(cases),
+               "passed": sum(r["ok"] for r in results), "failed": failed}
     (args.output / "summary.json").write_text(json.dumps(summary, indent=1) + "\n")
     print(f"\n{summary['passed']} passed, {failed} failed", flush=True)
     return 0 if failed == 0 else 1

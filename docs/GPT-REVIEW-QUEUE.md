@@ -39,6 +39,24 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## GR-088 — undocumented legacy/OpenDocument import probe
+
+Candidate `1a848f4` plus this item's commits. Rather than infer from upstream
+READMEs, the pinned bundles were probed with explicit fixture/editor pairs.
+**FODS imports into GridCraft** (marker in 196 XLSX cells) and **PPSX imports
+into DeckCraft** (marker in `ppt/slides/slide1.xml`). PPT, PPS, ODP and FODP only
+open a blank 5,048-byte deck, and FODT produces no save even with longer waits.
+
+The marker detector now scans generic OPC XML parts (with a focused test), the
+probe accepts `--cases`/timeouts and retains the saved payload privately, and
+FODS was added to the opt-in viewing candidate because GridCraft is already in
+it. PPSX stays unrouted because DeckCraft is not a viewing-candidate editor.
+No real-Seafile route replay covers the new FODS route; it is NOT VERIFIED.
+
+Independent review of GR-088 NOT PERFORMED. Project remains INCOMPLETE and
+upstream publication LOCKED. Evidence:
+`docs/GR-088-UNDOCUMENTED-LEGACY-IMPORT-PROBE.md`.
+
 ## GR-087 — legacy / OpenDocument viewing fixtures and routing
 
 Candidate `2c112fc` adds one deterministic synthetic fixture per remaining

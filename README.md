@@ -39,7 +39,7 @@ edit/save/new-version/fresh-reopen slice; broad presentation fidelity is unverif
 | `.svg` | VectorCraft 0.19.0 | upstream bundle plus declared lab page-API shim |
 | `.figcraft` | FigCraft 0.13.1 | upstream bundle plus declared lab page-API shim |
 | `.pptx` (lab `--pptx`) | DeckCraft 0.16.0 | unmodified upstream bundle; focused same-format edit/save/reopen verified |
-| ODF / legacy office (lab `--viewing`) | DOC/ODT → WordCraft, XLS/ODS/CSV → GridCraft | browser-verified routing + bundle import; rendered content unverified; 7 formats unrouted |
+| ODF / legacy office (lab `--viewing`) | DOC/ODT → WordCraft, XLS/ODS/CSV/FODS → GridCraft | browser-verified routing for the documented five; FODS route configured, runtime unverified; 6 formats unrouted (PPSX import-proven) |
 
 The deployment example routes DXF by default; office extensions are operator
 opt-ins. The synthetic lab routes DOCX/XLSX/PDF to Craft for testing and leaves

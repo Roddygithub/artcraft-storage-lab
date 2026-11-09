@@ -231,15 +231,17 @@ documentation.
 | `scripts/probe-legacy-import.py` | 5/5 routed legacy fixtures imported |
 | Default, `--pptx` and six-editor replays (earlier, retained) | 119/119; seven-editor 132/132; PPTX focused 15/15 |
 | Independent free review at `265897f` | PROVISIONAL PASS, no blocker/major; two Playwright-dependency minors remediated |
+| GR-088 undocumented-import probe | FODS→GridCraft and PPSX→DeckCraft import; PPT/PPS/ODP/FODP blank deck; FODT no save |
 
 Scope frozen: the default six unmodified Craft bundles, the opt-in DeckCraft
 PPTX candidate, and the opt-in documented-import legacy routes (DOC/ODT to
 WordCraft, XLS/ODS/CSV to GridCraft).
 
 Still NOT VERIFIED: rendered legacy content inside one combined host+browser
-session, the seven formats with no documented Craft import, broad document
-fidelity, human HTTPS/hardware acceptance, production behavior and the
-project-level GPT PASS. The independent free review is PROVISIONAL only.
+session, the six formats that remain unrouted, broad document fidelity, human
+HTTPS/hardware acceptance, production behavior and the project-level GPT PASS.
+The FODS opt-in route is configured but its real-Seafile route is NOT VERIFIED.
+The independent free review is PROVISIONAL only.
 
 Verdict: implementation and evidence are **frozen** at `864fc77`, integrated on
 `main` at `40a2f1b` and pushed as `265897f`. An independent free review of

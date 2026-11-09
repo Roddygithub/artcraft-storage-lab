@@ -7,8 +7,8 @@
   },
   "gridcraft": {
     "app": "gridcraft",
-    "label": "GridCraft (opt-in viewing candidate: +XLS/ODS/CSV; runtime import NOT VERIFIED)",
-    "extensions": ["xlsx", "xls", "ods", "csv"],
+    "label": "GridCraft (opt-in viewing candidate: +XLS/ODS/CSV/FODS; bundle import proven, runtime route NOT VERIFIED)",
+    "extensions": ["xlsx", "xls", "ods", "csv", "fods"],
     "url": "/editors/gridcraft/index.html?host=parent"
   },
   "pdfcraft": {

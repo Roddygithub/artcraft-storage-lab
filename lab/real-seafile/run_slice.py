@@ -474,8 +474,9 @@ def content_matches(name: str, data: bytes) -> bool:
 def viewing_payload_has_marker(payload: bytes, marker: str = "GR-LEGACY-MARKER-20261108") -> tuple[bool, str]:
     """Does the document an editor serialized after importing a legacy file contain the
     fixture marker? Covers the native serializations observed from the pinned bundles:
-    DOCX text runs, ODT content.xml and XLSX cells. A caller that aborts the relay uses
-    this as import evidence about the editor's model, not as a Seafile write."""
+    DOCX text runs, ODT content.xml, XLSX cells and any other OPC XML part (for
+    example PPTX slides). A caller that aborts the relay uses this as import
+    evidence about the editor's model, not as a Seafile write."""
     if payload[:2] != b"PK":
         return marker in payload.decode("utf-8", "replace"), "plain text"
     if marker in docx_text(payload):
@@ -488,9 +489,13 @@ def viewing_payload_has_marker(payload: bytes, marker: str = "GR-LEGACY-MARKER-2
         pass
     try:
         with zipfile.ZipFile(io.BytesIO(payload)) as archive:
-            if marker in archive.read("content.xml").decode("utf-8", "replace"):
+            names = archive.namelist()
+            if "content.xml" in names and marker in archive.read("content.xml").decode("utf-8", "replace"):
                 return True, "odt content.xml"
-    except (zipfile.BadZipFile, KeyError):
+            for part in names:
+                if part.endswith((".xml", ".rels")) and marker in archive.read(part).decode("utf-8", "replace"):
+                    return True, f"opc {part}"
+    except zipfile.BadZipFile:
         pass
     return False, "marker not in the serialized document"
 
@@ -500,7 +505,7 @@ def viewing_payload_has_marker(payload: bytes, marker: str = "GR-LEGACY-MARKER-2
 # route. Fixture file -> (extension, expected editor or None).
 LEGACY_VIEWING = {
     "doc.doc": ("doc", "wordcraft"), "doc.odt": ("odt", "wordcraft"), "doc.fodt": ("fodt", None),
-    "sheet.xls": ("xls", "gridcraft"), "sheet.ods": ("ods", "gridcraft"), "sheet.fods": ("fods", None),
+    "sheet.xls": ("xls", "gridcraft"), "sheet.ods": ("ods", "gridcraft"), "sheet.fods": ("fods", "gridcraft"),
     "sheet.csv": ("csv", "gridcraft"),
     "slide.ppt": ("ppt", None), "slide.odp": ("odp", None), "slide.fodp": ("fodp", None),
     "slide.pps": ("pps", None), "slide.ppsx": ("ppsx", None),

@@ -836,6 +836,7 @@ LEGACY_VIEWING_FIXTURES = {
     "doc.odt": "wordcraft",
     "sheet.xls": "gridcraft",
     "sheet.ods": "gridcraft",
+    "sheet.fods": "gridcraft",
     "sheet.csv": "gridcraft",
 }
 LEGACY_VIEWING_MARKER = "GR-LEGACY-MARKER-20261108"

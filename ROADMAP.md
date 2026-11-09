@@ -30,9 +30,10 @@ Do not run the historical ONLYOFFICE campaigns below.
 3. Done: legacy/OpenDocument coverage evidence. Deterministic fixtures, offline
    signature/routing checks, an opt-in `--viewing` browser replay (HTTP 57/57,
    browser 140/140, 21 viewing checks) and a bundle import probe (5/5) are
-   committed. Rendered legacy content in the combined run and the seven
-   import-less formats remain NOT VERIFIED. Hardware WebGPU/clipboard/font/unload
-   acceptance is still pending.
+   committed. GR-088 adds bundle-level proof that FODS and PPSX import; FODS is
+   routed in the opt-in candidate (runtime route NOT VERIFIED) and five further
+   formats remain unimportable. Rendered legacy content in the combined run and
+   hardware WebGPU/clipboard/font/unload acceptance remain NOT VERIFIED.
 4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
    Evidence is frozen at `864fc77`, pushed as `265897f`; an independent free review
    returned PROVISIONAL PASS with two Playwright-dependency minors, remediated.

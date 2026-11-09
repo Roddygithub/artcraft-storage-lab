@@ -41,9 +41,10 @@ file), PPSX (OPC package with a `ppt/` part) and FODT/FODS/FODP (flat
 OpenDocument `office:document`). CSV stays deliberately unguarded — it has no
 strong signature — and remains listed as unguarded in `SIGNATURE_KNOWN`.
 
-The routing candidate maps only formats with a documented upstream import:
-DOC/ODT to WordCraft and XLS/ODS/CSV to GridCraft. The other seven formats have
-no documented Craft import and stay unrouted.
+The routing candidate maps formats with a documented upstream import or a
+probe-proven bundle import: DOC/ODT to WordCraft and XLS/ODS/CSV/FODS to
+GridCraft. The other six formats stay unrouted; GR-088 shows PPSX imports at
+bundle level but DeckCraft is not a viewing-candidate editor.
 
 Documented-import evidence, cited from the pinned release bundles (hashes in
 `docs/reviews/PROJECT-CLOSURE-20261108/upstream-release-pins.json`):
@@ -85,6 +86,10 @@ Documented-import evidence, cited from the pinned release bundles (hashes in
   serialize the marker in their native format (DOCX text, ODT content.xml,
   XLSX cells). Script `scripts/probe-legacy-import.py`, exit 0 with 5/5 passed.
   This is editor-bundle import evidence, independent of host/bridge/Seafile.
+* Undocumented-import probe at GR-088: FODS (GridCraft) and PPSX (DeckCraft)
+  import the marker too; PPT, PPS, ODP and FODP only produce a blank deck and
+  FODT produces no save. FODS is now in the opt-in route (runtime route NOT
+  VERIFIED); PPSX stays unrouted. See `docs/GR-088-UNDOCUMENTED-LEGACY-IMPORT-PROBE.md`.
 * Fixture bytes and their SHA-256 are committed; `PROVENANCE.txt` records the
   exact container image id (`72717717d6ce…`) and the disclosed limit that
   `slide.pps` and `slide.ppt` are byte-identical under this LibreOffice.
@@ -109,8 +114,10 @@ Documented-import evidence, cited from the pinned release bundles (hashes in
   `/relay/file` capture inside the combined run is blocked by iframe load order:
   the nested same-origin request fires before any listener can attach. See
   `docs/VALIDATION-STATE.md`.
-* No format is declared replaced; the seven formats with no documented Craft
-  import (FODT, FODS, FODP, PPT, ODP, PPS, PPSX) remain without a route.
+* No format is declared replaced; six formats stay unrouted (FODT, FODP, PPT,
+  ODP, PPS, PPSX). GR-088 proves FODS and PPSX import at bundle level; FODS is
+  routed in the opt-in candidate with its real-Seafile route NOT VERIFIED, and
+  PPSX stays unrouted because DeckCraft is not a viewing-candidate editor.
 * Human HTTPS desktop acceptance remains pending.
 * The project-level GPT gate cannot run while the `openai` provider quota is
   exhausted (the Sol final reviewer uses the same provider).
