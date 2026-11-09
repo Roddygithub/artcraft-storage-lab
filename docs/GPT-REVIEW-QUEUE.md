@@ -61,6 +61,16 @@ import probe passes **5/5** and offline validation is **20/20** at the same
 commit. Rendered legacy content inside the combined run, the seven import-less
 formats, human HTTPS acceptance and independent review of this run remain NOT
 VERIFIED. Project GPT remains INCOMPLETE and upstream publication LOCKED.
+
+**Independent free review at `265897f` (2026-11-10).** The configured
+`artcraft-reviewer` returned **PROVISIONAL PASS** with no blocker/major and two
+Playwright-dependency minors, both remediated. It independently ran the bridge
+(33 OK), legacy (9 OK, 1 skipped for its missing Playwright) and lab (13 OK)
+suites, and verified every retained `verify.py` and `SHA256SUMS`. It did not
+replay the runtime. `artcraft-gpt-auditor` again hit the provider usage limit,
+so the Sol gate is NOT RUN. Evidence:
+`docs/reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md`.
+
 Evidence: `docs/GR-087-LEGACY-VIEWING-FIXTURES.md`,
 `lab/real-seafile/fixtures/legacy/`.
 

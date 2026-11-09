@@ -34,7 +34,9 @@ Do not run the historical ONLYOFFICE campaigns below.
    import-less formats remain NOT VERIFIED. Hardware WebGPU/clipboard/font/unload
    acceptance is still pending.
 4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
-   Evidence is frozen at `864fc77` (2026-11-10); the gate itself is pending.
+   Evidence is frozen at `864fc77`, pushed as `265897f`; an independent free review
+   returned PROVISIONAL PASS with two Playwright-dependency minors, remediated.
+   The project GPT gate itself is pending (provider quota).
 
 ## Historical next steps (superseded where they require ONLYOFFICE)
 

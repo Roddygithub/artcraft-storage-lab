@@ -282,3 +282,26 @@ Outcome:
 
 No DeepSeek task was on the critical path. All free-model verdicts remain
 PROVISIONAL.
+
+## 2026-11-10 — final freeze review at 265897f
+
+A fresh read-only `artcraft-reviewer` session (provider `nvidia`, model
+`nvidia/nvidia/nemotron-3-ultra-550b-a55b#high`) reviewed the exact pushed commit
+`265897f36739349f453d8519e6113ac43d3dbe51` (branch `main`, clean tree). It had
+no part in writing the candidate and edit permission was denied.
+
+Outcome: **PROVISIONAL PASS**, no BLOCKER and no MAJOR. Two MINOR findings:
+`scripts/validate-candidate.py` reported a per-test failure instead of naming a
+missing Playwright install, and `scripts/probe-legacy-import.py` did not state
+the Playwright/Chromium requirement in its docstring. Both are remediated
+(precheck with exit 2 and usage message; dependency documented). The sanitized
+record is `docs/reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md`.
+
+The reviewer confirmed bridge 33 OK, legacy 9 OK (1 skipped for its missing
+Playwright), lab 13 OK, all retained `verify.py` and `SHA256SUMS` passing, and
+no secrets in the committed evidence. It did not replay the lab.
+
+`artcraft-gpt-auditor` (provider `openai`, model `gpt-5.6-luna`) again returned
+"The usage limit has been reached"; the Sol final gate was not attempted. No
+DeepSeek task was used. GPT REVIEW remains PENDING, the project remains
+INCOMPLETE and upstream publication remains LOCKED.

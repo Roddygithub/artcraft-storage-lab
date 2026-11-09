@@ -230,6 +230,7 @@ documentation.
 | `results/2026-11-09-legacy-viewing-browser/verify.py` | PASS: HTTP 57/57, browser 140/140, 21 viewing checks |
 | `scripts/probe-legacy-import.py` | 5/5 routed legacy fixtures imported |
 | Default, `--pptx` and six-editor replays (earlier, retained) | 119/119; seven-editor 132/132; PPTX focused 15/15 |
+| Independent free review at `265897f` | PROVISIONAL PASS, no blocker/major; two Playwright-dependency minors remediated |
 
 Scope frozen: the default six unmodified Craft bundles, the opt-in DeckCraft
 PPTX candidate, and the opt-in documented-import legacy routes (DOC/ODT to
@@ -237,11 +238,13 @@ WordCraft, XLS/ODS/CSV to GridCraft).
 
 Still NOT VERIFIED: rendered legacy content inside one combined host+browser
 session, the seven formats with no documented Craft import, broad document
-fidelity, human HTTPS/hardware acceptance, production behavior and any
-independent or project-level PASS.
+fidelity, human HTTPS/hardware acceptance, production behavior and the
+project-level GPT PASS. The independent free review is PROVISIONAL only.
 
 Verdict: implementation and evidence are **frozen** at `864fc77`, integrated on
-`main` at `40a2f1b`. Project **INCOMPLETE** until the owner-controlled gates
-close (independent forensic and project GPT gate, human HTTPS desktop
-acceptance). Upstream publication remains **LOCKED**. This freeze is not a
-global PASS and must not be presented as one.
+`main` at `40a2f1b` and pushed as `265897f`. An independent free review of
+`265897f` returned PROVISIONAL PASS with two Playwright-dependency minors,
+remediated; the project GPT gate remains unavailable (provider quota). Project
+**INCOMPLETE** until the owner-controlled gates close (project GPT gate, human
+HTTPS desktop acceptance). Upstream publication remains **LOCKED**. This freeze
+is not a global PASS and must not be presented as one.

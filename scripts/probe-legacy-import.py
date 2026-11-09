@@ -11,6 +11,8 @@ This isolates editor import from the host, the bridge and Seafile: a failure her
 is an editor-bundle limitation, not a routing or WOPI problem. The real Seafile
 replay is `lab/real-seafile/local.py --viewing`.
 
+Requires Playwright and its Chromium; without them the probe cannot run.
+
 usage:
   uv run --with playwright --with pillow python scripts/probe-legacy-import.py \
       --static ~/.cache/artcraft-storage-lab/pptx-candidate-20261108/static \

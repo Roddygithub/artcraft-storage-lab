@@ -12,7 +12,7 @@ historical GR corpus to resume routine validation.
 | Remaining office viewing formats and broad fidelity | Fixtures; `--viewing` browser routing 140/140 (21 viewing checks); bundle import 5/5; rendered content in the combined run NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md`, `results/2026-11-09-legacy-viewing-browser/` |
 | Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
-| Independent forensic review and final project GPT gate | NOT PERFORMED | `PROJECT-CLOSURE.md` |
+| Independent review / final project GPT gate | free review PROVISIONAL PASS at `265897f`; GPT gate NOT PERFORMED (quota) | `reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md` |
 
 ONLYOFFICE is retired; do not restart compatibility campaigns. Production is
 outside this validation run. Upstream remains LOCKED. An automated subset PASS
@@ -57,8 +57,10 @@ prove full pagination or font fidelity.
    a listener can attach. Seven formats have no documented import at all and
    stay unrouted.
 2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
-3. Independent forensic review and a fresh project GPT gate, in a context that
-   did not implement this candidate. No global PASS has been granted.
+3. Project GPT gate (Luna auditor and Sol final reviewer). An independent free
+   review at `265897f` returned PROVISIONAL PASS with two Playwright-dependency
+   minors, now remediated; the `openai` provider quota still blocks the GPT
+   audit. No global PASS has been granted.
 
 The default six-editor candidate remains unchanged. Add `--pptx` and the
 verified official DeckCraft assets for the validated seven-editor option.

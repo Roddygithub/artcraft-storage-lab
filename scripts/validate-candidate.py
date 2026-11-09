@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 """Run the active offline checks with bounded, private logs and a compact summary.
 
+Requires Playwright and its Chromium for the browser-backed checks. Run it in
+the documented environment:
+
+  uv run --with playwright --with pillow python3 scripts/validate-candidate.py \
+      --output <new-private-dir>
+
+Without Playwright the runner fails fast with exit 2 and names the dependency,
+rather than reporting a misleading per-test failure.
+
 Real browser validation remains lab/real-seafile/local.py. This runner never
 claims HTTPS, format compatibility or independent review from offline checks.
 """
 import argparse
+import importlib.util
 from concurrent.futures import ThreadPoolExecutor
 import json
 import os
@@ -36,6 +46,11 @@ def main():
     output = args.output.expanduser().resolve()
     if output == ROOT or ROOT in output.parents:
         parser.error('logs must stay outside the repository')
+    if importlib.util.find_spec('playwright') is None:
+        print('Playwright is not installed in this Python environment.', file=sys.stderr)
+        print('Run: uv run --with playwright --with pillow python3 scripts/validate-candidate.py '
+              '--output <new-private-dir>', file=sys.stderr)
+        return 2
     os.umask(0o077)
     output.mkdir(parents=True, exist_ok=False)
     commands = [(p, [sys.executable, p]) for p in PYTHON_CHECKS]
