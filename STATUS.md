@@ -189,14 +189,20 @@ remediated, and R2 found no new findings. See
 
 ## PREVIOUS GR: GR-076 — bounded PhotoCraft host adapter
 
-Source candidate `5637bf2` is committed on `main`; runtime follow-up docs/evidence
-are comm## CURRENT: Zero-Patch Candidate — `51ff292ea` (2026-11-08)
+Source candidate `5637bf2` is committed on `main`; runtime follow-up
+docs/evidence are in `docs/reviews/GR-076/runtime/`.
+
+## HISTORICAL snapshot: zero-patch candidate `51ff292ea` (2026-11-08)
+
+> Superseded by the 2026-11-10 evidence freeze at `864fc77`, merged to `main`
+> as `40a2f1b`. Current state: `README.md`, `docs/PROJECT-CLOSURE.md`,
+> `docs/VALIDATION-STATE.md`.
 
 **Status:** LAB EVIDENCE COMPLETE — AWAITING HUMAN HTTPS ACCEPTANCE → GPT GATE
 
 **Architecture:** Stateless WOPI editor bridge (`bridge/`) + upstream Craft web bundles + Seahub configuration only. **No Seafile patch, no editor patch** (AGENTS.md rule 6).
 
-**Frozen commit:** `51ff292ea843c01269f2626c3d011c29c915a1ec` (branch `work/project-closure-20261108`)
+**Snapshot commit:** `51ff292ea843c01269f2626c3d011c29c915a1ec` (branch `work/project-closure-20261108`)
 
 ### Lab Evidence (all synthetic Seafile CE 13.0.28, rootless Podman)
 

@@ -215,9 +215,10 @@ command groups.
 
 ## Final evidence freeze — 2026-11-10
 
-Source: branch `work/project-closure-20261108` at `864fc77` (80 commits ahead of
-`main`/`ae903ac`). No runtime code changed after the `--viewing` replay source
-`53c7e22`; the later commits add the retained run, its verifier and this
+Source: `main` at `40a2f1b`, fast-forwarded from `work/project-closure-20261108`
+(previously 80 commits ahead of `ae903ac`). The frozen evidence commit is
+`864fc77`; no runtime code changed after the `--viewing` replay source
+`53c7e22`, and the later commits add the retained run, its verifier and this
 documentation.
 
 | Check (re-run 2026-11-10 at `864fc77`) | Result |
@@ -239,7 +240,8 @@ session, the seven formats with no documented Craft import, broad document
 fidelity, human HTTPS/hardware acceptance, production behavior and any
 independent or project-level PASS.
 
-Verdict: implementation and evidence are **frozen** at `864fc77`. Project
-**INCOMPLETE** until the owner-controlled gates close (independent forensic and
-project GPT gate, human HTTPS desktop acceptance). Upstream publication remains
-**LOCKED**. This freeze is not a global PASS and must not be presented as one.
+Verdict: implementation and evidence are **frozen** at `864fc77`, integrated on
+`main` at `40a2f1b`. Project **INCOMPLETE** until the owner-controlled gates
+close (independent forensic and project GPT gate, human HTTPS desktop
+acceptance). Upstream publication remains **LOCKED**. This freeze is not a
+global PASS and must not be presented as one.
