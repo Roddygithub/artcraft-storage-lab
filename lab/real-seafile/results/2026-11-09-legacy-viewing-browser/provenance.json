@@ -1,0 +1,17 @@
+{
+  "source_reference": "53c7e22 (branch work/project-closure-20261108)",
+  "seafile_version": "13.0.28",
+  "mode": "--viewing (opt-in documented-import legacy routes)",
+  "static_manifest_sha256": "5f0cef84fe03efb916496be2df103b9661ee293a19f7e7771233c5260a9963b9",
+  "run_directory": "~/.cache/artcraft-storage-lab/verify-viewing-20261109-r4 (private; not retained)",
+  "retained": [
+    "slice.json (sanitized: no repo id, tokens, WOPISrc or per-run accounts)",
+    "browser.json (sanitized: same; includes the 21 viewing browser checks)"
+  ],
+  "fixtures": "lab/real-seafile/fixtures/legacy/ (SHA256SUMS pinned)",
+  "limits": [
+    "browser probe asserts routing/safety only: no bytes-delivery or import capture in the combined run",
+    "bundle-level import proof: scripts/probe-legacy-import.py 5/5 PASS (separate, offline)",
+    "FODT/FODS/FODP/PPT/ODP/PPS/PPSX intentionally have no route"
+  ]
+}

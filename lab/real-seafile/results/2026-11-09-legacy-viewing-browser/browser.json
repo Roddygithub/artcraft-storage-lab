@@ -1,0 +1,708 @@
+{
+ "ran_at": "2026-11-09T18:57:50Z",
+ "passed": 140,
+ "failed": 0,
+ "checks": [
+  {
+   "name": "viewing_probe_authenticated_session",
+   "ok": true,
+   "detail": "attempts=1 url=http://seafile.lab/"
+  },
+  {
+   "name": "viewing_doc_doc_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_doc_doc_routes_to_wordcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/doc.d', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_doc_doc_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_doc_doc_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_doc_odt_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_doc_odt_routes_to_wordcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/doc.o', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_doc_odt_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_doc_odt_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_sheet_xls_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_sheet_xls_routes_to_gridcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/sheet', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_sheet_xls_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_sheet_xls_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_sheet_ods_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_sheet_ods_routes_to_gridcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/sheet', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_sheet_ods_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_sheet_ods_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_sheet_csv_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_sheet_csv_routes_to_gridcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/sheet', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_sheet_csv_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_sheet_csv_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "browser_login",
+   "ok": true,
+   "detail": "http://seafile.lab/"
+  },
+  {
+   "name": "figcraft_fixture_made_by_the_app",
+   "ok": true,
+   "detail": "Untitled.figcraft 1397 bytes"
+  },
+  {
+   "name": "wordcraft_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "wordcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "wordcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 19s"
+  },
+  {
+   "name": "wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=browsertyped696a797f39 status='unsaved changes'"
+  },
+  {
+   "name": "wordcraft_save_request_carries_the_typed_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browsertyped696a797f39"
+  },
+  {
+   "name": "wordcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': '35e884bc6c135cc95ade720d8a2bb72fb1c288e1', 'rev_file_id': '4bbadd9ca39341e40f0d255ba02e2f55ffcd0c2b', 'creator': '<run-admin>', 'desc': 'Modified \"test.docx\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_saved_docx_contains_the_typed_marker",
+   "ok": true,
+   "detail": "marker=browsertyped696a797f39 len=6599 bytes_identical_to_original=False"
+  },
+  {
+   "name": "wordcraft_save_is_not_identical_bytes",
+   "ok": true,
+   "detail": "887 -> 6599 bytes"
+  },
+  {
+   "name": "wordcraft_saved_docx_bytes_look_right",
+   "ok": true,
+   "detail": "len=6599"
+  },
+  {
+   "name": "wordcraft_reopen_fresh_seafile_session",
+   "ok": true,
+   "detail": "http://seafile.lab/"
+  },
+  {
+   "name": "wordcraft_reopened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "wordcraft_reopen_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "wordcraft_reopen_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "relay/file responses=1 after 72s"
+  },
+  {
+   "name": "wordcraft_reopen_bytes_identical_to_the_saved_version",
+   "ok": true,
+   "detail": "len=6599 vs saved 6599"
+  },
+  {
+   "name": "wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=browserreopened2f6308ae8f status='unsaved changes'"
+  },
+  {
+   "name": "wordcraft_reopen_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_reopen_second_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 2->3 top={'id': '1983fe1eac3829f9e9a99feaf3f123b50dd71941', 'rev_file_id': 'ab7f03e4f35090cd3bb803351712e4afeb0c0cc9', 'creator': '<run-admin>', 'desc': 'Modified \"test.docx\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_reopen_seafile_holds_both_markers",
+   "ok": true,
+   "detail": "marker=browserreopened2f6308ae8f len=6634"
+  },
+  {
+   "name": "wordcraft_reopen_editor_holds_the_original_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browsertyped696a797f39"
+  },
+  {
+   "name": "wordcraft_reopen_editor_holds_the_second_typed_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browserreopened2f6308ae8f"
+  },
+  {
+   "name": "wordcraft_saves_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "gridcraft_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "gridcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "gridcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 19s"
+  },
+  {
+   "name": "gridcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=gridtyped1d1b266e36 status='unsaved changes'"
+  },
+  {
+   "name": "gridcraft_save_request_carries_the_typed_value",
+   "ok": true,
+   "detail": "payload=4086B marker=gridtyped1d1b266e36 cells=['A1', 'J3']"
+  },
+  {
+   "name": "gridcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "gridcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': '311957a45366b2de9ae74153dd7afa37c066d16a', 'rev_file_id': '88354ae08b53be8d81fa7c1aa75daa09d1315286', 'creator': '<run-admin>', 'desc': 'Modified \"test.xlsx\"'}"
+  },
+  {
+   "name": "gridcraft_saved_xlsx_semantically_contains_the_typed_value",
+   "ok": true,
+   "detail": "marker=gridtyped1d1b266e36 cells=['A1', 'J3']"
+  },
+  {
+   "name": "gridcraft_saved_xlsx_keeps_the_fixture_value",
+   "ok": true,
+   "detail": "A1='1' (the typed cell is not A1: click at 30% canvas height)"
+  },
+  {
+   "name": "gridcraft_save_is_not_identical_bytes",
+   "ok": true,
+   "detail": "1885 -> 4086 bytes"
+  },
+  {
+   "name": "gridcraft_saved_xlsx_bytes_look_right",
+   "ok": true,
+   "detail": "len=4086"
+  },
+  {
+   "name": "gridcraft_reopen_fresh_seafile_session",
+   "ok": true,
+   "detail": "http://seafile.lab/"
+  },
+  {
+   "name": "gridcraft_reopened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "gridcraft_reopen_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "gridcraft_reopen_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "relay/file responses=1 after 50s"
+  },
+  {
+   "name": "gridcraft_reopen_bytes_identical_to_the_saved_version",
+   "ok": true,
+   "detail": "len=4086 vs saved 4086"
+  },
+  {
+   "name": "gridcraft_reopen_parsed_the_saved_value",
+   "ok": true,
+   "detail": "cells=['A1', 'J3']"
+  },
+  {
+   "name": "gridcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=gridreopened4877f628ce status='unsaved changes'"
+  },
+  {
+   "name": "gridcraft_reopen_editor_holds_the_original_value",
+   "ok": true,
+   "detail": "marker=gridtyped1d1b266e36 cells=['A1', 'J3', 'P16']"
+  },
+  {
+   "name": "gridcraft_reopen_editor_holds_the_second_typed_value",
+   "ok": true,
+   "detail": "marker=gridreopened4877f628ce cells=['A1', 'J3', 'P16']"
+  },
+  {
+   "name": "gridcraft_reopen_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "gridcraft_reopen_second_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 2->3 top={'id': 'a8330941319cbc7cf32718197afdafd07bf1f0a8', 'rev_file_id': '02b7d0c61d43d91354aa0faf9d8c978fddb85237', 'creator': '<run-admin>', 'desc': 'Modified \"test.xlsx\"'}"
+  },
+  {
+   "name": "gridcraft_reopen_seafile_holds_both_values",
+   "ok": true,
+   "detail": "marker=gridreopened4877f628ce cells=['A1', 'J3', 'P16']"
+  },
+  {
+   "name": "gridcraft_second_save_is_not_identical_bytes",
+   "ok": true,
+   "detail": "4086 -> 4117 bytes"
+  },
+  {
+   "name": "gridcraft_saves_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "pdfcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'about:blank', '')]"
+  },
+  {
+   "name": "pdfcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 4s"
+  },
+  {
+   "name": "pdfcraft_typed_form_edit_is_dirty_before_save",
+   "ok": true,
+   "detail": "marker=pdfeditedc02194c7e2 status='unsaved changes'"
+  },
+  {
+   "name": "pdfcraft_save_request_contains_the_typed_name_field_value",
+   "ok": true,
+   "detail": "captured=True marker=pdfeditedc02194c7e2 bytes=2389"
+  },
+  {
+   "name": "pdfcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "pdfcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': 'aa0c9cdf5c819640f98557679fca114ddb4404ee', 'rev_file_id': '7c383f1952bfde77f6955905ab8c51695fe814f8', 'creator': '<run-admin>', 'desc': 'Modified \"test.pdf\"'}"
+  },
+  {
+   "name": "pdfcraft_relay_save_bytes_match_seafile_readback",
+   "ok": true,
+   "detail": "relay=2389 readback=2389"
+  },
+  {
+   "name": "pdfcraft_saved_pdf_name_field_contains_typed_value",
+   "ok": true,
+   "detail": "marker=pdfeditedc02194c7e2 bytes=2389"
+  },
+  {
+   "name": "pdfcraft_saved_pdf_differs_from_fixture",
+   "ok": true,
+   "detail": "1744 -> 2389 bytes"
+  },
+  {
+   "name": "pdfcraft_saved_pdf_bytes_look_right",
+   "ok": true,
+   "detail": "bytes=2389"
+  },
+  {
+   "name": "pdfcraft_fresh_seafile_session",
+   "ok": true,
+   "detail": "http://seafile.lab/"
+  },
+  {
+   "name": "pdfcraft_reopened_from_seafile_pdf_edit_route",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pdfcraft_reopen_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'about:blank', '')]"
+  },
+  {
+   "name": "pdfcraft_fresh_open_loaded_the_saved_pdf_field_value",
+   "ok": true,
+   "detail": "responses=1 marker=pdfeditedc02194c7e2 bytes=2389"
+  },
+  {
+   "name": "pdfcraft_reopen_status_reports_opened_document",
+   "ok": true,
+   "detail": "status='ready'"
+  },
+  {
+   "name": "pdfcraft_save_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "cadcraft_opened_dxf_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "cadcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'http://bridge:8778/edit/cadcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/cadcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "cadcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 9s"
+  },
+  {
+   "name": "cadcraft_initial_fixture_has_no_circle",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "cadcraft_initial_drawing_canvas_captured",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "cadcraft_user_circle_edit_marks_host_dirty",
+   "ok": true,
+   "detail": "status='unsaved changes'"
+  },
+  {
+   "name": "cadcraft_circle_is_visible_before_save",
+   "ok": true,
+   "detail": "rendered pixels/aspect/ring=(1133, 0.9975186104218362, 1.0, 200.67947079858467)"
+  },
+  {
+   "name": "cadcraft_save_payload_contains_circle_entity",
+   "ok": true,
+   "detail": "payload bytes=17548; circles=1"
+  },
+  {
+   "name": "cadcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "cadcraft_circle_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2"
+  },
+  {
+   "name": "cadcraft_seafile_readback_contains_circle_entity",
+   "ok": true,
+   "detail": "readback bytes=17548; circles=1"
+  },
+  {
+   "name": "cadcraft_relay_save_bytes_match_seafile_readback",
+   "ok": true,
+   "detail": "payload=17548; readback=17548"
+  },
+  {
+   "name": "cadcraft_saved_canvas_still_renders_circle",
+   "ok": true,
+   "detail": "rendered pixels/aspect/ring=(1133, 0.9975186104218362, 1.0, 200.67947079858467)"
+  },
+  {
+   "name": "cadcraft_save_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "cadcraft_fresh_session_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "cadcraft_fresh_session_reads_saved_dxf",
+   "ok": true,
+   "detail": "relay/file bytes=17548; circles=1"
+  },
+  {
+   "name": "cadcraft_fresh_session_renders_saved_circle",
+   "ok": true,
+   "detail": "rendered pixels/aspect/ring=(1133, 0.9975186104218362, 1.0, 200.67947079858467)"
+  },
+  {
+   "name": "cadcraft_edits_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "vectorcraft_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'http://bridge:8778/edit/vectorcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/vectorcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "vectorcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 22s"
+  },
+  {
+   "name": "vectorcraft_fixture_lacks_new_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_fixture_parsed_before_edit",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_edited_scene_contains_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "saved to Seafile"
+  },
+  {
+   "name": "vectorcraft_relay_save_contains_actual_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_edit_creates_version_by_user",
+   "ok": true,
+   "detail": "history 1->2"
+  },
+  {
+   "name": "vectorcraft_relay_bytes_equal_seafile",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_saved_geometry_differs_from_fixture",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_old_page_closed",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_fresh_authenticated_session",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_fresh_relay_bytes_equal_saved",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_fresh_api_scene_retains_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_fresh_serialization_has_no_stale_capture",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_fresh_reserialization_retains_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "vectorcraft_save_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "figcraft_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/86ba2d39-ff88-4865-832e-48befd163991/file/test.', None), ('office_frame', 'http://bridge:8778/edit/figcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/figcraft/index.html?host=parent&control', 'office_frame')]"
+  },
+  {
+   "name": "figcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 9s"
+  },
+  {
+   "name": "figcraft_fixture_lacks_new_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_fixture_parsed_before_edit",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_edited_scene_contains_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "saved to Seafile"
+  },
+  {
+   "name": "figcraft_relay_save_contains_actual_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_edit_creates_version_by_user",
+   "ok": true,
+   "detail": "history 1->2"
+  },
+  {
+   "name": "figcraft_relay_bytes_equal_seafile",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_saved_geometry_differs_from_fixture",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_old_page_closed",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_fresh_authenticated_session",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_fresh_relay_bytes_equal_saved",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_fresh_api_scene_retains_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_fresh_serialization_has_no_stale_capture",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_fresh_reserialization_retains_geometry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "figcraft_save_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  }
+ ],
+ "raw_private_sha256": "20012c639a52e2cf0663822e06782830f0d095713a3a7dbc9bdaa9cff615cd82"
+}
