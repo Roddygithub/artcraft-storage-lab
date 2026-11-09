@@ -64,6 +64,11 @@ Documented-import evidence, cited from the pinned release bundles (hashes in
   viewing-route checks) and browser **119/119**, launcher exit 0, on stock
   synthetic Seafile CE 13.0.28. Sanitized evidence and verifier:
   `lab/real-seafile/results/2026-11-08-legacy-viewing/`.
+* Bundle-level import probe: the pinned WordCraft v0.16.0 and GridCraft v0.17.0
+  bundles import all five routed legacy fixtures (DOC, ODT, XLS, ODS, CSV) and
+  serialize the marker in their native format (DOCX text, ODT content.xml,
+  XLSX cells). Script `scripts/probe-legacy-import.py`, exit 0 with 5/5 passed.
+  This is editor-bundle import evidence, independent of host/bridge/Seafile.
 * Fixture bytes and their SHA-256 are committed; `PROVENANCE.txt` records the
   exact container image id (`72717717d6ce…`) and the disclosed limit that
   `slide.pps` and `slide.ppt` are byte-identical under this LibreOffice.
@@ -81,10 +86,11 @@ Documented-import evidence, cited from the pinned release bundles (hashes in
 
 ## Explicit limits (NOT VERIFIED)
 
-* No runtime **import** of any legacy/OpenDocument format in a browser. The
-  real-Seafile replay proves routing only: it never opens a legacy fixture in an
-  editor, asserts rendered content, or saves one. The browser replay in that run
-  is the unchanged six-editor candidate.
+* No runtime **import** of any legacy/OpenDocument format in a browser with
+  Seafile. The bundle-level probe (`scripts/probe-legacy-import.py`) proves
+  editor-bundle import; the real-Seafile replay (`--viewing`) proves routing
+  only. No combined host+editor+Seafile run has captured the marker on a fresh
+  reopen.
 * No format is declared replaced; the seven formats with no documented Craft
   import (FODT, FODS, FODP, PPT, ODP, PPS, PPSX) remain without a route.
 * Human HTTPS desktop acceptance remains pending.

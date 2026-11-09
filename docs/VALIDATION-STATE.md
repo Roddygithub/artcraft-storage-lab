@@ -9,7 +9,7 @@ historical GR corpus to resume routine validation.
 | Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
 | All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
 | Official DeckCraft PPTX opt-in | focused 15/15; combined HTTP 40/40, browser 132/132, exit 0 | `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
-| Remaining office viewing formats and broad fidelity | Fixtures + routing ready; runtime import NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md`, `fixtures/legacy/` |
+| Remaining office viewing formats and broad fidelity | Fixtures + routing + bundle import ready; full runtime import NOT VERIFIED | `ONLYOFFICE-REPLACEMENT-MATRIX.md`, `fixtures/legacy/` |
 | Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent forensic review and final project GPT gate | NOT PERFORMED | `PROJECT-CLOSURE.md` |
@@ -47,10 +47,12 @@ prove full pagination or font fidelity.
 ## Next unresolved work
 
 1. Required legacy/OpenDocument viewing formats: deterministic fixtures, an
-   opt-in routing candidate and a real-Seafile routing replay now exist for all
-   twelve; DOC/ODT (WordCraft) and XLS/ODS/CSV (GridCraft) have a documented
-   upstream import and a proven route. Browser **import** of a legacy fixture is
-   still NOT VERIFIED, and seven formats have no documented import at all.
+   opt-in routing candidate, a real-Seafile routing replay and a **bundle-level
+   import probe** (5/5 passed, `scripts/probe-legacy-import.py`) now exist for
+   the five routed formats; DOC/ODT (WordCraft) and XLS/ODS/CSV (GridCraft)
+   have a documented upstream import and proven route/import. Browser **import
+   on Seafile** of a legacy fixture is still NOT VERIFIED, and seven formats
+   have no documented import at all.
 2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
 3. Independent forensic review and a fresh project GPT gate, in a context that
    did not implement this candidate. No global PASS has been granted.

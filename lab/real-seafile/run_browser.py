@@ -828,6 +828,18 @@ def wait_for_wordcraft_document(page, timeout=90):
     return False
 
 
+# Opt-in (VIEWING_FORMATS=1) import probe for the legacy/OpenDocument viewing
+# fixtures. Only the formats whose pinned upstream bundle documents an import are
+# listed, and the same map as editors.viewing.json routes them.
+LEGACY_VIEWING_FIXTURES = {
+    "doc.doc": "wordcraft",
+    "doc.odt": "wordcraft",
+    "sheet.xls": "gridcraft",
+    "sheet.ods": "gridcraft",
+    "sheet.csv": "gridcraft",
+}
+LEGACY_VIEWING_MARKER = "GR-LEGACY-MARKER-20261108"
+
 WORDCRAFT_FIDELITY_FIXTURES = {"fidelity-layout.docx", "fidelity-prose.docx", "fidelity-structure.docx"}
 
 
@@ -913,6 +925,110 @@ def main():
             page.on("console", lambda m: console.append(f"[{m.type}] {m.text}"[:300]))
             page.on("pageerror", lambda e: console.append(f"[pageerror] {e}"[:300]))
             return page
+
+        def legacy_viewing_probe(page):
+            """Opt-in (VIEWING_FORMATS=1) import proof for the legacy/OpenDocument
+            fixtures. Open each file from the real Seafile file list, require the routed
+            editor to receive the exact legacy bytes, then capture the document the
+            editor itself serializes after import. The /relay/save request is aborted, so
+            nothing is written: this is import evidence, not a save."""
+            # Authenticate the page first (the main queue does this before its first open).
+            page.goto(f"{rs.SEAFILE}/accounts/login/", wait_until="domcontentloaded")
+            page.fill("input[name=login]", rs.ADMIN)
+            page.fill("input[name=password]", rs.ADMIN_PW)
+            page.click("button[type=submit], input[type=submit]")
+            page.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
+            check("viewing_probe_authenticated_session", "/accounts/login" not in page.url, page.url)
+
+            directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "legacy")
+            base = page
+            for name, editor in LEGACY_VIEWING_FIXTURES.items():
+                slug = name.replace(".", "_")
+                path = os.path.join(directory, name)
+                if not os.path.isfile(path):
+                    check(f"viewing_{slug}_fixture_present", False, path)
+                    continue
+                with open(path, "rb") as fixture_file:
+                    content = fixture_file.read()
+                ids[name] = rs.upload(admin, repo_id, name, content)
+                before = len(rs.history(admin, repo_id, name))
+                downloads.clear()
+                relay: list = []
+                saved: list = []
+
+                def on_response(r):
+                    if r.url.endswith("/relay/file"):
+                        try:
+                            relay.append((r.status, r.body()))
+                        except Exception:  # noqa: BLE001 - body may be gone
+                            pass
+
+                def on_save(route):
+                    try:
+                        body = route.request.post_data_buffer
+                    except Exception:  # noqa: BLE001
+                        body = None
+                    if body:
+                        saved.append(body)
+                    route.abort()
+
+                # Set up listeners BEFORE navigation so we catch /relay/file
+                ctx.on("response", on_response)
+                ctx.route("**/relay/save", on_save)
+                try:
+                    try:
+                        page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
+                    except TimeoutError:
+                        check(f"viewing_{slug}_opened_from_seafile_file_list", False, "file-list click timed out")
+                        continue
+                    check(f"viewing_{slug}_opened_from_seafile_file_list", True)
+                    host = find_frame(page, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=page.main_frame)
+                    routed = host is not None and f"/edit/{editor}" in host.url
+                    check(f"viewing_{slug}_routes_to_{editor}", routed,
+                          f"host={host.url if host else None} frames={frames_dump(page)}")
+                    if not routed:
+                        page.screenshot(path=os.path.join(RESULTS, f"viewing-{slug}-no-host.png"))
+                        continue
+                    end = time.time() + 90
+                    while time.time() < end and not relay:
+                        time.sleep(0.5)
+                    got = relay[-1][1] if relay else None
+                    check(f"viewing_{slug}_delivers_the_exact_legacy_bytes", got == content,
+                          f"{len(got) if got else 0} vs fixture {len(content)} bytes")
+                    box = page.locator("#office-frame").bounding_box()
+                    if box is None:
+                        check(f"viewing_{slug}_editor_frame_has_a_box", False)
+                        continue
+                    page.mouse.click(box["x"] + box["width"] / 2,
+                                     box["y"] + 60 + (box["height"] - 60) / 2)
+                    time.sleep(0.5)
+                    if editor == "gridcraft":
+                        # Import-only .xls/.ods open behind a notice; Enter dismisses it.
+                        page.keyboard.press("Enter")
+                        time.sleep(1)
+                    page.keyboard.press("Control+s")
+                    end = time.time() + 45
+                    while time.time() < end and not saved:
+                        time.sleep(0.5)
+                    ok, kind = (rs.viewing_payload_has_marker(saved[0]) if saved
+                                else (False, "no /relay/save payload captured"))
+                    check(f"viewing_{slug}_imported_document_contains_the_marker", ok, kind)
+                    versions = len(rs.history(admin, repo_id, name))
+                    check(f"viewing_{slug}_aborted_relay_wrote_no_version", versions == before,
+                          f"history {before}->{versions} (the aborted relay must not write)")
+                    check(f"viewing_{slug}_open_did_not_download", not downloads,
+                          f"downloads={len(downloads)}")
+                    page.screenshot(path=os.path.join(RESULTS, f"viewing-{slug}.png"))
+                finally:
+                    ctx.remove_listener("response", on_response)
+                    ctx.unroute("**/relay/save", on_save)
+                    if page is not base:
+                        page.close()
+                        page = base
+            return page
+
+        if os.environ.get("VIEWING_FORMATS") and (not only_editor or only_editor in ("wordcraft", "gridcraft")):
+            page = legacy_viewing_probe(page)
 
         def pdfcraft_real_edit_flow(page, name, content, box, status, before):
             """Type into the fixture's name AcroForm field, save through WOPI, then verify

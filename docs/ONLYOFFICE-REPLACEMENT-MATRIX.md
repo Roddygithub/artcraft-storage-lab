@@ -60,6 +60,14 @@ carry **no WOPI route**. Sanitized retained evidence and a runnable verifier:
 evidence on real Seafile; it still does not prove that any editor imports or
 renders these documents.
 
+### Bundle-level import probe — 2026-11-08 (offline)
+
+The pinned WordCraft v0.16.0 and GridCraft v0.17.0 bundles import all five
+routed legacy fixtures (DOC, ODT, XLS, ODS, CSV) and serialize the marker in
+their native format: DOCX text runs, ODT `content.xml`, XLSX cells. Script
+`scripts/probe-legacy-import.py`, exit 0 with **5/5 passed**. This is
+editor-bundle import evidence, independent of host, bridge and Seafile.
+
 The initial replacement baseline is **15 viewing formats and 3 editing
 formats**. Adding editing support for the currently view-only formats would be
 an additional capability, not something established by the existing settings.

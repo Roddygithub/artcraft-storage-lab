@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import os
 from pathlib import Path
 import sys
 import unittest
@@ -23,9 +24,28 @@ sys.path.insert(0, str(ROOT / "bridge"))
 
 from bridge.app import Config, content_matches_extension, load_editors  # noqa: E402
 
+# run_slice reads its Seafile settings from the environment when imported; these
+# offline tests never contact it.
+os.environ.setdefault("SEAFILE_URL", "http://seafile.test")
+os.environ.setdefault("BRIDGE_URL", "http://bridge.test")
+os.environ.setdefault("ADMIN_EMAIL", "test@example.test")
+os.environ.setdefault("ADMIN_PASSWORD", "test")
+os.environ.setdefault("RESULTS_DIR", "/tmp/artcraft-offline-tests")
+sys.path.insert(0, str(ROOT / "lab/real-seafile"))
+import run_slice as rs  # noqa: E402
+
 MARKER = b"GR-LEGACY-MARKER-20261108"
+MARKER_TEXT = MARKER.decode()
 FIXTURES = ROOT / "lab/real-seafile/fixtures/legacy"
 VIEWING_MAP = ROOT / "lab/real-seafile/editors.viewing.json"
+
+
+def _zip(parts: dict[str, str]) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as archive:
+        for name, text in parts.items():
+            archive.writestr(name, text)
+    return buf.getvalue()
 
 # matrix format -> (fixture file, expected editor or None when no documented Craft import exists)
 LEGACY = {
@@ -99,6 +119,35 @@ class LegacyFixtureTests(unittest.TestCase):
         for ext, editor in (("docx", "wordcraft"), ("xlsx", "gridcraft"), ("pdf", "pdfcraft"),
                             ("dxf", "cadcraft"), ("svg", "vectorcraft"), ("figcraft", "figcraft")):
             self.assertEqual(cfg.extension_editor.get(ext), editor, ext)
+
+    def test_serialized_payload_detection_reads_each_native_form(self):
+        """The browser import probe reads the marker out of whatever the editor saved."""
+        docx = rs.minimal_docx(f"prefix {MARKER_TEXT} suffix")
+        self.assertEqual(rs.viewing_payload_has_marker(docx), (True, "docx text"))
+        odt = _zip({"content.xml": f"<text:p>{MARKER_TEXT}</text:p>"})
+        self.assertEqual(rs.viewing_payload_has_marker(odt), (True, "odt content.xml"))
+        xlsx = _zip({"xl/worksheets/sheet1.xml":
+                     '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+                     f'<sheetData><row r="1"><c r="B1" t="inlineStr"><is><t>{MARKER_TEXT}</t></is></c></row></sheetData></worksheet>'})
+        ok, kind = rs.viewing_payload_has_marker(xlsx)
+        self.assertTrue(ok, kind)
+        self.assertTrue(kind.startswith("xlsx cells"), kind)
+        self.assertEqual(rs.viewing_payload_has_marker(MARKER_TEXT.encode()), (True, "plain text"))
+
+    def test_serialized_payload_detection_rejects_a_missing_marker(self):
+        self.assertEqual(rs.viewing_payload_has_marker(rs.minimal_docx("no marker here")),
+                         (False, "marker not in the serialized document"))
+        self.assertEqual(rs.viewing_payload_has_marker(_zip({"content.xml": "<text:p>other</text:p>"})),
+                         (False, "marker not in the serialized document"))
+
+    def test_browser_probe_map_matches_the_routed_viewing_map(self):
+        """The browser import probe must not drift from the opt-in routing candidate."""
+        try:
+            import run_browser  # imports playwright; skipped when it is not installed
+        except ModuleNotFoundError:
+            self.skipTest("playwright is not installed; browser probe map not checked")
+        expected = {name: editor for name, (ext, editor) in rs.LEGACY_VIEWING.items() if editor}
+        self.assertEqual(run_browser.LEGACY_VIEWING_FIXTURES, expected)
 
 
 if __name__ == "__main__":

@@ -471,6 +471,30 @@ def content_matches(name: str, data: bytes) -> bool:
     return True
 
 
+def viewing_payload_has_marker(payload: bytes, marker: str = "GR-LEGACY-MARKER-20261108") -> tuple[bool, str]:
+    """Does the document an editor serialized after importing a legacy file contain the
+    fixture marker? Covers the native serializations observed from the pinned bundles:
+    DOCX text runs, ODT content.xml and XLSX cells. A caller that aborts the relay uses
+    this as import evidence about the editor's model, not as a Seafile write."""
+    if payload[:2] != b"PK":
+        return marker in payload.decode("utf-8", "replace"), "plain text"
+    if marker in docx_text(payload):
+        return True, "docx text"
+    try:
+        cells = xlsx_cells(payload)
+        if any(marker in value for value in cells.values()):
+            return True, f"xlsx cells ({len(cells)})"
+    except ValueError:
+        pass
+    try:
+        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            if marker in archive.read("content.xml").decode("utf-8", "replace"):
+                return True, "odt content.xml"
+    except (zipfile.BadZipFile, KeyError):
+        pass
+    return False, "marker not in the serialized document"
+
+
 # Opt-in (VIEWING_FORMATS=1) legacy/OpenDocument viewing routes. Only the formats
 # with a documented upstream import are routed; the rest must stay without a WOPI
 # route. Fixture file -> (extension, expected editor or None).
