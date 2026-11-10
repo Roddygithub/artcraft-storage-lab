@@ -60,7 +60,7 @@ LEGACY = {
     "odp":   ("slide.odp",   None),
     "fodp":  ("slide.fodp",  None),
     "pps":   ("slide.pps",   None),
-    "ppsx":  ("slide.ppsx",  None),
+    "ppsx":  ("slide.ppsx",  "deckcraft"),
 }
 
 

@@ -34,5 +34,11 @@
     "label": "FigCraft v0.13.1 (upstream + lab page-API shim; ?control enables window.figcraft)",
     "extensions": ["figcraft"],
     "url": "/editors/figcraft/index.html?host=parent&control"
+  },
+  "deckcraft": {
+    "app": "deckcraft",
+    "label": "DeckCraft v0.16.0 (opt-in viewing candidate: +PPSX; bundle import proven, runtime route NOT VERIFIED)",
+    "extensions": ["ppsx", "deckcraft"],
+    "url": "/editors/deckcraft/index.html?host=parent"
   }
 }

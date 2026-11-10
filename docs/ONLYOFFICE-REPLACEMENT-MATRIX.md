@@ -19,9 +19,9 @@ proof that every current ONLYOFFICE path works in practice.
 | ODP | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
 | FODP | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
 | ODS | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:96, saved values not formulas); rendered content NOT VERIFIED |
-| FODS | View | Fixture; GR-088 probe: GridCraft imports it (196 cells); opt-in route configured, browser route NOT VERIFIED |
+| FODS | View | Fixture; GridCraft bundle import (196 cells) and browser-verified route (59/59, 173/173); rendered content NOT VERIFIED |
 | CSV | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:93, CSV/TSV); rendered content NOT VERIFIED |
-| PPSX | View | Fixture; GR-088 probe: DeckCraft imports it (marker in slide1), but DeckCraft is not a viewing-candidate editor — route NOT VERIFIED |
+| PPSX | View | Fixture; DeckCraft bundle import (marker in slide1) and browser-verified route (59/59, 173/173); rendered content NOT VERIFIED |
 | PPS | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
 
 ## Deterministic viewing fixtures — 2026-11-08
@@ -44,11 +44,11 @@ open/route/no-download/no-write check and the bundle probe adds editor import,
 but no format replacement or rendered-content equivalence is claimed. Only DOC, ODT (WordCraft v0.16.0
 README:99/128) and XLS, ODS, CSV (GridCraft v0.17.0 README:93/94/96) have a
 documented upstream import path. GR-088 adds probe-proven imports for FODS
-(GridCraft, now in the opt-in route with its browser route NOT VERIFIED) and PPSX
-(DeckCraft, still unrouted because DeckCraft is not a viewing-candidate editor).
-PPT, PPS, ODP and FODP only produce a blank deck and FODT produces no save, so
-those five stay unrouted. The replacement baseline therefore remains a partial,
-honest subset.
+(GridCraft) and PPSX (DeckCraft); both are in the opt-in route and passed a real
+browser routing replay (59/59 HTTP, 173/173 browser), though rendered content is
+NOT VERIFIED. PPT, PPS, ODP and FODP only produce a blank deck and FODT produces
+no save, so those five stay unrouted. The replacement baseline therefore remains
+a partial, honest subset.
 
 ### Real Seafile routing replay — 2026-11-09 (opt-in `--viewing`)
 

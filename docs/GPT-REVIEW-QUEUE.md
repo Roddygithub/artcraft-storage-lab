@@ -49,9 +49,11 @@ open a blank 5,048-byte deck, and FODT produces no save even with longer waits.
 
 The marker detector now scans generic OPC XML parts (with a focused test), the
 probe accepts `--cases`/timeouts and retains the saved payload privately, and
-FODS was added to the opt-in viewing candidate because GridCraft is already in
-it. PPSX stays unrouted because DeckCraft is not a viewing-candidate editor.
-No real-Seafile route replay covers the new FODS route; it is NOT VERIFIED.
+FODS (GridCraft) and PPSX (DeckCraft) were both added to the opt-in viewing
+candidate. A fresh `--viewing` replay on Seafile CE 13.0.28 passed HTTP **59/59**
+and browser **173/173** (29 viewing checks): both routes open from the file list,
+download nothing and write no version, and the native `.deckcraft` workflow
+passes again. Rendered legacy content is still NOT VERIFIED.
 
 Independent review of GR-088 NOT PERFORMED. Project remains INCOMPLETE and
 upstream publication LOCKED. Evidence:

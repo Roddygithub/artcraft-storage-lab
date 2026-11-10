@@ -263,7 +263,7 @@ class LauncherTest(unittest.TestCase):
                 self.assertNotIn('onlyoffice', args)
                 if args[-2:-1] == ['-c'] and 'with p.open' in args[-1]:
                     self.assertIn('ENABLE_ONLYOFFICE = False', args[-1])
-                    self.assertEqual("OFFICE_WEB_APP_FILE_EXTENSION += ('pptx',)" in args[-1], pptx)
+                    self.assertEqual("OFFICE_WEB_APP_FILE_EXTENSION += ('pptx', 'deckcraft')" in args[-1], pptx)
                     editors = json.loads((run / 'app/lab/real-seafile/editors.json').read_text())
                     self.assertEqual('deckcraft' in editors, pptx)
                 self.assertEqual(env['SEAFILE_PUBLIC_URL'], 'https://seafile.test' if public else '')

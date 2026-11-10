@@ -829,8 +829,8 @@ def wait_for_wordcraft_document(page, timeout=90):
 
 
 # Opt-in (VIEWING_FORMATS=1) import probe for the legacy/OpenDocument viewing
-# fixtures. Only the formats whose pinned upstream bundle documents an import are
-# listed, and the same map as editors.viewing.json routes them.
+# fixtures. Formats with a documented or probe-proven import are listed, and the
+# same map as editors.viewing.json routes them.
 LEGACY_VIEWING_FIXTURES = {
     "doc.doc": "wordcraft",
     "doc.odt": "wordcraft",
@@ -838,6 +838,7 @@ LEGACY_VIEWING_FIXTURES = {
     "sheet.ods": "gridcraft",
     "sheet.fods": "gridcraft",
     "sheet.csv": "gridcraft",
+    "slide.ppsx": "deckcraft",
 }
 LEGACY_VIEWING_MARKER = "GR-LEGACY-MARKER-20261108"
 

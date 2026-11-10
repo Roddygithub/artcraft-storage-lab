@@ -1,0 +1,19 @@
+{
+ "source_reference": "91d8c7f plus the GR-088 FODS/PPSX routing changes (committed after this run)",
+ "seafile_version": "13.0.28",
+ "mode": "--viewing (documented five + FODS->GridCraft + PPSX->DeckCraft + native deckcraft)",
+ "static_manifest_sha256": "ad0c4371f18cb20ed6a085ac42d965db9df1b8a8af891df15bb52c48422a4c89",
+ "run_directory": "~/.cache/artcraft-storage-lab/viewing-fods-ppsx-20261110-r2 (private; not retained)",
+ "retained": [
+  "slice.json (sanitized: no repo id, tokens, WOPISrc or per-run accounts)",
+  "browser.json (sanitized: same; 29 viewing checks)"
+ ],
+ "launcher_exit": "not captured (session interrupted after the browser container finished; containers removed manually)",
+ "fixtures": "lab/real-seafile/fixtures/legacy/ (SHA256SUMS pinned)",
+ "limits": [
+  "routing and safety only: no rendered legacy content and no legacy save",
+  "bundle import proof: scripts/probe-legacy-import.py 7/7 PASS (separate, offline)",
+  "FODT/FODP/PPT/ODP/PPS intentionally have no route",
+  "independent review of this run NOT PERFORMED"
+ ]
+}

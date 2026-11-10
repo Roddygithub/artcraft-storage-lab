@@ -232,15 +232,17 @@ documentation.
 | Default, `--pptx` and six-editor replays (earlier, retained) | 119/119; seven-editor 132/132; PPTX focused 15/15 |
 | Independent free review at `265897f` | PROVISIONAL PASS, no blocker/major; two Playwright-dependency minors remediated |
 | GR-088 undocumented-import probe | FODS→GridCraft and PPSX→DeckCraft import; PPT/PPS/ODP/FODP blank deck; FODT no save |
+| GR-088 FODS/PPSX replay (2026-11-10) | HTTP 59/59, browser 173/173 (29 viewing checks); both routes open from Seafile, no download, no version write |
 
 Scope frozen: the default six unmodified Craft bundles, the opt-in DeckCraft
 PPTX candidate, and the opt-in documented-import legacy routes (DOC/ODT to
 WordCraft, XLS/ODS/CSV to GridCraft).
 
 Still NOT VERIFIED: rendered legacy content inside one combined host+browser
-session, the six formats that remain unrouted, broad document fidelity, human
+session, the five formats that remain unrouted, broad document fidelity, human
 HTTPS/hardware acceptance, production behavior and the project-level GPT PASS.
-The FODS opt-in route is configured but its real-Seafile route is NOT VERIFIED.
+The FODS and PPSX opt-in routes are browser-verified (HTTP 59/59, browser
+173/173); rendered content is NOT VERIFIED.
 The independent free review is PROVISIONAL only.
 
 Verdict: implementation and evidence are **frozen** at `864fc77`, integrated on

@@ -214,8 +214,9 @@ def main():
         shutil.copyfile(run / 'app/lab/real-seafile/editors.viewing.json', editor_config)
     if args.pptx:
         editors = json.loads(editor_config.read_text())
+        extensions = set((editors.get('deckcraft') or {}).get('extensions', [])) | {'pptx', 'deckcraft'}
         editors['deckcraft'] = dict(app='deckcraft', label='DeckCraft v0.16.0 (upstream, unpatched)',
-                                    extensions=['pptx'], url='/editors/deckcraft/index.html?host=parent')
+                                    extensions=sorted(extensions), url='/editors/deckcraft/index.html?host=parent')
         editor_config.write_text(json.dumps(editors, indent=2) + '\n')
     # Seahub settings.py reapplies these Docker values after user settings.
     # They must match the external origin or minted WOPISrc stays internal.
@@ -239,13 +240,13 @@ def main():
         config_path = run / 'app/lab/real-seafile/seahub_settings.extra.py'
     config = config_path.read_text()
     if args.pptx:
-        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('pptx',)\n"
-                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('pptx',)\n")
+        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('pptx', 'deckcraft')\n"
+                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('pptx', 'deckcraft')\n")
     if args.viewing:
-        # Only the formats with a documented upstream import are routed; the lab
-        # slice asserts the other viewing formats have no WOPI route.
-        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('doc', 'odt', 'xls', 'ods', 'csv')\n"
-                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('doc', 'odt', 'xls', 'ods', 'csv')\n")
+        # Only formats with a documented or probe-proven import are routed; the
+        # lab slice asserts the other viewing formats have no WOPI route.
+        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('doc', 'odt', 'xls', 'ods', 'csv', 'fods', 'ppsx', 'deckcraft')\n"
+                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('doc', 'odt', 'xls', 'ods', 'csv', 'fods', 'ppsx', 'deckcraft')\n")
     config += '\nENABLE_ONLYOFFICE = False\n'
     config = render_settings(config, False,
                              args.seafile_public_url, args.bridge_public_url)

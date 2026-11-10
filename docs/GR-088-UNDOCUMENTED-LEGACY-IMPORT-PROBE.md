@@ -41,17 +41,32 @@ payload per case for inspection. `run_slice.viewing_payload_has_marker` now also
 scans generic OPC XML parts, so a PPTX slide is detected instead of being
 reported as a missing marker; `tests/test_legacy_fixtures.py` covers that case.
 
-Routing: only `fods` was added to the opt-in candidate
-(`lab/real-seafile/editors.viewing.json`) because GridCraft is already part of
-it. `ppsx` stays unrouted: DeckCraft is not part of the viewing candidate, and
-adding an editor without a real-Seafile replay would be an unverified change.
+Routing: both importable formats are now in the opt-in candidate
+(`lab/real-seafile/editors.viewing.json`): `fods` to GridCraft and `ppsx` to
+DeckCraft. The DeckCraft bundle is staged in the verified static, its native
+`deckcraft` extension is included so its own workflow keeps a route, and
+Seahub's `--viewing` WOPI tuples include `fods`, `ppsx` and `deckcraft`. Their
+real-Seafile routes were verified by the replay below.
+
+## Real-Seafile replay — 2026-11-10
+
+A fresh rootless `--viewing` lab on Seafile CE 13.0.28 passed HTTP **59/59** and
+browser **173/173**, including **29** viewing checks. FODS opens from the Seafile
+file-list click, routes to GridCraft, downloads nothing and writes no version;
+PPSX does the same through DeckCraft; the native `.deckcraft` workflow passes
+again; the documented five still pass; and FODT/FODP/PPT/ODP/PPS still have no
+route. Sanitized evidence and verifier:
+`lab/real-seafile/results/2026-11-10-viewing-fods-ppsx/` (verifier PASS).
+
+The launcher was interrupted after the browser container finished, so its final
+exit code was not captured; the browser wrote a complete result and the project
+containers were removed manually. No runtime/save of the legacy fixtures is
+claimed, and rendered content remains NOT VERIFIED.
 
 ## Limits
 
-* Bundle-level only: no host page, bridge, Seafile route or new version. The
-  `fods` route is configured and offline-checked, but its real-Seafile routing
-  is **NOT VERIFIED** until the next `--viewing` replay.
+* Bundle-level probe for the import claim; the replay above covers routing and
+  safety only. Neither proves rendered content or a legacy save.
 * One synthetic fixture per format; no fidelity claim.
-* Six formats remain unrouted: FODT, FODP, PPT, ODP, PPS and PPSX (PPSX is
-  import-proven but has no viewing-candidate editor).
+* Five formats remain unrouted and unimportable: FODT, FODP, PPT, ODP and PPS.
 * No independent review of GR-088 yet. Project INCOMPLETE; upstream LOCKED.

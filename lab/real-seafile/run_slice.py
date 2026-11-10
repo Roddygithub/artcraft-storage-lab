@@ -500,15 +500,15 @@ def viewing_payload_has_marker(payload: bytes, marker: str = "GR-LEGACY-MARKER-2
     return False, "marker not in the serialized document"
 
 
-# Opt-in (VIEWING_FORMATS=1) legacy/OpenDocument viewing routes. Only the formats
-# with a documented upstream import are routed; the rest must stay without a WOPI
-# route. Fixture file -> (extension, expected editor or None).
+# Opt-in (VIEWING_FORMATS=1) legacy/OpenDocument viewing routes. Only formats
+# with a documented or probe-proven upstream import are routed; the rest must
+# stay without a WOPI route. Fixture file -> (extension, expected editor or None).
 LEGACY_VIEWING = {
     "doc.doc": ("doc", "wordcraft"), "doc.odt": ("odt", "wordcraft"), "doc.fodt": ("fodt", None),
     "sheet.xls": ("xls", "gridcraft"), "sheet.ods": ("ods", "gridcraft"), "sheet.fods": ("fods", "gridcraft"),
     "sheet.csv": ("csv", "gridcraft"),
     "slide.ppt": ("ppt", None), "slide.odp": ("odp", None), "slide.fodp": ("fodp", None),
-    "slide.pps": ("pps", None), "slide.ppsx": ("ppsx", None),
+    "slide.pps": ("pps", None), "slide.ppsx": ("ppsx", "deckcraft"),
 }
 
 
