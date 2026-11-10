@@ -14,7 +14,7 @@ historical GR corpus to resume routine validation.
 | Mechanical evidence self-audit | 17 evidence directories: hashes, verifiers, provenance ancestors and secret scan PASS; NOT an independent review | `scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261108/FORENSIC-AUDIT-20261110.md` |
 | Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
-| Independent review / final project GPT gate | free review PROVISIONAL PASS at `265897f`; GPT gate NOT PERFORMED (quota) | `reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md` |
+| Independent review / final project GPT gate | free review PROVISIONAL PASS at `265897f`; delta review at `7d18afb` PROVISIONAL PASS (3 MINOR, remediated); GPT gate NOT PERFORMED (quota) | `reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md`, `...-DELTA.md` |
 
 ONLYOFFICE is retired; do not restart compatibility campaigns. Production is
 outside this validation run. Upstream remains LOCKED. An automated subset PASS
@@ -69,8 +69,10 @@ prove full pagination or font fidelity.
 3. Project GPT gate (Luna auditor and Sol final reviewer). A mechanical self-audit of the
    committed evidence passes at 17 directories but is not independent. An independent free
    review at `265897f` returned PROVISIONAL PASS with two Playwright-dependency
-   minors, now remediated; the `openai` provider quota still blocks the GPT
-   audit. No global PASS has been granted.
+   minors, now remediated, and an independent free review of the payload-evidence
+   delta at `7d18afb` returned PROVISIONAL PASS with three MINOR, all remediated;
+   the `openai` provider quota still blocks the GPT audit. No global PASS has been
+   granted.
 
 The default six-editor candidate remains unchanged. Add `--pptx` and the
 verified official DeckCraft assets for the validated seven-editor option.

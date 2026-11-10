@@ -45,8 +45,9 @@ Do not run the historical ONLYOFFICE campaigns below.
    returned PROVISIONAL PASS with two Playwright-dependency minors, remediated.
    A mechanical self-audit (`scripts/forensic-audit.py`) re-checks committed
    hashes, verifiers, provenance ancestry and secrets over 17 evidence
-   directories; it is not independent. The project GPT gate itself is pending
-   (provider quota).
+   directories; it is not independent. An independent free review of the
+   payload-evidence delta at `7d18afb` returned PROVISIONAL PASS with three MINOR,
+   all remediated. The project GPT gate itself is pending (provider quota).
 
 ## Historical next steps (superseded where they require ONLYOFFICE)
 

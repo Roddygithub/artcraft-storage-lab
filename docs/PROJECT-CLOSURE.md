@@ -275,6 +275,10 @@ change to the candidate itself:
   runs their verifiers, checks provenance ancestry and scans for secrets; its
   result is a self-audit, **not** independent review.
 
+An independent free review of this delta at `7d18afb` returned **PROVISIONAL
+PASS** with three MINOR (placeholder naming, an over-broad date-token skip in the
+self-audit, synthetic account defaults in the offline probe), all remediated; see
+`docs/reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110-DELTA.md`.
 Offline validation re-ran **20/20** at `5aa134a`. Still NOT VERIFIED: rendered
 legacy pixels (a canvas non-blank test would also pass on an empty sheet, so it
 cannot prove an import), legacy/OpenDocument saves, hardware acceptance and the

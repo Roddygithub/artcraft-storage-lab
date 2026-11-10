@@ -56,8 +56,11 @@ commit. `scripts/forensic-audit.py` re-checks 17 evidence directories (hashes,
 verifiers, provenance ancestry, secret scan) as a self-audit; it is not
 independent. `LEGACY-CONVERSION-FEASIBILITY.md` records that the five unrouted
 formats need a converted name/extension, i.e. a bridge architecture decision.
-Rendered legacy pixels, legacy saves, hardware acceptance and independent review
-of this delta remain NOT VERIFIED. Project INCOMPLETE; upstream LOCKED.
+An independent free review of this delta at `7d18afb` returned **PROVISIONAL
+PASS** with three MINOR (placeholder naming, an over-broad date-token skip in the
+audit, synthetic account defaults in the offline probe), all remediated. Rendered
+legacy pixels, legacy saves, hardware acceptance and the project GPT gate remain
+NOT VERIFIED. Project INCOMPLETE; upstream LOCKED.
 
 ## GR-088 — undocumented legacy/OpenDocument import probe
 
