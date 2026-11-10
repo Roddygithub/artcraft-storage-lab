@@ -9,7 +9,9 @@ historical GR corpus to resume routine validation.
 | Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
 | All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
 | Official DeckCraft PPTX opt-in | focused 15/15; combined HTTP 40/40, browser 132/132, exit 0 | `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
-| Remaining office viewing formats and broad fidelity | Fixtures; `--viewing` browser routing 140/140 (21 viewing checks); bundle import 5/5 documented + 2/7 undocumented (FODS, PPSX); FODS/PPSX browser routes verified (59/59, 173/173); rendered content NOT VERIFIED | `GR-088-UNDOCUMENTED-LEGACY-IMPORT-PROBE.md`, `results/2026-11-09-legacy-viewing-browser/`, `results/2026-11-10-viewing-fods-ppsx/` |
+| Remaining office viewing formats and broad fidelity | Fixtures; `--viewing` browser routing 140/140 (21 viewing checks); bundle import 5/5 documented + 2/7 undocumented (FODS, PPSX); FODS/PPSX browser routes verified (59/59, 173/173); routed formats' payload delivery verified (59/59, 67/67); rendered content NOT VERIFIED | `GR-088-UNDOCUMENTED-LEGACY-IMPORT-PROBE.md`, `results/2026-11-09-legacy-viewing-browser/`, `results/2026-11-10-viewing-fods-ppsx/`, `results/2026-11-10-viewing-relay-bytes/` |
+| Routed legacy payload delivery | HTTP 59/59, browser 67/67 (43 viewing checks): all seven routed formats' editors received the exact fixture bytes, marker included | `results/2026-11-10-viewing-relay-bytes/` |
+| Mechanical evidence self-audit | 17 evidence directories: hashes, verifiers, provenance ancestors and secret scan PASS; NOT an independent review | `scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261108/FORENSIC-AUDIT-20261110.md` |
 | Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent review / final project GPT gate | free review PROVISIONAL PASS at `265897f`; GPT gate NOT PERFORMED (quota) | `reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md` |
@@ -56,11 +58,16 @@ prove full pagination or font fidelity.
    still NOT VERIFIED: the nested same-origin `/relay/file` request fires before
    a listener can attach. GR-088 then probed the other seven: FODS (GridCraft)
    and PPSX (DeckCraft) import at bundle level, while PPT, PPS, ODP and FODP only
-   open a blank deck and FODT does not save. FODS and PPSX are in the opt-in
-   route and passed the 2026-11-10 real browser replay (59/59, 173/173); five
-   formats remain unrouted.
+   open a blank deck and FODT does not save.   FODS and PPSX are in the opt-in route and passed the 2026-11-10 real browser replay (59/59, 173/173); five
+   formats remain unrouted. A focused replay then captured the bridge's `/relay/file` response per
+   routed format (HTTP 59/59, browser 67/67, 43 viewing checks, `results/2026-11-10-viewing-relay-bytes/`):
+   every routed editor received the exact fixture bytes with the marker, while rendered pixels remain
+   NOT VERIFIED. For the five unrouted formats, `LEGACY-CONVERSION-FEASIBILITY.md` shows a converter is
+   viable only if the bridge also presents a converted name/extension — an architectural decision, not a
+   routing flag.
 2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
-3. Project GPT gate (Luna auditor and Sol final reviewer). An independent free
+3. Project GPT gate (Luna auditor and Sol final reviewer). A mechanical self-audit of the
+   committed evidence passes at 17 directories but is not independent. An independent free
    review at `265897f` returned PROVISIONAL PASS with two Playwright-dependency
    minors, now remediated; the `openai` provider quota still blocks the GPT
    audit. No global PASS has been granted.

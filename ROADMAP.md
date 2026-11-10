@@ -32,13 +32,21 @@ Do not run the historical ONLYOFFICE campaigns below.
    browser 140/140, 21 viewing checks) and a bundle import probe (5/5) are
    committed. GR-088 adds bundle-level proof that FODS and PPSX import; both are
    routed and passed a real browser replay (59/59 HTTP, 173/173 browser), while
-   five formats remain unimportable and unrouted. Rendered legacy content in the
-   combined run and hardware WebGPU/clipboard/font/unload acceptance remain NOT
-   VERIFIED.
+   five formats remain unimportable and unrouted. A focused 2026-11-10 replay
+   then captured the bridge's `/relay/file` payload per routed format (59/59
+   HTTP, 67/67 browser, 43 viewing checks): every routed editor received the exact
+   fixture bytes with the marker. Rendered pixels, legacy saves and hardware
+   WebGPU/clipboard/font/unload acceptance remain NOT VERIFIED.
+   `LEGACY-CONVERSION-FEASIBILITY.md` records that converting the five unrouted
+   formats only imports when a converted name/extension is presented too — a
+   bridge architecture change, not a routing flag.
 4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
    Evidence is frozen at `864fc77`, pushed as `265897f`; an independent free review
    returned PROVISIONAL PASS with two Playwright-dependency minors, remediated.
-   The project GPT gate itself is pending (provider quota).
+   A mechanical self-audit (`scripts/forensic-audit.py`) re-checks committed
+   hashes, verifiers, provenance ancestry and secrets over 17 evidence
+   directories; it is not independent. The project GPT gate itself is pending
+   (provider quota).
 
 ## Historical next steps (superseded where they require ONLYOFFICE)
 
