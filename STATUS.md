@@ -5,7 +5,24 @@
 > `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT — legacy/OpenDocument viewing fixtures committed (GR-087)
+## CURRENT — routed legacy payload delivery proven (2026-11-10)
+
+At `5aa134a`, the opt-in `--viewing` probe no longer stops at routing: it captures
+the bridge's `/relay/file` response and requires it to equal the committed fixture,
+marker included (DOC OLE/UTF-16LE, ODT `content.xml`, XLS OLE/UTF-8, ODS
+`content.xml`, FODS/CSV plain text, PPSX `ppt/slides/slide1.xml`). A focused real
+Seafile CE 13.0.28 replay passed HTTP **59/59** and browser **67/67** with **43**
+viewing checks; sanitized summaries, provenance and a verifier are in
+`lab/real-seafile/results/2026-11-10-viewing-relay-bytes/`. Offline validation is
+**20/20** at the same commit and the mechanical self-audit re-checks **17**
+evidence directories (hashes, verifiers, provenance ancestry, secret scan).
+`docs/LEGACY-CONVERSION-FEASIBILITY.md` records that the five unrouted formats need
+a converted name/extension, i.e. a bridge architecture decision. Rendered legacy
+pixels, legacy saves, human HTTPS/hardware acceptance and the project GPT gate
+remain open; the self-audit is not independent. Project INCOMPLETE; upstream
+LOCKED.
+
+## PREVIOUS — legacy/OpenDocument viewing fixtures committed (GR-087)
 
 At `2c112fc`, one deterministic synthetic fixture now exists for every remaining
 ONLYOFFICE viewing format (DOC, ODT, FODT, XLS, ODS, FODS, CSV, PPT, ODP, FODP,

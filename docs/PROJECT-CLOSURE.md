@@ -252,3 +252,30 @@ remediated; the project GPT gate remains unavailable (provider quota). Project
 **INCOMPLETE** until the owner-controlled gates close (project GPT gate, human
 HTTPS desktop acceptance). Upstream publication remains **LOCKED**. This freeze
 is not a global PASS and must not be presented as one.
+
+## Routed legacy payload delivery and self-audit — 2026-11-10
+
+The freeze above is extended by evidence added at `5aa134a`, with no runtime
+change to the candidate itself:
+
+* The opt-in `--viewing` probe now captures the bridge's `/relay/file` response
+  and requires byte equality with the committed fixture plus the
+  `GR-LEGACY-MARKER-20261108` marker. A focused replay on Seafile CE 13.0.28
+  passed HTTP **59/59** and browser **67/67** with **43** viewing checks, so all
+  seven routed formats (DOC, ODT, XLS, ODS, FODS, CSV, PPSX) delivered the exact
+  fixture bytes to WordCraft/GridCraft/DeckCraft. Sanitized summaries, provenance
+  and a runnable verifier: `lab/real-seafile/results/2026-11-10-viewing-relay-bytes/`.
+* The earlier retained summaries were re-redacted (per-run accounts, `repo_id`,
+  WOPISrc values, WOPI file ids) and their verifiers now reject those values.
+* `docs/LEGACY-CONVERSION-FEASIBILITY.md` records that converting the five
+  unrouted formats (FODT, FODP, PPT, ODP, PPS) only imports when a converted
+  name/extension is presented too — an owner architecture decision, not a
+  routing flag.
+* `scripts/forensic-audit.py` mechanically re-hashes 17 evidence directories,
+  runs their verifiers, checks provenance ancestry and scans for secrets; its
+  result is a self-audit, **not** independent review.
+
+Offline validation re-ran **20/20** at `5aa134a`. Still NOT VERIFIED: rendered
+legacy pixels (a canvas non-blank test would also pass on an empty sheet, so it
+cannot prove an import), legacy/OpenDocument saves, hardware acceptance and the
+project GPT gate. Project remains **INCOMPLETE**; upstream **LOCKED**.

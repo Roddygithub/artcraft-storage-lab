@@ -1,9 +1,11 @@
 # ArtCraft Storage Lab
 
-> **2026-11-10:** project **INCOMPLETE**. Evidence is frozen at `864fc77`; the
-> owner authorized ONLYOFFICE retirement and the active lab targets Craft only.
-> Rendered legacy content, HTTPS/hardware acceptance and the final independent
-> gate remain open. See [the closure ledger](docs/PROJECT-CLOSURE.md).
+> **2026-11-10:** project **INCOMPLETE**. Evidence is frozen at `864fc77` and
+> extended by the routed-legacy payload replay and the mechanical self-audit at
+> `5aa134a`; the owner authorized ONLYOFFICE retirement and the active lab
+> targets Craft only. Rendered legacy content, HTTPS/hardware acceptance and the
+> final independent gate remain open. See
+> [the closure ledger](docs/PROJECT-CLOSURE.md).
 
 
 > Open a file in Seafile Web, edit it in a Craft web editor, save, and get a normal Seafile

@@ -5,7 +5,7 @@ historical GR corpus to resume routine validation.
 
 | Scope | State | Evidence |
 | --- | --- | --- |
-| Active offline checks | 20/20 command groups PASS, re-verified 2026-11-10 at `864fc77` | `uv run --with playwright --with pillow python scripts/validate-candidate.py` |
+| Active offline checks | 20/20 command groups PASS, re-verified 2026-11-10 at `5aa134a` | `uv run --with playwright --with pillow python scripts/validate-candidate.py` |
 | Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
 | All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
 | Official DeckCraft PPTX opt-in | focused 15/15; combined HTTP 40/40, browser 132/132, exit 0 | `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |

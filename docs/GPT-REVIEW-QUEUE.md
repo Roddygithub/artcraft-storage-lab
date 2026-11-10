@@ -39,6 +39,26 @@ publication LOCKED. Evidence: `docs/GR-074-HTTP-BODY-FRAMING.md`,
 
 # GPT Review Queue
 
+## Routed legacy payload delivery and mechanical self-audit (2026-11-10)
+
+Candidate `5aa134a` (evidence added after the `864fc77` freeze; no runtime change
+to the six/seven-editor candidate). The opt-in `--viewing` probe now captures the
+bridge's `/relay/file` response and requires byte equality with the committed
+fixture plus the marker, covering DOC (OLE/UTF-16LE), ODT (`content.xml`), XLS
+(OLE/UTF-8), ODS (`content.xml`), FODS/CSV (plain text) and PPSX
+(`ppt/slides/slide1.xml`). A focused real replay on Seafile CE 13.0.28 passed
+HTTP **59/59** and browser **67/67** (**43** viewing checks); sanitized summaries,
+provenance and a verifier are retained in
+`lab/real-seafile/results/2026-11-10-viewing-relay-bytes/`. Earlier retained
+summaries were re-redacted and their verifiers now reject accounts, `repo_id`,
+WOPISrc values and WOPI file ids. Offline validation is **20/20** at the same
+commit. `scripts/forensic-audit.py` re-checks 17 evidence directories (hashes,
+verifiers, provenance ancestry, secret scan) as a self-audit; it is not
+independent. `LEGACY-CONVERSION-FEASIBILITY.md` records that the five unrouted
+formats need a converted name/extension, i.e. a bridge architecture decision.
+Rendered legacy pixels, legacy saves, hardware acceptance and independent review
+of this delta remain NOT VERIFIED. Project INCOMPLETE; upstream LOCKED.
+
 ## GR-088 — undocumented legacy/OpenDocument import probe
 
 Candidate `1a848f4` plus this item's commits. Rather than infer from upstream
