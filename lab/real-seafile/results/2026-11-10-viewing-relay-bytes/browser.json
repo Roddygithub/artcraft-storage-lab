@@ -1,0 +1,342 @@
+{
+ "ran_at": "2026-11-10T01:53:00Z",
+ "passed": 67,
+ "failed": 0,
+ "checks": [
+  {
+   "name": "viewing_probe_authenticated_session",
+   "ok": true,
+   "detail": "attempts=1 url=http://seafile.lab/"
+  },
+  {
+   "name": "viewing_doc_doc_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_doc_doc_routes_to_wordcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src>&ui=en-US&rs=en-US&lang=en-US frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/doc.d', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_doc_doc_editor_received_the_fixture",
+   "ok": true,
+   "detail": "captured=True bytes=9216 expected=9216"
+  },
+  {
+   "name": "viewing_doc_doc_editor_payload_contains_the_marker",
+   "ok": true,
+   "detail": "ole utf-16le"
+  },
+  {
+   "name": "viewing_doc_doc_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_doc_doc_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_doc_odt_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_doc_odt_routes_to_wordcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src>&ui=en-US&rs=en-US&lang=en-US frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/doc.o', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_doc_odt_editor_received_the_fixture",
+   "ok": true,
+   "detail": "captured=True bytes=9325 expected=9325"
+  },
+  {
+   "name": "viewing_doc_odt_editor_payload_contains_the_marker",
+   "ok": true,
+   "detail": "odt content.xml"
+  },
+  {
+   "name": "viewing_doc_odt_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_doc_odt_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_sheet_xls_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_sheet_xls_routes_to_gridcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src>&ui=en-US&rs=en-US&lang=en-US frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/sheet', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_sheet_xls_editor_received_the_fixture",
+   "ok": true,
+   "detail": "captured=True bytes=5632 expected=5632"
+  },
+  {
+   "name": "viewing_sheet_xls_editor_payload_contains_the_marker",
+   "ok": true,
+   "detail": "ole utf-8"
+  },
+  {
+   "name": "viewing_sheet_xls_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_sheet_xls_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_sheet_ods_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_sheet_ods_routes_to_gridcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src>&ui=en-US&rs=en-US&lang=en-US frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/sheet', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_sheet_ods_editor_received_the_fixture",
+   "ok": true,
+   "detail": "captured=True bytes=8763 expected=8763"
+  },
+  {
+   "name": "viewing_sheet_ods_editor_payload_contains_the_marker",
+   "ok": true,
+   "detail": "odt content.xml"
+  },
+  {
+   "name": "viewing_sheet_ods_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_sheet_ods_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_sheet_fods_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_sheet_fods_routes_to_gridcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src>&ui=en-US&rs=en-US&lang=en-US frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/sheet', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_sheet_fods_editor_received_the_fixture",
+   "ok": true,
+   "detail": "captured=True bytes=15767 expected=15767"
+  },
+  {
+   "name": "viewing_sheet_fods_editor_payload_contains_the_marker",
+   "ok": true,
+   "detail": "plain text"
+  },
+  {
+   "name": "viewing_sheet_fods_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_sheet_fods_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_sheet_csv_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_sheet_csv_routes_to_gridcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src>&ui=en-US&rs=en-US&lang=en-US frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/sheet', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_sheet_csv_editor_received_the_fixture",
+   "ok": true,
+   "detail": "captured=True bytes=42 expected=42"
+  },
+  {
+   "name": "viewing_sheet_csv_editor_payload_contains_the_marker",
+   "ok": true,
+   "detail": "plain text"
+  },
+  {
+   "name": "viewing_sheet_csv_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_sheet_csv_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "viewing_slide_ppsx_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "viewing_slide_ppsx_routes_to_deckcraft",
+   "ok": true,
+   "detail": "host=http://bridge:8778/edit/deckcraft?WOPISrc=<wopi-src>&ui=en-US&rs=en-US&lang=en-US frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/slide', None), ('office_frame', 'http://bridge:8778/edit/deckcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/deckcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "viewing_slide_ppsx_editor_received_the_fixture",
+   "ok": true,
+   "detail": "captured=True bytes=23994 expected=23994"
+  },
+  {
+   "name": "viewing_slide_ppsx_editor_payload_contains_the_marker",
+   "ok": true,
+   "detail": "opc ppt/slides/slide1.xml"
+  },
+  {
+   "name": "viewing_slide_ppsx_open_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  },
+  {
+   "name": "viewing_slide_ppsx_open_wrote_no_version",
+   "ok": true,
+   "detail": "history=1 (opening a document must not write)"
+  },
+  {
+   "name": "browser_login",
+   "ok": true,
+   "detail": "http://seafile.lab/"
+  },
+  {
+   "name": "browser_editor_filter_selects_requested_editor",
+   "ok": true,
+   "detail": "selected=['test.docx']"
+  },
+  {
+   "name": "wordcraft_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "wordcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/test.', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "wordcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 10s"
+  },
+  {
+   "name": "wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=browsertyped608e7807b8 status='unsaved changes'"
+  },
+  {
+   "name": "wordcraft_save_request_carries_the_typed_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browsertyped608e7807b8"
+  },
+  {
+   "name": "wordcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 top={'id': 'ab2fdc67606836605b541c83bcd62ca45d53a986', 'rev_file_id': '4c5c2c95a3d1d864090f4356e3c6a74741268169', 'creator': '<run-admin>', 'desc': 'Modified \"test.docx\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_saved_docx_contains_the_typed_marker",
+   "ok": true,
+   "detail": "marker=browsertyped608e7807b8 len=6597 bytes_identical_to_original=False"
+  },
+  {
+   "name": "wordcraft_save_is_not_identical_bytes",
+   "ok": true,
+   "detail": "887 -> 6597 bytes"
+  },
+  {
+   "name": "wordcraft_saved_docx_bytes_look_right",
+   "ok": true,
+   "detail": "len=6597"
+  },
+  {
+   "name": "wordcraft_reopen_fresh_seafile_session",
+   "ok": true,
+   "detail": "http://seafile.lab/"
+  },
+  {
+   "name": "wordcraft_reopened_from_seafile_file_list",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "wordcraft_reopen_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/777eb365-9889-4723-83be-3533e6ac2ce4/file/test.', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?WOPISrc=<wopi-src> ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?host=parent', 'office_frame')]"
+  },
+  {
+   "name": "wordcraft_reopen_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "relay/file responses=1 after 64s"
+  },
+  {
+   "name": "wordcraft_reopen_bytes_identical_to_the_saved_version",
+   "ok": true,
+   "detail": "len=6597 vs saved 6597"
+  },
+  {
+   "name": "wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=browserreopened07754fb8ea status='unsaved changes'"
+  },
+  {
+   "name": "wordcraft_reopen_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_reopen_second_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 2->3 top={'id': '6f26ba2dea62fd2693cccb72927a3a04c0b97142', 'rev_file_id': 'f09dd5e93f120a0c3458758dadce002297891422', 'creator': '<run-admin>', 'desc': 'Modified \"test.docx\"'} status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_reopen_seafile_holds_both_markers",
+   "ok": true,
+   "detail": "marker=browserreopened07754fb8ea len=6633"
+  },
+  {
+   "name": "wordcraft_reopen_editor_holds_the_original_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browsertyped608e7807b8"
+  },
+  {
+   "name": "wordcraft_reopen_editor_holds_the_second_typed_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browserreopened07754fb8ea"
+  },
+  {
+   "name": "wordcraft_saves_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  }
+ ]
+}

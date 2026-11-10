@@ -934,13 +934,13 @@ def main():
             real file list, and require Seahub to route it to the documented editor
             (the office frame URL is /edit/<editor>) with no download and no write.
 
-            Scope boundary: the exact bytes handed to the editor (/relay/file) and the
-            editor's imported model cannot be captured in this combined run — the
-            request fires before any listener can attach (nested same-origin iframe
-            load order). Those two assertions live in the bundle-level probe
-            (scripts/probe-legacy-import.py, 5/5 PASS), which loads the same bundles
-            and opens the same fixtures directly. This probe therefore asserts
-            routing and safety only, and never a save."""
+            Scope boundary: the exact bytes Seahub serves through the bridge are
+            captured from the /relay/file response and compared with the fixture,
+            including the fixture marker. Rendered pixels are not asserted: the
+            screenshot can fire before the editor has rendered, and OCR is not a
+            reliable substitute. Bundle-level parse proof remains
+            scripts/probe-legacy-import.py (7/7 PASS). This probe never saves and
+            never writes a version."""
             # Authenticate first (the main queue logs in before its first open). Seahub can
             # still be warming up right after the slice, so retry the login form briefly.
             logged_in = False
@@ -960,6 +960,15 @@ def main():
             check("viewing_probe_authenticated_session", logged_in,
                   f"attempts={attempt + 1} url={page.url}")
 
+            relay_responses: list = []
+
+            def capture_relay_response(response):
+                if (response.status == 200
+                        and response.url.split("?", 1)[0].endswith("/relay/file")):
+                    relay_responses.append(response)
+
+            page.context.on("response", capture_relay_response)
+
             directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "legacy")
             base = page
             for name, editor in LEGACY_VIEWING_FIXTURES.items():
@@ -972,6 +981,7 @@ def main():
                     content = fixture_file.read()
                 ids[name] = rs.upload(admin, repo_id, name, content)
                 downloads.clear()
+                relay_responses.clear()
                 try:
                     try:
                         page = open_from_seafile_list(page, rs.SEAFILE, repo_id, name)
@@ -987,6 +997,23 @@ def main():
                           f"host={host.url if host else None} frames={frames_dump(page)}")
                     if routed:
                         page.screenshot(path=os.path.join(RESULTS, f"viewing-{slug}.png"))
+                    relay_body = None
+                    if routed:
+                        end = time.monotonic() + 30
+                        while time.monotonic() < end and not relay_responses:
+                            page.wait_for_timeout(200)
+                        if relay_responses:
+                            try:
+                                relay_body = relay_responses[-1].body()
+                            except Exception:  # noqa: BLE001 - body may be gone after navigation
+                                relay_body = None
+                    check(f"viewing_{slug}_editor_received_the_fixture",
+                          relay_body == content,
+                          f"captured={relay_body is not None} "
+                          f"bytes={len(relay_body) if relay_body else 0} expected={len(content)}")
+                    marker_ok, marker_kind = rs.viewing_payload_has_marker(relay_body or b"")
+                    check(f"viewing_{slug}_editor_payload_contains_the_marker",
+                          marker_ok, marker_kind if relay_body else "no /relay/file body")
                     check(f"viewing_{slug}_open_did_not_download", not downloads,
                           f"downloads={len(downloads)}")
                     versions = len(rs.history(admin, repo_id, name))
@@ -996,6 +1023,7 @@ def main():
                     if page is not base:
                         page.close()
                         page = base
+            page.context.remove_listener("response", capture_relay_response)
             return page
 
         if os.environ.get("VIEWING_FORMATS") and (not only_editor or only_editor in ("wordcraft", "gridcraft")):

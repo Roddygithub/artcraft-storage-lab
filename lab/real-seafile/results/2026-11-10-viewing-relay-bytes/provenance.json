@@ -1,0 +1,23 @@
+{
+ "source_reference": "337e4ea plus the relay-capture probe changes (run_browser.py /relay/file payload checks, run_slice.py OLE marker detection), committed after this run",
+ "seafile_version": "13.0.28",
+ "mode": "--viewing --editor wordcraft (seven routed formats + focused WordCraft edit/save/reopen)",
+ "static_manifest_sha256": "5f0cef84fe03efb916496be2df103b9661ee293a19f7e7771233c5260a9963b9",
+ "run_directory": "~/.cache/artcraft-storage-lab/viewing-relay-20261110-r1 (private; not retained)",
+ "retained": [
+  "slice.json (sanitized: no repo id, tokens, WOPISrc or per-run accounts)",
+  "browser.json (sanitized: same; 43 viewing checks)",
+  "README.md, verify.py"
+ ],
+ "not_retained": "screenshots and full logs (screenshots can precede editor render, so they are not render evidence)",
+ "launcher_exit": "the wrapper reported completion after project-scoped cleanup; its exit code was not captured",
+ "fixtures": "lab/real-seafile/fixtures/legacy/ (SHA256SUMS pinned)",
+ "limits": [
+  "payload delivery and marker only: rendered pixels are NOT asserted",
+  "no legacy/OpenDocument save or version write is tested",
+  "browser replay filtered to WordCraft; the other five editors were not replayed",
+  "bundle import proof: scripts/probe-legacy-import.py 7/7 PASS (separate, offline)",
+  "FODT/FODP/PPT/ODP/PPS intentionally have no route",
+  "independent review of this run NOT PERFORMED"
+ ]
+}

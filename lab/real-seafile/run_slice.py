@@ -478,6 +478,12 @@ def viewing_payload_has_marker(payload: bytes, marker: str = "GR-LEGACY-MARKER-2
     example PPTX slides). A caller that aborts the relay uses this as import
     evidence about the editor's model, not as a Seafile write."""
     if payload[:2] != b"PK":
+        if payload.startswith(b"\xd0\xcf\x11\xe0"):
+            # DOC/XLS/PPT/PPS are OLE binaries; their fixture marker is UTF-16LE.
+            for encoding in ("utf-16le", "utf-8", "latin-1"):
+                if marker.encode(encoding) in payload:
+                    return True, f"ole {encoding}"
+            return False, "marker not in the OLE payload"
         return marker in payload.decode("utf-8", "replace"), "plain text"
     if marker in docx_text(payload):
         return True, "docx text"
