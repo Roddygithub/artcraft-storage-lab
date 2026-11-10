@@ -1,4 +1,4 @@
-# Forensic audit — retained evidence at `edbb8d543cff` (2026-11-10)
+# Forensic audit — retained evidence at `edbb8d598912` (2026-11-10)
 
 **State: mechanical self-audit by the implementer. This is NOT an independent
 forensic review and does not grant a project PASS.** Project INCOMPLETE; upstream
@@ -15,10 +15,10 @@ claims while it is private:
 * retained `*.json` for per-run Seafile accounts (`@auth.local`), synthetic ids,
   plain `WOPISrc`, unredacted WOPI file ids, token fields and `repo_id` keys.
 
-## Result at `edbb8d543cffdc255`
+## Result at `edbb8d598912`
 
 ```text
-PASS: 17 evidence directories, hashes, verifiers, provenance and secret scan at edbb8d543cffdc255
+PASS: 17 evidence directories, hashes, verifiers, provenance and secret scan at edbb8d598912
 ```
 
 | Check | Result |
