@@ -42,4 +42,5 @@ for secret in ('synthetic-1', 'access_token', 'WOPISrc=http', 'repo_id'):
     assert secret not in blob, secret
 assert not re.search(r'wopi/files/[0-9a-f]{8,}', blob), 'an unredacted WOPI file id is retained'
 assert 'synthetic-admin@' not in blob
+assert '@auth.local' not in blob, 'a per-run auth account is retained'
 print('PASS: integrity, HTTP 57/57, 5 routed legacy viewing formats, 7 unrouted, no secrets retained')

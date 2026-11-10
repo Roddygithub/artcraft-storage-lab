@@ -23,12 +23,12 @@
   {
    "name": "reader_user_ready",
    "ok": true,
-   "detail": "c8e9b875a96249298c8d09a972412d6e@auth.local {\"email\": \"c8e9b875a96249298c8d09a972412d6e@auth.local\", \"name\": \"reader\", \"contact_email\": \"reader@lab.test\", \"login_id"
+   "detail": "<run-admin> {\"email\": \"<run-admin>\", \"name\": \"reader\", \"contact_email\": \"reader@lab.test\", \"login_id"
   },
   {
    "name": "reader_share_readonly",
    "ok": true,
-   "detail": "{\"failed\": [], \"success\": [{\"share_type\": \"user\", \"user_info\": {\"name\": \"c8e9b875a96249298c8d09a972412d6e@auth.local\", \"nickname\": \"reader\", \"contact_email\": \"reader@lab.test\", \"avatar_url\": \"http://s"
+   "detail": "{\"failed\": [], \"success\": [{\"share_type\": \"user\", \"user_info\": {\"name\": \"<run-admin>\", \"nickname\": \"reader\", \"contact_email\": \"reader@lab.test\", \"avatar_url\": \"http://s"
   },
   {
    "name": "seahub_svg_routes_to_wopi",
@@ -203,7 +203,7 @@
   {
    "name": "seahub_putfile_ignores_can_edit",
    "ok": true,
-   "detail": "status=200 overwritten=True top_creator=c8e9b875a96249298c8d09a972412d6e@auth.local  (ok=True means the Seahub gap is real)"
+   "detail": "status=200 overwritten=True top_creator=<run-admin>  (ok=True means the Seahub gap is real)"
   },
   {
    "name": "seahub_doc_routes_to_wopi_wordcraft",
