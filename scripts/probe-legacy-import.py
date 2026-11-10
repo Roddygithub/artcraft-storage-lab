@@ -44,6 +44,8 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 os.environ.setdefault("SEAFILE_URL", "http://seafile.test")
 os.environ.setdefault("BRIDGE_URL", "http://bridge.test")
+# Lab-only synthetic account for this offline wrapper; it never reaches a real host.
+# Real runs set ADMIN_EMAIL/ADMIN_PASSWORD in the environment instead of these defaults.
 os.environ.setdefault("ADMIN_EMAIL", "test@example.test")
 os.environ.setdefault("ADMIN_PASSWORD", "test")
 os.environ.setdefault("RESULTS_DIR", "/tmp/artcraft-offline-tests")

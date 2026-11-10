@@ -143,7 +143,7 @@
   {
    "name": "history_two_versions_attributed_to_admin",
    "ok": true,
-   "detail": "[{\"id\": \"ca85581f2ca70e16272cb4e3c14a74a89a431226\", \"rev_file_id\": \"acc4a4f72382667f70aa81f2ce9886ba64a06d43\", \"creator\": \"<synthetic-admin>\", \"desc\": \"Modified \\\"test.svg\\\"\"}, {\"id\": \"26f71ef618c219230e980c94f19b88759c9134aa\", \"rev_file_id\": \"1bcf5d2eea6c00f8fc75dedfe58becca47e25e3e\", \"creator\": \"<synthetic-admin>\", \"desc\": \"Added \\\"test.svg\\\".\"}]"
+   "detail": "[{\"id\": \"ca85581f2ca70e16272cb4e3c14a74a89a431226\", \"rev_file_id\": \"acc4a4f72382667f70aa81f2ce9886ba64a06d43\", \"creator\": \"<run-admin>\", \"desc\": \"Modified \\\"test.svg\\\"\"}, {\"id\": \"26f71ef618c219230e980c94f19b88759c9134aa\", \"rev_file_id\": \"1bcf5d2eea6c00f8fc75dedfe58becca47e25e3e\", \"creator\": \"<run-admin>\", \"desc\": \"Added \\\"test.svg\\\".\"}]"
   },
   {
    "name": "relay_stale_version_409_no_overwrite",

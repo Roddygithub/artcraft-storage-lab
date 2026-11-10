@@ -74,6 +74,9 @@ def audit_verifier(directory: Path, failures: list) -> bool:
     return True
 
 
+DATE_TOKEN = re.compile(r'20\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])')
+
+
 def audit_provenance(directory: Path, failures: list) -> int:
     provenance = directory / 'provenance.json'
     if not provenance.is_file():
@@ -83,9 +86,9 @@ def audit_provenance(directory: Path, failures: list) -> int:
         for text in ([value] if isinstance(value, str) else
                      [item for item in value if isinstance(item, str)]
                      if isinstance(value, list) else []):
-            # Dates such as 20261108 are not commits; require a hex letter or a full SHA.
+            # A token that is a real YYYYMMDD date (20261108) is not a commit.
             for sha in re.findall(r'\b[0-9a-f]{7,40}\b', text):
-                if len(sha) == 8 and sha.startswith('20'):
+                if DATE_TOKEN.fullmatch(sha):
                     continue
                 if git('cat-file', '-e', f'{sha}^{{commit}}').returncode:
                     failures.append(f'{directory.name}: provenance SHA {sha} is not a commit')
