@@ -1,0 +1,16 @@
+test_bridge_signature_guard_accepts_every_fixture (__main__.LegacyFixtureTests.test_bridge_signature_guard_accepts_every_fixture) ... ok
+test_browser_probe_map_matches_the_routed_viewing_map (__main__.LegacyFixtureTests.test_browser_probe_map_matches_the_routed_viewing_map)
+The browser import probe must not drift from the opt-in routing candidate. ... ok
+test_checksums_match_the_committed_bytes (__main__.LegacyFixtureTests.test_checksums_match_the_committed_bytes) ... ok
+test_every_fixture_carries_the_marker (__main__.LegacyFixtureTests.test_every_fixture_carries_the_marker) ... ok
+test_every_required_viewing_format_has_a_fixture (__main__.LegacyFixtureTests.test_every_required_viewing_format_has_a_fixture) ... ok
+test_serialized_payload_detection_reads_each_native_form (__main__.LegacyFixtureTests.test_serialized_payload_detection_reads_each_native_form)
+The browser import probe reads the marker out of whatever the editor saved. ... ok
+test_serialized_payload_detection_rejects_a_missing_marker (__main__.LegacyFixtureTests.test_serialized_payload_detection_rejects_a_missing_marker) ... ok
+test_viewing_map_keeps_the_base_routes (__main__.LegacyFixtureTests.test_viewing_map_keeps_the_base_routes) ... ok
+test_viewing_map_routes_only_formats_with_accurate_render_evidence (__main__.LegacyFixtureTests.test_viewing_map_routes_only_formats_with_accurate_render_evidence) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.160s
+
+OK

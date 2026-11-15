@@ -1,0 +1,39 @@
+test_acknowledged_but_not_stored_is_502 (__main__.BridgeTestCase.test_acknowledged_but_not_stored_is_502) ... ok
+test_config_rejects_duplicate_extensions_and_foreign_editor_urls (__main__.BridgeTestCase.test_config_rejects_duplicate_extensions_and_foreign_editor_urls) ... ok
+test_deployment_defaults_match_discovery_and_pinned_fetch_docs (__main__.BridgeTestCase.test_deployment_defaults_match_discovery_and_pinned_fetch_docs) ... ok
+test_discovery_matches_seahub_parser_contract (__main__.BridgeTestCase.test_discovery_matches_seahub_parser_contract) ... ok
+test_edit_refuses_a_forged_top_level_post (__main__.BridgeTestCase.test_edit_refuses_a_forged_top_level_post) ... ok
+test_editor_page_may_be_framed_by_host_and_seahub (__main__.BridgeTestCase.test_editor_page_may_be_framed_by_host_and_seahub) ... ok
+test_hashed_assets_are_immutable_and_streamed_with_head_support (__main__.BridgeTestCase.test_hashed_assets_are_immutable_and_streamed_with_head_support) ... ok
+test_host_js_is_served_and_speaks_upstream_protocol (__main__.BridgeTestCase.test_host_js_is_served_and_speaks_upstream_protocol) ... ok
+test_lock_roundtrip_and_conflict (__main__.BridgeTestCase.test_lock_roundtrip_and_conflict) ... ok
+test_open_refuses_foreign_wopisrc (__main__.BridgeTestCase.test_open_refuses_foreign_wopisrc) ... ok
+test_open_refuses_wrong_editor_for_extension (__main__.BridgeTestCase.test_open_refuses_wrong_editor_for_extension) ... ok
+test_open_renders_host_page_with_csp_and_no_token_in_urls (__main__.BridgeTestCase.test_open_renders_host_page_with_csp_and_no_token_in_urls) ... ok
+test_open_requires_form_post (__main__.BridgeTestCase.test_open_requires_form_post) ... ok
+test_open_with_unknown_token_is_401 (__main__.BridgeTestCase.test_open_with_unknown_token_is_401) ... ok
+test_putfile_5xx_after_commit_is_reconciled_to_200 (__main__.BridgeTestCase.test_putfile_5xx_after_commit_is_reconciled_to_200) ... ok
+test_redirect_from_seafile_is_refused_not_followed (__main__.BridgeTestCase.test_redirect_from_seafile_is_refused_not_followed) ... ok
+test_relay_info_and_file (__main__.BridgeTestCase.test_relay_info_and_file) ... ok
+test_relay_requires_bridge_header_and_same_origin (__main__.BridgeTestCase.test_relay_requires_bridge_header_and_same_origin) ... ok
+test_retry_after_lost_answer_is_idempotent_even_with_the_old_version (__main__.BridgeTestCase.test_retry_after_lost_answer_is_idempotent_even_with_the_old_version) ... ok
+test_save_creates_new_version_attributed_to_user (__main__.BridgeTestCase.test_save_creates_new_version_attributed_to_user) ... ok
+test_save_is_idempotent_on_identical_bytes (__main__.BridgeTestCase.test_save_is_idempotent_on_identical_bytes) ... ok
+test_save_overwrites_intervening_external_writer_despite_verified_readback (__main__.BridgeTestCase.test_save_overwrites_intervening_external_writer_despite_verified_readback)
+Document the residual race, not atomic protection: PutFile is unconditional. ... ok
+test_save_reconciles_lost_response (__main__.BridgeTestCase.test_save_reconciles_lost_response) ... ok
+test_save_refuses_rename_and_wrong_signature (__main__.BridgeTestCase.test_save_refuses_rename_and_wrong_signature) ... ok
+test_save_rejects_already_visible_external_change_without_overwrite (__main__.BridgeTestCase.test_save_rejects_already_visible_external_change_without_overwrite) ... ok
+test_save_too_large_is_413 (__main__.BridgeTestCase.test_save_too_large_is_413) ... ok
+test_save_with_read_only_token_is_refused_by_bridge_not_seahub (__main__.BridgeTestCase.test_save_with_read_only_token_is_refused_by_bridge_not_seahub) ... ok
+test_save_with_revoked_token_is_401 (__main__.BridgeTestCase.test_save_with_revoked_token_is_401) ... ok
+test_save_without_expected_version_is_400 (__main__.BridgeTestCase.test_save_without_expected_version_is_400) ... ok
+test_signature_covers_legacy_office_and_opendocument (__main__.BridgeTestCase.test_signature_covers_legacy_office_and_opendocument) ... ok
+test_signature_guard_table (__main__.BridgeTestCase.test_signature_guard_table) ... ok
+test_signature_table_additions (__main__.BridgeTestCase.test_signature_table_additions) ... ok
+test_wopisrc_must_be_a_wopi_file_endpoint (__main__.BridgeTestCase.test_wopisrc_must_be_a_wopi_file_endpoint) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 1.122s
+
+OK

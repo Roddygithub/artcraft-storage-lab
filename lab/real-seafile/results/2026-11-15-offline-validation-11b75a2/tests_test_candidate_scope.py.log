@@ -1,0 +1,3 @@
+PASS: zero-patch candidate scope, consistent discovery, ONLYOFFICE retired; PPTX replacement remains unverified
+PASS: ONLYOFFICE HTTP gate rejects blocking Seahub error
+PASS: deployment omits capability-bearing access logs and conflicting frame header

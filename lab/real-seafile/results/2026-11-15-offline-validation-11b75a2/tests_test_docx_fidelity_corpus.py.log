@@ -1,0 +1,8 @@
+test_fidelity_cases_cover_the_intended_formatting_features (__main__.FidelityCorpusTests.test_fidelity_cases_cover_the_intended_formatting_features) ... ok
+test_three_deterministic_cases_are_well_formed_docx_packages (__main__.FidelityCorpusTests.test_three_deterministic_cases_are_well_formed_docx_packages) ... ok
+test_used_wordprocessingml_property_elements_follow_schema_order (__main__.FidelityCorpusTests.test_used_wordprocessingml_property_elements_follow_schema_order) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.016s
+
+OK

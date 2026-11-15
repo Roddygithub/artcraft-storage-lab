@@ -1,0 +1,25 @@
+PASS wait_returns_bytes_captured_after_the_wait_began  -- got 887 of 887 bytes after 3s
+PASS returned_bytes_are_the_document_fixture  -- status=200 responses=1
+PASS wait_times_out_without_a_qualifying_response  -- responses=[(200, 0), (500, 4)]
+PASS delayed_success_fails_with_the_former_sleep_only_wait  -- after 4s no callbacks were dispatched; responses=0
+PASS former_wait_starved_a_response_the_browser_received  -- captured=[(200, 887)]
+PASS production_wait_finds_the_starved_response  -- len=887
+PASS file_list_click_supports_same_tab
+PASS download_observed_on_existing_page
+PASS file_list_click_supports_new_tab
+PASS download_observed_on_popup
+PASS delayed_save_200_captures_payload
+PASS save_200_confirmation_matches_outcome
+PASS save_200_removes_callback
+PASS delayed_save_200_reconciled_captures_payload
+PASS save_200_reconciled_confirmation_matches_outcome
+PASS save_200_reconciled_removes_callback
+PASS delayed_save_500_captures_payload
+PASS save_500_confirmation_matches_outcome
+PASS save_500_removes_callback
+PASS save_timeout_rejects_missing_request
+PASS save_timeout_removes_callback
+PASS save_status_error_propagates
+PASS save_status_error_removes_callback
+
+0 failed

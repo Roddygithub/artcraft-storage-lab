@@ -1,0 +1,13 @@
+PASS lab_fixture_a1_is_numeric_one  -- cells={'A1': '1'}
+PASS numeric_and_formula_string_cells_parsed  -- cells={'A1': '3.14', 'A2': '-7', 'B1': 'ab'}
+PASS inline_string_cell_parsed  -- cells={'B2': 'gridtypedx'}
+PASS shared_string_cells_parsed  -- cells={'C3': 'richtext', 'D4': 'hello'}
+PASS not_a_zip_rejected
+PASS zip_without_sheet_rejected
+PASS broken_sheet_xml_rejected
+PASS shared_string_index_out_of_range_rejected
+PASS non_numeric_shared_string_index_rejected
+PASS missing_shared_string_index_rejected
+PASS empty_shared_string_index_rejected
+
+0 failed
