@@ -43,15 +43,16 @@ Independent GPT-6 Sol reviews at `d2379f0`, `9def0bb`, `ad638d1` and
 `d263583` returned **PROVISIONAL PASS for the isolated MVP subset only**. The
 documentation follow-up at `a8e7149` also received a PROVISIONAL PASS and found
 three MINOR wording/link issues; those are corrected in the current follow-up.
-The production-boundary MAJOR remains disclosed. No production readiness or
-project-wide PASS is claimed.
+The corrected documentation candidate at `546ce0d` received an exact-HEAD
+PROVISIONAL PASS with no new MINOR findings. The production-boundary MAJOR
+remains disclosed. No production readiness or project-wide PASS is claimed.
 
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product
-runtime or conversion path. The runtime source remains tested at `be51c3b`; the
-current changes are documentation-only. The repository is not frozen for the
-project-wide gate: owner-server editing, hardware acceptance and independent
-exact-HEAD review remain open.
+runtime or conversion path. Reviewed candidate SHA:
+`546ce0dd711eade0d9cb253a0fc4389c28ee2617`; its runtime source remains tested at
+`be51c3b`. The current changes are documentation-only. Owner-server editing,
+hardware acceptance and the project-wide gate remain open.
 
 The owner requires replacement coverage for every currently configured
 ONLYOFFICE format: 15 viewing routes and 3 editing routes. The six-Craft

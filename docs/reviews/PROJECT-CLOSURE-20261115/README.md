@@ -44,7 +44,10 @@ deployment or upstream publication is authorized by this packet.
 - `SOL-REVIEW-A8E7149.md`: PROVISIONAL PASS for the documentation follow-up;
   three MINOR wording/link issues are addressed in the current follow-up. No
   runtime replay was performed for that documentation-only review; the current
-  exact SHA still needs its own review.
+  exact SHA was then reviewed at `546ce0d`.
+- `SOL-REVIEW-546CE0D.md`: PROVISIONAL PASS for the documentation follow-up;
+  no new MINOR findings. Production permission MAJOR and readiness limits
+  remain open.
 
 ## Format claims
 

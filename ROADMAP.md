@@ -38,7 +38,7 @@ Do not run the historical ONLYOFFICE campaigns below.
    bridge configured, so authenticated browser edit/save/reopen remains NOT
    VERIFIED. See `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
 4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance and authenticated
-   owner-server validation. GPT-6 Sol reviewed `a8e7149` and returned PROVISIONAL
+   owner-server validation. GPT-6 Sol reviewed `546ce0d` and returned PROVISIONAL
    PASS for the documentation follow-up only; this is not the project-wide gate. No
    converter or LibreOffice product path is planned.
 

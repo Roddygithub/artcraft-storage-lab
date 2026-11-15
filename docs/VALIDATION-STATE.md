@@ -1,5 +1,9 @@
 # Validation checkpoint — tested source `be51c3b` (2026-11-15)
 
+**Reviewed candidate SHA:** `546ce0dd711eade0d9cb253a0fc4389c28ee2617`.
+GPT-6 Sol returned PROVISIONAL PASS for this documentation follow-up only;
+runtime source remains `be51c3b`. No project-wide gate has passed.
+
 This short checkpoint is the continuation entry point. Do not re-read the
 historical GR corpus to resume routine validation.
 
@@ -14,7 +18,7 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |
-| Independent and final review | GPT-6 Sol at `a8e7149`: PROVISIONAL PASS for documentation follow-up; three MINOR findings are addressed in this follow-up. New exact-HEAD review pending; no project-wide PASS | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-A8E7149.md` |
+| Independent and final review | GPT-6 Sol at `546ce0d`: PROVISIONAL PASS for documentation follow-up; no new MINOR. No global GPT PASS | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-546CE0D.md` |
 | Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
 | Owner's live Seafile server | HTTPS/TLS and ping PASS; active owner account now has direct read-write access to the existing synthetic library. No file content or server configuration changed. Seafile 12.0.14; ArtCraft bridge absent; authenticated browser edit/save/reopen NOT VERIFIED | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md) |
 
@@ -63,10 +67,9 @@ prove full pagination or font fidelity.
    the synthetic-library test authorization.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
-3. GPT-6 Sol at `a8e7149` returned PROVISIONAL PASS for the documentation
-   follow-up and found three MINOR documentation issues. The current follow-up
-   addresses them; obtain independent review of its exact SHA. No project-wide
-   gate has passed.
+3. GPT-6 Sol at `546ce0d` returned PROVISIONAL PASS for the documentation
+   follow-up. This closes the exact-HEAD documentation review only; no
+   project-wide gate has passed.
 4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
    unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
    No converter or LibreOffice product path is planned.
