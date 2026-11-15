@@ -3,9 +3,13 @@
 **Technical candidate SHA:** `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`.
 This candidate adds a reproducible Seafile CE12 runner and retains a corrected
 66/66 browser replay. The offline runner passed 21/21 command groups at this
-exact SHA. The prior GPT-6 Sol PROVISIONAL PASS at `98c6bba` covered an earlier
-evidence-only delta, not this candidate; the global gate remains open pending
-independent review.
+exact SHA. An independent free-model review of `123d2a0` returned PROVISIONAL
+PASS for the claimed lab scope; its one limitation and four documentation
+minors are resolved. See
+`reviews/PROJECT-CLOSURE-20261115/INDEPENDENT-REVIEW-2DD571F.md`.
+The prior GPT-6 Sol PROVISIONAL PASS at `98c6bba` covered
+an earlier evidence-only delta, not this candidate. **No GPT gate has run on
+`123d2a0`**, so the global gate remains open.
 
 This short checkpoint is the continuation entry point. Do not re-read the
 historical GR corpus to resume routine validation.
@@ -22,7 +26,7 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |
-| Independent and final review | GPT-6 Sol at `98c6bba`: PROVISIONAL PASS for the earlier evidence-only delta; this `123d2a0` candidate is NOT YET REVIEWED. Global GPT gate NOT PASSED | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-98C6BBA.md` |
+| Independent and final review | Free-model independent review of `123d2a0` at docs `2dd571f`: PROVISIONAL PASS for the claimed lab scope; 1 limitation and 4 documentation minors, all resolved. GPT-6 Sol at `98c6bba` covered only the earlier evidence delta. **No GPT gate has run on this candidate.** | `reviews/PROJECT-CLOSURE-20261115/INDEPENDENT-REVIEW-2DD571F.md` |
 | Mechanical evidence self-audit | PASS at exact candidate `123d2a0`: 24 result directories, 21 available verifiers run, 19 provenance commits checked, 307 files hashed and 87 JSON files scanned; two loose root JSON files scanned; pattern-based secret scan | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-123D2A0.json` |
 | Owner's live Seafile server | HTTPS/TLS and ping PASS; synthetic library shared read-write. Seafile 12.0.14; current WOPI disabled. Patched Seahub route allowlists the synthetic library; a separate gateway service is active, but its relationship to the configured action URL is unverified. Supplied credentials were rejected at login; authenticated current-bridge edit/save NOT VERIFIED. No config/content changed | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md), `GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` |
 
@@ -76,9 +80,11 @@ prove full pagination or font fidelity.
    post-review server findings need an independent documentation review.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
-3. GPT-6 Sol at `230a47c` returned PROVISIONAL PASS for the documentation
-   correction. This closes that exact-HEAD review only; no project-wide gate
-   has passed.
+3. An independent free-model review of `123d2a0` at docs `2dd571f` returned
+   PROVISIONAL PASS for the claimed lab scope. No GPT gate has run on this
+   candidate. The next step is the GPT-6 Sol review once the provider quota
+   resets (previously blocked until 2026-11-20), then the human hardware
+   checklist. Neither is a code change.
 4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
    unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
    No converter or LibreOffice product path is planned.
