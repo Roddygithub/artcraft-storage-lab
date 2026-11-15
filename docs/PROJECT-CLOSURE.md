@@ -53,7 +53,10 @@ PROVISIONAL PASS with no new MINOR findings. A later read-only owner-server
 check found a pre-existing custom Seahub ArtCraft route and active legacy
 gateway, scoped to the synthetic library; it was not part of that review. The
 current zero-patch WOPI bridge remains disabled. The production-boundary MAJOR
-remains disclosed. No production readiness or project-wide PASS is claimed.
+remains disclosed. The follow-up correcting route/gateway wording at `230a47c`
+received a separate exact-HEAD PROVISIONAL PASS; both prior MINOR findings were
+closed, with none new. These documentation reviews do not verify the live WOPI
+workflow. No production readiness or project-wide PASS is claimed.
 
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product

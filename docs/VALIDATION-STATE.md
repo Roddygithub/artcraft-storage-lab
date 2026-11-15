@@ -1,8 +1,9 @@
-# Validation checkpoint — tested source `be51c3b` (2026-11-15)
+# Validation checkpoint — runtime evidence source `be51c3b` (2026-11-15)
 
-**Reviewed candidate SHA:** `546ce0dd711eade0d9cb253a0fc4389c28ee2617`.
-GPT-6 Sol returned PROVISIONAL PASS for this documentation follow-up only;
-runtime source remains `be51c3b`. No project-wide gate has passed.
+**Technical candidate SHA:** `546ce0dd711eade0d9cb253a0fc4389c28ee2617`.
+Latest documentation follow-up `230a47cd0652c8d8680ddc3493f0c044a994ef07`
+received a GPT-6 Sol PROVISIONAL PASS. Runtime source remains `be51c3b`;
+no project-wide gate has passed.
 
 This short checkpoint is the continuation entry point. Do not re-read the
 historical GR corpus to resume routine validation.
@@ -18,7 +19,7 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |
-| Independent and final review | GPT-6 Sol at `546ce0d`: PROVISIONAL PASS for documentation follow-up; no new MINOR. A later live-route discovery is not included in that review. No global GPT PASS | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-546CE0D.md` |
+| Independent and final review | GPT-6 Sol at `230a47c`: PROVISIONAL PASS for the docs correction; both inherited MINOR findings closed, none new. No global GPT PASS | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-230A47C.md` |
 | Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
 | Owner's live Seafile server | HTTPS/TLS and ping PASS; synthetic library shared read-write. Seafile 12.0.14; current WOPI disabled. Patched Seahub route allowlists the synthetic library; a separate gateway service is active, but its relationship to the configured action URL is unverified. Historical GR-059 records a real legacy-route save/version/reopen, not current WOPI. No config/content changed during this task. Authenticated current-bridge edit/save NOT VERIFIED | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md), `GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` |
 
@@ -71,9 +72,9 @@ prove full pagination or font fidelity.
    post-review server findings need an independent documentation review.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
-3. GPT-6 Sol at `546ce0d` returned PROVISIONAL PASS for the documentation
-   follow-up. This closes the exact-HEAD documentation review only; no
-   project-wide gate has passed.
+3. GPT-6 Sol at `230a47c` returned PROVISIONAL PASS for the documentation
+   correction. This closes that exact-HEAD review only; no project-wide gate
+   has passed.
 4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
    unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
    No converter or LibreOffice product path is planned.

@@ -50,6 +50,10 @@ deployment or upstream publication is authorized by this packet.
   remain open. A later read-only owner-server check found pre-existing legacy
   Seahub routing and an active gateway; this discovery is not part of that
   review and is being documented separately.
+- `SOL-REVIEW-6E496BA.md`: PROVISIONAL PASS with two MINOR wording findings
+  about gateway linkage and the lab checklist entry point.
+- `SOL-REVIEW-230A47C.md`: PROVISIONAL PASS for the correction; both MINOR
+  findings closed, none new. This does not verify the live WOPI workflow.
 
 ## Format claims
 

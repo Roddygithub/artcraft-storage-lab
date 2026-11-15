@@ -40,13 +40,15 @@ Do not run the historical ONLYOFFICE campaigns below.
    is disabled. Stock WOPI routing is
    extension-wide, so a test limited to one library requires an isolated
    Seafile 12 instance. GR-059 contains historical legacy-route edit/save
-   evidence, not evidence for the current candidate. This post-review discovery
-   is awaiting independent documentation review. See
+   evidence, not evidence for the current candidate. The route wording was
+   corrected and reviewed at `230a47c`; live WOPI behavior remains NOT VERIFIED.
+   See
    `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
 4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance and authenticated
-   owner-server validation. GPT-6 Sol reviewed `546ce0d` and returned PROVISIONAL
-   PASS for the documentation follow-up only; this is not the project-wide gate. No
-   converter or LibreOffice product path is planned.
+   owner-server validation. GPT-6 Sol reviewed the route-wording correction at
+   `230a47c` and returned PROVISIONAL PASS; this was not owner-server WOPI
+   validation or the project-wide gate. No converter or LibreOffice product
+   path is planned.
 
 ## Historical next steps (superseded where they require ONLYOFFICE)
 
