@@ -1,6 +1,6 @@
 # Offline candidate checks — 2026-11-15
 
-Source `4a5ab576da0e0a0f227e672d8ea6258ea90c9acc` passed all 20 command
+Source `be51c3b577fda9834de4364a35d0784d28f62492` passed all 20 command
 groups in `scripts/validate-candidate.py`. The sanitized summary records each
 check name, exit code and duration; full command logs remain private.
 

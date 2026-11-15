@@ -23,10 +23,10 @@ Compact validation/continuation entry point: `docs/VALIDATION-STATE.md`.
 ONLYOFFICE is retired by owner instruction (`docs/ONLYOFFICE-RETIREMENT-20261108.md`).
 Do not run the historical ONLYOFFICE campaigns below.
 
-1. Automated isolated candidate: 20/20 offline command groups pass at source
-   `4a5ab576da0e0a0f227e672d8ea6258ea90c9acc`. Fresh Seafile CE 13.0.28 lab at
-   that source passed HTTP 56/56 and browser 58/58. Core DOCX typed edits create
-   Seafile versions and survive a fresh-session reopen.
+1. Automated isolated candidate: 20/20 offline command groups and the fresh
+   Seafile CE 13.0.28 lab pass at source `be51c3b577fda9834de4364a35d0784d28f62492`;
+   HTTP 56/56 and browser 58/58. Core DOCX typed edits create Seafile versions
+   and survive a fresh-session reopen.
 2. Opt-in read-only legacy routes: ODT→WordCraft, ODS/CSV→GridCraft and
    PPSX→DeckCraft have exact-byte, visible-marker and read-only-state checks.
    DOC/XLS are unrouted; their standalone fixture render works, but retained

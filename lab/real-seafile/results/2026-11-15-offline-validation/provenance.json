@@ -1,8 +1,8 @@
 {
-  "source_commit": "4a5ab576da0e0a0f227e672d8ea6258ea90c9acc",
-  "command": "uv run --with playwright --with pillow python scripts/validate-candidate.py --output <private-dir>",
-  "result": "20/20 command groups passed",
-  "retained": "sanitized summary only; full logs remain private",
-  "production": "not contacted",
-  "upstream": "not contacted"
+ "source_commit": "be51c3b577fda9834de4364a35d0784d28f62492",
+ "command": "uv run --with playwright --with pillow python scripts/validate-candidate.py --output <private-dir>",
+ "result": "20/20 command groups passed",
+ "retained": "sanitized summary only; full logs remain private",
+ "production": "not contacted",
+ "upstream": "not contacted"
 }

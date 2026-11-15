@@ -1,6 +1,6 @@
 # Seafile legacy viewing candidate — 2026-11-15
 
-**Source:** `4a5ab576da0e0a0f227e672d8ea6258ea90c9acc`
+**Source:** `be51c3b577fda9834de4364a35d0784d28f62492`
 **Host:** stock Seafile CE 13.0.28 in the private rootless lab
 **Bundles:** exact static manifest SHA in `provenance.json`
 

@@ -1,10 +1,11 @@
 # Final-candidate review packet — 2026-11-15
 
 This packet asks an independent reviewer to assess the exact repository SHA
-provided with the review task. The tested source change is
-`4a5ab576da0e0a0f227e672d8ea6258ea90c9acc`; documentation and sanitized
-evidence updates are layered on top. Do not treat a source-run PASS as a
-project-wide PASS.
+provided with the review task. The route correction began at
+`4a5ab576da0e0a0f227e672d8ea6258ea90c9acc`; labels were aligned with the retained
+evidence at `be51c3b577fda9834de4364a35d0784d28f62492`, where the offline and
+Seafile lab runs were repeated. Documentation and sanitized evidence updates
+are layered on top. Do not treat a source-run PASS as a project-wide PASS.
 
 ## Owner intent and scope
 

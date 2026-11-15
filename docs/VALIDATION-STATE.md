@@ -1,11 +1,11 @@
-# Validation checkpoint — candidate source `4a5ab57` (2026-11-15)
+# Validation checkpoint — tested source `be51c3b` (2026-11-15)
 
 This short checkpoint is the continuation entry point. Do not re-read the
 historical GR corpus to resume routine validation.
 
 | Scope | State | Evidence |
 | --- | --- | --- |
-| Active offline checks | 20/20 command groups PASS at exact source `4a5ab576da0e0a0f227e672d8ea6258ea90c9acc` | `../lab/real-seafile/results/2026-11-15-offline-validation/` |
+| Active offline checks | 20/20 command groups PASS at exact source `be51c3b577fda9834de4364a35d0784d28f62492` | `../lab/real-seafile/results/2026-11-15-offline-validation/` |
 | Core Seafile DOCX edit/save/reopen | HTTP slice 56/56; browser 58/58; two typed saves create versions and fresh-session reopen preserves edits | `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Legacy read-only Seafile routes | 34/34 route assertions; exact fixture bytes, OCR marker/value, no download, no version write, host reports `read-only` | `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Legacy format status | `VIEW_SUPPORTED`: ODT, ODS, CSV, PPSX. `UNSUPPORTED`: DOC, XLS, FODS, FODT, FODP, PPT, ODP, PPS | `ONLYOFFICE-REPLACEMENT-MATRIX.md` |
@@ -14,8 +14,8 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
-| Independent and final review | GPT-6 Sol at `d2379f0`: PROVISIONAL PASS for isolated subset only; one production-boundary MAJOR and two wording MINOR. Wording fixes are on the current follow-up; re-review pending. No global GPT PASS | `../reviews/PROJECT-CLOSURE-20261115/` |
-| Mechanical evidence self-audit | PASS at source `4a5ab57`: 20 result directories and checksum manifests, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`; private run summary |
+| Independent and final review | GPT-6 Sol at `d2379f0`: PROVISIONAL PASS for isolated subset only; one production-boundary MAJOR and two wording MINOR. Wording fixes and exact-source test replay are at `be51c3b`; follow-up review pending. No global GPT PASS | `../reviews/PROJECT-CLOSURE-20261115/` |
+| Mechanical evidence self-audit | Prior PASS at source `4a5ab57`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent. Re-audit after latest evidence commit is pending | `../scripts/forensic-audit.py`; private run summary |
 | Owner's live Seafile server | Read-only HTTPS/TLS and ping PASS; release is older than tested CE 13.0.28, ArtCraft bridge is absent, and synthetic library is unshared. Supplied account is not registered in Seafile; no test library created. Authenticated edit/save NOT VERIFIED | private infrastructure discovery; no production writes |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized, but
