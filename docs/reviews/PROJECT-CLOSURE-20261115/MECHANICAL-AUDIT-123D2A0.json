@@ -1,0 +1,177 @@
+{
+ "scope": "mechanical self-audit, not an independent review",
+ "head": "123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb",
+ "directories": [
+  {
+   "directory": "2026-11-02-wordcraft-pilot",
+   "hashes": 14,
+   "verifier": true,
+   "provenance_commits": 0,
+   "secrets_scanned": 7
+  },
+  {
+   "directory": "2026-11-03-gridcraft-pilot",
+   "hashes": 15,
+   "verifier": true,
+   "provenance_commits": 0,
+   "secrets_scanned": 7
+  },
+  {
+   "directory": "2026-11-08-all-craft-validation",
+   "hashes": 19,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 5
+  },
+  {
+   "directory": "2026-11-08-closure-diagnostics",
+   "hashes": 3,
+   "verifier": true,
+   "provenance_commits": 0,
+   "secrets_scanned": 1
+  },
+  {
+   "directory": "2026-11-08-combined-core-recovery",
+   "hashes": 4,
+   "verifier": false,
+   "provenance_commits": 1,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-08-craft-only-wordcraft",
+   "hashes": 12,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-08-legacy-viewing",
+   "hashes": 4,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 2
+  },
+  {
+   "directory": "2026-11-08-pptx-official",
+   "hashes": 14,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 5
+  },
+  {
+   "directory": "2026-11-08-save-safety",
+   "hashes": 8,
+   "verifier": false,
+   "provenance_commits": 1,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-08-seven-craft-validation",
+   "hashes": 22,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 5
+  },
+  {
+   "directory": "2026-11-08-wordcraft-corpus-recovery",
+   "hashes": 19,
+   "verifier": true,
+   "provenance_commits": 0,
+   "secrets_scanned": 5
+  },
+  {
+   "directory": "2026-11-08-wordcraft-fidelity-edit",
+   "hashes": 11,
+   "verifier": false,
+   "provenance_commits": 0,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-08-wordcraft-https-current",
+   "hashes": 12,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 5
+  },
+  {
+   "directory": "2026-11-08-wordcraft-structure-recovery",
+   "hashes": 12,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-09-legacy-viewing-browser",
+   "hashes": 5,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-10-viewing-fods-ppsx",
+   "hashes": 5,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-10-viewing-relay-bytes",
+   "hashes": 5,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-15-legacy-render-probe",
+   "hashes": 11,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 2
+  },
+  {
+   "directory": "2026-11-15-offline-validation",
+   "hashes": 4,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 2
+  },
+  {
+   "directory": "2026-11-15-offline-validation-11b75a2",
+   "hashes": 24,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 2
+  },
+  {
+   "directory": "2026-11-15-offline-validation-123d2a0",
+   "hashes": 25,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 2
+  },
+  {
+   "directory": "2026-11-15-seafile-render-readonly",
+   "hashes": 10,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 3
+  },
+  {
+   "directory": "2026-11-15-seafile12-isolated-edit-save",
+   "hashes": 23,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 5
+  },
+  {
+   "directory": "2026-11-15-seafile12-replay",
+   "hashes": 26,
+   "verifier": true,
+   "provenance_commits": 1,
+   "secrets_scanned": 5
+  }
+ ],
+ "loose_root_json_scanned": 2,
+ "failures": [],
+ "passed": true
+}

@@ -1,18 +1,18 @@
-# Validation checkpoint — runtime evidence source `be51c3b` (2026-11-15)
+# Validation checkpoint — candidate `123d2a0` (2026-11-15)
 
-**Technical candidate SHA:** `546ce0dd711eade0d9cb253a0fc4389c28ee2617`.
-Latest documentation follow-up `230a47cd0652c8d8680ddc3493f0c044a994ef07`
-received a GPT-6 Sol PROVISIONAL PASS. Runtime source remains `be51c3b`;
-offline checks reran 20/20 at exact HEAD `11b75a2`. New isolated CE12 browser
-results are recorded below. The evidence-only follow-up at `98c6bba` received
-an independent GPT-6 Sol PROVISIONAL PASS; the global gate remains open.
+**Technical candidate SHA:** `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`.
+This candidate adds a reproducible Seafile CE12 runner and retains a corrected
+66/66 browser replay. The offline runner passed 21/21 command groups at this
+exact SHA. The prior GPT-6 Sol PROVISIONAL PASS at `98c6bba` covered an earlier
+evidence-only delta, not this candidate; the global gate remains open pending
+independent review.
 
 This short checkpoint is the continuation entry point. Do not re-read the
 historical GR corpus to resume routine validation.
 
 | Scope | State | Evidence |
 | --- | --- | --- |
-| Active offline checks | 20/20 command groups PASS at exact source `11b75a23be5e263f9bb7b4b9cb332caa2158bd6d` | `../lab/real-seafile/results/2026-11-15-offline-validation-11b75a2/` |
+| Active offline checks | 21/21 command groups PASS at exact candidate `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`; all logs are retained and manifest-verified | `../lab/real-seafile/results/2026-11-15-offline-validation-123d2a0/` |
 | Core Seafile DOCX edit/save/reopen | HTTP slice 56/56; browser 58/58; two typed saves create versions and fresh-session reopen preserves edits | `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Legacy read-only Seafile routes | 34/34 route assertions; exact fixture bytes, OCR marker/value, no download, no version write, host reports `read-only` | `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Legacy format status | `VIEW_SUPPORTED`: ODT, ODS, CSV, PPSX. `UNSUPPORTED`: DOC, XLS, FODS, FODT, FODP, PPT, ODP, PPS | `ONLYOFFICE-REPLACEMENT-MATRIX.md` |
@@ -22,8 +22,8 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |
-| Independent and final review | GPT-6 Sol at `98c6bba`: PROVISIONAL PASS for this evidence-only delta; missing-log MAJOR closed, no new findings. Global GPT gate NOT PASSED | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-98C6BBA.md` |
-| Mechanical evidence self-audit | PASS at exact HEAD `98c6bba`: 22 result directories, 19 available verifiers run, 17 provenance commits checked, 256 files hashed and 82 JSON files scanned; pattern-based secret scan | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-98C6BBA.json` |
+| Independent and final review | GPT-6 Sol at `98c6bba`: PROVISIONAL PASS for the earlier evidence-only delta; this `123d2a0` candidate is NOT YET REVIEWED. Global GPT gate NOT PASSED | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-98C6BBA.md` |
+| Mechanical evidence self-audit | PASS at exact candidate `123d2a0`: 24 result directories, 21 available verifiers run, 19 provenance commits checked, 307 files hashed and 87 JSON files scanned; two loose root JSON files scanned; pattern-based secret scan | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-123D2A0.json` |
 | Owner's live Seafile server | HTTPS/TLS and ping PASS; synthetic library shared read-write. Seafile 12.0.14; current WOPI disabled. Patched Seahub route allowlists the synthetic library; a separate gateway service is active, but its relationship to the configured action URL is unverified. Supplied credentials were rejected at login; authenticated current-bridge edit/save NOT VERIFIED. No config/content changed | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md), `GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized. Production
