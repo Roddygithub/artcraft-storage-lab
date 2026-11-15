@@ -35,7 +35,16 @@ deployment or upstream publication is authorized by this packet.
   browser assertions, each with a new Seafile version and a fresh-session
   reopen. DOCX and PPTX relay/readback bytes are retained; GridCraft's runner
   does not retain XLSX relay bytes, so its claim is limited to the recorded
-  assertions.
+  assertions. Its summaries retained the central claims as bare booleans —
+  superseded by the re-run below.
+* `lab/real-seafile/results/2026-11-15-seafile12-detail/`: the remediated
+  re-run (same pinned image and launcher): 66/66, and its `verify.py` rejects
+  bare booleans — every version check retains
+  `history N->M grew=True creator_is_opener=True`, every fresh-session and
+  file-list check retains `url_has_login_redirect=False`; the nine
+  `check(name, True)` tautologies are gone; the sanitizer is committed and
+  unit-tested. Produced from the review
+  `CE12-REVIEW-5FE30C6.md`.
 * `lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`: the same
   CE12 three-editor replay (24 DOCX + 27 XLSX + 15 PPTX = 66) at the earlier
   source `11b75a2`, superseded by the replay above at the current candidate.
@@ -66,6 +75,15 @@ deployment or upstream publication is authorized by this packet.
   about gateway linkage and the lab checklist entry point.
 - `SOL-REVIEW-230A47C.md`: PROVISIONAL PASS for the correction; both MINOR
   findings closed, none new. This does not verify the live WOPI workflow.
+- `CE12-REVIEW-5FE30C6.md`: targeted free-model review of the CE12 runner and
+  both replay directories, run in an isolated worktree at `5fe30c6`
+  (byte-identical CE12 artefacts to the `a1984d5` review head). PROVISIONAL
+  PASS; no BLOCKER/MAJOR; two MINOR evidence-quality findings (version and
+  fresh-session claims retained as bare booleans), all six fault-injection
+  mutations rejected by both verifiers. Remediated by the
+  `2026-11-15-seafile12-detail` re-run with retained proof details; the
+  remediation also found and removed nine `check(name, True)` tautologies,
+  three of which counted in the advertised 66/66.
 
 ## Format claims
 

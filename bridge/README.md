@@ -3,8 +3,10 @@
 Status: **prototype, validated against stock Seafile CE 13.0.28 and CE 12.0.14**
 (`lab/real-seafile/results/2026-11-15-seafile-render-readonly/`: HTTP 56/56 and browser 58/58 with the
 unpatched upstream Craft bundles plus the opt-in read-only legacy routes;
-`lab/real-seafile/results/2026-11-15-seafile12-replay/`: DOCX/XLSX/PPTX
-edit → save → new version → fresh-session reopen, 66/66 browser assertions), and
+`lab/real-seafile/results/2026-11-15-seafile12-detail/`: DOCX/XLSX/PPTX
+edit → save → new version (retained `history N->M grew=True
+creator_is_opener=True`) → fresh-session reopen (`url_has_login_redirect=False`),
+66/66 browser assertions with the verifier rejecting bare booleans), and
 unit-tested against a fake Seahub WOPI host (`tests/bridge/`, 33 tests, with fault injection: lost answer, 5xx after commit, redirect, acknowledged-but-not-stored). Not yet run on HTTPS with a human
 in a real browser. See `docs/REFOUNDATION-REPORT.md` §5 and §7.
 

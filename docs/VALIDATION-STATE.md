@@ -8,7 +8,11 @@ PASS for the bridge source and the consistency of the retained evidence; its
 one limitation and four documentation minors are resolved. See
 `reviews/PROJECT-CLOSURE-20261115/INDEPENDENT-REVIEW-2DD571F.md`.
 That review did **not** cover the CE12 launcher or the replay evidence chain in
-depth; those are the subject of a separate targeted review.
+depth; a separate targeted review of those ran at `5fe30c6` in an isolated
+worktree: PROVISIONAL PASS, no BLOCKER/MAJOR, two MINOR evidence-quality
+findings (version and fresh-session claims retained as bare booleans), both
+remediated and re-proven in `../lab/real-seafile/results/2026-11-15-seafile12-detail/`.
+See `reviews/PROJECT-CLOSURE-20261115/CE12-REVIEW-5FE30C6.md`.
 The prior GPT-6 Sol PROVISIONAL PASS at `98c6bba` covered
 an earlier evidence-only delta, not this candidate. **No GPT gate has run on
 `123d2a0`**, so the global gate remains open.
@@ -22,9 +26,10 @@ historical GR corpus to resume routine validation.
 | Core Seafile DOCX edit/save/reopen | HTTP slice 56/56; browser 58/58; two typed saves create versions and fresh-session reopen preserves edits | `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Legacy read-only Seafile routes | 34/34 route assertions; exact fixture bytes, OCR marker/value, no download, no version write, host reports `read-only` | `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Legacy format status | `VIEW_SUPPORTED`: ODT, ODS, CSV, PPSX. `UNSUPPORTED`: DOC, XLS, FODS, FODT, FODP, PPT, ODP, PPS | `ONLYOFFICE-REPLACEMENT-MATRIX.md` |
-| Seafile 12.0.14 isolated browser workflows | Reproduced through the checked-in CE12 launcher: WordCraft DOCX 24/24, GridCraft XLSX 27/27, DeckCraft PPTX 15/15; each saved a new version and reopened edits in a fresh session. Synthetic data only. Initial bridge-start ordering defect was fixed before this passing replay | `../lab/real-seafile/results/2026-11-15-seafile12-replay/` |
+| Seafile 12.0.14 isolated browser workflows | Reproduced through the checked-in CE12 launcher: WordCraft DOCX 24/24, GridCraft XLSX 27/27, DeckCraft PPTX 15/15; each saved a new version and reopened edits in a fresh session. Synthetic data only. Initial bridge-start ordering defect was fixed before this passing replay. Targeted review found the retained summaries assertion-only for the version and fresh-session claims; superseded by the re-run below | `../lab/real-seafile/results/2026-11-15-seafile12-replay/` |
+| Seafile 12.0.14 replay with retained proof | Re-run after remediation: 66/66 and the verifier rejects bare booleans — every version check retains `history N->M grew=True creator_is_opener=True`, every fresh-session/file-list check retains `url_has_login_redirect=False`; nine `check(name, True)` tautologies removed from the runner; sanitizer committed and unit-tested (5 tests) | `../lab/real-seafile/results/2026-11-15-seafile12-detail/`, `reviews/PROJECT-CLOSURE-20261115/CE12-REVIEW-5FE30C6.md` |
 | Bundle render diagnosis | DOC/XLS/ODT/ODS/CSV/PPSX markers verified in standalone bundles; FODS shows flat XML. DOC/XLS host failure was observed in exploratory runs, not retained as an exact-source screenshot | `../lab/real-seafile/results/2026-11-15-legacy-render-probe/` |
-| Default ArtCraft edit/save workflows | DOCX, XLSX, PPTX have isolated CE 12.0.14 save/version/fresh-reopen checks (24/24, 27/27, 15/15). Broad document/workbook/deck fidelity NOT VERIFIED | `../lab/real-seafile/results/2026-11-15-seafile12-replay/`; prior multi-app runs: `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
+| Default ArtCraft edit/save workflows | DOCX, XLSX, PPTX have isolated CE 12.0.14 save/version/fresh-reopen checks (24/24, 27/27, 15/15) with retained proof details. Broad document/workbook/deck fidelity NOT VERIFIED | `../lab/real-seafile/results/2026-11-15-seafile12-detail/`; prior multi-app runs: `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |

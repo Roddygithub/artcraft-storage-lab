@@ -1,0 +1,128 @@
+{
+ "editor": "wordcraft",
+ "assertion_count": 24,
+ "passed": 24,
+ "failed": 0,
+ "checks": [
+  {
+   "name": "browser_login",
+   "ok": true,
+   "detail": "http://seafile.lab/"
+  },
+  {
+   "name": "browser_editor_filter_selects_requested_editor",
+   "ok": true,
+   "detail": "selected=['test.docx']"
+  },
+  {
+   "name": "wordcraft_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": "url_has_login_redirect=False"
+  },
+  {
+   "name": "wordcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/<id>/file/test.', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?<query>', ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?<query>', 'office_frame')]"
+  },
+  {
+   "name": "wordcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 19s"
+  },
+  {
+   "name": "wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=browsertyped5240fc8a35 status='unsaved changes'"
+  },
+  {
+   "name": "wordcraft_save_request_carries_the_typed_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browsertyped5240fc8a35"
+  },
+  {
+   "name": "wordcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 grew=True creator_is_opener=True status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_saved_docx_contains_the_typed_marker",
+   "ok": true,
+   "detail": "marker=browsertyped5240fc8a35 len=6598 bytes_identical_to_original=False"
+  },
+  {
+   "name": "wordcraft_save_is_not_identical_bytes",
+   "ok": true,
+   "detail": "887 -> 6598 bytes"
+  },
+  {
+   "name": "wordcraft_saved_docx_bytes_look_right",
+   "ok": true,
+   "detail": "len=6598"
+  },
+  {
+   "name": "wordcraft_reopen_fresh_seafile_session",
+   "ok": true,
+   "detail": "url_has_login_redirect=False"
+  },
+  {
+   "name": "wordcraft_reopened_from_seafile_file_list",
+   "ok": true,
+   "detail": "url_has_login_redirect=False"
+  },
+  {
+   "name": "wordcraft_reopen_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'http://seafile.lab/lib/<id>/file/test.', None), ('office_frame', 'http://bridge:8778/edit/wordcraft?<query>', ''), ('frame', 'http://bridge:8778/editors/wordcraft/index.html?<query>', 'office_frame')]"
+  },
+  {
+   "name": "wordcraft_reopen_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "relay/file responses=1 after 97s"
+  },
+  {
+   "name": "wordcraft_reopen_bytes_identical_to_the_saved_version",
+   "ok": true,
+   "detail": "len=6598 vs saved 6598"
+  },
+  {
+   "name": "wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=browserreopened789c8119c5 status='unsaved changes'"
+  },
+  {
+   "name": "wordcraft_reopen_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_reopen_second_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 2->3 grew=True creator_is_opener=True status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_reopen_seafile_holds_both_markers",
+   "ok": true,
+   "detail": "marker=browserreopened789c8119c5 len=6635"
+  },
+  {
+   "name": "wordcraft_reopen_editor_holds_the_original_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browsertyped5240fc8a35"
+  },
+  {
+   "name": "wordcraft_reopen_editor_holds_the_second_typed_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browserreopened789c8119c5"
+  },
+  {
+   "name": "wordcraft_saves_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  }
+ ]
+}

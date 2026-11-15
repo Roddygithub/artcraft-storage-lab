@@ -101,12 +101,18 @@ The run directory must be new and outside the checkout. `--editors` accepts
 CE12 output directory and `.env` are private. Offline launcher check:
 `python3 tests/lab/test_local_ce12.py`; this check never starts containers.
 Retained CE12 browser results are under
-`results/2026-11-15-seafile12-replay/`. The launcher replay passed 66/66
-assertions; the initial retry exposed and fixed a startup-order bug where the
-bridge started before the DeckCraft route was added to its editor map. The
-retained replay includes sanitized assertions, screenshots, DOCX/PPTX
-readbacks, and the exact static asset manifest. The earlier run remains
-historical evidence with its own one-off provenance.
+`results/2026-11-15-seafile12-detail/`. The launcher replay passed 66/66
+assertions and keeps the proof inside each assertion's `detail` (version
+growth and creator attribution, no login redirect on fresh sessions); its
+`verify.py` rejects bare booleans. The initial replay exposed and fixed a
+startup-order bug where the bridge started before the DeckCraft route was
+added to its editor map; a targeted review then found the earlier evidence
+drop stripped the observed details, and nine `check(name, True)` tautologies,
+three of which counted in that replay's 66/66 — all remediated before this
+re-run. The retained results include sanitized assertions (committed
+sanitizer, unit-tested), screenshots, DOCX/PPTX readbacks, and the exact
+static asset manifest. The earlier runs remain historical evidence with their
+own one-off provenance.
 
 ### Optional external HTTPS origins (offline candidate; runtime NOT VERIFIED)
 

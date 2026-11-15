@@ -70,10 +70,32 @@ unconditionally and can never fail. Four of them are inside this replay —
 | --- | --- |
 | `MINOR` | The adjacent assertions (host frame present, readback bytes equal, marker visible) carry the substance, so the core claim is not resting on these. But a count that includes unfalsifiable assertions overstates coverage. |
 
-Remediated: each now asserts that the navigation did not land on
-`/accounts/login`, and records `url_has_login_redirect=False` in its detail.
-The remaining five occurrences are in flows outside this replay and are left
-for a later pass rather than changed without a re-run.
+Remediated: all nine now assert that the navigation did not land on
+`/accounts/login`, and record `url_has_login_redirect=False` in their detail.
+Correction to an earlier draft of this note: three of the remaining five —
+`wordcraft_opened_from_seafile_file_list`, `gridcraft_opened_from_seafile_file_list`
+and `pptx_opened_from_seafile_file_list` — execute inside this replay via the
+generic fixture loop and were counted in the advertised 66/66. They are fixed
+too, and the replacement evidence dir was produced from a full re-run; no
+`check(name, True)` remains in the runner.
+
+### Remediation result (verified by re-run)
+
+Full re-run on the same pinned image and launcher, sanitized with the
+committed sanitizer, retained in
+[`lab/real-seafile/results/2026-11-15-seafile12-detail/`](../../../lab/real-seafile/results/2026-11-15-seafile12-detail/).
+Its `verify.py` rejects bare booleans and requires the proof itself:
+
+| Review finding | Retained detail in the replacement evidence |
+| --- | --- |
+| MINOR 1 — "new version" assertion-only | every version check now carries `history 1->2 grew=True creator_is_opener=True` (second saves `history 2->3 …`) |
+| MINOR 2 — "fresh session" assertion-only | every fresh-session/file-list check carries `url_has_login_redirect=False` |
+| Tautologies (found during remediation) | none remain; `verify.py` requires non-empty proof for the navigation and version checks |
+
+66/66 PASS, DOCX/PPTX relay==readback byte-identical, 29 files pinned by
+`SHA256SUMS`. The sanitizer's redaction and fail-closed behaviour is unit
+tested in `tests/test_sanitize_browser_evidence.py` (5 tests, including
+idempotence of `redact()`).
 
 ## Weakest link
 
