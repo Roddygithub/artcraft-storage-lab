@@ -11,8 +11,8 @@ proof that every current ONLYOFFICE path works in practice.
 | DOCX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | WordCraft synthetic typed edits, Seafile version and fresh reopen; broad arbitrary-document fidelity NOT VERIFIED |
 | XLSX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | GridCraft synthetic typed-cell save, version and fresh reopen; broad workbook fidelity NOT VERIFIED |
 | PPTX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | DeckCraft v0.16 synthetic title edit, same-format save, version and fresh reopen; broad fidelity NOT VERIFIED |
-| DOC | View | UNSUPPORTED | Seafile-host screenshot shows unrelated WordCraft sample content despite exact fixture bytes reaching the editor; removed from route |
-| XLS | View | UNSUPPORTED | Stock Seafile CE 13.0.28 opens an empty office frame; GridCraft receives no WOPI file bytes |
+| DOC | View | UNSUPPORTED in current Seafile candidate | Standalone WordCraft bundle probe renders the synthetic marker; DOC is unrouted in the candidate and Seafile-host rendering is NOT VERIFIED by retained exact-source evidence |
+| XLS | View | UNSUPPORTED in current Seafile candidate | Standalone GridCraft bundle probe renders the marker and value; XLS is unrouted in the candidate and Seafile-host rendering is NOT VERIFIED by retained exact-source evidence |
 | ODT | View | VIEW_SUPPORTED | WordCraft displays the fixture marker; route/payload proved on Seafile; no in-place legacy save tested |
 | ODS | View | VIEW_SUPPORTED | GridCraft displays marker/value cells, warns formulas become values and Save produces XLSX; no Seafile save tested |
 | CSV | View | VIEW_SUPPORTED | GridCraft displays marker/value cells; its editor serializes XLSX, not a same-format CSV save |
@@ -28,14 +28,16 @@ These are synthetic-fixture classifications, not broad format-fidelity claims.
 No legacy row is evidence of an edit/save workflow. `CONVERT_AND_SAVE_AS` is
 not part of the ArtCraft product path; the target is the Craft suite itself.
 
-Current render evidence (isolated Craft bundles and Seafile-host screenshots):
-`lab/real-seafile/results/2026-11-15-legacy-render-probe/`. The six visible
-bundle fixtures do not imply Seafile-host rendering works for DOC or XLS.
-Current combined Seafile browser captures show DOC displays unrelated content;
-XLS opens an empty office frame without a WOPI file response. Both are
-unrouted. FODS is unrouted because GridCraft displays raw XML. The 2026-11-10 Seafile
-replay proves route and exact payload bytes, not the renderer's pixels or a
-legacy save.
+Current render evidence (isolated Craft bundles and Seafile-host screenshots for the four routed formats):
+`lab/real-seafile/results/2026-11-15-legacy-render-probe/` and
+`lab/real-seafile/results/2026-11-15-seafile-render-readonly/`. The six visible
+bundle fixtures do not imply Seafile-host rendering works for DOC or XLS. Earlier
+exploratory observations reported DOC unrelated content and an empty XLS frame,
+but those failures are not retained as exact-source evidence and are not counted
+as verified. Both formats are unrouted in the candidate. FODS is unrouted
+because GridCraft displays raw XML. Current Seafile browser evidence verifies
+visible content only for ODT, ODS, CSV and PPSX, and verifies no route for the
+eight excluded formats; it makes no legacy save claim.
 
 ## Deterministic viewing fixtures — 2026-11-08
 

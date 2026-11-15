@@ -170,3 +170,9 @@ The slices run headless over plain HTTP, so they cannot see these. Run against a
 9. `.pdf` opens Seafile's viewer; the `?edit_pdf=true` URL opens PdfCraft.
 10. If the opt-in PPTX route is enabled, `.pptx` opens in DeckCraft; unsupported legacy
     formats have no Craft route. No ONLYOFFICE behavior is assumed by this checklist.
+
+Security limit: Seafile CE 13.0.28 accepts a direct `PutFile` with a read-only
+WOPI token. The bridge refuses a read-only save through its relay, but a token
+in the browser can be extracted and sent directly to Seahub. The checklist's
+read-only UI result does not prove host-side authorization; do not treat legacy
+view routes as a production security boundary.

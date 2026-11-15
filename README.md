@@ -42,7 +42,7 @@ edit/save/new-version/fresh-reopen slice; broad presentation fidelity is unverif
 | `.svg` | VectorCraft 0.19.0 | upstream bundle plus declared lab page-API shim |
 | `.figcraft` | FigCraft 0.13.1 | upstream bundle plus declared lab page-API shim |
 | `.pptx` (lab `--pptx`) | DeckCraft 0.16.0 | unmodified upstream bundle; focused same-format edit/save/reopen verified |
-| ODF / legacy office (lab `--viewing`) | ODT → WordCraft, ODS/CSV → GridCraft, PPSX → DeckCraft | route, exact payload and synthetic render verified; DOC renders unrelated content, XLS fails WOPI routing, FODS shows raw XML; 8 formats unrouted |
+| ODF / legacy office (lab `--viewing`) | ODT → WordCraft, ODS/CSV → GridCraft, PPSX → DeckCraft | these four routes have exact-payload and synthetic-render evidence; DOC/XLS standalone bundle import works but Seafile-host behavior is not verified and they remain unrouted; FODS shows raw XML; 8 formats unrouted |
 
 The deployment example routes DXF by default; office extensions are operator
 opt-ins. The synthetic lab routes DOCX/XLSX/PDF to Craft for testing and leaves

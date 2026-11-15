@@ -13,9 +13,24 @@ authorization is not deployment authorization. The current candidate retains
 the tested core DOCX/XLSX/PPTX workflows and an opt-in **read-only** legacy route
 for ODT, ODS, CSV and PPSX. Fresh stock Seafile CE 13.0.28 browser evidence
 checks exact bytes, visible fixture semantics and the bridge `read-only` status.
-DOC shows unrelated content in the Seafile host, XLS gets no WOPI file response,
-and FODS renders raw XML; all three are now unrouted. FODT/FODP/PPT/ODP/PPS also
-remain unsupported. Per-format evidence is in `docs/ONLYOFFICE-REPLACEMENT-MATRIX.md`.
+DOC and XLS remain unrouted; standalone bundles render their fixtures, but
+Seafile-host behavior is NOT VERIFIED by retained exact-source evidence. FODS
+renders raw XML and is unrouted. FODT/FODP/PPT/ODP/PPS also remain unsupported.
+Exact-source runnable evidence is in
+`lab/real-seafile/results/2026-11-15-seafile-render-readonly/`; per-format states
+are in `docs/ONLYOFFICE-REPLACEMENT-MATRIX.md`.
+
+**Security boundary:** the isolated CE 13.0.28 host accepts a direct `PutFile`
+with a read-only WOPI token. The bridge's relay refuses writes when
+`UserCanWrite=false`, and the browser shows `read-only`, but the access token is
+present in the browser and can be extracted. This is not a host-side security
+boundary. The legacy view routes are lab-only until owner decides how to handle
+that host behavior; no production deployment or multi-user safety is claimed.
+
+The owner's live Seafile was checked read-only on 2026-11-15: HTTPS/TLS and the
+Seafile ping endpoint responded. A synthetic library exists but is not shared
+with the supplied account, so authenticated browser, edit, save and reopen tests
+remain NOT VERIFIED. No production configuration or document was changed.
 
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product

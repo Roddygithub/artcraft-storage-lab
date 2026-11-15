@@ -1,29 +1,30 @@
-# Validation checkpoint — audited 2026-11-15
+# Validation checkpoint — candidate source `4a5ab57` (2026-11-15)
 
 This short checkpoint is the continuation entry point. Do not re-read the
 historical GR corpus to resume routine validation.
 
 | Scope | State | Evidence |
 | --- | --- | --- |
-| Active offline checks | 20/20 command groups PASS, re-verified 2026-11-10 at `5aa134a` | `uv run --with playwright --with pillow python scripts/validate-candidate.py` |
-| Craft-only WordCraft layout cycle | HTTP 40/40, browser 28/28, exit 0 | `lab/real-seafile/results/2026-11-08-craft-only-wordcraft/` |
-| All six default Craft editors, source `8369e8f` | HTTP 40/40, browser 119/119, exit 0 | `../lab/real-seafile/results/2026-11-08-all-craft-validation/` |
-| Official DeckCraft PPTX opt-in | focused 15/15; combined HTTP 40/40, browser 132/132, exit 0 | `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
-| Remaining office viewing formats and broad fidelity | Fixtures; `--viewing` browser routing 140/140 (21 viewing checks); bundle import 5/5 documented + 2/7 undocumented (FODS, PPSX); FODS/PPSX browser routes verified (59/59, 173/173); routed formats' payload delivery verified (59/59, 67/67); rendered content NOT VERIFIED | `GR-088-UNDOCUMENTED-LEGACY-IMPORT-PROBE.md`, `results/2026-11-09-legacy-viewing-browser/`, `results/2026-11-10-viewing-fods-ppsx/`, `results/2026-11-10-viewing-relay-bytes/` |
-| Routed legacy payload delivery | HTTP 59/59, browser 67/67 (43 viewing checks): all seven routed formats' editors received the exact fixture bytes, marker included | `results/2026-11-10-viewing-relay-bytes/` |
-| Mechanical evidence self-audit | 17 evidence directories: hashes, verifiers, provenance ancestors and secret scan PASS; NOT an independent review | `scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261108/FORENSIC-AUDIT-20261110.md` |
-| Independent audit at `cd4c8ba` | PROVISIONAL PASS; no blocker/major, six minors. Loose historical JSON and documentation minors remediated; audit rerun covers 17 directories + 2 root JSON files | audit task report; `scripts/forensic-audit.py` |
-| Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
+| Active offline checks | 20/20 command groups PASS at exact source `4a5ab576da0e0a0f227e672d8ea6258ea90c9acc` | `../lab/real-seafile/results/2026-11-15-offline-validation/` |
+| Core Seafile DOCX edit/save/reopen | HTTP slice 56/56; browser 58/58; two typed saves create versions and fresh-session reopen preserves edits | `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
+| Legacy read-only Seafile routes | 34/34 route assertions; exact fixture bytes, OCR marker/value, no download, no version write, host reports `read-only` | `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
+| Legacy format status | `VIEW_SUPPORTED`: ODT, ODS, CSV, PPSX. `UNSUPPORTED`: DOC, XLS, FODS, FODT, FODP, PPT, ODP, PPS | `ONLYOFFICE-REPLACEMENT-MATRIX.md` |
+| Bundle render diagnosis | DOC/XLS/ODT/ODS/CSV/PPSX markers verified in standalone bundles; FODS shows flat XML. DOC/XLS host failure was observed in exploratory runs, not retained as an exact-source screenshot | `../lab/real-seafile/results/2026-11-15-legacy-render-probe/` |
+| Default ArtCraft edit/save workflows | DOCX, XLSX, PPTX evidence remains the prior synthetic baseline; broad document/workbook/deck fidelity NOT VERIFIED | `../lab/real-seafile/results/2026-11-08-wordcraft-corpus-recovery/`, `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
+| HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
+| Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
-| Independent review / final project GPT gate | free review PROVISIONAL PASS at `265897f`; delta review at `7d18afb` PROVISIONAL PASS (3 MINOR, remediated); GPT gate NOT PERFORMED (quota) | `reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md`, `...-DELTA.md` |
+| Independent and final review | Prior audit at `cd4c8ba` was PROVISIONAL PASS with six minors; implementation/doc delta awaits new independent review and GPT-6 Sol gate | `../reviews/PROJECT-CLOSURE-20261108/`, current candidate dossier |
+| Mechanical evidence self-audit | PASS: 20 evidence directories, hashes/verifiers/provenance, 2 loose JSON files and secret scan at source `4a5ab57`; not independent | `../scripts/forensic-audit.py`; private run summary |
+| Owner's live Seafile server | Read-only HTTPS/TLS and ping PASS; inspected release is older than tested CE 13.0.28, ArtCraft bridge is absent, and synthetic library is not shared. Authenticated browser/edit/save NOT VERIFIED | private infrastructure discovery; no production writes |
 
-ONLYOFFICE is retired; do not restart compatibility campaigns. Production is
-outside this validation run. Upstream remains LOCKED. An automated subset PASS
-must never be presented as full format coverage or project approval.
+ArtCraft is the intended suite. ONLYOFFICE retirement is authorized, but
+production is outside these tests and remains untouched. Upstream remains
+LOCKED. An automated subset PASS is not full format coverage or project approval.
 
-The independent audit and its follow-up fixes are recorded in the current
-branch history. Its free-model verdict remains PROVISIONAL; the GPT gate and
-human acceptance remain open.
+The prior independent audit and follow-up fixes are recorded in repository
+history. Its verdict remains PROVISIONAL; owner-server and hardware acceptance
+and the GPT gate remain open.
 
 ## Repeat checks with compact output
 
@@ -53,31 +54,21 @@ prove full pagination or font fidelity.
 
 ## Next unresolved work
 
-1. Required legacy/OpenDocument viewing formats: deterministic fixtures, the
-   opt-in routing candidate, a real-Seafile browser routing replay (HTTP 57/57,
-   browser 140/140, 21 viewing checks at `53c7e22`) and a **bundle-level import
-   probe** (5/5 passed, `scripts/probe-legacy-import.py`) now exist for the five
-   routed formats; DOC/ODT (WordCraft) and XLS/ODS/CSV (GridCraft) have a
-   documented upstream import, a browser-verified route and proven bundle
-   import. Rendered legacy content inside the combined host+browser session is
-   still NOT VERIFIED: the nested same-origin `/relay/file` request fires before
-   a listener can attach. GR-088 then probed the other seven: FODS (GridCraft)
-   and PPSX (DeckCraft) import at bundle level, while PPT, PPS, ODP and FODP only
-   open a blank deck and FODT does not save.   FODS and PPSX are in the opt-in route and passed the 2026-11-10 real browser replay (59/59, 173/173); five
-   formats remain unrouted. A focused replay then captured the bridge's `/relay/file` response per
-   routed format (HTTP 59/59, browser 67/67, 43 viewing checks, `results/2026-11-10-viewing-relay-bytes/`):
-   every routed editor received the exact fixture bytes with the marker, while rendered pixels remain
-   NOT VERIFIED. For the five unrouted formats, `LEGACY-CONVERSION-FEASIBILITY.md` shows a converter is
-   viable only if the bridge also presents a converted name/extension — an architectural decision, not a
-   routing flag.
-2. Hardware WebGPU, clipboard, exact fonts and unload-guard acceptance.
-3. Project GPT gate (Luna auditor and Sol final reviewer). A mechanical self-audit of the
-   committed evidence passes at 17 directories but is not independent. An independent free
-   review at `265897f` returned PROVISIONAL PASS with two Playwright-dependency
-   minors, now remediated, and an independent free review of the payload-evidence
-   delta at `7d18afb` returned PROVISIONAL PASS with three MINOR, all remediated;
-   the `openai` provider quota still blocks the GPT audit. No global PASS has been
-   granted.
+1. Reproduce the authenticated HTTPS workflow on the owner's Seafile with a
+   synthetic document. The credentials supplied in chat have not been used.
+   The existing synthetic library must be shared to the supplied account, or
+   the owner must authorize creation of a dedicated test library. No existing
+   user files will be changed. The inspected live release is older than the
+   CE 13.0.28 candidate and has no ArtCraft bridge; an upgrade or deployment is
+   a separate owner decision and is not authorized by this validation task.
+2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
+   close, refused saves and network recovery.
+3. Perform a mechanical evidence audit, then independent forensic review and
+   GPT-6 Sol adversarial review of the frozen exact candidate SHA. Existing free
+   reviews remain PROVISIONAL and do not satisfy this gate.
+4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
+   unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
+   No converter or LibreOffice product path is planned.
 
-The default six-editor candidate remains unchanged. Add `--pptx` and the
-verified official DeckCraft assets for the validated seven-editor option.
+The default six-editor candidate remains unchanged. `--pptx` is opt-in and the
+four legacy routes are also opt-in and read-only.

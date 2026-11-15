@@ -8,42 +8,38 @@ under `docs/reviews/` and `integration/` as evidence.
 
 | What | Evidence |
 | --- | --- |
-| Decision: zero-patch WOPI editor bridge, ONLYOFFICE kept for office | report §5 |
+| Decision: zero-patch WOPI editor bridge; owner later authorized ONLYOFFICE retirement and selected ArtCraft as the target suite | report §5; `docs/ONLYOFFICE-RETIREMENT-20261108.md` |
 | Bridge prototype + fake-host tests | `bridge/`, `tests/bridge/` (33) |
-| Real Seafile CE 13.0.28 + ONLYOFFICE 9.4 lab, HTTP slice | `lab/real-seafile/results/slice.json` (45/45) |
+| Historical Seafile CE 13.0.28 + ONLYOFFICE 9.4 lab, HTTP slice | `lab/real-seafile/results/slice.json` (45/45); not the active candidate |
 | Real browser path: 4 unpatched upstream bundles, VectorCraft via shim, DeckCraft/SoundCraft/PhotoCraft/DesignCraft via local ports built in the lab | `results/browser.json` (50/50), screenshots |
 | Independent review R2 of the bridge, all HIGH/MEDIUM fixed | report §7, historical suite at review time (30); current suite has 33 |
 | Deployment kit | `deploy/bridge/` |
 | Upstream drafts (unpublished) | `docs/upstream-drafts/` |
 
-## Active next steps — owner override, 2026-11-08
+## Active status — owner override, updated 2026-11-15
 
 Compact validation/continuation entry point: `docs/VALIDATION-STATE.md`.
 
 ONLYOFFICE is retired by owner instruction (`docs/ONLYOFFICE-RETIREMENT-20261108.md`).
 Do not run the historical ONLYOFFICE campaigns below.
 
-1. Done: ONLYOFFICE removed from active lab; fresh WordCraft replay HTTP 40/40,
-   browser 28/28, exit 0 (`lab/real-seafile/results/2026-11-08-craft-only-wordcraft/`).
-2. Done (opt-in `--pptx`): official DeckCraft v0.16.0 same-format edit/save/reopen,
-   focused 15/15 and combined seven-editor 132/132 browser checks; see validation checkpoint.
-3. Done for the read-only viewing candidate: deterministic fixtures, exact
-   payload checks, OCR-gated Seafile renders, and read-only host status are being
-   retained for ODT→WordCraft, ODS/CSV→GridCraft, and PPSX→DeckCraft. DOC renders
-   unrelated sample content in the Seafile-host flow; XLS gets no WOPI file
-   response; FODS displays raw XML. Those three stay unrouted, along with the
-   five formats whose Craft import probe failed (FODT/FODP/PPT/ODP/PPS). Legacy
-   editing/saving remains unsupported and is deliberately disabled in the
-   viewing lab. User-owned HTTPS/hardware acceptance and the final independent
-   review remain open. No converter is in the ArtCraft product path.
-4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
-   Evidence is frozen at `864fc77`, pushed as `265897f`; an independent free review
-   returned PROVISIONAL PASS with two Playwright-dependency minors, remediated.
-   A mechanical self-audit (`scripts/forensic-audit.py`) re-checks committed
-   hashes, verifiers, provenance ancestry and secrets over 17 evidence
-   directories; it is not independent. An independent free review of the
-   payload-evidence delta at `7d18afb` returned PROVISIONAL PASS with three MINOR,
-   all remediated. The project GPT gate itself is pending (provider quota).
+1. Automated isolated candidate: 20/20 offline command groups pass at source
+   `4a5ab576da0e0a0f227e672d8ea6258ea90c9acc`. Fresh Seafile CE 13.0.28 lab at
+   that source passed HTTP 56/56 and browser 58/58. Core DOCX typed edits create
+   Seafile versions and survive a fresh-session reopen.
+2. Opt-in read-only legacy routes: ODT→WordCraft, ODS/CSV→GridCraft and
+   PPSX→DeckCraft have exact-byte, visible-marker and read-only-state checks.
+   DOC/XLS are unrouted; their standalone fixture render works, but retained
+   Seafile-host behavior is NOT VERIFIED. FODS displays raw XML; FODT/FODP/PPT/
+   ODP/PPS remain unrouted. No legacy edit/save or conversion is claimed.
+3. Owner server discovery is read-only: HTTPS/TLS and Seafile ping respond. A
+   synthetic library exists but is not shared with the supplied account; no
+   authenticated browser, edit or save test has been run. Await account access
+   to the existing synthetic library or authorization to create a test library.
+4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance, exact-source
+   mechanical audit, independent forensic review and GPT-6 Sol adversarial gate.
+   Current endpoint tests and free reviews do not satisfy the final project gate.
+   No converter or LibreOffice product path is planned.
 
 ## Historical next steps (superseded where they require ONLYOFFICE)
 

@@ -1,0 +1,108 @@
+{
+  "source": "4a5ab576da0e0a0f227e672d8ea6258ea90c9acc",
+  "scope": "active offline checks only",
+  "passed": 20,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "tests/bridge/test_bridge.py",
+      "exit": 0,
+      "seconds": 1.32
+    },
+    {
+      "name": "tests/lab/test_local.py",
+      "exit": 0,
+      "seconds": 0.36
+    },
+    {
+      "name": "tests/test_candidate_scope.py",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "tests/test_gridcraft_real_edit.py",
+      "exit": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "tests/test_pdfcraft_real_edit.py",
+      "exit": 0,
+      "seconds": 0.31
+    },
+    {
+      "name": "tests/test_cadcraft_real_edit.py",
+      "exit": 0,
+      "seconds": 0.87
+    },
+    {
+      "name": "tests/test_vector_fig_real_edit.py",
+      "exit": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "tests/test_docx_fidelity_corpus.py",
+      "exit": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "tests/test_wordcraft_browser_fixture.py",
+      "exit": 0,
+      "seconds": 0.31
+    },
+    {
+      "name": "tests/test_wordcraft_reopen_wait.py",
+      "exit": 0,
+      "seconds": 19.45
+    },
+    {
+      "name": "tests/test_pptx_roundtrip_fixture.py",
+      "exit": 0,
+      "seconds": 0.16
+    },
+    {
+      "name": "tests/test_deckcraft_real_edit.py",
+      "exit": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "tests/test_deckcraft_render_wait.py",
+      "exit": 0,
+      "seconds": 4.72
+    },
+    {
+      "name": "tests/test_xlsx_fixture.py",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "tests/test_gr041_craft_zip_limits.py",
+      "exit": 0,
+      "seconds": 0.21
+    },
+    {
+      "name": "tests/test_legacy_fixtures.py",
+      "exit": 0,
+      "seconds": 0.27
+    },
+    {
+      "name": "tests/bridge/test_host.mjs",
+      "exit": 0,
+      "seconds": 0.12
+    },
+    {
+      "name": "tests/bridge/test_host_shim.mjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "tests/bridge/test_shim.mjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "shell-syntax",
+      "exit": 0,
+      "seconds": 0.0
+    }
+  ]
+}

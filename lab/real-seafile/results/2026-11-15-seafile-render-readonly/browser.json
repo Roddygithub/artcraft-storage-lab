@@ -1,0 +1,252 @@
+{
+  "source_commit": "4a5ab576da0e0a0f227e672d8ea6258ea90c9acc",
+  "seafile_version": "13.0.28",
+  "passed": 58,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "viewing_probe_authenticated_session",
+      "ok": true
+    },
+    {
+      "name": "viewing_render_ocr_available",
+      "ok": true
+    },
+    {
+      "name": "viewing_doc_odt_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "viewing_doc_odt_routes_to_wordcraft",
+      "ok": true
+    },
+    {
+      "name": "viewing_doc_odt_host_reports_read_only",
+      "ok": true
+    },
+    {
+      "name": "viewing_doc_odt_editor_received_the_fixture",
+      "ok": true,
+      "detail": "captured=True bytes=9325 expected=9325"
+    },
+    {
+      "name": "viewing_doc_odt_editor_payload_contains_the_marker",
+      "ok": true,
+      "detail": "odt content.xml"
+    },
+    {
+      "name": "viewing_doc_odt_rendered_marker_and_expected_value",
+      "ok": true,
+      "detail": "fixture marker/value visibility; last OCR: brlegacymarker20261108syntheticlegacyopendocumentviewingfixture"
+    },
+    {
+      "name": "viewing_doc_odt_open_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "viewing_doc_odt_open_wrote_no_version",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_ods_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_ods_routes_to_gridcraft",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_ods_host_reports_read_only",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_ods_editor_received_the_fixture",
+      "ok": true,
+      "detail": "captured=True bytes=8763 expected=8763"
+    },
+    {
+      "name": "viewing_sheet_ods_editor_payload_contains_the_marker",
+      "ok": true,
+      "detail": "odt content.xml"
+    },
+    {
+      "name": "viewing_sheet_ods_rendered_marker_and_expected_value",
+      "ok": true,
+      "detail": "fixture marker/value visibility; last OCR: vuuoldollhyhnpotlportuiessvecotmeliesaveopesuilsdilgwiltolpecgicuiglesouicepopmgluniychidilshiidqesavixvykkmarkerabccdefghjklmmarkerigrlegacymarker20261108value42"
+    },
+    {
+      "name": "viewing_sheet_ods_open_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_ods_open_wrote_no_version",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_csv_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_csv_routes_to_gridcraft",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_csv_host_reports_read_only",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_csv_editor_received_the_fixture",
+      "ok": true,
+      "detail": "captured=True bytes=42 expected=42"
+    },
+    {
+      "name": "viewing_sheet_csv_editor_payload_contains_the_marker",
+      "ok": true,
+      "detail": "plain text"
+    },
+    {
+      "name": "viewing_sheet_csv_rendered_marker_and_expected_value",
+      "ok": true,
+      "detail": "fixture marker/value visibility; last OCR: vymvyfemarkerabisdefghjklmmarkericrlegacymarker20261108value42"
+    },
+    {
+      "name": "viewing_sheet_csv_open_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "viewing_sheet_csv_open_wrote_no_version",
+      "ok": true
+    },
+    {
+      "name": "viewing_slide_ppsx_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "viewing_slide_ppsx_routes_to_deckcraft",
+      "ok": true
+    },
+    {
+      "name": "viewing_slide_ppsx_host_reports_read_only",
+      "ok": true
+    },
+    {
+      "name": "viewing_slide_ppsx_editor_received_the_fixture",
+      "ok": true,
+      "detail": "captured=True bytes=23994 expected=23994"
+    },
+    {
+      "name": "viewing_slide_ppsx_editor_payload_contains_the_marker",
+      "ok": true,
+      "detail": "opc ppt/slides/slide1.xml"
+    },
+    {
+      "name": "viewing_slide_ppsx_rendered_marker_and_expected_value",
+      "ok": true,
+      "detail": "fixture marker/value visibility; last OCR: grlegacymarker20261108"
+    },
+    {
+      "name": "viewing_slide_ppsx_open_did_not_download",
+      "ok": true
+    },
+    {
+      "name": "viewing_slide_ppsx_open_wrote_no_version",
+      "ok": true
+    },
+    {
+      "name": "browser_login",
+      "ok": true
+    },
+    {
+      "name": "browser_editor_filter_selects_requested_editor",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_opened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_request_carries_the_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saved_docx_contains_the_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_save_is_not_identical_bytes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saved_docx_bytes_look_right",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_fresh_seafile_session",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopened_from_seafile_file_list",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_host_frame_from_seahub",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_ready_and_document_opened",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_bytes_identical_to_the_saved_version",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_save_confirmed_by_host_page",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_second_save_creates_seafile_version_by_user",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_seafile_holds_both_markers",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_holds_the_original_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_reopen_editor_holds_the_second_typed_marker",
+      "ok": true
+    },
+    {
+      "name": "wordcraft_saves_did_not_download",
+      "ok": true
+    }
+  ]
+}

@@ -10,9 +10,9 @@ fixture probe, not broad fidelity or an in-Seafile render claim.
 
 | Format | Editor | Render result | Visible semantic check |
 | --- | --- | --- | --- |
-| DOC | WordCraft | bundle: PASS; Seafile host: **FAIL** | Isolated bundle shows the marker, but the Seafile-host screenshot shows unrelated sample content; DOC stays unrouted |
+| DOC | WordCraft | bundle: PASS; Seafile host: NOT VERIFIED in retained exact-source evidence | An earlier exploratory run reportedly showed unrelated sample content in the host; that screenshot is not retained here, so this is not counted as a reproducible host-render failure |
 | ODT | WordCraft | PASS | marker on the document page |
-| XLS | GridCraft | bundle: PASS; Seafile route: **FAIL** | Standalone GridCraft displays marker and `value / 42`; stock Seafile opens an empty office frame and sends no WOPI file bytes; XLS stays unrouted |
+| XLS | GridCraft | bundle: PASS; Seafile host: NOT VERIFIED in retained exact-source evidence | An earlier exploratory run reportedly opened an empty office frame without WOPI file bytes; that run is not retained here, so this is not counted as a reproducible host-route failure |
 | ODS | GridCraft | PASS | marker and `value / 42` in cells; editor warns it imports data only and saves XLSX |
 | CSV | GridCraft | PASS | marker and `value / 42` in cells |
 | PPSX | DeckCraft | PASS | marker visibly rendered on slide 1 |
@@ -20,11 +20,9 @@ fixture probe, not broad fidelity or an in-Seafile render claim.
 
 All seven pass the existing bundle-level serialization-marker probe. That
 proves FODS bytes reach an import/save path, but the screenshot shows the wrong
-content model. The DOC host screenshot also shows unrelated WordCraft sample
-content despite exact fixture bytes reaching the editor. XLS can render in the
-standalone GridCraft bundle, but stock Seafile CE 13.0.28 does not route it to
-WOPI. Accordingly DOC, XLS and FODS are **UNSUPPORTED** in the Seafile product
-candidate. No ArtCraft bundle or bridge code was changed.
+content model. DOC and XLS remain unrouted in the Seafile candidate; their host
+behavior is **NOT VERIFIED** by this retained probe. FODS is unsupported based
+on its retained render result. No ArtCraft bundle or bridge code was changed.
 
 The evidence is deliberately bundled as: screenshot + editor-emitted payload
 summary + OCR verifier. Inspect the PNGs directly for layout. OCR verifies the

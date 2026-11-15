@@ -1,0 +1,14 @@
+{
+  "source_commit": "4a5ab576da0e0a0f227e672d8ea6258ea90c9acc",
+  "command": "uv run --with playwright --with pillow python lab/real-seafile/local.py --viewing --editor wordcraft",
+  "seafile": "Community Edition 13.0.28, disposable rootless Podman project",
+  "browser": "Playwright Python 1.49.0 / bundled Chromium",
+  "ocr": "Tesseract OCR 5.3.4-1build5 in disposable browser container",
+  "static_manifest_sha256": "5f0cef84fe03efb916496be2df103b9661ee293a19f7e7771233c5260a9963b9",
+  "routed_legacy_formats": ["odt", "ods", "csv", "ppsx"],
+  "read_only": true,
+  "retained": "sanitized check names and booleans, exact fixture byte assertions, OCR details, synthetic screenshots",
+  "not_retained": "per-run credentials, repository IDs, WOPI URLs/tokens/file IDs, full logs or raw HTML",
+  "production": "not contacted",
+  "upstream": "not contacted"
+}

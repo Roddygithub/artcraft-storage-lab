@@ -55,7 +55,7 @@ def main():
 
     fods = ocr("sheet_fods.png")
     assert "office:document" in fods.lower(), "expected the visible FODS XML leak"
-    print("FAIL render (expected finding): sheet_fods.png displays office:document XML")
+    print("EXPECTED FINDING: FODS displays office:document XML; rendering is unsupported")
 
 
 if __name__ == "__main__":
