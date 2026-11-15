@@ -154,9 +154,11 @@ deletes the build's `target/` (each is several GB on a 30 GB disk).
 
 Use [`docs/reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md`](../../docs/reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md)
 to record browser, GPU, font, clipboard, popup, dirty-close, refused-save and
-network-recovery observations. The owner's live Seafile is 12.0.14 and has no
-ArtCraft bridge; this checklist needs a separately authorized HTTPS test
-deployment and does not authorize installing the bridge on that server.
+network-recovery observations. The owner's live Seafile is 12.0.14 with
+current WOPI disabled. It has a legacy repo-scoped Seahub route and a separate
+active gateway service; their connection is unverified. This checklist applies
+to the current stateless WOPI path and needs an isolated HTTPS test deployment.
+It does not authorize changing the live server.
 
 The slices run headless over plain HTTP, so they cannot see these. Run against a deployment from
 `deploy/bridge/` behind TLS, in Chrome/Edge and Firefox:

@@ -20,7 +20,7 @@ historical GR corpus to resume routine validation.
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |
 | Independent and final review | GPT-6 Sol at `546ce0d`: PROVISIONAL PASS for documentation follow-up; no new MINOR. A later live-route discovery is not included in that review. No global GPT PASS | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-546CE0D.md` |
 | Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
-| Owner's live Seafile server | HTTPS/TLS and ping PASS; synthetic library shared read-write. Seafile 12.0.14; current WOPI bridge disabled. A pre-existing patched, repo-scoped third-party route and gateway are active. Historical GR-059 records a real legacy-route save/version/reopen, not current WOPI. No config/content changed during this task. Authenticated current-bridge edit/save NOT VERIFIED | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md), `GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` |
+| Owner's live Seafile server | HTTPS/TLS and ping PASS; synthetic library shared read-write. Seafile 12.0.14; current WOPI disabled. Patched Seahub route allowlists the synthetic library; a separate gateway service is active, but its relationship to the configured action URL is unverified. Historical GR-059 records a real legacy-route save/version/reopen, not current WOPI. No config/content changed during this task. Authenticated current-bridge edit/save NOT VERIFIED | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md), `GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized. Production
 deployment remains outside these tests. Only the authorized synthetic-library
@@ -63,8 +63,9 @@ prove full pagination or font fidelity.
 1. Reproduce the authenticated HTTPS workflow on the owner's Seafile with a
    synthetic document. Test-library access is now prepared, but the live
    Seafile is 12.0.14 and the current WOPI bridge is disabled. A legacy patched
-   route and gateway remain active for the synthetic library. Stock WOPI
-   routing is extension-wide, so the current bridge cannot be limited to one
+   route allowlists the synthetic library, and a separate gateway service is
+   active; their connection is unverified. Stock WOPI routing is extension-wide,
+   so the current bridge cannot be limited to one
    library with the existing configuration. Use an isolated Seafile test
    instance or obtain separate approval for broader routing changes. These
    post-review server findings need an independent documentation review.

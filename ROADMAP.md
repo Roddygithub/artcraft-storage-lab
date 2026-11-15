@@ -34,8 +34,10 @@ Do not run the historical ONLYOFFICE campaigns below.
    ODP/PPS remain unrouted. No legacy edit/save or conversion is claimed.
 3. Owner-server test access is prepared: the corrected account is active and
    the synthetic library is shared read-write. Read-only inspection found a
-   pre-existing patched, repository-scoped ArtCraft route and active legacy
-   gateway for that library; current WOPI is disabled. Stock WOPI routing is
+   pre-existing patched, repository-scoped ArtCraft route that allowlists the
+   synthetic library, plus a separate active legacy gateway service; the
+   service's relation to the configured action URL is unverified. Current WOPI
+   is disabled. Stock WOPI routing is
    extension-wide, so a test limited to one library requires an isolated
    Seafile 12 instance. GR-059 contains historical legacy-route edit/save
    evidence, not evidence for the current candidate. This post-review discovery
