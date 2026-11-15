@@ -34,10 +34,10 @@ a dedicated test library, but it has not been created without a valid account.
 Authenticated browser, edit, save and reopen tests remain NOT VERIFIED. No
 production configuration or document was changed.
 
-Independent GPT-6 Sol reviews at `d2379f0` and `9def0bb` returned
+Independent GPT-6 Sol reviews at `d2379f0`, `9def0bb` and `ad638d1` returned
 **PROVISIONAL PASS for the isolated MVP subset only**. The production-boundary
 MAJOR remains disclosed. Wording and audit-scope MINOR findings were corrected;
-the `9def0bb` review found one stale roadmap item, now removed on the current
+the last review found one stale closure-ledger item, now removed on the current
 follow-up. A review of that follow-up SHA is pending. No production readiness
 or project-wide PASS is claimed.
 
@@ -108,10 +108,10 @@ direct endpoint. Same-origin editor bundles are trusted code with access to
 the host frame, not a sandbox protecting that frame's token. These limits
 must remain visible in the final verdict and deployment documentation.
 
-Production upgrades/rollback, live ONLYOFFICE diagnosis and deployment are
-separate owner-controlled work, not actions required to close the isolated
-lab MVP. Upstream remains LOCKED until a project GPT PASS and separate owner
-publication approval. Direct parent work is not Aptarchy completion.
+Production upgrades, rollback and deployment remain separate owner-controlled
+work; they are not required to close the isolated lab MVP. Upstream remains
+LOCKED until a project GPT PASS and separate owner publication approval.
+Direct parent work is not Aptarchy completion.
 
 ## Blocking coexistence defect found in packaged Seahub 13.0.28
 

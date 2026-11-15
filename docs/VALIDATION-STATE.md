@@ -14,7 +14,7 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
-| Independent and final review | GPT-6 Sol at `9def0bb`: PROVISIONAL PASS for isolated subset only; production-boundary MAJOR remains disclosed. One roadmap MINOR is corrected on the current follow-up. No global GPT PASS | `../reviews/PROJECT-CLOSURE-20261115/` |
+| Independent and final review | GPT-6 Sol at `ad638d1`: PROVISIONAL PASS for isolated subset only; production-boundary MAJOR remains disclosed. One closure-ledger MINOR is corrected on the current follow-up; review of that SHA is pending | `../reviews/PROJECT-CLOSURE-20261115/` |
 | Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `../reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
 | Owner's live Seafile server | Read-only HTTPS/TLS and ping PASS; release is older than tested CE 13.0.28, ArtCraft bridge is absent, and synthetic library is unshared. Supplied account is not registered in Seafile; no test library created. Authenticated edit/save NOT VERIFIED | private infrastructure discovery; no production writes |
 
@@ -63,9 +63,9 @@ prove full pagination or font fidelity.
    deployment is a separate owner decision and is not authorized here.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
-3. GPT-6 Sol at `9def0bb` returned PROVISIONAL PASS for the isolated subset
-   only and found one roadmap MINOR, now corrected. Obtain an adversarial review
-   of the current follow-up SHA; no project-wide gate has passed.
+3. GPT-6 Sol at `ad638d1` returned PROVISIONAL PASS for the isolated subset
+   only and found one closure-ledger MINOR, now corrected. Obtain an adversarial
+   review of the current follow-up SHA; no project-wide gate has passed.
 4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
    unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
    No converter or LibreOffice product path is planned.
