@@ -1,11 +1,13 @@
 # Final-candidate review packet — 2026-11-15
 
 This packet asks an independent reviewer to assess the exact repository SHA
-provided with the review task. The route correction began at
-`4a5ab576da0e0a0f227e672d8ea6258ea90c9acc`; labels were aligned with the retained
-evidence at `be51c3b577fda9834de4364a35d0784d28f62492`, where the offline and
-Seafile lab runs were repeated. Documentation and sanitized evidence updates
-are layered on top. Do not treat a source-run PASS as a project-wide PASS.
+provided with the review task. The current technical candidate is
+`123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`; the commits layered on top are
+documentation and sanitized evidence only (`git diff --stat 123d2a0 <SHA>`
+should show no change under `bridge/`). The route correction began at
+`4a5ab576da0e0a0f227e672d8ea6258ea90c9acc`, and labels were aligned with the
+retained evidence at `be51c3b577fda9834de4364a35d0784d28f62492`. Do not treat a
+source-run PASS as a project-wide PASS.
 
 ## Owner intent and scope
 
@@ -21,21 +23,31 @@ deployment or upstream publication is authorized by this packet.
 
 ## Current evidence
 
-* `lab/real-seafile/results/2026-11-15-offline-validation/`: 20/20 offline
-  command groups at the exact source commit.
+* `lab/real-seafile/results/2026-11-15-offline-validation-123d2a0/`: 21/21
+  offline command groups at the exact candidate `123d2a0`, with every log
+  retained and manifest-verified.
 * `lab/real-seafile/results/2026-11-15-seafile-render-readonly/`: isolated
   Seafile CE 13.0.28; HTTP 56/56, browser 58/58; DOCX typed edits create
   versions and survive a fresh-session reopen; ODT, ODS, CSV and PPSX have
   visible synthetic markers and read-only UI checks.
+* `lab/real-seafile/results/2026-11-15-seafile12-replay/`: pinned Seafile CE
+  12.0.14; WordCraft DOCX 24/24, GridCraft XLSX 27/27, DeckCraft PPTX 15/15
+  browser assertions, each with a new Seafile version and a fresh-session
+  reopen. DOCX and PPTX relay/readback bytes are retained; GridCraft's runner
+  does not retain XLSX relay bytes, so its claim is limited to the recorded
+  assertions.
+* `lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`: the same
+  CE12 three-editor replay (24 DOCX + 27 XLSX + 15 PPTX = 66) at the earlier
+  source `11b75a2`, superseded by the replay above at the current candidate.
 * `lab/real-seafile/results/2026-11-15-legacy-render-probe/`: standalone bundle
   render screenshots; FODS displays raw XML. DOC/XLS host behavior was reported
   by earlier exploratory runs, but those failures are not retained as exact-
   source evidence and must be treated as NOT VERIFIED.
-* `scripts/forensic-audit.py`: mechanical self-audit inventories 20 result
-  directories/checksum manifests, runs 17 available verifiers, checks 16
-  provenance files and scans 2 loose JSON files for known secret patterns.
-  It is not a complete verifier/provenance chain for every directory and does
-  not replace independent review.
+* `scripts/forensic-audit.py`: mechanical self-audit inventories 24 result
+  directories/checksum manifests, runs 21 available verifiers, checks 19
+  provenance files and scans 87 JSON files plus 2 loose root JSON files for
+  known secret patterns. It is not a complete verifier/provenance chain for
+  every directory and does not replace independent review.
 
 ## Independent review rounds
 

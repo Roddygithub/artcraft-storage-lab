@@ -44,6 +44,7 @@ in Seafile or reported as failed.**
 | Read-back verification after PutFile | `/relay/save` | 200 only when readback observes these bytes; "acknowledged but not stored" is 502, differing bytes with a changed version are 409 |
 | Reconciliation on lost answer, 5xx or redirect | `/relay/save` | PutFile is never retried blindly; redirects are refused (urllib would turn PutFile into a GET) |
 | File name unchanged, content signature matches extension | `/relay/save` | no PDF bytes into a `.docx`; a Save As / Export from the editor becomes a browser download from the host page and is reported to the editor as *not* stored |
+| Unknown extensions are not byte-checked | `bridge/app.py` (`content_matches_extension`) | only extensions listed in `SIGNATURE_KNOWN` are verified; a deployment that maps a new extension gets no signature guard until it is added there |
 | `WOPISrc` must be a Seahub WOPI file endpoint on the configured origin; relay calls same-origin with a custom header; nonce CSP on the host page; full CSP on editor pages (`connect-src 'self'`); `frame-ancestors` = Seahub | everywhere | SSRF / CSRF / token exfiltration / clickjacking |
 | A refused save keeps the page dirty; an expired token downloads the document instead of losing it | `host.js` | the editor may believe it saved; the host page does not |
 
@@ -83,6 +84,13 @@ On Seahub 12.0 the WOPI branch is only reached for office/PDF file types (see th
 proxy in front for TLS and compression (`deploy/bridge/`), or run `bridge.wsgi:application` under any WSGI
 server. The bridge keeps no state between requests, so several workers are fine.
 
+`/relay/save` buffers the whole request body in memory before it validates the token, bounded by
+`Config.max_bytes` (default 256 MiB). The relay is gated to the bridge's own origin, so a browser
+on another site cannot reach it; a direct HTTP client still can, and the error is only known after
+the body has been read. A reverse proxy in front of the bridge should therefore enforce a
+request-body limit and a rate limit. Reading first is deliberate: it lets the bridge answer with a
+clean JSON error instead of resetting the connection on an unread body.
+
 ## Run locally
 
 ```bash
@@ -102,7 +110,7 @@ bridge/static/host.html  host page template (nonce CSP)
 bridge/static/host.js    editor protocol, save discipline, locks
 bridge/editors.example.json
 tests/bridge/fake_seahub.py   fake of seahub/wopi/views.py semantics (incl. its missing can_edit check)
-tests/bridge/test_bridge.py   32 offline checks
+tests/bridge/test_bridge.py   33 offline checks
 ```
 
 ## Real-Seafile lab
