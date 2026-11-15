@@ -35,7 +35,8 @@ Do not run the historical ONLYOFFICE campaigns below.
    ODP/PPS remain unrouted. No legacy edit/save or conversion is claimed.
 3. Isolated stock Seafile CE 12.0.14 browser edit/save/reopen now passes for
    DOCX, XLSX and PPTX (66/66 assertions); retained evidence is under
-   `lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`.
+   `lab/real-seafile/results/2026-11-15-seafile12-replay/` (checked-in launcher
+   replay, 66/66 assertions; initial bridge startup-order defect corrected).
    Owner-server access is still unauthenticated: the supplied credentials were
    rejected at login. Read-only inspection found a
    pre-existing patched, repository-scoped ArtCraft route that allowlists the

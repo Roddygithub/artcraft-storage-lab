@@ -22,13 +22,16 @@ Exact-source runnable evidence is in
 `lab/real-seafile/results/2026-11-15-seafile-render-readonly/`; per-format states
 are in `docs/ONLYOFFICE-REPLACEMENT-MATRIX.md`.
 
-A separate synthetic, rootless Seafile CE 12.0.14 browser run verified DOCX,
+A separate synthetic, rootless Seafile CE 12.0.14 browser replay verified DOCX,
 XLSX and PPTX edit → save → new version → fresh-session reopen: 66/66 browser
-assertions passed. The exact-source results, screenshots, source/readback files
-where captured, and SHA-256 manifest are retained in
-`lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`. The setup
-was a one-off and is not yet reproducible through the checked-in launcher;
-this evidence does not establish the workflow on the owner's server.
+assertions passed. The replay used the checked-in CE12 launcher and pinned
+image. Its screenshots, sanitized assertions, DOCX/PPTX source/readbacks,
+static-asset manifest and SHA-256 list are retained in
+`lab/real-seafile/results/2026-11-15-seafile12-replay/`. The first launcher
+attempt exposed an ordering bug: the bridge started before the DeckCraft route
+was added to its editor map. That attempt was not a pass; the corrected replay
+passed all three workflows. This isolated evidence does not establish the
+workflow on the owner's server.
 
 **Security boundary:** the isolated CE 13.0.28 host accepts a direct `PutFile`
 with a read-only WOPI token. The bridge's relay refuses writes when

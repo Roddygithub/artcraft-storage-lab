@@ -25,7 +25,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_CHECKS = [
-    'tests/bridge/test_bridge.py', 'tests/lab/test_local.py',
+    'tests/bridge/test_bridge.py', 'tests/lab/test_local.py', 'tests/lab/test_local_ce12.py',
     'tests/test_candidate_scope.py', 'tests/test_gridcraft_real_edit.py',
     'tests/test_pdfcraft_real_edit.py', 'tests/test_cadcraft_real_edit.py',
     'tests/test_vector_fig_real_edit.py', 'tests/test_docx_fidelity_corpus.py',

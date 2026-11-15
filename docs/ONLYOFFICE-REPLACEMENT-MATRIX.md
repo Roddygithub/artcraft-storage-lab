@@ -42,9 +42,9 @@ eight excluded formats; it makes no legacy save claim.
 The three modern edit/save workflows also passed on an isolated stock Seafile
 CE 12.0.14 image: 24/24 DOCX, 27/27 XLSX, and 15/15 PPTX browser assertions.
 Their scope and retained binary evidence are in
-`lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`. This
-one-off setup is not the owner's server and is not yet reproducible with the
-checked-in CE13 launcher.
+`lab/real-seafile/results/2026-11-15-seafile12-replay/`. The checked-in
+CE12-specific launcher reproduces the synthetic workflows; this does not
+validate the owner's server or the CE13 launcher.
 
 ## Historical fixture/routing evidence — 2026-11-08 to 2026-11-10
 

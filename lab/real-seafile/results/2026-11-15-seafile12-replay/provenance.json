@@ -1,0 +1,8 @@
+{
+  "source_commit": "1f658dd28c687e36444fd40e28cca88ecf525b67",
+  "launcher_sha256": "5be7d623db6eb6b483c995e8bccf33ce4d3c247826d13ac69be174bc8254dcec",
+  "compose_sha256": "3fc7b1cc1e09f4df24589ab443da8a59d87c0a94b0b29141433ffd4ee4c6db4b",
+  "browser_runner_sha256": "ad58e979024e621e5b3beaae8cbd1dc9c569275cd4f9d588f5425eeeed3c7e59",
+  "bridge_sha256": "02cf715427fbd5daccba96da91f16ffacd11d91496c9de236da577c5ccea51ac",
+  "seafile_image": "docker.io/seafileltd/seafile-mc@sha256:7bbe7043facbc639a8e6144f32d50dc4d771191ecaa68002efb2b0237fb90358"
+}

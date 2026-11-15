@@ -71,6 +71,43 @@ Review and redact evidence before copying anything into Git; this launcher does 
 Offline check: `python3 tests/lab/test_local.py`. The parent must run the real lab and obtain
 independent review before treating this candidate as final evidence.
 
+## Isolated Seafile CE 12 browser replay
+
+`local_ce12.py` replays the same browser workflow against a disposable Seafile
+CE 12 stack for compatibility testing. Its Compose profile is adapted from the
+official CE12 file at
+`https://manual.seafile.com/12.0/repo/docker/ce/seafile-server.yml`
+(source SHA-256 `883a961ed96d559e845e249cddff1e51a0375e04e889149749d8eb990fa7a69e`).
+It removes fixed container/network names, binds Seafile to loopback, generates
+private synthetic credentials, and pins the official Seafile 12.0.14 image by
+digest. It runs only selected synthetic browser workflows, then performs
+project-scoped cleanup. It does not use the CE13 HTTP slice or change the
+owner's server.
+
+Prepare and verify the unmodified WordCraft v0.13.2, GridCraft v0.14.2 and
+DeckCraft v0.16.0 bundles under one static directory; DeckCraft must be present
+to include PPTX. Pass a lowercase SHA-256 manifest for every file, just as for
+the CE13 launcher:
+
+```bash
+python3 lab/real-seafile/local_ce12.py \
+  --run-dir "$HOME/seafile-ce12-runs/candidate-001" \
+  --static /absolute/path/to/verified-static \
+  --manifest /absolute/path/to/independently-verified-static-sha256.json
+```
+
+The run directory must be new and outside the checkout. `--editors` accepts
+`wordcraft`, `gridcraft`, and `deckcraft`; it defaults to all three. The default
+CE12 output directory and `.env` are private. Offline launcher check:
+`python3 tests/lab/test_local_ce12.py`; this check never starts containers.
+Retained CE12 browser results are under
+`results/2026-11-15-seafile12-replay/`. The launcher replay passed 66/66
+assertions; the initial retry exposed and fixed a startup-order bug where the
+bridge started before the DeckCraft route was added to its editor map. The
+retained replay includes sanitized assertions, screenshots, DOCX/PPTX
+readbacks, and the exact static asset manifest. The earlier run remains
+historical evidence with its own one-off provenance.
+
 ### Optional external HTTPS origins (offline candidate; runtime NOT VERIFIED)
 
 For the upcoming WordCraft replay, add both flags to the rootless command above:
