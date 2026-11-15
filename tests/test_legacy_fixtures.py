@@ -47,14 +47,14 @@ def _zip(parts: dict[str, str]) -> bytes:
             archive.writestr(name, text)
     return buf.getvalue()
 
-# matrix format -> (fixture file, expected editor or None when no import is documented or probe-proven)
+# matrix format -> (fixture file, expected editor or None when no accurate render is verified)
 LEGACY = {
-    "doc":   ("doc.doc",     "wordcraft"),
+    "doc":   ("doc.doc",     None),
     "odt":   ("doc.odt",     "wordcraft"),
     "fodt":  ("doc.fodt",    None),
-    "xls":   ("sheet.xls",   "gridcraft"),
+    "xls":   ("sheet.xls",   None),
     "ods":   ("sheet.ods",   "gridcraft"),
-    "fods":  ("sheet.fods",  "gridcraft"),
+    "fods":  ("sheet.fods",  None),
     "csv":   ("sheet.csv",   "gridcraft"),
     "ppt":   ("slide.ppt",   None),
     "odp":   ("slide.odp",   None),
@@ -101,7 +101,7 @@ class LegacyFixtureTests(unittest.TestCase):
             data = (FIXTURES / name).read_bytes()
             self.assertTrue(content_matches_extension(ext, data), ext)
 
-    def test_viewing_map_is_loadable_and_routes_only_documented_or_probe_proven_imports(self):
+    def test_viewing_map_routes_only_formats_with_accurate_render_evidence(self):
         editors = load_editors(str(VIEWING_MAP))
         cfg = Config(public_url="https://bridge.example",
                      seahub_origin="https://seafile.example", editors=editors)
@@ -111,7 +111,7 @@ class LegacyFixtureTests(unittest.TestCase):
         for ext, (_, editor) in LEGACY.items():
             if editor is None:
                 self.assertNotIn(ext, cfg.extension_editor,
-                                 f"{ext} has no documented or probe-proven Craft import; it must stay unrouted")
+                                 f"{ext} has no verified accurate Craft rendering; it must stay unrouted")
 
     def test_viewing_map_keeps_the_base_routes(self):
         cfg = Config(public_url="https://bridge.example", seahub_origin="https://seafile.example",

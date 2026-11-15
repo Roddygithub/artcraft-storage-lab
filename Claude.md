@@ -1,34 +1,24 @@
-# READ THIS FIRST — state on 2026-10-31 (the mandate below has been executed)
+# READ THIS FIRST — state on 2026-11-15
 
-The first-principles re-foundation this file asks for is **done**. Do not redo it. Pick up here:
+The first-principles re-foundation is complete; continue validation from the
+current candidate described in `docs/VALIDATION-STATE.md` and `ROADMAP.md`.
 
-1. **Decision and evidence**: `docs/REFOUNDATION-REPORT.md` (§5 decision, §7 what was done and
-   measured, final status block). Architecture: a stateless **WOPI editor bridge** (`bridge/`) on
-   top of Seahub's existing WOPI host; no Seafile patch, no editor patch; ONLYOFFICE kept for the
-   formats it handles. The old gateway + Seahub/fileserver patches under `integration/` are
-   **legacy** (evidence only, do not extend).
-2. **What works, measured on stock Seafile CE 13.0.28 in an isolated lab**: 10 of the 13 Craft apps
-   round-trip (open from Seafile Web → edit → save → new Seafile version): HTTP slice 48/48,
-   browser slice 50/50, `lab/real-seafile/results/`. Per-app table: report §7 step 4. The three
-   media apps (FilmCraft, EffectCraft, LightCraft) are out of scope by design
-   (`docs/upstream-drafts/host-bridge-ports.md`).
-3. **Where things are**: `README.md` (what works per file type), `ROADMAP.md` (done / next /
-   owner-only), `AGENTS.md` (rules and process), `deploy/bridge/` (run it next to a real Seafile),
-   `lab/real-seafile/` (rebuild the lab: README there; the lab VM used so far lived on another
-   machine and is **not** part of this repository — recreate it with `up.sh`), `docs/upstream-drafts/`
-   (what we would propose to Seahub and storytold — **not published**).
-4. **Next steps, in order** (`ROADMAP.md`):
-   - Owner, on the live server: diagnose the ONLYOFFICE `api.js` 404; roll back the GR-015
-     Seahub/`seaf-server` patches (rollback archive recorded in `docs/reviews/GR-015/`); upgrade
-     Seafile to 13 (the bridge needs Seahub ≥ 13 for non-office extensions); deploy the bridge from
-     `deploy/bridge/` behind TLS; run the human checklist in `lab/real-seafile/README.md`.
-   - Lab: a real typed edit before Save in the browser slice; ONLYOFFICE vs WordCraft fidelity
-     comparison; a third independent review of the current revision; then candidate freeze and the
-     project-level GPT gate (§34 below).
-   - Only after the gate **and** the owner's explicit yes: open the drafts upstream.
-5. **Rules that still bind** (unchanged below): production is never touched without the owner's
-   explicit authorization; `UPSTREAM_STATUS=LOCKED` until the gate passes and the owner approves;
-   no secrets in Git; implementation and review are different contexts.
+1. **Architecture:** stateless WOPI editor bridge (`bridge/`) on Seahub's
+   existing WOPI host; no Seafile or editor patch. The gateway and patches under
+   `integration/` are retired legacy. ArtCraft is the intended office suite.
+2. **ONLYOFFICE:** the owner authorized retirement on 2026-11-08. That direction
+   does not authorize changes to production. Production remains untouched until
+   separately approved and operationally planned.
+3. **Current candidate:** core DOCX/XLSX/PPTX edit/save evidence is separate
+   from the opt-in read-only legacy-viewing candidate. Do not infer broad format
+   fidelity from synthetic fixtures. See
+   `docs/ONLYOFFICE-REPLACEMENT-MATRIX.md` for current per-format states.
+4. **Research direction:** ArtCraft itself is the product target. Historical
+   LibreOffice references describe synthetic fixture provenance and isolated
+   research only; no LibreOffice product runtime or conversion path is intended.
+5. **Rules:** production is not modified without explicit authorization;
+   upstream remains LOCKED until the GPT gate and owner approval; no secrets in
+   Git; implementation and review are separate contexts.
 
 Status line to carry forward:
 

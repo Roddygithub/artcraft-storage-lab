@@ -23,8 +23,11 @@ import json
 import math
 import os
 import re
+import shutil
+import subprocess
 import sys
 import time
+from difflib import SequenceMatcher
 import urllib.parse
 import zipfile
 import xml.etree.ElementTree as ET
@@ -828,15 +831,45 @@ def wait_for_wordcraft_document(page, timeout=90):
     return False
 
 
+def legacy_render_ocr(image_data, fixture):
+    """OCR the fixture's expected visible region, not just a nonblank canvas."""
+    if not shutil.which("tesseract"):
+        raise RuntimeError("tesseract is required for --viewing rendered-content assertions")
+    with Image.open(BytesIO(image_data)) as source:
+        width, height = source.size
+        if fixture.startswith("sheet."):
+            bounds = (int(width * .02), int(height * .29),
+                      int(width * .50), int(height * .42))
+        elif fixture == "slide.ppsx":
+            bounds = (int(width * .30), int(height * .34),
+                      int(width * .60), int(height * .43))
+        else:
+            bounds = (int(width * .22), int(height * .35),
+                      int(width * .65), int(height * .55))
+        region = source.crop(bounds)
+        region = region.resize((region.width * 3, region.height * 3))
+        png = BytesIO()
+        region.save(png, format="PNG")
+    result = subprocess.run(["tesseract", "stdin", "stdout", "--psm", "6"],
+                            input=png.getvalue(), capture_output=True,
+                            timeout=10, check=True)
+    return re.sub(r"[^a-z0-9]", "", result.stdout.decode("utf-8", "replace").lower())
+
+
+def legacy_render_matches(fixture, text):
+    marker = re.sub(r"[^a-z0-9]", "", LEGACY_VIEWING_MARKER.lower())
+    if not any(SequenceMatcher(None, marker, text[i:i + len(marker)]).ratio() >= .86
+               for i in range(max(1, len(text) - len(marker) + 1))):
+        return False
+    return fixture not in ("sheet.xls", "sheet.ods", "sheet.csv") or "42" in text
+
+
 # Opt-in (VIEWING_FORMATS=1) import probe for the legacy/OpenDocument viewing
-# fixtures. Formats with a documented or probe-proven import are listed, and the
+# fixtures. Formats with a verified accurate rendered fixture are listed, and the
 # same map as editors.viewing.json routes them.
 LEGACY_VIEWING_FIXTURES = {
-    "doc.doc": "wordcraft",
     "doc.odt": "wordcraft",
-    "sheet.xls": "gridcraft",
     "sheet.ods": "gridcraft",
-    "sheet.fods": "gridcraft",
     "sheet.csv": "gridcraft",
     "slide.ppsx": "deckcraft",
 }
@@ -968,6 +1001,8 @@ def main():
                     relay_responses.append(response)
 
             page.context.on("response", capture_relay_response)
+            check("viewing_render_ocr_available", bool(shutil.which("tesseract")),
+                  "tesseract required to assert visible synthetic content")
 
             directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "legacy")
             base = page
@@ -995,8 +1030,15 @@ def main():
                     routed = host is not None and f"/edit/{editor}" in host.url
                     check(f"viewing_{slug}_routes_to_{editor}", routed,
                           f"host={host.url if host else None} frames={frames_dump(page)}")
-                    if routed:
-                        page.screenshot(path=os.path.join(RESULTS, f"viewing-{slug}.png"))
+                    readonly = False
+                    if host:
+                        try:
+                            host.locator("#ro").wait_for(state="visible", timeout=15000)
+                            readonly = True
+                        except Exception:  # noqa: BLE001 - absent readonly status is a failed check
+                            pass
+                    check(f"viewing_{slug}_host_reports_read_only", readonly,
+                          "legacy viewing routes must not allow a native-format save to replace the source")
                     relay_body = None
                     if routed:
                         end = time.monotonic() + 30
@@ -1014,6 +1056,31 @@ def main():
                     marker_ok, marker_kind = rs.viewing_payload_has_marker(relay_body or b"")
                     check(f"viewing_{slug}_editor_payload_contains_the_marker",
                           marker_ok, marker_kind if relay_body else "no /relay/file body")
+                    rendered = False
+                    rendered_image = None
+                    render_observation = "no exact relay body"
+                    if routed and relay_body == content and shutil.which("tesseract"):
+                        deadline = time.monotonic() + 60
+                        while time.monotonic() < deadline:
+                            rendered_image = page.screenshot()
+                            try:
+                                ocr_text = legacy_render_ocr(rendered_image, name)
+                                render_observation = ocr_text[:180]
+                            except Exception as exc:  # noqa: BLE001 - failed OCR is a render-check failure
+                                ocr_text = ""
+                                render_observation = f"OCR error: {type(exc).__name__}: {exc}"
+                            if legacy_render_matches(name, ocr_text):
+                                rendered = True
+                                break
+                            page.wait_for_timeout(1000)
+                    check(f"viewing_{slug}_rendered_marker_and_expected_value",
+                          rendered, f"fixture marker/value visibility; last OCR: {render_observation}")
+                    if rendered and rendered_image:
+                        (Image.open(BytesIO(rendered_image)).save(
+                            os.path.join(RESULTS, f"viewing-{slug}.png")))
+                    elif rendered_image:
+                        Image.open(BytesIO(rendered_image)).save(
+                            os.path.join(RESULTS, f"viewing-{slug}-render-failed.png"))
                     check(f"viewing_{slug}_open_did_not_download", not downloads,
                           f"downloads={len(downloads)}")
                     versions = len(rs.history(admin, repo_id, name))

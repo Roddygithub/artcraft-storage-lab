@@ -127,7 +127,7 @@ services:
     image: mcr.microsoft.com/playwright/python:v1.49.0-noble
     profiles: [test]
     working_dir: /app
-    command: ["bash", "-c", "pip install -q --break-system-packages playwright==1.49.0 Pillow==13.0.0 && python3 \"lab/real-seafile/$${BROWSER_SCRIPT}\""]
+    command: ["bash", "-c", "apt-get update -qq && apt-get install -y -qq --no-install-recommends tesseract-ocr && pip install -q --break-system-packages playwright==1.49.0 Pillow==13.0.0 && python3 \"lab/real-seafile/$${BROWSER_SCRIPT}\""]
     ipc: private
     shm_size: 1gb
     volumes:

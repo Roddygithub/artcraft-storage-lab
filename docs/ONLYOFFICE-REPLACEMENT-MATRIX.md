@@ -6,33 +6,48 @@ following declared routes. No settings were executed or changed, and no
 credentials or private origins are retained. Configuration membership is not
 proof that every current ONLYOFFICE path works in practice.
 
-| Required format | Current configured mode | Craft replacement evidence |
-| --- | --- | --- |
-| DOCX | View + edit | WordCraft: three synthetic corpus edit/save/version/fresh-reopen cases, 28 checks each; bounded reviews PASS |
-| XLSX | View + edit | GridCraft: synthetic typed-cell edit/save/version/fresh-reopen evidence; broader workbook fidelity NOT VERIFIED |
-| PPTX | View + edit | Official DeckCraft v0.16.0: synthetic title edit, same-file PPTX save, attributed version and fresh reopen; 15/15 browser checks; broad fidelity NOT VERIFIED |
-| DOC | View | Fixture; browser-verified route (140/140 run) and WordCraft v0.16.0 bundle import (README:99/128); rendered content NOT VERIFIED |
-| PPT | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
-| XLS | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:94, values/formulas/number formats); rendered content NOT VERIFIED |
-| ODT | View | Fixture; browser-verified route and WordCraft v0.16.0 bundle import (README:99, .odt import/export); rendered content NOT VERIFIED |
-| FODT | View | Fixture; GR-088 probe: WordCraft rejects it (no save) — NOT VERIFIED |
-| ODP | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
-| FODP | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
-| ODS | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:96, saved values not formulas); rendered content NOT VERIFIED |
-| FODS | View | Fixture; GridCraft bundle import (196 cells) and browser-verified route (59/59, 173/173); rendered content NOT VERIFIED |
-| CSV | View | Fixture; browser-verified route and GridCraft v0.17.0 bundle import (README:93, CSV/TSV); rendered content NOT VERIFIED |
-| PPSX | View | Fixture; DeckCraft bundle import (marker in slide1) and browser-verified route (59/59, 173/173); rendered content NOT VERIFIED |
-| PPS | View | Fixture; GR-088 probe: DeckCraft opens a blank deck (no import) — NOT VERIFIED |
+| Required format | Current mode | ArtCraft status | Verified behavior and limit |
+| --- | --- | --- | --- |
+| DOCX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | WordCraft synthetic typed edits, Seafile version and fresh reopen; broad arbitrary-document fidelity NOT VERIFIED |
+| XLSX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | GridCraft synthetic typed-cell save, version and fresh reopen; broad workbook fidelity NOT VERIFIED |
+| PPTX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | DeckCraft v0.16 synthetic title edit, same-format save, version and fresh reopen; broad fidelity NOT VERIFIED |
+| DOC | View | UNSUPPORTED | Seafile-host screenshot shows unrelated WordCraft sample content despite exact fixture bytes reaching the editor; removed from route |
+| XLS | View | UNSUPPORTED | Stock Seafile CE 13.0.28 opens an empty office frame; GridCraft receives no WOPI file bytes |
+| ODT | View | VIEW_SUPPORTED | WordCraft displays the fixture marker; route/payload proved on Seafile; no in-place legacy save tested |
+| ODS | View | VIEW_SUPPORTED | GridCraft displays marker/value cells, warns formulas become values and Save produces XLSX; no Seafile save tested |
+| CSV | View | VIEW_SUPPORTED | GridCraft displays marker/value cells; its editor serializes XLSX, not a same-format CSV save |
+| PPSX | View | VIEW_SUPPORTED | DeckCraft visibly renders the fixture marker on slide 1; route/payload proved on Seafile; no in-place legacy save tested |
+| FODS | View | UNSUPPORTED | GridCraft screenshot displays raw `office:document` XML as cells; removed from the opt-in route |
+| FODT | View | UNSUPPORTED | WordCraft rejects the fixture; no serialized import |
+| PPT | View | UNSUPPORTED | DeckCraft opens a blank deck; no import |
+| ODP | View | UNSUPPORTED | DeckCraft opens a blank deck; no import |
+| FODP | View | UNSUPPORTED | DeckCraft opens a blank deck; no import |
+| PPS | View | UNSUPPORTED | DeckCraft opens a blank deck; no import |
+
+These are synthetic-fixture classifications, not broad format-fidelity claims.
+No legacy row is evidence of an edit/save workflow. `CONVERT_AND_SAVE_AS` is
+not part of the ArtCraft product path; the target is the Craft suite itself.
+
+Current render evidence (isolated Craft bundles and Seafile-host screenshots):
+`lab/real-seafile/results/2026-11-15-legacy-render-probe/`. The six visible
+bundle fixtures do not imply Seafile-host rendering works for DOC or XLS.
+Current combined Seafile browser captures show DOC displays unrelated content;
+XLS opens an empty office frame without a WOPI file response. Both are
+unrouted. FODS is unrouted because GridCraft displays raw XML. The 2026-11-10 Seafile
+replay proves route and exact payload bytes, not the renderer's pixels or a
+legacy save.
 
 ## Deterministic viewing fixtures — 2026-11-08
 
 Every viewing format above now has one synthetic file that carries the marker
-`GR-LEGACY-MARKER-20261108` in its real content, produced offline with
-LibreOffice in a disposable container and committed with checksums and a
-regeneration script:
+`GR-LEGACY-MARKER-20261108` in its real content, generated offline and
+committed with checksums. Their provenance records the tool used at that time;
+this is synthetic test-data provenance, not a product dependency or editor
+recommendation. The owner has clarified that the intended office suite is
+ArtCraft itself; no LibreOffice runtime or conversion workflow is in scope.
 
 * fixtures + `PROVENANCE.txt` + `SHA256SUMS`: `lab/real-seafile/fixtures/legacy/`
-* regenerate: `scripts/make-legacy-fixtures.sh <libreoffice-image> <outdir>`
+* historical regeneration script: `scripts/make-legacy-fixtures.sh <tool-image> <outdir>`
 * opt-in routing candidate: `lab/real-seafile/editors.viewing.json`
 * offline check: `tests/test_legacy_fixtures.py` (fixture integrity, bridge
   signature guard, routing only)

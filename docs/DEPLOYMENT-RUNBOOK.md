@@ -222,7 +222,7 @@ Run in **Chrome/Edge AND Firefox** on **desktop** (not headless).
 | 7 | Share library read-only with another user → for them bar says `read-only` and Ctrl+S is refused | ☐ | Permissions |
 | 8 | Wait past `WOPI_ACCESS_TOKEN_EXPIRATION` (default 30 min) → save says token expired; reopen works | ☐ | Token lifecycle |
 | 9 | `.pdf` opens Seafile viewer; `?edit_pdf=true` on file URL opens PdfCraft | ☐ | PDF route |
-| 10 | `.pptx` still opens in ONLYOFFICE | ☐ | ONLYOFFICE unchanged |
+| 10 | With the opt-in PPTX candidate, `.pptx` opens in DeckCraft; unsupported legacy formats have no Craft route | ☐ | Validate only the formats enabled in the deployment manifest |
 
 **Record**: Date, browser, Seafile version, bridge commit (`git rev-parse HEAD`), any failures with screenshots/console logs.
 

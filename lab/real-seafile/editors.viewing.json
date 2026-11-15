@@ -1,14 +1,14 @@
 {
   "wordcraft": {
     "app": "wordcraft",
-    "label": "WordCraft (opt-in viewing candidate: +DOC/ODT; route and payload delivery verified; rendered content NOT VERIFIED)",
-    "extensions": ["docx", "doc", "odt"],
+    "label": "WordCraft (opt-in viewing candidate: +ODT; DOC renders unrelated sample content and stays unrouted)",
+    "extensions": ["docx", "odt"],
     "url": "/editors/wordcraft/index.html?host=parent"
   },
   "gridcraft": {
     "app": "gridcraft",
-    "label": "GridCraft (opt-in viewing candidate: +XLS/ODS/CSV/FODS; route and payload delivery verified; rendered content NOT VERIFIED)",
-    "extensions": ["xlsx", "xls", "ods", "csv", "fods"],
+    "label": "GridCraft (opt-in viewing candidate: +ODS/CSV; both render synthetic markers; XLS fails Seafile routing, FODS renders raw XML)",
+    "extensions": ["xlsx", "ods", "csv"],
     "url": "/editors/gridcraft/index.html?host=parent"
   },
   "pdfcraft": {
@@ -37,7 +37,7 @@
   },
   "deckcraft": {
     "app": "deckcraft",
-    "label": "DeckCraft v0.16.0 (opt-in viewing candidate: +PPSX; route and payload delivery verified; rendered content NOT VERIFIED)",
+    "label": "DeckCraft v0.16.0 (opt-in viewing candidate: +PPSX; route, payload and synthetic render verified; legacy saves NOT VERIFIED)",
     "extensions": ["ppsx", "deckcraft"],
     "url": "/editors/deckcraft/index.html?host=parent"
   }

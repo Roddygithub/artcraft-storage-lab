@@ -63,6 +63,9 @@ manual project-scoped cleanup; never use global Podman prune commands.
 Optional browser selection: `--editor wordcraft --wordcraft-fixture fidelity-layout.docx` (the fixture
 name is passed unchanged to `BROWSER_WORDCRAFT_FIXTURE`; use a name supported by
 `run_browser.py`). These options affect browser only; the HTTP slice remains complete.
+The opt-in `--viewing` route installs Tesseract in the disposable Playwright test
+container; it waits for OCR of the unique synthetic marker (and spreadsheet value
+`42`) before recording a render as passed. A nonempty canvas alone is not render proof.
 Raw logs, generated config, credentials and results remain inside the private run directory.
 Review and redact evidence before copying anything into Git; this launcher does not publish it.
 Offline check: `python3 tests/lab/test_local.py`. The parent must run the real lab and obtain
@@ -165,4 +168,5 @@ The slices run headless over plain HTTP, so they cannot see these. Run against a
    is refused.
 8. Wait past `WOPI_ACCESS_TOKEN_EXPIRATION`; a save then says the token expired; reopen works.
 9. `.pdf` opens Seafile's viewer; the `?edit_pdf=true` URL opens PdfCraft.
-10. `.pptx` still opens in ONLYOFFICE.
+10. If the opt-in PPTX route is enabled, `.pptx` opens in DeckCraft; unsupported legacy
+    formats have no Craft route. No ONLYOFFICE behavior is assumed by this checklist.

@@ -507,11 +507,11 @@ def viewing_payload_has_marker(payload: bytes, marker: str = "GR-LEGACY-MARKER-2
 
 
 # Opt-in (VIEWING_FORMATS=1) legacy/OpenDocument viewing routes. Only formats
-# with a documented or probe-proven upstream import are routed; the rest must
+# with a verified accurate rendered fixture are routed; the rest must
 # stay without a WOPI route. Fixture file -> (extension, expected editor or None).
 LEGACY_VIEWING = {
-    "doc.doc": ("doc", "wordcraft"), "doc.odt": ("odt", "wordcraft"), "doc.fodt": ("fodt", None),
-    "sheet.xls": ("xls", "gridcraft"), "sheet.ods": ("ods", "gridcraft"), "sheet.fods": ("fods", "gridcraft"),
+    "doc.doc": ("doc", None), "doc.odt": ("odt", "wordcraft"), "doc.fodt": ("fodt", None),
+    "sheet.xls": ("xls", None), "sheet.ods": ("ods", "gridcraft"), "sheet.fods": ("fods", None),
     "sheet.csv": ("csv", "gridcraft"),
     "slide.ppt": ("ppt", None), "slide.odp": ("odp", None), "slide.fodp": ("fodp", None),
     "slide.pps": ("pps", None), "slide.ppsx": ("ppsx", "deckcraft"),

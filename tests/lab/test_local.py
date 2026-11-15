@@ -146,8 +146,12 @@ class LauncherTest(unittest.TestCase):
         viewing = _json.loads((Path(__file__).resolve().parents[2] / 'lab/real-seafile/editors.viewing.json').read_text())
         default = _json.loads((Path(__file__).resolve().parents[2] / 'lab/real-seafile/editors.json').read_text())
         self.assertNotEqual(viewing, default, 'the viewing map is opt-in and must not replace the default')
-        self.assertEqual([e for e, s in viewing.items() if 'doc' in s['extensions']], ['wordcraft'])
+        self.assertEqual([e for e, s in viewing.items() if 'odt' in s['extensions']], ['wordcraft'])
         self.assertEqual([e for e, s in viewing.items() if 'csv' in s['extensions']], ['gridcraft'])
+        self.assertNotIn('fods', {ext for s in viewing.values() for ext in s['extensions']})
+        self.assertNotIn('xls', {ext for s in viewing.values() for ext in s['extensions']})
+        self.assertNotIn('fods', local.VIEWING_EXTENSIONS)
+        self.assertNotIn('xls', local.VIEWING_EXTENSIONS)
 
     def test_user_and_libexec_compose_plugins_are_discovered(self):
         with tempfile.TemporaryDirectory() as d:

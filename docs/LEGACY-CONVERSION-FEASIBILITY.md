@@ -3,6 +3,11 @@
 **State: offline probe evidence. Project INCOMPLETE; upstream LOCKED.** This is
 not an independent review and does not add a route, dependency or deployment.
 
+**Product direction clarified 2026-11-15:** the intended office suite is
+ArtCraft. LibreOffice references and conversion trials in this historical lab
+record are not a product dependency or recommendation; no such converter is
+to be added to the bridge or deployment candidate.
+
 GR-088 proved the pinned bundles cannot import PPT, PPS, ODP, FODP or FODT. This
 probe asks the next question: if a converter normalized them to OOXML first,
 would the bundles import the result? It also tests whether the same bytes are

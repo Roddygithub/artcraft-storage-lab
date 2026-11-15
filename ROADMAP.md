@@ -27,19 +27,15 @@ Do not run the historical ONLYOFFICE campaigns below.
    browser 28/28, exit 0 (`lab/real-seafile/results/2026-11-08-craft-only-wordcraft/`).
 2. Done (opt-in `--pptx`): official DeckCraft v0.16.0 same-format edit/save/reopen,
    focused 15/15 and combined seven-editor 132/132 browser checks; see validation checkpoint.
-3. Done: legacy/OpenDocument coverage evidence. Deterministic fixtures, offline
-   signature/routing checks, an opt-in `--viewing` browser replay (HTTP 57/57,
-   browser 140/140, 21 viewing checks) and a bundle import probe (5/5) are
-   committed. GR-088 adds bundle-level proof that FODS and PPSX import; both are
-   routed and passed a real browser replay (59/59 HTTP, 173/173 browser), while
-   five formats remain unimportable and unrouted. A focused 2026-11-10 replay
-   then captured the bridge's `/relay/file` payload per routed format (59/59
-   HTTP, 67/67 browser, 43 viewing checks): every routed editor received the exact
-   fixture bytes with the marker. Rendered pixels, legacy saves and hardware
-   WebGPU/clipboard/font/unload acceptance remain NOT VERIFIED.
-   `LEGACY-CONVERSION-FEASIBILITY.md` records that converting the five unrouted
-   formats only imports when a converted name/extension is presented too — a
-   bridge architecture change, not a routing flag.
+3. Done for the read-only viewing candidate: deterministic fixtures, exact
+   payload checks, OCR-gated Seafile renders, and read-only host status are being
+   retained for ODT→WordCraft, ODS/CSV→GridCraft, and PPSX→DeckCraft. DOC renders
+   unrelated sample content in the Seafile-host flow; XLS gets no WOPI file
+   response; FODS displays raw XML. Those three stay unrouted, along with the
+   five formats whose Craft import probe failed (FODT/FODP/PPT/ODP/PPS). Legacy
+   editing/saving remains unsupported and is deliberately disabled in the
+   viewing lab. User-owned HTTPS/hardware acceptance and the final independent
+   review remain open. No converter is in the ArtCraft product path.
 4. Freeze exact source/evidence, then obtain independent forensic and project GPT review.
    Evidence is frozen at `864fc77`, pushed as `265897f`; an independent free review
    returned PROVISIONAL PASS with two Playwright-dependency minors, remediated.

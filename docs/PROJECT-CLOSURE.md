@@ -6,19 +6,36 @@ and coexistence requirements below are historical and no longer block closure.
 The active lab now targets Craft only. Missing office-format coverage, HTTPS
 acceptance, exact-source evidence and independent final review remain open.
 
+## Current candidate delta — 2026-11-15
+
+ArtCraft is the intended office suite. Production is still untouched; retirement
+authorization is not deployment authorization. The current candidate retains
+the tested core DOCX/XLSX/PPTX workflows and an opt-in **read-only** legacy route
+for ODT, ODS, CSV and PPSX. Fresh stock Seafile CE 13.0.28 browser evidence
+checks exact bytes, visible fixture semantics and the bridge `read-only` status.
+DOC shows unrelated content in the Seafile host, XLS gets no WOPI file response,
+and FODS renders raw XML; all three are now unrouted. FODT/FODP/PPT/ODP/PPS also
+remain unsupported. Per-format evidence is in `docs/ONLYOFFICE-REPLACEMENT-MATRIX.md`.
+
+Legacy routes are not edit/save claims. `--viewing` does not add them to
+`OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product
+runtime or conversion path. The candidate SHA, clean tree and test inventory
+will be recorded after the final evidence commit; until then this is not a freeze.
+
 The owner requires replacement coverage for every currently configured
 ONLYOFFICE format: 15 viewing routes and 3 editing routes. The six-Craft
 candidate below is a verified subset, not the complete replacement scope.
 See `docs/ONLYOFFICE-REPLACEMENT-MATRIX.md`.
 
-## Current verified candidate subset
+## Historical candidate profile (pre-2026-11-15 revalidation)
 
 The candidate follows AGENTS.md rule 6: no Seafile patch and no editor patch.
 It includes the released WordCraft, GridCraft, PdfCraft and CADCraft bundles,
 plus VectorCraft/FigCraft with the explicitly declared lab JavaScript shim.
 The default lab advertises only DOCX, XLSX, PDF, DXF, SVG and FIGCRAFT.
-PPTX remains on ONLYOFFICE. Deployment defaults to DXF; office extensions
-remain explicit operator opt-ins as documented in `deploy/bridge/README.md`.
+This historical profile said PPTX remained on ONLYOFFICE. Current evidence
+supersedes that statement: the DeckCraft PPTX route is opt-in and has a bounded
+edit/save/version/reopen proof. Deployment still defaults to DXF.
 
 DeckCraft, SoundCraft, PhotoCraft and DesignCraft require local Rust shell
 ports. They remain experimental drafts and retained evidence, outside this

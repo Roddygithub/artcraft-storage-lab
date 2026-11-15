@@ -1,0 +1,98 @@
+{
+ "cases": [
+  {
+   "fixture": "doc.doc",
+   "editor": "wordcraft",
+   "ok": true,
+   "save_payloads": [
+    6027
+   ],
+   "save_sha256": "b2b18893a0fdb618cdab65cb2b53705c2013b0694f5cfe7cbcfbe3fade2369c0",
+   "kind": "docx text",
+   "kinds": [
+    "docx text"
+   ]
+  },
+  {
+   "fixture": "doc.odt",
+   "editor": "wordcraft",
+   "ok": true,
+   "save_payloads": [
+    2236
+   ],
+   "save_sha256": "9398d93d3fce9eac17a8b17ed552fba134b5122d1445a54b8fe9c44efcf1f85a",
+   "kind": "odt content.xml",
+   "kinds": [
+    "odt content.xml"
+   ]
+  },
+  {
+   "fixture": "sheet.xls",
+   "editor": "gridcraft",
+   "ok": true,
+   "save_payloads": [
+    4315
+   ],
+   "save_sha256": "6614d8446f4aaba141d32b858fe7c543582680a0cda072185638c854cd374e8f",
+   "kind": "xlsx cells (4)",
+   "kinds": [
+    "xlsx cells (4)"
+   ]
+  },
+  {
+   "fixture": "sheet.ods",
+   "editor": "gridcraft",
+   "ok": true,
+   "save_payloads": [
+    4119
+   ],
+   "save_sha256": "7713155bd3763a1ca152806718549a831fa0ec33f2dd0b2af6e1a1ede3db2423",
+   "kind": "xlsx cells (4)",
+   "kinds": [
+    "xlsx cells (4)"
+   ]
+  },
+  {
+   "fixture": "sheet.fods",
+   "editor": "gridcraft",
+   "ok": true,
+   "save_payloads": [
+    8327
+   ],
+   "save_sha256": "c29b0d8749ed44ff398083c6086c8f0dbdc79ca7fcd49f3bfbc8ff43b7e7a76a",
+   "kind": "xlsx cells (196)",
+   "kinds": [
+    "xlsx cells (196)"
+   ]
+  },
+  {
+   "fixture": "sheet.csv",
+   "editor": "gridcraft",
+   "ok": true,
+   "save_payloads": [
+    4125
+   ],
+   "save_sha256": "ae19341c4df3ecdd71257360bafcb029a7279cdd23f02a7e5d55c3c00d3267ad",
+   "kind": "xlsx cells (4)",
+   "kinds": [
+    "xlsx cells (4)"
+   ]
+  },
+  {
+   "fixture": "slide.ppsx",
+   "editor": "deckcraft",
+   "ok": true,
+   "save_payloads": [
+    23786
+   ],
+   "save_sha256": "3f418a2518007302508603e5dacc54b582e00fff70a39b8d2993ef72d5e553b2",
+   "kind": "opc ppt/slides/slide1.xml",
+   "kinds": [
+    "opc ppt/slides/slide1.xml"
+   ]
+  }
+ ],
+ "cases_requested": 7,
+ "passed": 7,
+ "failed": 0
+}

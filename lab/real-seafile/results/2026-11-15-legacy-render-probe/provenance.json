@@ -1,0 +1,12 @@
+{
+  "source_commit": "7961db5a28479c8056b68de356800958aad5f70d",
+  "method": "scripts/probe-legacy-import.py bundle-level wrapper; screenshots captured after the editor emitted a serialized payload containing the fixture marker",
+  "seafile": "not used",
+  "bridge": "not used",
+  "editor_bundle_set": "~/.cache/artcraft-storage-lab/pptx-candidate-20261108/static",
+  "static_manifest_sha256": "5f0cef84fe03efb916496be2df103b9661ee293a19f7e7771233c5260a9963b9",
+  "fixtures": "lab/real-seafile/fixtures/legacy/ (checksums are in SHA256SUMS)",
+  "probe": "7/7 serialization-marker imports; 6 visually accurate synthetic renders; FODS visibly displays raw XML",
+  "screenshots": "synthetic fixture data only",
+  "tesseract_required_for_verifier": true
+}

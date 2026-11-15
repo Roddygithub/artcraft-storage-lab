@@ -1,10 +1,11 @@
 # ArtCraft Storage Lab
 
-> **2026-11-10:** project **INCOMPLETE**. Evidence is frozen at `864fc77` and
-> extended by the routed-legacy payload replay and the mechanical self-audit at
-> `5aa134a`; the owner authorized ONLYOFFICE retirement and the active lab
-> targets Craft only. Rendered legacy content, HTTPS/hardware acceptance and the
-> final independent gate remain open. See
+> **2026-11-15:** project **INCOMPLETE**. Finalization is in progress on
+> `work/final-candidate-20261115`, based on `7961db5`. Fresh Seafile CE 13.0.28
+> evidence validates the core DOCX workflow and four read-only rendered formats
+> (ODT, ODS, CSV, PPSX). DOC, XLS and FODS are excluded after concrete failures.
+> Only the isolated lab was changed; production is untouched and upstream remains
+> LOCKED. Hardware acceptance and the independent GPT gate remain open. See
 > [the closure ledger](docs/PROJECT-CLOSURE.md).
 
 
@@ -41,7 +42,7 @@ edit/save/new-version/fresh-reopen slice; broad presentation fidelity is unverif
 | `.svg` | VectorCraft 0.19.0 | upstream bundle plus declared lab page-API shim |
 | `.figcraft` | FigCraft 0.13.1 | upstream bundle plus declared lab page-API shim |
 | `.pptx` (lab `--pptx`) | DeckCraft 0.16.0 | unmodified upstream bundle; focused same-format edit/save/reopen verified |
-| ODF / legacy office (lab `--viewing`) | DOC/ODT → WordCraft, XLS/ODS/CSV/FODS → GridCraft | browser-verified routing for the documented five plus FODS/PPSX; rendered content unverified; 5 formats unrouted |
+| ODF / legacy office (lab `--viewing`) | ODT → WordCraft, ODS/CSV → GridCraft, PPSX → DeckCraft | route, exact payload and synthetic render verified; DOC renders unrelated content, XLS fails WOPI routing, FODS shows raw XML; 8 formats unrouted |
 
 The deployment example routes DXF by default; office extensions are operator
 opt-ins. The synthetic lab routes DOCX/XLSX/PDF to Craft for testing and leaves

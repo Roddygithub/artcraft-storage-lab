@@ -17,6 +17,7 @@ import time
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
+VIEWING_EXTENSIONS = ('odt', 'ods', 'csv', 'ppsx', 'deckcraft')
 
 
 def manifest(directory):
@@ -243,10 +244,11 @@ def main():
         config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('pptx', 'deckcraft')\n"
                    "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('pptx', 'deckcraft')\n")
     if args.viewing:
-        # Only formats with a documented or probe-proven import are routed; the
-        # lab slice asserts the other viewing formats have no WOPI route.
-        config += ("\nOFFICE_WEB_APP_FILE_EXTENSION += ('doc', 'odt', 'xls', 'ods', 'csv', 'fods', 'ppsx', 'deckcraft')\n"
-                   "OFFICE_WEB_APP_EDIT_FILE_EXTENSION += ('doc', 'odt', 'xls', 'ods', 'csv', 'fods', 'ppsx', 'deckcraft')\n")
+        # Route only formats with a verified rendered synthetic fixture; the
+        # lab slice asserts that the other formats have no WOPI route. Keep
+        # these legacy routes read-only; do not add them to the edit allowlist.
+        extension_tuple = repr(VIEWING_EXTENSIONS)
+        config += f"\nOFFICE_WEB_APP_FILE_EXTENSION += {extension_tuple}\n"
     config += '\nENABLE_ONLYOFFICE = False\n'
     config = render_settings(config, False,
                              args.seafile_public_url, args.bridge_public_url)
