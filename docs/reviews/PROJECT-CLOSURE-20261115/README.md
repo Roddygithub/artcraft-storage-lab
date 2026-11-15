@@ -47,7 +47,9 @@ deployment or upstream publication is authorized by this packet.
   exact SHA was then reviewed at `546ce0d`.
 - `SOL-REVIEW-546CE0D.md`: PROVISIONAL PASS for the documentation follow-up;
   no new MINOR findings. Production permission MAJOR and readiness limits
-  remain open.
+  remain open. A later read-only owner-server check found pre-existing legacy
+  Seahub routing and an active gateway; this discovery is not part of that
+  review and is being documented separately.
 
 ## Format claims
 
@@ -66,12 +68,11 @@ deployment or upstream publication is authorized by this packet.
    The bridge rejects its own read-only relay, but cannot enforce host
    authorization. Do not call this production-safe.
 3. The owner's live Seafile 12.0.14 responds over HTTPS and ping. The corrected
-   owner account is active and has a verified direct read-write share to the
-   existing synthetic library. Only that library permission changed; its files
-   and server configuration were not changed. ArtCraft is not configured, and
-   authenticated owner-server edit/save remains NOT VERIFIED. Do not request a
-   production upgrade or deployment as part of this review. See
-   `OWNER-SERVER-ACCESS-20261115.md`.
+   account has a verified read-write share to the synthetic library. Read-only
+   inspection found a pre-existing patched repo-scoped ArtCraft route and
+   active legacy gateway; current WOPI is disabled. The route is not the
+   candidate and was not tested. No file content or server configuration was
+   changed during this task. See `OWNER-SERVER-ACCESS-20261115.md`.
 4. Physical browser acceptance (WebGPU, clipboard, fonts, popup behavior,
    dirty close, refused save and network recovery) remains NOT VERIFIED.
 5. Some earlier free-review transcripts were private and are not retained.

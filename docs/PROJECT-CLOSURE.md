@@ -35,8 +35,13 @@ shared read-write to that account under the owner's prior test-library
 authorization. The share is confirmed in Seafile's RPC share listing. Its root
 contains only synthetic fixtures. This changed library permissions only; no
 file contents or server configuration were changed. The live server is Seafile
-12.0.14 and has no ArtCraft bridge configured. Browser authentication and
-ArtCraft edit/save/reopen on this server remain NOT VERIFIED. Sanitized evidence:
+12.0.14, with the current stateless WOPI bridge disabled. Read-only inspection
+found a pre-existing patched Seahub ArtCraft dispatcher with a one-repository
+allowlist containing the synthetic library, plus an active legacy
+`artcraft-gateway.service`. They belong to the retired third-party-editor
+design and are not the current candidate; their connection and runtime behavior
+were not tested. Browser authentication and current-bridge edit/save/reopen
+remain NOT VERIFIED. Sanitized evidence:
 `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
 
 Independent GPT-6 Sol reviews at `d2379f0`, `9def0bb`, `ad638d1` and
@@ -44,15 +49,19 @@ Independent GPT-6 Sol reviews at `d2379f0`, `9def0bb`, `ad638d1` and
 documentation follow-up at `a8e7149` also received a PROVISIONAL PASS and found
 three MINOR wording/link issues; those are corrected in the current follow-up.
 The corrected documentation candidate at `546ce0d` received an exact-HEAD
-PROVISIONAL PASS with no new MINOR findings. The production-boundary MAJOR
+PROVISIONAL PASS with no new MINOR findings. A later read-only owner-server
+check found a pre-existing custom Seahub ArtCraft route and active legacy
+gateway, scoped to the synthetic library; it was not part of that review. The
+current zero-patch WOPI bridge remains disabled. The production-boundary MAJOR
 remains disclosed. No production readiness or project-wide PASS is claimed.
 
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product
 runtime or conversion path. Reviewed candidate SHA:
 `546ce0dd711eade0d9cb253a0fc4389c28ee2617`; its runtime source remains tested at
-`be51c3b`. The current changes are documentation-only. Owner-server editing,
-hardware acceptance and the project-wide gate remain open.
+`be51c3b`. The current changes are documentation-only. The live legacy route is
+not evidence for this candidate. Owner-server current-WOPI editing, hardware
+acceptance and the project-wide gate remain open.
 
 The owner requires replacement coverage for every currently configured
 ONLYOFFICE format: 15 viewing routes and 3 editing routes. The six-Craft

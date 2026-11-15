@@ -18,9 +18,9 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |
-| Independent and final review | GPT-6 Sol at `546ce0d`: PROVISIONAL PASS for documentation follow-up; no new MINOR. No global GPT PASS | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-546CE0D.md` |
+| Independent and final review | GPT-6 Sol at `546ce0d`: PROVISIONAL PASS for documentation follow-up; no new MINOR. A later live-route discovery is not included in that review. No global GPT PASS | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-546CE0D.md` |
 | Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
-| Owner's live Seafile server | HTTPS/TLS and ping PASS; active owner account now has direct read-write access to the existing synthetic library. No file content or server configuration changed. Seafile 12.0.14; ArtCraft bridge absent; authenticated browser edit/save/reopen NOT VERIFIED | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md) |
+| Owner's live Seafile server | HTTPS/TLS and ping PASS; synthetic library shared read-write. Seafile 12.0.14; current WOPI bridge disabled. A pre-existing patched, repository-scoped third-party ArtCraft route and `artcraft-gateway.service` are active for the synthetic library; not the current candidate and not tested. No config/content changed during this task. Authenticated current-bridge edit/save NOT VERIFIED | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md) |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized. Production
 deployment remains outside these tests. Only the authorized synthetic-library
@@ -62,9 +62,12 @@ prove full pagination or font fidelity.
 
 1. Reproduce the authenticated HTTPS workflow on the owner's Seafile with a
    synthetic document. Test-library access is now prepared, but the live
-   Seafile is 12.0.14 and has no ArtCraft bridge. Any bridge deployment or
-   server upgrade remains a separate owner decision; neither is authorized by
-   the synthetic-library test authorization.
+   Seafile is 12.0.14 and the current WOPI bridge is disabled. A legacy patched
+   route and gateway remain active for the synthetic library. Stock WOPI
+   routing is extension-wide, so the current bridge cannot be limited to one
+   library with the existing configuration. Use an isolated Seafile test
+   instance or obtain separate approval for broader routing changes. These
+   post-review server findings need an independent documentation review.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
 3. GPT-6 Sol at `546ce0d` returned PROVISIONAL PASS for the documentation

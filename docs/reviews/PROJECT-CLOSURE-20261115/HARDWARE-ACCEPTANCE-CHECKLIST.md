@@ -1,9 +1,10 @@
 # ArtCraft desktop acceptance checklist — NOT RUN
 
-Run only against an HTTPS ArtCraft bridge deployment and the synthetic Seafile
-library. The owner's live Seafile is 12.0.14 and has no bridge; this checklist
-does not authorize installing one there. Use Chrome or Edge and Firefox where
-available. Do not use personal documents.
+Run only against an HTTPS deployment of the current stateless WOPI bridge and
+the synthetic Seafile library. The owner's live Seafile is 12.0.14; its current
+WOPI bridge is disabled and a pre-existing legacy route is not this candidate.
+This checklist does not authorize changing that server. Use Chrome or Edge and
+Firefox where available. Do not use personal documents.
 
 ## Record before testing
 

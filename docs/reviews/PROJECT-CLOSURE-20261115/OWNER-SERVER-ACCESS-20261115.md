@@ -8,7 +8,8 @@ omitted.
 
 - Seafile ping and HTTPS login page respond successfully.
 - Live server release is Seafile 12.0.14, older than the isolated CE 13.0.28
-  validation target. No ArtCraft bridge is configured on this server.
+  validation target. The current stateless WOPI bridge is not configured;
+  `ENABLE_OFFICE_WEB_APP` is false and its extension list is empty.
 - The corrected owner-provided account exists and is active in Seahub/CCNet.
 - The existing `ArtCraft GPT Review Synthetic` library was found. Its root has
   11 synthetic entries; its owner is a separate synthetic identity.
@@ -19,6 +20,32 @@ omitted.
   list confirmed the resulting share. `check_permission` and
   `check_permission_by_path` both returned `rw` for the account and library root.
 - A headless browser reached the HTTPS login form but did not authenticate.
+
+## Pre-existing legacy route found
+
+Further read-only inspection found that this server still has a custom,
+repository-scoped ArtCraft route from the retired third-party-editor design:
+
+- The installed Seahub `views/file.py` and `thirdparty_editor/views.py` do not
+  match the corresponding files in the adjacent Seafile 12.0.14 release
+  archive. They contain custom `ARTCRAFT_*` dispatch and cached editor-token
+  code.
+- The active settings have one ArtCraft repository allowlist entry; the
+  synthetic library is in it. An ArtCraft action URL is configured and the
+  extension list includes office formats. The values and URL are intentionally
+  omitted.
+- Proxmox CT 114 has an active `artcraft-gateway.service` described as the
+  synthetic Seafile gateway.
+- The stock WOPI branch routes by configured file-extension tuples and does
+  not scope by repository. The active allowlisted route is custom and does not
+  use the project's stateless WOPI bridge.
+
+This is pre-existing infrastructure, not a result of the current test. Its
+runtime behavior and security were not tested. It was not changed or stopped.
+The limited authorization to test one synthetic library does not authorize
+replacing this route or enabling a global WOPI extension route. A current-bridge
+test needs an isolated Seafile instance unless the owner separately approves a
+broader live-server routing change.
 
 ## Scope and limits
 

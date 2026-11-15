@@ -33,10 +33,13 @@ Do not run the historical ONLYOFFICE campaigns below.
    Seafile-host behavior is NOT VERIFIED. FODS displays raw XML; FODT/FODP/PPT/
    ODP/PPS remain unrouted. No legacy edit/save or conversion is claimed.
 3. Owner-server test access is prepared: the corrected account is active and
-   the existing synthetic library is shared read-write. No file content or
-   server configuration changed. The live Seafile is 12.0.14 with no ArtCraft
-   bridge configured, so authenticated browser edit/save/reopen remains NOT
-   VERIFIED. See `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
+   the synthetic library is shared read-write. Read-only inspection found a
+   pre-existing patched, repository-scoped ArtCraft route and active legacy
+   gateway for that library; current WOPI is disabled. Stock WOPI routing is
+   extension-wide, so a test limited to one library requires an isolated
+   Seafile 12 instance. The live legacy route is not evidence for the current
+   candidate. This post-review discovery is awaiting independent documentation
+   review. See `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
 4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance and authenticated
    owner-server validation. GPT-6 Sol reviewed `546ce0d` and returned PROVISIONAL
    PASS for the documentation follow-up only; this is not the project-wide gate. No
