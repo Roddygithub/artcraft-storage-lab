@@ -8,8 +8,10 @@ acceptance, exact-source evidence and independent final review remain open.
 
 ## Current candidate delta — 2026-11-15
 
-ArtCraft is the intended office suite. Production is still untouched; retirement
-authorization is not deployment authorization. The current candidate retains
+ArtCraft is the intended office suite. No production deployment, configuration,
+or document-content change was made; the authorized synthetic-library
+permission was updated. Retirement authorization is not deployment
+authorization. The current candidate retains
 the tested core DOCX/XLSX/PPTX workflows and an opt-in **read-only** legacy route
 for ODT, ODS, CSV and PPSX. Fresh stock Seafile CE 13.0.28 browser evidence
 checks exact bytes, visible fixture semantics and the bridge `read-only` status.
@@ -39,13 +41,17 @@ ArtCraft edit/save/reopen on this server remain NOT VERIFIED. Sanitized evidence
 
 Independent GPT-6 Sol reviews at `d2379f0`, `9def0bb`, `ad638d1` and
 `d263583` returned **PROVISIONAL PASS for the isolated MVP subset only**. The
-production-boundary MAJOR remains disclosed. The final closure-ledger MINOR was
-removed at `d263583`. No production readiness or project-wide PASS is claimed.
+documentation follow-up at `a8e7149` also received a PROVISIONAL PASS and found
+three MINOR wording/link issues; those are corrected in the current follow-up.
+The production-boundary MAJOR remains disclosed. No production readiness or
+project-wide PASS is claimed.
 
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product
-runtime or conversion path. The candidate SHA, clean tree and test inventory
-will be recorded after the final evidence commit; until then this is not a freeze.
+runtime or conversion path. The runtime source remains tested at `be51c3b`; the
+current changes are documentation-only. The repository is not frozen for the
+project-wide gate: owner-server editing, hardware acceptance and independent
+exact-HEAD review remain open.
 
 The owner requires replacement coverage for every currently configured
 ONLYOFFICE format: 15 viewing routes and 3 editing routes. The six-Craft

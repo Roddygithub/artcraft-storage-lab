@@ -37,6 +37,15 @@ deployment or upstream publication is authorized by this packet.
   It is not a complete verifier/provenance chain for every directory and does
   not replace independent review.
 
+## Independent review rounds
+
+- `SOL-REVIEW-D263583.md`: PROVISIONAL PASS for the isolated sequential MVP
+  subset only; production permission MAJOR and scope limitations remain.
+- `SOL-REVIEW-A8E7149.md`: PROVISIONAL PASS for the documentation follow-up;
+  three MINOR wording/link issues are addressed in the current follow-up. No
+  runtime replay was performed for that documentation-only review; the current
+  exact SHA still needs its own review.
+
 ## Format claims
 
 | Status | Formats | Boundary |
@@ -53,11 +62,13 @@ deployment or upstream publication is authorized by this packet.
 2. Seafile CE 13.0.28 accepts direct `PutFile` with a read-only WOPI token.
    The bridge rejects its own read-only relay, but cannot enforce host
    authorization. Do not call this production-safe.
-3. The owner's live instance was inspected read-only. TLS and the ping endpoint
-   work, but its Seafile release is older than CE 13.0.28 and ArtCraft is not configured.
-   The existing synthetic library is not shared with the supplied account.
-   No authenticated owner-server edit/save was run; do not request a production
-   upgrade or deployment as part of this review.
+3. The owner's live Seafile 12.0.14 responds over HTTPS and ping. The corrected
+   owner account is active and has a verified direct read-write share to the
+   existing synthetic library. Only that library permission changed; its files
+   and server configuration were not changed. ArtCraft is not configured, and
+   authenticated owner-server edit/save remains NOT VERIFIED. Do not request a
+   production upgrade or deployment as part of this review. See
+   `OWNER-SERVER-ACCESS-20261115.md`.
 4. Physical browser acceptance (WebGPU, clipboard, fonts, popup behavior,
    dirty close, refused save and network recovery) remains NOT VERIFIED.
 5. Some earlier free-review transcripts were private and are not retained.

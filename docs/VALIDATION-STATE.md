@@ -13,14 +13,16 @@ historical GR corpus to resume routine validation.
 | Default ArtCraft edit/save workflows | DOCX, XLSX, PPTX evidence remains the prior synthetic baseline; broad document/workbook/deck fidelity NOT VERIFIED | `../lab/real-seafile/results/2026-11-08-wordcraft-corpus-recovery/`, `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
-| Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
-| Independent and final review | GPT-6 Sol at `d263583`: PROVISIONAL PASS for isolated sequential subset only; production-boundary MAJOR remains disclosed. No project-wide PASS | `../reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-D263583.md` |
-| Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `../reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
+| Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |
+| Independent and final review | GPT-6 Sol at `a8e7149`: PROVISIONAL PASS for documentation follow-up; three MINOR findings are addressed in this follow-up. New exact-HEAD review pending; no project-wide PASS | `reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-A8E7149.md` |
+| Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
 | Owner's live Seafile server | HTTPS/TLS and ping PASS; active owner account now has direct read-write access to the existing synthetic library. No file content or server configuration changed. Seafile 12.0.14; ArtCraft bridge absent; authenticated browser edit/save/reopen NOT VERIFIED | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md) |
 
-ArtCraft is the intended suite. ONLYOFFICE retirement is authorized, but
-production is outside these tests and remains untouched. Upstream remains
-LOCKED. An automated subset PASS is not full format coverage or project approval.
+ArtCraft is the intended suite. ONLYOFFICE retirement is authorized. Production
+deployment remains outside these tests. Only the authorized synthetic-library
+permission changed; server configuration and file contents were not changed.
+Upstream remains LOCKED. An automated subset PASS is not full format coverage
+or project approval.
 
 The prior independent audit and follow-up fixes are recorded in repository
 history. Its verdict remains PROVISIONAL; owner-server and hardware acceptance
@@ -61,9 +63,10 @@ prove full pagination or font fidelity.
    the synthetic-library test authorization.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
-3. GPT-6 Sol at `ad638d1` returned PROVISIONAL PASS for the isolated subset
-   only and found one closure-ledger MINOR, now corrected. Obtain an adversarial
-   review of the current follow-up SHA; no project-wide gate has passed.
+3. GPT-6 Sol at `a8e7149` returned PROVISIONAL PASS for the documentation
+   follow-up and found three MINOR documentation issues. The current follow-up
+   addresses them; obtain independent review of its exact SHA. No project-wide
+   gate has passed.
 4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
    unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
    No converter or LibreOffice product path is planned.
