@@ -1,4 +1,10 @@
-# The ArtCraft gateway
+# LEGACY — retired gateway architecture
+
+This directory documents the superseded gateway + Seafile patch design. The
+current implementation is the stateless WOPI bridge in `bridge/`; do not extend
+this gateway. See `docs/REFOUNDATION-REPORT.md` and `ROADMAP.md`.
+
+# The ArtCraft gateway (historical)
 
 A small service that lets a **Seafile** page hand a document to a **Craft web
 editor** and take the saved bytes back.

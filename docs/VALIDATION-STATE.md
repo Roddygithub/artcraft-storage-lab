@@ -1,4 +1,4 @@
-# Validation checkpoint — 2026-11-08
+# Validation checkpoint — audited 2026-11-15
 
 This short checkpoint is the continuation entry point. Do not re-read the
 historical GR corpus to resume routine validation.
@@ -12,6 +12,7 @@ historical GR corpus to resume routine validation.
 | Remaining office viewing formats and broad fidelity | Fixtures; `--viewing` browser routing 140/140 (21 viewing checks); bundle import 5/5 documented + 2/7 undocumented (FODS, PPSX); FODS/PPSX browser routes verified (59/59, 173/173); routed formats' payload delivery verified (59/59, 67/67); rendered content NOT VERIFIED | `GR-088-UNDOCUMENTED-LEGACY-IMPORT-PROBE.md`, `results/2026-11-09-legacy-viewing-browser/`, `results/2026-11-10-viewing-fods-ppsx/`, `results/2026-11-10-viewing-relay-bytes/` |
 | Routed legacy payload delivery | HTTP 59/59, browser 67/67 (43 viewing checks): all seven routed formats' editors received the exact fixture bytes, marker included | `results/2026-11-10-viewing-relay-bytes/` |
 | Mechanical evidence self-audit | 17 evidence directories: hashes, verifiers, provenance ancestors and secret scan PASS; NOT an independent review | `scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261108/FORENSIC-AUDIT-20261110.md` |
+| Independent audit at `cd4c8ba` | PROVISIONAL PASS; no blocker/major, six minors. Loose historical JSON and documentation minors remediated; audit rerun covers 17 directories + 2 root JSON files | audit task report; `scripts/forensic-audit.py` |
 | Automated WordCraft HTTPS edit/save/reopen | HTTP 40/40, browser 28/28, exit 0; TLS routes restored | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent review / final project GPT gate | free review PROVISIONAL PASS at `265897f`; delta review at `7d18afb` PROVISIONAL PASS (3 MINOR, remediated); GPT gate NOT PERFORMED (quota) | `reviews/PROJECT-CLOSURE-20261108/FINAL-FREE-REVIEW-20261110.md`, `...-DELTA.md` |
@@ -19,6 +20,10 @@ historical GR corpus to resume routine validation.
 ONLYOFFICE is retired; do not restart compatibility campaigns. Production is
 outside this validation run. Upstream remains LOCKED. An automated subset PASS
 must never be presented as full format coverage or project approval.
+
+The independent audit and its follow-up fixes are recorded in the current
+branch history. Its free-model verdict remains PROVISIONAL; the GPT gate and
+human acceptance remain open.
 
 ## Repeat checks with compact output
 

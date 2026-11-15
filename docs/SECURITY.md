@@ -1,4 +1,11 @@
-# Security
+# LEGACY SECURITY REVIEW — gateway architecture
+
+This document describes the retired gateway and GR-015 patch design. It is
+historical evidence, not the security specification for the current bridge.
+For current bridge risks, see `bridge/README.md`, `docs/PROJECT-CLOSURE.md`
+and `docs/VALIDATION-STATE.md`.
+
+# Security (historical)
 
 Status: **GPT REVIEW FAIL** (Sol, latest reviewed candidate `0edbe524b4fa321b0f73f8601afef390e7f785e6`)
 GR-009 · Independent free review: `docs/reviews/REVIEW-01.md`, `REVIEW-02.md`

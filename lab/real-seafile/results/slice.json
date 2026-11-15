@@ -1,6 +1,6 @@
 {
  "seafile_version": "13.0.28",
- "repo_id": "aa0b41fa-cc4e-42ce-bda5-11aba6d3e09a",
+ "synthetic_library": "<synthetic-library>",
  "ran_at": "2026-10-31T20:46:59Z",
  "passed": 48,
  "failed": 0,
@@ -28,27 +28,27 @@
   {
    "name": "reader_user_ready",
    "ok": true,
-   "detail": "932257210ade4f478a9a38de61df337a@auth.local {\"email\": \"932257210ade4f478a9a38de61df337a@auth.local\", \"name\": \"reader\", \"contact_email\": \"reader@lab.test\", \"login_id"
+   "detail": "<synthetic-reader> {\"email\": \"<synthetic-reader>\", \"name\": \"reader\", \"contact_email\": \"reader@lab.test\", \"login_id"
   },
   {
    "name": "reader_share_readonly",
    "ok": true,
-   "detail": "{\"failed\": [], \"success\": [{\"share_type\": \"user\", \"user_info\": {\"name\": \"932257210ade4f478a9a38de61df337a@auth.local\", \"nickname\": \"reader\", \"contact_email\": \"reader@lab.test\", \"avatar_url\": \"http://s"
+   "detail": "{\"failed\": [], \"success\": [{\"share_type\": \"user\", \"user_info\": {\"name\": \"<synthetic-reader>\", \"nickname\": \"reader\", \"contact_email\": \"reader@lab.test\", \"avatar_url\": \"http://s"
   },
   {
    "name": "seahub_svg_routes_to_wopi",
    "ok": true,
-   "detail": "version=13.0.28 action=http://bridge:8778/edit/vectorcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F583ba96bf72174940b9a124e005"
+   "detail": "version=13.0.28 action=<private-WOPI-source>"
   },
   {
    "name": "seahub_docx_routes_to_wopi_wordcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/wordcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fa57f4c42f4f8b14b216fcafba3f67"
+   "detail": "<private-WOPI-source>"
   },
   {
    "name": "seahub_xlsx_routes_to_wopi_gridcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/gridcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F2cd7ab3e6fba246d3520121bbba49"
+   "detail": "<private-WOPI-source>"
   },
   {
    "name": "seahub_pdf_default_is_viewer_not_wopi",
@@ -58,17 +58,17 @@
   {
    "name": "seahub_pdf_edit_pdf_routes_to_wopi_pdfcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/pdfcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F724ddfac172212678b71f3c62e2170"
+   "detail": "<private-WOPI-source>"
   },
   {
    "name": "seahub_dxf_routes_to_wopi_cadcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/cadcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fc0bb1a658c0d775e66cc49dc6091b2"
+   "detail": "<private-WOPI-source>"
   },
   {
    "name": "seahub_pptx_routes_to_wopi_deckcraft",
    "ok": true,
-   "detail": "http://bridge:8778/edit/deckcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2Fe4dc49207f64b28d220c7dc465901"
+   "detail": "<private-WOPI-source>"
   },
   {
    "name": "seahub_odt_routes_to_onlyoffice",
@@ -128,12 +128,12 @@
   {
    "name": "discovery_form_token_not_in_url",
    "ok": true,
-   "detail": "http://bridge:8778/edit/vectorcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F583ba96bf72174940b9a124e005"
+   "detail": "<private-WOPI-source>"
   },
   {
    "name": "discovery_wopisrc_is_seahub",
    "ok": true,
-   "detail": "http://seafile.lab/api2/wopi/files/583ba96bf72174940b9a124e005c4501596934b8"
+   "detail": "<private-WOPI-source>"
   },
   {
    "name": "bridge_open_host_page",
@@ -213,7 +213,7 @@
   {
    "name": "seahub_readonly_gets_wopi_view_form",
    "ok": true,
-   "detail": "http://bridge:8778/edit/vectorcraft?WOPISrc=http%3A%2F%2Fseafile.lab%2Fapi2%2Fwopi%2Ffiles%2F583ba96bf72174940b9a124e005"
+   "detail": "<private-WOPI-source>"
   },
   {
    "name": "bridge_readonly_open",
@@ -228,7 +228,7 @@
   {
    "name": "seahub_putfile_ignores_can_edit",
    "ok": true,
-   "detail": "status=200 overwritten=True top_creator=932257210ade4f478a9a38de61df337a@auth.local  (ok=True means the Seahub gap is real)"
+   "detail": "status=200 overwritten=True top_creator=<synthetic-reader>  (ok=True means the Seahub gap is real)"
   },
   {
    "name": "onlyoffice_apijs_200",

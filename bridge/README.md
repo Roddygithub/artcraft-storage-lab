@@ -2,7 +2,7 @@
 
 Status: **prototype, validated against a stock Seafile CE 13.0.28** (`lab/real-seafile/`: 45 HTTP checks +
 21 headless-browser checks with the unpatched upstream WordCraft/GridCraft/PdfCraft/CADCraft bundles and VectorCraft through a page-API shim), and
-unit-tested against a fake Seahub WOPI host (`tests/bridge/`, 32 tests, with fault injection: lost answer, 5xx after commit, redirect, acknowledged-but-not-stored). Not yet run on HTTPS with a human
+unit-tested against a fake Seahub WOPI host (`tests/bridge/`, 33 tests, with fault injection: lost answer, 5xx after commit, redirect, acknowledged-but-not-stored). Not yet run on HTTPS with a human
 in a real browser. See `docs/REFOUNDATION-REPORT.md` §5 and §7.
 
 ## What it is
@@ -105,7 +105,7 @@ tests/bridge/test_bridge.py   32 offline checks
 ## Real-Seafile lab
 
 `lab/real-seafile/up.sh up|configure|slice|browser|down` drives a dedicated Lima VM (Docker) with Seafile
-CE 13, ONLYOFFICE Docs, the bridge and the upstream editor bundles. Results and screenshots land in
+CE 13, the bridge and the upstream editor bundles. ONLYOFFICE is retired; historical results are retained. Results and screenshots land in
 `lab/real-seafile/results/`. Findings that changed this code: editor pages need
 `frame-ancestors 'self' <seahub-origin>` (Chromium checks the whole ancestor chain).
 

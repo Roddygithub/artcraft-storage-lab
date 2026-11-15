@@ -61,3 +61,18 @@ python3 scripts/forensic-audit.py --output /absolute/new/private-dir
 ```
 
 Expected: `PASS: 17 evidence directories …` at the audited `HEAD`.
+
+## Independent delta audit — 2026-11-15
+
+A separate read-only audit of `cd4c8ba` re-ran the bridge, legacy-fixture and
+launcher test counts and reviewed the current evidence/docs. It reported no
+BLOCKER or MAJOR and six MINOR: unaudited loose root JSON, stale test counts,
+stale viewing config labels, missing legacy banners on SECURITY/integration,
+implementer-attested free-review transcripts, and legacy save-back/signature
+risk. The first four were remediated in the follow-up commit; the remaining two
+are disclosed limits. The root `slice.json` and `browser.json` were sanitized;
+the forensic checker now scans loose root JSON too. Re-run at the follow-up
+source passed 17 evidence directories plus both loose JSON files. The audit's
+PROVISIONAL verdict is independent free-model input, not the final project GPT
+gate. Rendered legacy content, legacy saves, five unrouted formats, hardware
+acceptance and GPT review remain open.

@@ -110,6 +110,18 @@ def audit_secrets(directory: Path, failures: list) -> int:
     return scanned
 
 
+def audit_root_json(failures: list) -> int:
+    """Also scan loose historical JSON beside the evidence directories."""
+    scanned = 0
+    for path in RESULTS.glob('*.json'):
+        text = path.read_text()
+        scanned += 1
+        for label, pattern in SECRET_PATTERNS.items():
+            if pattern.search(text):
+                failures.append(f'{path.name}: retained {label}')
+    return scanned
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('--output', type=Path, required=True,
@@ -135,9 +147,11 @@ def main() -> int:
               f"provenance={row['provenance_commits']} json={row['secrets_scanned']}",
               flush=True)
 
+    root_json_scanned = audit_root_json(failures)
     head = git('rev-parse', 'HEAD').stdout.strip()
     summary = {'scope': 'mechanical self-audit, not an independent review',
                'head': head, 'directories': rows,
+               'loose_root_json_scanned': root_json_scanned,
                'failures': failures, 'passed': not failures}
     (output / 'summary.json').write_text(json.dumps(summary, indent=1) + '\n')
     if failures:
@@ -145,8 +159,8 @@ def main() -> int:
         for failure in failures:
             print(' - ' + failure)
         return 1
-    print(f"\nPASS: {len(rows)} evidence directories, hashes, verifiers, provenance "
-          f"and secret scan at {head[:12]}")
+    print(f"\nPASS: {len(rows)} evidence directories, hashes, verifiers, provenance, "
+          f"{root_json_scanned} loose JSON files and secret scan at {head[:12]}")
     return 0
 
 

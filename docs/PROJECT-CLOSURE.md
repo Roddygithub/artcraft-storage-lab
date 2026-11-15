@@ -283,3 +283,16 @@ Offline validation re-ran **20/20** at `5aa134a`. Still NOT VERIFIED: rendered
 legacy pixels (a canvas non-blank test would also pass on an empty sheet, so it
 cannot prove an import), legacy/OpenDocument saves, hardware acceptance and the
 project GPT gate. Project remains **INCOMPLETE**; upstream **LOCKED**.
+
+## Independent audit delta — 2026-11-15
+
+A separate read-only audit at `cd4c8ba` returned **PROVISIONAL PASS** with no
+BLOCKER/MAJOR and six MINOR. Remediation updated stale test counts and viewing
+candidate labels, marked the gateway security/integration documentation as
+legacy, sanitized the two loose root result JSON files, and expanded
+`scripts/forensic-audit.py` to scan them. Re-running that audit passed all 17
+evidence directories and both loose root JSON files. The remaining review notes
+are that the original free-review transcripts are not retained and legacy
+save-back for imported formats is untested; both remain disclosed limits.
+This does not close the project GPT gate or human acceptance. INCOMPLETE;
+upstream LOCKED.

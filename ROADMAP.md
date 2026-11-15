@@ -9,10 +9,10 @@ under `docs/reviews/` and `integration/` as evidence.
 | What | Evidence |
 | --- | --- |
 | Decision: zero-patch WOPI editor bridge, ONLYOFFICE kept for office | report §5 |
-| Bridge prototype + fake-host tests | `bridge/`, `tests/bridge/` (32) |
+| Bridge prototype + fake-host tests | `bridge/`, `tests/bridge/` (33) |
 | Real Seafile CE 13.0.28 + ONLYOFFICE 9.4 lab, HTTP slice | `lab/real-seafile/results/slice.json` (45/45) |
 | Real browser path: 4 unpatched upstream bundles, VectorCraft via shim, DeckCraft/SoundCraft/PhotoCraft/DesignCraft via local ports built in the lab | `results/browser.json` (50/50), screenshots |
-| Independent review R2 of the bridge, all HIGH/MEDIUM fixed | report §7, `tests/bridge/` (30) |
+| Independent review R2 of the bridge, all HIGH/MEDIUM fixed | report §7, historical suite at review time (30); current suite has 33 |
 | Deployment kit | `deploy/bridge/` |
 | Upstream drafts (unpublished) | `docs/upstream-drafts/` |
 
