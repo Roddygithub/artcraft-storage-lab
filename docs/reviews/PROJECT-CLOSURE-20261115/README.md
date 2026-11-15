@@ -30,8 +30,11 @@ deployment or upstream publication is authorized by this packet.
   render screenshots; FODS displays raw XML. DOC/XLS host behavior was reported
   by earlier exploratory runs, but those failures are not retained as exact-
   source evidence and must be treated as NOT VERIFIED.
-* `scripts/forensic-audit.py`: mechanical evidence self-audit; it does not
-  replace this independent review.
+* `scripts/forensic-audit.py`: mechanical self-audit inventories 20 result
+  directories/checksum manifests, runs 17 available verifiers, checks 16
+  provenance files and scans 2 loose JSON files for known secret patterns.
+  It is not a complete verifier/provenance chain for every directory and does
+  not replace independent review.
 
 ## Format claims
 

@@ -1,13 +1,13 @@
 {
   "wordcraft": {
     "app": "wordcraft",
-    "label": "WordCraft (opt-in viewing candidate: +ODT; DOC renders unrelated sample content and stays unrouted)",
+    "label": "WordCraft (opt-in ODT viewing: Seafile render verified, read-only; DOC unrouted; standalone import only, host render NOT VERIFIED)",
     "extensions": ["docx", "odt"],
     "url": "/editors/wordcraft/index.html?host=parent"
   },
   "gridcraft": {
     "app": "gridcraft",
-    "label": "GridCraft (opt-in viewing candidate: +ODS/CSV; both render synthetic markers; XLS fails Seafile routing, FODS renders raw XML)",
+    "label": "GridCraft (opt-in ODS/CSV viewing: Seafile render verified, read-only; XLS unrouted, host render NOT VERIFIED; FODS unsupported: raw XML)",
     "extensions": ["xlsx", "ods", "csv"],
     "url": "/editors/gridcraft/index.html?host=parent"
   },

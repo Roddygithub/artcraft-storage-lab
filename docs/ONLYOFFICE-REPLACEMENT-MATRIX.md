@@ -39,7 +39,12 @@ because GridCraft displays raw XML. Current Seafile browser evidence verifies
 visible content only for ODT, ODS, CSV and PPSX, and verifies no route for the
 eight excluded formats; it makes no legacy save claim.
 
-## Deterministic viewing fixtures — 2026-11-08
+## Historical fixture/routing evidence — 2026-11-08 to 2026-11-10
+
+**Superseded for current route and render status by the 2026-11-15 candidate
+matrix above and its exact-source evidence.** This section records what older
+replays did at their own source revisions; it does not describe today's
+`editors.viewing.json` routes.
 
 Every viewing format above now has one synthetic file that carries the marker
 `GR-LEGACY-MARKER-20261108` in its real content, generated offline and

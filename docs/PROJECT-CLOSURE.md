@@ -28,9 +28,11 @@ boundary. The legacy view routes are lab-only until owner decides how to handle
 that host behavior; no production deployment or multi-user safety is claimed.
 
 The owner's live Seafile was checked read-only on 2026-11-15: HTTPS/TLS and the
-Seafile ping endpoint responded. A synthetic library exists but is not shared
-with the supplied account, so authenticated browser, edit, save and reopen tests
-remain NOT VERIFIED. No production configuration or document was changed.
+Seafile ping endpoint responded. A synthetic library exists but is not shared;
+the supplied account was not found in Seafile's user lookup. The owner authorized
+a dedicated test library, but it has not been created without a valid account.
+Authenticated browser, edit, save and reopen tests remain NOT VERIFIED. No
+production configuration or document was changed.
 
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product

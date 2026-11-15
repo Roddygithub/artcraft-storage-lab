@@ -32,10 +32,11 @@ Do not run the historical ONLYOFFICE campaigns below.
    DOC/XLS are unrouted; their standalone fixture render works, but retained
    Seafile-host behavior is NOT VERIFIED. FODS displays raw XML; FODT/FODP/PPT/
    ODP/PPS remain unrouted. No legacy edit/save or conversion is claimed.
-3. Owner server discovery is read-only: HTTPS/TLS and Seafile ping respond. A
-   synthetic library exists but is not shared with the supplied account; no
-   authenticated browser, edit or save test has been run. Await account access
-   to the existing synthetic library or authorization to create a test library.
+3. Owner server discovery is read-only: HTTPS/TLS and Seafile ping respond. The
+   existing synthetic library is unshared, and Seafile does not recognize the
+   supplied account. The owner authorized a dedicated test library, but its
+   creation awaits a valid Seafile account. No authenticated browser/edit/save
+   test has run; the live release is older than CE 13.0.28 and has no bridge.
 4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance, exact-source
    mechanical audit, independent forensic review and GPT-6 Sol adversarial gate.
    Current endpoint tests and free reviews do not satisfy the final project gate.

@@ -14,9 +14,9 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
-| Independent and final review | Prior audit at `cd4c8ba` was PROVISIONAL PASS with six minors; implementation/doc delta awaits new independent review and GPT-6 Sol gate | `../reviews/PROJECT-CLOSURE-20261108/`, current candidate dossier |
-| Mechanical evidence self-audit | PASS: 20 evidence directories, hashes/verifiers/provenance, 2 loose JSON files and secret scan at source `4a5ab57`; not independent | `../scripts/forensic-audit.py`; private run summary |
-| Owner's live Seafile server | Read-only HTTPS/TLS and ping PASS; inspected release is older than tested CE 13.0.28, ArtCraft bridge is absent, and synthetic library is not shared. Authenticated browser/edit/save NOT VERIFIED | private infrastructure discovery; no production writes |
+| Independent and final review | GPT-6 Sol at `d2379f0`: PROVISIONAL PASS for isolated subset only; one production-boundary MAJOR and two wording MINOR. Wording fixes are on the current follow-up; re-review pending. No global GPT PASS | `../reviews/PROJECT-CLOSURE-20261115/` |
+| Mechanical evidence self-audit | PASS at source `4a5ab57`: 20 result directories and checksum manifests, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`; private run summary |
+| Owner's live Seafile server | Read-only HTTPS/TLS and ping PASS; release is older than tested CE 13.0.28, ArtCraft bridge is absent, and synthetic library is unshared. Supplied account is not registered in Seafile; no test library created. Authenticated edit/save NOT VERIFIED | private infrastructure discovery; no production writes |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized, but
 production is outside these tests and remains untouched. Upstream remains
@@ -55,12 +55,12 @@ prove full pagination or font fidelity.
 ## Next unresolved work
 
 1. Reproduce the authenticated HTTPS workflow on the owner's Seafile with a
-   synthetic document. The credentials supplied in chat have not been used.
-   The existing synthetic library must be shared to the supplied account, or
-   the owner must authorize creation of a dedicated test library. No existing
-   user files will be changed. The inspected live release is older than the
-   CE 13.0.28 candidate and has no ArtCraft bridge; an upgrade or deployment is
-   a separate owner decision and is not authorized by this validation task.
+   synthetic document. Read-only Seafile lookup did not find the supplied
+   account, so the owner-authorized test-library creation is paused until a
+   valid account is identified. The existing synthetic library must be shared
+   to that account. No existing user files were changed. The inspected live
+   release is older than CE 13.0.28 and has no ArtCraft bridge; an upgrade or
+   deployment is a separate owner decision and is not authorized here.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
 3. Perform a mechanical evidence audit, then independent forensic review and
