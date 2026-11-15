@@ -1,0 +1,9 @@
+Evidence source commit: 11b75a23be5e263f9bb7b4b9cb332caa2158bd6d
+Runtime: Seafile CE 12.0.14, official image digest sha256:7bbe7043facbc639a8e6144f32d50dc4d771191ecaa68002efb2b0237fb90358
+Execution: rootless Podman; private synthetic account/library; loopback-only port; synthetic office fixtures
+Browser: lab/real-seafile/run_browser.py from evidence source commit; headless Playwright/Chromium
+WordCraft ZIP: v0.13.2; SHA-256 b6c9c8d3a730495189ba0c213fe64313f317be8fc0611ac1ff8cdd6a4b20880c
+GridCraft ZIP: v0.14.2; SHA-256 f6675cfe26f89f07cb9d9ff23a5ae0a946088eef6e22c93ac1141f0279f741f8
+DeckCraft ZIP: v0.16.0; SHA-256 8795d58ab02c30ad25f38525a79ee0e69c40b3d122e223dc04d2703827621f55
+Official CE12 compose source: https://manual.seafile.com/12.0/repo/docker/ce/seafile-server.yml
+This was a disposable test stack; no production server or files were changed.

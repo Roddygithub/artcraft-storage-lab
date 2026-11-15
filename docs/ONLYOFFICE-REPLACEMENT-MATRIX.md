@@ -8,9 +8,9 @@ proof that every current ONLYOFFICE path works in practice.
 
 | Required format | Current mode | ArtCraft status | Verified behavior and limit |
 | --- | --- | --- | --- |
-| DOCX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | WordCraft synthetic typed edits, Seafile version and fresh reopen; broad arbitrary-document fidelity NOT VERIFIED |
-| XLSX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | GridCraft synthetic typed-cell save, version and fresh reopen; broad workbook fidelity NOT VERIFIED |
-| PPTX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | DeckCraft v0.16 synthetic title edit, same-format save, version and fresh reopen; broad fidelity NOT VERIFIED |
+| DOCX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | WordCraft synthetic typed edits, Seafile versions and fresh reopen; isolated CE 12.0.14 replay 24/24. Broad arbitrary-document fidelity NOT VERIFIED |
+| XLSX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | GridCraft synthetic typed-cell saves, versions and fresh reopen; isolated CE 12.0.14 replay 27/27. Broad workbook fidelity NOT VERIFIED |
+| PPTX | View + edit | EDIT_SUPPORTED / SAVE_SAME_FORMAT | DeckCraft v0.16 synthetic title edit, same-format save, version and fresh reopen; isolated CE 12.0.14 replay 15/15. Broad fidelity NOT VERIFIED |
 | DOC | View | UNSUPPORTED in current Seafile candidate | Standalone WordCraft bundle probe renders the synthetic marker; DOC is unrouted in the candidate and Seafile-host rendering is NOT VERIFIED by retained exact-source evidence |
 | XLS | View | UNSUPPORTED in current Seafile candidate | Standalone GridCraft bundle probe renders the marker and value; XLS is unrouted in the candidate and Seafile-host rendering is NOT VERIFIED by retained exact-source evidence |
 | ODT | View | VIEW_SUPPORTED | WordCraft displays the fixture marker; route/payload proved on Seafile; no in-place legacy save tested |
@@ -38,6 +38,13 @@ as verified. Both formats are unrouted in the candidate. FODS is unrouted
 because GridCraft displays raw XML. Current Seafile browser evidence verifies
 visible content only for ODT, ODS, CSV and PPSX, and verifies no route for the
 eight excluded formats; it makes no legacy save claim.
+
+The three modern edit/save workflows also passed on an isolated stock Seafile
+CE 12.0.14 image: 24/24 DOCX, 27/27 XLSX, and 15/15 PPTX browser assertions.
+Their scope and retained binary evidence are in
+`lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`. This
+one-off setup is not the owner's server and is not yet reproducible with the
+checked-in CE13 launcher.
 
 ## Historical fixture/routing evidence — 2026-11-08 to 2026-11-10
 

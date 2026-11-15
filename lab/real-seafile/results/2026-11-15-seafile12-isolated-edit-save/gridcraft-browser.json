@@ -1,0 +1,142 @@
+{
+  "ran_at": "2026-11-15T13:04:14Z",
+  "passed": 27,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "browser_login",
+      "ok": true,
+      "detail": "http://seafile.lab/"
+    },
+    {
+      "name": "browser_editor_filter_selects_requested_editor",
+      "ok": true,
+      "detail": "selected=['test.xlsx']"
+    },
+    {
+      "name": "gridcraft_opened_from_seafile_file_list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gridcraft_host_frame_from_seahub",
+      "ok": true,
+      "detail": "frames=[('', 'http://seafile.lab/lib/<synthetic-repo>/file/test.', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=[redacted]', ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+    },
+    {
+      "name": "gridcraft_editor_ready_and_document_opened",
+      "ok": true,
+      "detail": "status='ready' after 13s"
+    },
+    {
+      "name": "gridcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+      "ok": true,
+      "detail": "marker=gridtyped8c9c753726 status='unsaved changes'"
+    },
+    {
+      "name": "gridcraft_save_request_carries_the_typed_value",
+      "ok": true,
+      "detail": "payload=4087B marker=gridtyped8c9c753726 cells=['A1', 'J3']"
+    },
+    {
+      "name": "gridcraft_save_confirmed_by_host_page",
+      "ok": true,
+      "detail": "status='saved to Seafile'"
+    },
+    {
+      "name": "gridcraft_save_creates_seafile_version_by_user",
+      "ok": true,
+      "detail": "history 1->2 top={'id': 'd9d9cbd7a93b215da1e9aed519b0368d94ffb56d', 'rev_file_id': '60f92375ba90472c50b3aafe64f1580d887bc074', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.xlsx\"'}"
+    },
+    {
+      "name": "gridcraft_saved_xlsx_semantically_contains_the_typed_value",
+      "ok": true,
+      "detail": "marker=gridtyped8c9c753726 cells=['A1', 'J3']"
+    },
+    {
+      "name": "gridcraft_saved_xlsx_keeps_the_fixture_value",
+      "ok": true,
+      "detail": "A1='1' (the typed cell is not A1: click at 30% canvas height)"
+    },
+    {
+      "name": "gridcraft_save_is_not_identical_bytes",
+      "ok": true,
+      "detail": "1885 -> 4087 bytes"
+    },
+    {
+      "name": "gridcraft_saved_xlsx_bytes_look_right",
+      "ok": true,
+      "detail": "len=4087"
+    },
+    {
+      "name": "gridcraft_reopen_fresh_seafile_session",
+      "ok": true,
+      "detail": "http://seafile.lab/"
+    },
+    {
+      "name": "gridcraft_reopened_from_seafile_file_list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gridcraft_reopen_host_frame_from_seahub",
+      "ok": true,
+      "detail": "frames=[('', 'http://seafile.lab/lib/<synthetic-repo>/file/test.', None), ('office_frame', 'http://bridge:8778/edit/gridcraft?WOPISrc=[redacted]', ''), ('frame', 'http://bridge:8778/editors/gridcraft/index.html?host=parent', 'office_frame')]"
+    },
+    {
+      "name": "gridcraft_reopen_editor_ready_and_document_opened",
+      "ok": true,
+      "detail": "relay/file responses=1 after 59s"
+    },
+    {
+      "name": "gridcraft_reopen_bytes_identical_to_the_saved_version",
+      "ok": true,
+      "detail": "len=4087 vs saved 4087"
+    },
+    {
+      "name": "gridcraft_reopen_parsed_the_saved_value",
+      "ok": true,
+      "detail": "cells=['A1', 'J3']"
+    },
+    {
+      "name": "gridcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+      "ok": true,
+      "detail": "marker=gridreopenedcb37434ef2 status='unsaved changes'"
+    },
+    {
+      "name": "gridcraft_reopen_editor_holds_the_original_value",
+      "ok": true,
+      "detail": "marker=gridtyped8c9c753726 cells=['A1', 'J3', 'P16']"
+    },
+    {
+      "name": "gridcraft_reopen_editor_holds_the_second_typed_value",
+      "ok": true,
+      "detail": "marker=gridreopenedcb37434ef2 cells=['A1', 'J3', 'P16']"
+    },
+    {
+      "name": "gridcraft_reopen_save_confirmed_by_host_page",
+      "ok": true,
+      "detail": "status='saved to Seafile'"
+    },
+    {
+      "name": "gridcraft_reopen_second_save_creates_seafile_version_by_user",
+      "ok": true,
+      "detail": "history 2->3 top={'id': 'bbf5afb3e59b9d5cf2a4aaf028df1e8bc85b9d42', 'rev_file_id': '797dd780e2294109e71955ce8e02e2570f5d2544', 'creator': 'admin@lab.test', 'desc': 'Modified \"test.xlsx\"'}"
+    },
+    {
+      "name": "gridcraft_reopen_seafile_holds_both_values",
+      "ok": true,
+      "detail": "marker=gridreopenedcb37434ef2 cells=['A1', 'J3', 'P16']"
+    },
+    {
+      "name": "gridcraft_second_save_is_not_identical_bytes",
+      "ok": true,
+      "detail": "4087 -> 4118 bytes"
+    },
+    {
+      "name": "gridcraft_saves_did_not_download",
+      "ok": true,
+      "detail": "downloads=0"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "ran_at": "2026-11-15T13:08:41Z",
+  "passed": 15,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "browser_login",
+      "ok": true,
+      "detail": "http://seafile.lab/"
+    },
+    {
+      "name": "browser_editor_filter_selects_requested_editor",
+      "ok": true,
+      "detail": "selected=['synthetic.pptx']"
+    },
+    {
+      "name": "pptx_opened_from_seafile_file_list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "deckcraft_host_frame_from_seahub",
+      "ok": true,
+      "detail": "frames=[('', 'http://seafile.lab/lib/<synthetic-repo>/file/synth', None), ('office_frame', 'http://bridge:8778/edit/deckcraft?WOPISrc=[redacted]', ''), ('frame', 'http://bridge:8778/editors/deckcraft/index.html?host=parent', 'office_frame')]"
+    },
+    {
+      "name": "deckcraft_editor_ready_and_document_opened",
+      "ok": true,
+      "detail": "status='ready' after 16s"
+    },
+    {
+      "name": "pptx_canvas_ready_before_typing",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pptx_save_payload_contains_original_title_and_typed_marker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pptx_save_confirmed_by_host",
+      "ok": true,
+      "detail": "status='saved to Seafile'"
+    },
+    {
+      "name": "pptx_new_version_attributed_to_user",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pptx_same_file_readback_equals_relay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pptx_readback_retains_title_and_typed_marker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pptx_old_page_closed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pptx_fresh_session_file_list_reopen",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pptx_fresh_editor_loaded_persisted_edit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pptx_save_did_not_download",
+      "ok": true,
+      "detail": "downloads=0"
+    }
+  ]
+}

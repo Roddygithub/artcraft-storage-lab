@@ -55,9 +55,10 @@ broader live-server routing change.
 ## Scope and limits
 
 Only the synthetic library's permission changed. No document content, other
-library, user file, or server configuration was modified. No password was
-submitted through the HTTP login URL. The browser has not opened an editor;
-authenticated open/edit/save/reopen against this server remains **NOT VERIFIED**.
+library, user file, or server configuration was modified. The HTTP login URL
+was not used for credentials. The HTTPS login page responded, but the supplied
+credentials were rejected; the browser has not opened an editor. Authenticated
+open/edit/save/reopen against this server remains **NOT VERIFIED**.
 The absence of a configured bridge and the older Seafile release prevent this
 from being evidence for the isolated CE 13.0.28 workflow or for production
 readiness.

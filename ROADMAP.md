@@ -23,17 +23,21 @@ Compact validation/continuation entry point: `docs/VALIDATION-STATE.md`.
 ONLYOFFICE is retired by owner instruction (`docs/ONLYOFFICE-RETIREMENT-20261108.md`).
 Do not run the historical ONLYOFFICE campaigns below.
 
-1. Automated isolated candidate: 20/20 offline command groups and the fresh
-   Seafile CE 13.0.28 lab pass at source `be51c3b577fda9834de4364a35d0784d28f62492`;
-   HTTP 56/56 and browser 58/58. Core DOCX typed edits create Seafile versions
-   and survive a fresh-session reopen.
+1. Automated isolated candidate: 20/20 offline command groups PASS at exact
+   source `11b75a23be5e263f9bb7b4b9cb332caa2158bd6d`. The fresh Seafile CE
+   13.0.28 lab still has its retained HTTP 56/56 and browser 58/58 evidence at
+   source `be51c3b`; isolated CE 12.0.14 adds 66/66 browser assertions for
+   DOCX, XLSX and PPTX. See the two dated evidence directories below.
 2. Opt-in read-only legacy routes: ODT→WordCraft, ODS/CSV→GridCraft and
    PPSX→DeckCraft have exact-byte, visible-marker and read-only-state checks.
    DOC/XLS are unrouted; their standalone fixture render works, but retained
    Seafile-host behavior is NOT VERIFIED. FODS displays raw XML; FODT/FODP/PPT/
    ODP/PPS remain unrouted. No legacy edit/save or conversion is claimed.
-3. Owner-server test access is prepared: the corrected account is active and
-   the synthetic library is shared read-write. Read-only inspection found a
+3. Isolated stock Seafile CE 12.0.14 browser edit/save/reopen now passes for
+   DOCX, XLSX and PPTX (66/66 assertions); retained evidence is under
+   `lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`.
+   Owner-server access is still unauthenticated: the supplied credentials were
+   rejected at login. Read-only inspection found a
    pre-existing patched, repository-scoped ArtCraft route that allowlists the
    synthetic library, plus a separate active legacy gateway service; the
    service's relation to the configured action URL is unverified. Current WOPI

@@ -22,6 +22,14 @@ Exact-source runnable evidence is in
 `lab/real-seafile/results/2026-11-15-seafile-render-readonly/`; per-format states
 are in `docs/ONLYOFFICE-REPLACEMENT-MATRIX.md`.
 
+A separate synthetic, rootless Seafile CE 12.0.14 browser run verified DOCX,
+XLSX and PPTX edit → save → new version → fresh-session reopen: 66/66 browser
+assertions passed. The exact-source results, screenshots, source/readback files
+where captured, and SHA-256 manifest are retained in
+`lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`. The setup
+was a one-off and is not yet reproducible through the checked-in launcher;
+this evidence does not establish the workflow on the owner's server.
+
 **Security boundary:** the isolated CE 13.0.28 host accepts a direct `PutFile`
 with a read-only WOPI token. The bridge's relay refuses writes when
 `UserCanWrite=false`, and the browser shows `read-only`, but the access token is
