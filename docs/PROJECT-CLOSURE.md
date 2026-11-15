@@ -66,6 +66,11 @@ received a separate exact-HEAD PROVISIONAL PASS; both prior MINOR findings were
 closed, with none new. These documentation reviews do not verify the live WOPI
 workflow. No production readiness or project-wide PASS is claimed.
 
+The evidence follow-up at `98c6bba` received an independent GPT-6 Sol
+PROVISIONAL PASS. The prior MAJOR for missing offline logs is closed: all 20
+logs are committed, covered by SHA-256, and missing-file/corruption cases fail
+the verifier. This bounded review does not change the project-wide gate.
+
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product
 runtime or conversion path. Reviewed candidate SHA:

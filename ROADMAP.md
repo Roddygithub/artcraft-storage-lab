@@ -49,8 +49,8 @@ Do not run the historical ONLYOFFICE campaigns below.
    See
    `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
 4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance and authenticated
-   owner-server validation. GPT-6 Sol reviewed the route-wording correction at
-   `230a47c` and returned PROVISIONAL PASS; this was not owner-server WOPI
+   owner-server validation. GPT-6 Sol reviewed the evidence/log repair at
+   `98c6bba` and returned PROVISIONAL PASS; this was not owner-server WOPI
    validation or the project-wide gate. No converter or LibreOffice product
    path is planned.
 
