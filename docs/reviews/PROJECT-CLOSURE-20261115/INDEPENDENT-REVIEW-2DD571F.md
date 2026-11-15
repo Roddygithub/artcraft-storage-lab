@@ -4,6 +4,12 @@
 review. It is **not** a GPT gate, not a project-wide PASS, and not production
 approval. Upstream remains LOCKED.
 
+The reviewing context's own headline verdict was **FAIL on one BLOCKER**
+(`/relay/save` buffering before token validation). That BLOCKER was re-checked
+against the source and reduced to a documented deployment limitation; the
+reasons are in "Why finding 1 is a limitation, not a blocker" below. The PASS
+above is this record's conclusion, not the reviewer's.
+
 | Field | Value |
 | --- | --- |
 | Technical candidate | `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb` |
