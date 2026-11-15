@@ -37,10 +37,11 @@ Do not run the historical ONLYOFFICE campaigns below.
    supplied account. The owner authorized a dedicated test library, but its
    creation awaits a valid Seafile account. No authenticated browser/edit/save
    test has run; the live release is older than CE 13.0.28 and has no bridge.
-4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance, exact-source
-   mechanical audit, independent forensic review and GPT-6 Sol adversarial gate.
-   Current endpoint tests and free reviews do not satisfy the final project gate.
-   No converter or LibreOffice product path is planned.
+4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance and an
+   independent GPT-6 Sol follow-up review. The mechanical evidence audit passes
+   at `eb896d0`; the earlier Sol PROVISIONAL PASS at `d2379f0` is subset-only,
+   not the final project gate. No converter or LibreOffice product path is
+   planned.
 
 ## Historical next steps (superseded where they require ONLYOFFICE)
 

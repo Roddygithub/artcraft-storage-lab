@@ -15,7 +15,7 @@ historical GR corpus to resume routine validation.
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent and final review | GPT-6 Sol at `d2379f0`: PROVISIONAL PASS for isolated subset only; one production-boundary MAJOR and two wording MINOR. Wording fixes and exact-source test replay are at `be51c3b`; follow-up review pending. No global GPT PASS | `../reviews/PROJECT-CLOSURE-20261115/` |
-| Mechanical evidence self-audit | Prior PASS at source `4a5ab57`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent. Re-audit after latest evidence commit is pending | `../scripts/forensic-audit.py`; private run summary |
+| Mechanical evidence self-audit | PASS at evidence HEAD `eb896d0`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`; private run summary |
 | Owner's live Seafile server | Read-only HTTPS/TLS and ping PASS; release is older than tested CE 13.0.28, ArtCraft bridge is absent, and synthetic library is unshared. Supplied account is not registered in Seafile; no test library created. Authenticated edit/save NOT VERIFIED | private infrastructure discovery; no production writes |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized, but
@@ -63,9 +63,10 @@ prove full pagination or font fidelity.
    deployment is a separate owner decision and is not authorized here.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
-3. Perform a mechanical evidence audit, then independent forensic review and
-   GPT-6 Sol adversarial review of the frozen exact candidate SHA. Existing free
-   reviews remain PROVISIONAL and do not satisfy this gate.
+3. The GPT-6 Sol review at `d2379f0` returned PROVISIONAL PASS for the isolated
+   subset only, with two MINOR wording findings now corrected. Obtain a new
+   adversarial review of the current frozen SHA; the earlier verdict does not
+   satisfy the project-wide gate.
 4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
    unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
    No converter or LibreOffice product path is planned.

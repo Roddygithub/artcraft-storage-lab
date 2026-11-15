@@ -34,6 +34,13 @@ a dedicated test library, but it has not been created without a valid account.
 Authenticated browser, edit, save and reopen tests remain NOT VERIFIED. No
 production configuration or document was changed.
 
+An independent GPT-6 Sol review of `d2379f0` returned **PROVISIONAL PASS for the
+isolated MVP subset only**, with one production-boundary MAJOR and two wording
+MINOR findings. The wording findings were corrected and the candidate was
+retested at source `be51c3b`; a separate follow-up review of the current SHA is
+still pending. The production-boundary finding remains disclosed and does not
+grant production readiness.
+
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product
 runtime or conversion path. The candidate SHA, clean tree and test inventory
