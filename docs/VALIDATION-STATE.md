@@ -4,9 +4,11 @@
 This candidate adds a reproducible Seafile CE12 runner and retains a corrected
 66/66 browser replay. The offline runner passed 21/21 command groups at this
 exact SHA. An independent free-model review of `123d2a0` returned PROVISIONAL
-PASS for the claimed lab scope; its one limitation and four documentation
-minors are resolved. See
+PASS for the bridge source and the consistency of the retained evidence; its
+one limitation and four documentation minors are resolved. See
 `reviews/PROJECT-CLOSURE-20261115/INDEPENDENT-REVIEW-2DD571F.md`.
+That review did **not** cover the CE12 launcher or the replay evidence chain in
+depth; those are the subject of a separate targeted review.
 The prior GPT-6 Sol PROVISIONAL PASS at `98c6bba` covered
 an earlier evidence-only delta, not this candidate. **No GPT gate has run on
 `123d2a0`**, so the global gate remains open.
