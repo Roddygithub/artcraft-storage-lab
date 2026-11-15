@@ -14,8 +14,8 @@ historical GR corpus to resume routine validation.
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
-| Independent and final review | GPT-6 Sol at `d2379f0`: PROVISIONAL PASS for isolated subset only; one production-boundary MAJOR and two wording MINOR. Wording fixes and exact-source test replay are at `be51c3b`; follow-up review pending. No global GPT PASS | `../reviews/PROJECT-CLOSURE-20261115/` |
-| Mechanical evidence self-audit | PASS at evidence HEAD `eb896d0`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`; private run summary |
+| Independent and final review | GPT-6 Sol at `9def0bb`: PROVISIONAL PASS for isolated subset only; production-boundary MAJOR remains disclosed. One roadmap MINOR is corrected on the current follow-up. No global GPT PASS | `../reviews/PROJECT-CLOSURE-20261115/` |
+| Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `../reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
 | Owner's live Seafile server | Read-only HTTPS/TLS and ping PASS; release is older than tested CE 13.0.28, ArtCraft bridge is absent, and synthetic library is unshared. Supplied account is not registered in Seafile; no test library created. Authenticated edit/save NOT VERIFIED | private infrastructure discovery; no production writes |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized, but
@@ -63,10 +63,9 @@ prove full pagination or font fidelity.
    deployment is a separate owner decision and is not authorized here.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
-3. The GPT-6 Sol review at `d2379f0` returned PROVISIONAL PASS for the isolated
-   subset only, with two MINOR wording findings now corrected. Obtain a new
-   adversarial review of the current frozen SHA; the earlier verdict does not
-   satisfy the project-wide gate.
+3. GPT-6 Sol at `9def0bb` returned PROVISIONAL PASS for the isolated subset
+   only and found one roadmap MINOR, now corrected. Obtain an adversarial review
+   of the current follow-up SHA; no project-wide gate has passed.
 4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
    unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
    No converter or LibreOffice product path is planned.

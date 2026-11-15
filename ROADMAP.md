@@ -39,9 +39,8 @@ Do not run the historical ONLYOFFICE campaigns below.
    test has run; the live release is older than CE 13.0.28 and has no bridge.
 4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance and an
    independent GPT-6 Sol follow-up review. The mechanical evidence audit passes
-   at `eb896d0`; the earlier Sol PROVISIONAL PASS at `d2379f0` is subset-only,
-   not the final project gate. No converter or LibreOffice product path is
-   planned.
+   at `9def0bb`; Sol's PROVISIONAL PASS is for the isolated subset only, not the
+   final project gate. No converter or LibreOffice product path is planned.
 
 ## Historical next steps (superseded where they require ONLYOFFICE)
 
@@ -56,12 +55,11 @@ Do not run the historical ONLYOFFICE campaigns below.
 | 7 | Second independent review (R2) of the report and the bridge | findings incorporated |
 | 8 | Candidate freeze → forensic review → project-level GPT gate | PENDING; previous PASS wording was incorrect |
 
-## Owner-only
+## Owner-controlled actions — separate authorization required
 
-* Diagnose the ONLYOFFICE `api.js` 404 on the live instance.
-* Roll back the GR-015 Seahub/`seaf-server` patches on the live instance (rollback archive recorded).
-* Upgrade the live Seafile to 13 (the bridge needs Seahub ≥ 13 for non-office extensions).
-* After the gate: approve (or not) each item in `docs/upstream-drafts/`.
+* If historical GR-015 Seahub/`seaf-server` patches remain deployed, assess a rollback plan separately; do not change production in this validation task.
+* For a live ArtCraft test, use an isolated Seafile CE 13+ test instance or obtain separate authorization for any production compatibility change and bridge deployment.
+* Consider upstream drafts only after the project GPT gate passes and the owner explicitly authorizes publication.
 
 ## Out of scope
 
