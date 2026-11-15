@@ -34,12 +34,10 @@ a dedicated test library, but it has not been created without a valid account.
 Authenticated browser, edit, save and reopen tests remain NOT VERIFIED. No
 production configuration or document was changed.
 
-Independent GPT-6 Sol reviews at `d2379f0`, `9def0bb` and `ad638d1` returned
-**PROVISIONAL PASS for the isolated MVP subset only**. The production-boundary
-MAJOR remains disclosed. Wording and audit-scope MINOR findings were corrected;
-the last review found one stale closure-ledger item, now removed on the current
-follow-up. A review of that follow-up SHA is pending. No production readiness
-or project-wide PASS is claimed.
+Independent GPT-6 Sol reviews at `d2379f0`, `9def0bb`, `ad638d1` and
+`d263583` returned **PROVISIONAL PASS for the isolated MVP subset only**. The
+production-boundary MAJOR remains disclosed. The final closure-ledger MINOR was
+removed at `d263583`. No production readiness or project-wide PASS is claimed.
 
 Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product
