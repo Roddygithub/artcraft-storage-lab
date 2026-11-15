@@ -27,12 +27,15 @@ present in the browser and can be extracted. This is not a host-side security
 boundary. The legacy view routes are lab-only until owner decides how to handle
 that host behavior; no production deployment or multi-user safety is claimed.
 
-The owner's live Seafile was checked read-only on 2026-11-15: HTTPS/TLS and the
-Seafile ping endpoint responded. A synthetic library exists but is not shared;
-the supplied account was not found in Seafile's user lookup. The owner authorized
-a dedicated test library, but it has not been created without a valid account.
-Authenticated browser, edit, save and reopen tests remain NOT VERIFIED. No
-production configuration or document was changed.
+The owner's live Seafile was checked on 2026-11-15. The corrected owner account
+is active. The existing synthetic library had no direct user share, so it was
+shared read-write to that account under the owner's prior test-library
+authorization. The share is confirmed in Seafile's RPC share listing. Its root
+contains only synthetic fixtures. This changed library permissions only; no
+file contents or server configuration were changed. The live server is Seafile
+12.0.14 and has no ArtCraft bridge configured. Browser authentication and
+ArtCraft edit/save/reopen on this server remain NOT VERIFIED. Sanitized evidence:
+`docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
 
 Independent GPT-6 Sol reviews at `d2379f0`, `9def0bb`, `ad638d1` and
 `d263583` returned **PROVISIONAL PASS for the isolated MVP subset only**. The

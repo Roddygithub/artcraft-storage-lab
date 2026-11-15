@@ -16,7 +16,7 @@ historical GR corpus to resume routine validation.
 | Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `../lab/real-seafile/README.md` checklist |
 | Independent and final review | GPT-6 Sol at `d263583`: PROVISIONAL PASS for isolated sequential subset only; production-boundary MAJOR remains disclosed. No project-wide PASS | `../reviews/PROJECT-CLOSURE-20261115/SOL-REVIEW-D263583.md` |
 | Mechanical evidence self-audit | PASS at evidence HEAD `9def0bb`: 20 result directories/checksums, 17 available verifiers run, 16 provenance files checked, 2 loose JSON files scanned. Pattern-based secret scan; not independent | `../scripts/forensic-audit.py`, `../reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-9DEF0BB.json` |
-| Owner's live Seafile server | Read-only HTTPS/TLS and ping PASS; release is older than tested CE 13.0.28, ArtCraft bridge is absent, and synthetic library is unshared. Supplied account is not registered in Seafile; no test library created. Authenticated edit/save NOT VERIFIED | private infrastructure discovery; no production writes |
+| Owner's live Seafile server | HTTPS/TLS and ping PASS; active owner account now has direct read-write access to the existing synthetic library. No file content or server configuration changed. Seafile 12.0.14; ArtCraft bridge absent; authenticated browser edit/save/reopen NOT VERIFIED | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md) |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized, but
 production is outside these tests and remains untouched. Upstream remains
@@ -55,12 +55,10 @@ prove full pagination or font fidelity.
 ## Next unresolved work
 
 1. Reproduce the authenticated HTTPS workflow on the owner's Seafile with a
-   synthetic document. Read-only Seafile lookup did not find the supplied
-   account, so the owner-authorized test-library creation is paused until a
-   valid account is identified. The existing synthetic library must be shared
-   to that account. No existing user files were changed. The inspected live
-   release is older than CE 13.0.28 and has no ArtCraft bridge; an upgrade or
-   deployment is a separate owner decision and is not authorized here.
+   synthetic document. Test-library access is now prepared, but the live
+   Seafile is 12.0.14 and has no ArtCraft bridge. Any bridge deployment or
+   server upgrade remains a separate owner decision; neither is authorized by
+   the synthetic-library test authorization.
 2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
    close, refused saves and network recovery.
 3. GPT-6 Sol at `ad638d1` returned PROVISIONAL PASS for the isolated subset

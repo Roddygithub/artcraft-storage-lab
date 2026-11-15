@@ -32,11 +32,11 @@ Do not run the historical ONLYOFFICE campaigns below.
    DOC/XLS are unrouted; their standalone fixture render works, but retained
    Seafile-host behavior is NOT VERIFIED. FODS displays raw XML; FODT/FODP/PPT/
    ODP/PPS remain unrouted. No legacy edit/save or conversion is claimed.
-3. Owner server discovery is read-only: HTTPS/TLS and Seafile ping respond. The
-   existing synthetic library is unshared, and Seafile does not recognize the
-   supplied account. The owner authorized a dedicated test library, but its
-   creation awaits a valid Seafile account. No authenticated browser/edit/save
-   test has run; the live release is older than CE 13.0.28 and has no bridge.
+3. Owner-server test access is prepared: the corrected account is active and
+   the existing synthetic library is shared read-write. No file content or
+   server configuration changed. The live Seafile is 12.0.14 with no ArtCraft
+   bridge configured, so authenticated browser edit/save/reopen remains NOT
+   VERIFIED. See `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
 4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance and authenticated
    owner-server validation. GPT-6 Sol reviewed `d263583` and returned PROVISIONAL
    PASS for the isolated subset only; this is not the project-wide gate. No
