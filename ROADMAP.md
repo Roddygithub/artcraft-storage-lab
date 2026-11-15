@@ -37,9 +37,10 @@ Do not run the historical ONLYOFFICE campaigns below.
    pre-existing patched, repository-scoped ArtCraft route and active legacy
    gateway for that library; current WOPI is disabled. Stock WOPI routing is
    extension-wide, so a test limited to one library requires an isolated
-   Seafile 12 instance. The live legacy route is not evidence for the current
-   candidate. This post-review discovery is awaiting independent documentation
-   review. See `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
+   Seafile 12 instance. GR-059 contains historical legacy-route edit/save
+   evidence, not evidence for the current candidate. This post-review discovery
+   is awaiting independent documentation review. See
+   `docs/reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md`.
 4. Remaining: hardware WebGPU/clipboard/fonts/unload acceptance and authenticated
    owner-server validation. GPT-6 Sol reviewed `546ce0d` and returned PROVISIONAL
    PASS for the documentation follow-up only; this is not the project-wide gate. No

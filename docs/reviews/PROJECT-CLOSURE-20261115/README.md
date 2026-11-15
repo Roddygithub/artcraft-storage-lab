@@ -71,8 +71,10 @@ deployment or upstream publication is authorized by this packet.
    account has a verified read-write share to the synthetic library. Read-only
    inspection found a pre-existing patched repo-scoped ArtCraft route and
    active legacy gateway; current WOPI is disabled. The route is not the
-   candidate and was not tested. No file content or server configuration was
-   changed during this task. See `OWNER-SERVER-ACCESS-20261115.md`.
+   candidate. GR-059 has historical real save/version/reopen evidence through
+   that route; current WOPI was not tested. No file content or server
+   configuration was changed during this task. See
+   `OWNER-SERVER-ACCESS-20261115.md`.
 4. Physical browser acceptance (WebGPU, clipboard, fonts, popup behavior,
    dirty close, refused save and network recovery) remains NOT VERIFIED.
 5. Some earlier free-review transcripts were private and are not retained.

@@ -59,9 +59,10 @@ Legacy routes are not edit/save claims. `--viewing` does not add them to
 `OFFICE_WEB_APP_EDIT_FILE_EXTENSION`. The project has no LibreOffice product
 runtime or conversion path. Reviewed candidate SHA:
 `546ce0dd711eade0d9cb253a0fc4389c28ee2617`; its runtime source remains tested at
-`be51c3b`. The current changes are documentation-only. The live legacy route is
-not evidence for this candidate. Owner-server current-WOPI editing, hardware
-acceptance and the project-wide gate remain open.
+`be51c3b`. The current changes are documentation-only. Historical GR-059
+records a real edit/save/version/reopen through the retired live route, not the
+current WOPI candidate. Owner-server current-WOPI editing, hardware acceptance
+and the project-wide gate remain open.
 
 The owner requires replacement coverage for every currently configured
 ONLYOFFICE format: 15 viewing routes and 3 editing routes. The six-Craft

@@ -36,12 +36,17 @@ repository-scoped ArtCraft route from the retired third-party-editor design:
   omitted.
 - Proxmox CT 114 has an active `artcraft-gateway.service` described as the
   synthetic Seafile gateway.
+- Historical GR-059 records a real browser WordCraft edit, Seafile version
+  creation and fresh-session reopen on the owner's Seafile 12.0.14 through the
+  earlier gateway. That evidence belongs to the retired third-party-editor
+  path; it was not replayed here and does not validate the current WOPI bridge.
 - The stock WOPI branch routes by configured file-extension tuples and does
   not scope by repository. The active allowlisted route is custom and does not
   use the project's stateless WOPI bridge.
 
 This is pre-existing infrastructure, not a result of the current test. Its
-runtime behavior and security were not tested. It was not changed or stopped.
+current runtime behavior and security were not tested in this session; see the
+historical GR-059 scope above. It was not changed or stopped.
 The limited authorization to test one synthetic library does not authorize
 replacing this route or enabling a global WOPI extension route. A current-bridge
 test needs an isolated Seafile instance unless the owner separately approves a
