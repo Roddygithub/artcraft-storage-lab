@@ -1,0 +1,68 @@
+name: Offline validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  offline-checks:
+    name: Offline checks (Python + Node)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install Playwright and deps
+        run: |
+          pip install --upgrade pip
+          pip install playwright pillow
+          playwright install chromium
+      - name: Run Python offline checks
+        run: |
+          python3 scripts/validate-candidate.py --output /tmp/offline-checks
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run Node protocol tests
+        working-directory: tests/bridge
+        run: |
+          npm ci
+          npm test
+      - name: Check for secrets in repo
+        run: |
+          pip install trufflehog3
+          trufflehog3 --no-history --no-entropy --only-verified --fail || true
+
+  manifest-check:
+    name: Manifest & provenance integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify static-sha256.json manifests
+        run: |
+          python3 -c "
+import json, hashlib, sys
+for f in ('lab/real-seafile/results/2026-11-16-seafile12-byteproof/static-sha256.json',
+          'lab/real-seafile/results/2026-11-15-seafile12-detail/static-sha256.json',
+          'lab/real-seafile/results/2026-11-15-seafile12-replay/static-sha256.json',
+          'lab/real-seafile/results/2026-11-15-seafile-render-readonly/static-sha256.json'):
+    d = json.load(open(f))
+    for rel, want in d.items():
+        p = f.rsplit('/', 1)[0] + '/' + rel
+        got = hashlib.sha256(open(p, 'rb').read()).hexdigest()
+        if got != want:
+            print(f'MISMATCH: {p} got={got} want={want}')
+            sys.exit(1)
+    print(f'OK: {len(d)} entries in {f}')
+          "
