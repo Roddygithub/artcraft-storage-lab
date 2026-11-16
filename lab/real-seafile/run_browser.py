@@ -1189,7 +1189,7 @@ def main():
             p2.fill("input[name=password]", rs.ADMIN_PW)
             p2.click("button[type=submit], input[type=submit]")
             p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
-            check("pdfcraft_fresh_seafile_session", "/accounts/login" not in p2.url, f"url_has_login_redirect={'/accounts/login' in p2.url}")
+            check("pdfcraft_fresh_seafile_session", "/accounts/login" not in p2.url, f"new_browser_context=True url_has_login_redirect={'/accounts/login' in p2.url}")
             # Seafile's file-list PDF link opens its preview; the supported editor route is
             # the same specific Seafile file URL with ?edit_pdf=true (also used for first open).
             p2.goto(f"{rs.SEAFILE}/lib/{repo_id}/file/{name}?edit_pdf=true",
@@ -1350,7 +1350,7 @@ def main():
             p2.fill("input[name=password]", rs.ADMIN_PW)
             p2.click("button[type=submit], input[type=submit]")
             p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
-            check("wordcraft_reopen_fresh_seafile_session", "/accounts/login" not in p2.url, f"url_has_login_redirect={'/accounts/login' in p2.url}")
+            check("wordcraft_reopen_fresh_seafile_session", "/accounts/login" not in p2.url, f"new_browser_context=True url_has_login_redirect={'/accounts/login' in p2.url}")
             p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
             check("wordcraft_reopened_from_seafile_file_list", "/accounts/login" not in p2.url, f"url_has_login_redirect={'/accounts/login' in p2.url}")
             host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
@@ -1537,6 +1537,15 @@ def main():
 
             # -- Seafile now holds the specific new value (semantic) and differs by bytes --
             got, _ = rs.download(admin, repo_id, name)
+            # Private synthetic artifacts for byte-level inspection; never publish
+            # these bytes without the evidence privacy review.
+            with open(os.path.join(RESULTS, "gridcraft-original.xlsx"), "wb") as output:
+                output.write(content)
+            with open(os.path.join(RESULTS, "gridcraft-first-readback.xlsx"), "wb") as output:
+                output.write(got)
+            if payload is not None:
+                with open(os.path.join(RESULTS, "gridcraft-first-relay.xlsx"), "wb") as output:
+                    output.write(payload)
             try:
                 got_cells = rs.xlsx_cells(got)
                 check("gridcraft_saved_xlsx_semantically_contains_the_typed_value", semantic(got_cells, marker),
@@ -1570,7 +1579,7 @@ def main():
             p2.fill("input[name=password]", rs.ADMIN_PW)
             p2.click("button[type=submit], input[type=submit]")
             p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
-            check("gridcraft_reopen_fresh_seafile_session", "/accounts/login" not in p2.url, f"url_has_login_redirect={'/accounts/login' in p2.url}")
+            check("gridcraft_reopen_fresh_seafile_session", "/accounts/login" not in p2.url, f"new_browser_context=True url_has_login_redirect={'/accounts/login' in p2.url}")
             p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
             check("gridcraft_reopened_from_seafile_file_list", "/accounts/login" not in p2.url, f"url_has_login_redirect={'/accounts/login' in p2.url}")
             host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
@@ -1613,6 +1622,8 @@ def main():
                       ok2 and len(after2) > len(after) and after2[0]["creator"] == admin_username,
                       version_detail(len(after), after2, admin_username))
                 got2, _ = rs.download(admin, repo_id, name)
+                with open(os.path.join(RESULTS, "gridcraft-second-readback.xlsx"), "wb") as output:
+                    output.write(got2)
                 try:
                     got2_cells = rs.xlsx_cells(got2)
                     check("gridcraft_reopen_seafile_holds_both_values",
@@ -1706,7 +1717,7 @@ def main():
                 reopened.click("button[type=submit], input[type=submit]")
                 reopened.wait_for_url(lambda url: "/accounts/login" not in url, timeout=30000)
                 reopened = open_from_seafile_list(reopened, rs.SEAFILE, repo_id, name)
-                check("pptx_fresh_session_file_list_reopen", "/accounts/login" not in reopened.url, f"url_has_login_redirect={'/accounts/login' in reopened.url}")
+                check("pptx_fresh_session_file_list_reopen", "/accounts/login" not in reopened.url, f"new_browser_context=True url_has_login_redirect={'/accounts/login' in reopened.url}")
                 host2 = find_frame(reopened, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=reopened.main_frame)
                 body = wait_for_saved_response(reopened, responses, 180)
                 canvas = _wait_for_deckcraft_canvas(host2, 90, lambda image: bool(image)) if host2 else None
@@ -1830,7 +1841,7 @@ def main():
             p2.fill("input[name=password]", rs.ADMIN_PW)
             p2.click("button[type=submit], input[type=submit]")
             p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
-            check("deckcraft_fresh_session_logged_into_seafile", "/accounts/login" not in p2.url, f"url_has_login_redirect={'/accounts/login' in p2.url}")
+            check("deckcraft_fresh_session_logged_into_seafile", "/accounts/login" not in p2.url, f"new_browser_context=True url_has_login_redirect={'/accounts/login' in p2.url}")
             p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
             check("deckcraft_reopened_from_seafile_file_list", "/accounts/login" not in p2.url, f"url_has_login_redirect={'/accounts/login' in p2.url}")
             host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
@@ -2082,7 +2093,7 @@ def main():
             p2.click("button[type=submit], input[type=submit]")
             p2.wait_for_url(lambda u: "/accounts/login" not in u, timeout=30000)
             p2 = open_from_seafile_list(p2, rs.SEAFILE, repo_id, name)
-            check("cadcraft_fresh_session_opened_from_seafile_file_list", "/accounts/login" not in p2.url, f"url_has_login_redirect={'/accounts/login' in p2.url}")
+            check("cadcraft_fresh_session_opened_from_seafile_file_list", "/accounts/login" not in p2.url, f"new_browser_context=True url_has_login_redirect={'/accounts/login' in p2.url}")
             host2 = find_frame(p2, rs.BRIDGE + "/edit/", 60, name="office_frame", parent=p2.main_frame)
             reopened_bytes = wait_for_saved_response(p2, relay_file, 180)
             reopened_canvas = wait_for_cadcraft_canvas_change(host2, original_canvas) if host2 is not None else None

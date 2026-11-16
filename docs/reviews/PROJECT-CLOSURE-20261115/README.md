@@ -45,6 +45,13 @@ deployment or upstream publication is authorized by this packet.
   `check(name, True)` tautologies are gone; the sanitizer is committed and
   unit-tested. Produced from the review
   `CE12-REVIEW-5FE30C6.md`.
+* `lab/real-seafile/results/2026-11-16-seafile12-byteproof/`: the current
+  CE12 evidence: 66/66, same proof requirements as the detail run, plus
+  retained XLSX bytes (relay==readback byte-identical, original differs) and
+  `new_browser_context=True` in fresh-session details.
+* `docs/security/HOST_PERMISSION_BOUNDARY.md`: the host write boundary
+  analysis (PutFile ignores `can_edit` on CE 12 and 13; zero-patch fix NOT
+  possible; host change required for untrusted viewers).
 * `lab/real-seafile/results/2026-11-15-seafile12-isolated-edit-save/`: the same
   CE12 three-editor replay (24 DOCX + 27 XLSX + 15 PPTX = 66) at the earlier
   source `11b75a2`, superseded by the replay above at the current candidate.

@@ -101,7 +101,7 @@ The run directory must be new and outside the checkout. `--editors` accepts
 CE12 output directory and `.env` are private. Offline launcher check:
 `python3 tests/lab/test_local_ce12.py`; this check never starts containers.
 Retained CE12 browser results are under
-`results/2026-11-15-seafile12-detail/`. The launcher replay passed 66/66
+`results/2026-11-16-seafile12-byteproof/` (XLSX bytes retained alongside the DOCX/PPTX artifacts). The launcher replay passed 66/66
 assertions and keeps the proof inside each assertion's `detail` (version
 growth and creator attribution, no login redirect on fresh sessions); its
 `verify.py` rejects bare booleans. The initial replay exposed and fixed a

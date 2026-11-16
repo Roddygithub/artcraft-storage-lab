@@ -1,0 +1,10 @@
+{
+  "source_commit": "b72084de1b3a6c99ec95a76c1a33ca33df200d4e",
+  "note": "run_browser.py was modified after that commit to retain GridCraft XLSX bytes and record new_browser_context=True in fresh-session details; its exact SHA-256 is pinned below and the runner snapshot copied into the run directory matches it.",
+  "launcher_sha256": "5be7d623db6eb6b483c995e8bccf33ce4d3c247826d13ac69be174bc8254dcec",
+  "compose_sha256": "3fc7b1cc1e09f4df24589ab443da8a59d87c0a94b0b29141433ffd4ee4c6db4b",
+  "browser_runner_sha256": "6aaf9de837d3fb129754ccaffe219a7ed83c448724cc97e0b3284f7bb3d27eb2",
+  "sanitizer_sha256": "f61186d8f6acfcc458d7677800658a1f59d626cc9df19b22af999771c1312e75",
+  "bridge_sha256": "02cf715427fbd5daccba96da91f16ffacd11d91496c9de236da577c5ccea51ac",
+  "seafile_image": "docker.io/seafileltd/seafile-mc@sha256:7bbe7043facbc639a8e6144f32d50dc4d771191ecaa68002efb2b0237fb90358"
+}
