@@ -1,6 +1,6 @@
 # Validation checkpoint — candidate `123d2a0` (2026-11-15)
 
-**Technical candidate SHA:** `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`.
+**Technical candidate SHA:** `0d9ca0cbc0ae70640056c61a8347a30d0f7e82e7` (bridge: `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`).
 This candidate adds a reproducible Seafile CE12 runner and retains a corrected
 66/66 browser replay. The offline runner passed 21/21 command groups at this
 exact SHA. An independent free-model review of `123d2a0` returned PROVISIONAL

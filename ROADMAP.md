@@ -24,7 +24,7 @@ ONLYOFFICE is retired by owner instruction (`docs/ONLYOFFICE-RETIREMENT-20261108
 Do not run the historical ONLYOFFICE campaigns below.
 
 1. Automated isolated candidate: 22/22 offline command groups PASS at
-   `b72084de1b3a6c99ec95a76c1a33ca33df200d4e` (includes the five evidence
+   `0d9ca0cbc0ae70640056c61a8347a30d0f7e82e7` (includes the five evidence
    sanitizer tests). The fresh Seafile CE 13.0.28 lab still has its retained
    HTTP 56/56 and browser 58/58 evidence at source `be51c3b`; isolated CE
    12.0.14 adds 66/66 browser assertions for DOCX, XLSX and PPTX. See the

@@ -7,7 +7,7 @@
 
 ## CURRENT — CE12 evidence chain hardened, host boundary documented (2026-11-16)
 
-At `3fff9b3` on `main`, the technical candidate remains the stateless WOPI bridge
+At `0d9ca0c` on `main`, the technical candidate remains the stateless WOPI bridge
 at `123d2a0` (no bridge-code change since; later commits are evidence/docs).
 Current retained proof: Seafile CE 12.0.14 isolated replay **66/66** with the
 verifier rejecting bare booleans — version checks retain
