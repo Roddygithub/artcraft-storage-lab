@@ -5,7 +5,30 @@
 > `lab/real-seafile/results/`; current follow-ups are recorded at the top of this status log.
 
 
-## CURRENT — routed legacy payload delivery proven (2026-11-10)
+## CURRENT — CE12 evidence chain hardened, host boundary documented (2026-11-16)
+
+At `3fff9b3` on `main`, the technical candidate remains the stateless WOPI bridge
+at `123d2a0` (no bridge-code change since; later commits are evidence/docs).
+Current retained proof: Seafile CE 12.0.14 isolated replay **66/66** with the
+verifier rejecting bare booleans — version checks retain
+`history N->M grew=True creator_is_opener=True`, fresh-session checks retain
+`new_browser_context=True url_has_login_redirect=False`, and byte-level
+relay==readback artifacts exist for DOCX, XLSX (new) and PPTX
+(`lab/real-seafile/results/2026-11-16-seafile12-byteproof/`). The nine
+`check(name, True)` tautologies found by the targeted CE12 review
+(`docs/reviews/PROJECT-CLOSURE-20261115/CE12-REVIEW-5FE30C6.md`, PROVISIONAL
+PASS) are gone; the evidence sanitizer is committed and unit-tested, and the
+offline suite is **22/22** including its five tests. A new security analysis
+(`docs/security/HOST_PERMISSION_BOUNDARY.md`) documents that Seahub PutFile
+accepts any valid WOPI token and ignores the token's `can_edit` — confirmed on
+CE 13.0.28 in the lab and by source inspection on CE 12.0.14 and 2026-10-21
+master; zero-patch fix NOT possible, so read-only view routes stay unsafe for
+untrusted viewers. Read-only routes keep their trusted-deployment caveat.
+Owner-server credentials were not retained (login NOT VERIFIED); hardware
+acceptance and the GPT gate remain open. Project INCOMPLETE; production
+unchanged; upstream LOCKED.
+
+## PREVIOUS — routed legacy payload delivery proven (2026-11-10)
 
 At `5aa134a`, the opt-in `--viewing` probe no longer stops at routing: it captures
 the bridge's `/relay/file` response and requires it to equal the committed fixture,

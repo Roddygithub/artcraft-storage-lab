@@ -23,20 +23,26 @@ Compact validation/continuation entry point: `docs/VALIDATION-STATE.md`.
 ONLYOFFICE is retired by owner instruction (`docs/ONLYOFFICE-RETIREMENT-20261108.md`).
 Do not run the historical ONLYOFFICE campaigns below.
 
-1. Automated isolated candidate: 20/20 offline command groups PASS at exact
-   source `11b75a23be5e263f9bb7b4b9cb332caa2158bd6d`. The fresh Seafile CE
-   13.0.28 lab still has its retained HTTP 56/56 and browser 58/58 evidence at
-   source `be51c3b`; isolated CE 12.0.14 adds 66/66 browser assertions for
-   DOCX, XLSX and PPTX. See the two dated evidence directories below.
+1. Automated isolated candidate: 22/22 offline command groups PASS at
+   `b72084de1b3a6c99ec95a76c1a33ca33df200d4e` (includes the five evidence
+   sanitizer tests). The fresh Seafile CE 13.0.28 lab still has its retained
+   HTTP 56/56 and browser 58/58 evidence at source `be51c3b`; isolated CE
+   12.0.14 adds 66/66 browser assertions for DOCX, XLSX and PPTX. See the
+   dated evidence directories below.
 2. Opt-in read-only legacy routes: ODT→WordCraft, ODS/CSV→GridCraft and
    PPSX→DeckCraft have exact-byte, visible-marker and read-only-state checks.
    DOC/XLS are unrouted; their standalone fixture render works, but retained
    Seafile-host behavior is NOT VERIFIED. FODS displays raw XML; FODT/FODP/PPT/
    ODP/PPS remain unrouted. No legacy edit/save or conversion is claimed.
-3. Isolated stock Seafile CE 12.0.14 browser edit/save/reopen now passes for
-   DOCX, XLSX and PPTX (66/66 assertions); retained evidence is under
-   `lab/real-seafile/results/2026-11-15-seafile12-replay/` (checked-in launcher
-   replay, 66/66 assertions; initial bridge startup-order defect corrected).
+3. Isolated stock Seafile CE 12.0.14 browser edit/save/reopen passes for
+   DOCX, XLSX and PPTX (66/66 assertions with retained proof details and
+   byte-level relay==readback artifacts for all three formats); the current
+   evidence is `lab/real-seafile/results/2026-11-16-seafile12-byteproof/`
+   (supersedes the 2026-11-15 replay; the launcher's initial bridge
+   startup-order defect was corrected). A host write boundary is documented:
+   Seahub PutFile ignores the WOPI token's `can_edit` (CE 12 and 13;
+   `docs/security/HOST_PERMISSION_BOUNDARY.md`), so read-only view routes
+   need a trusted deployment or a one-line host patch.
    Owner-server access is still unauthenticated: the supplied credentials were
    rejected at login. Read-only inspection found a
    pre-existing patched, repository-scoped ArtCraft route that allowlists the

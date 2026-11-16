@@ -1,11 +1,18 @@
-> **Deployment blocked:** packaged Seahub CE 13.0.28 can break ONLYOFFICE
-> pages when WOPI is enabled. See `docs/PROJECT-CLOSURE.md`; this split is not
-> production-ready. Isolated ONLYOFFICE-only tests do not prove coexistence.
+> **Deployment status:** not production-ready. The host write boundary is
+> documented: Seahub PutFile ignores the WOPI token's `can_edit` (CE 12/13;
+> `docs/security/HOST_PERMISSION_BOUNDARY.md`), so read-only view routes are
+> unsafe for untrusted viewers without a one-line host patch. Production
+> remains UNTOUCHED; upstream LOCKED. Hardware acceptance and the GPT gate
+> remain open.
 
 # Deploying the bridge next to an existing Seafile
 
-What you get: Seafile Web opens `.dxf` by default in a Craft web editor,
-Save writes a new Seafile version attributed to the user (lab evidence: `lab/real-seafile/results/browser.json`, DXF history 1→2). No Seafile patch,
+What you get: Seafile Web opens `.docx`, `.xlsx`, `.pptx` (and opt-in
+`.dxf`, `.pdf`) in unpatched Craft web editors; Save writes a new Seafile
+version attributed to the user. Lab evidence: CE 12.0.14 isolated 66/66
+browser replay with byte-level relay==readback artifacts for DOCX, XLSX and
+PPTX, version history and fresh-context details retained
+(`lab/real-seafile/results/2026-11-16-seafile12-byteproof/`). No Seafile patch,
 no editor patch, no SeaDrive, no desktop app.
 
 ```text

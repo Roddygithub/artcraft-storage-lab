@@ -1,12 +1,23 @@
 # ArtCraft Storage Lab
 
-> **2026-11-15:** project **INCOMPLETE**. Finalization is in progress on
-> `work/final-candidate-20261115`, based on `7961db5`. Fresh Seafile CE 13.0.28
-> evidence validates the core DOCX workflow and four read-only rendered formats
-> (ODT, ODS, CSV, PPSX). DOC, XLS and FODS are excluded after concrete failures.
-> Only the isolated lab was changed; production is untouched and upstream remains
-> LOCKED. Hardware acceptance and the independent GPT gate remain open. See
-> [the closure ledger](docs/PROJECT-CLOSURE.md).
+# ArtCraft Storage Lab
+
+> **2026-11-16:** project **INCOMPLETE**, stabilised on `main` at `3fff9b3`.
+> The validated candidate is the stateless WOPI bridge at `123d2a0` (bridge
+> code unchanged since; later commits are evidence and documentation only).
+> Current proof: Seafile CE 12.0.14 isolated 66/66 browser replay with
+> byte-level relay==readback artifacts for DOCX, XLSX and PPTX, version
+> history and fresh-context details retained
+> ([validation state](docs/VALIDATION-STATE.md)); CE 13.0.28 DOCX/replay
+> evidence plus four read-only rendered formats (ODT, ODS, CSV, PPSX).
+> A host write boundary is documented: Seahub PutFile ignores the WOPI
+> token's `can_edit`, so read-only view routes are not safe for untrusted
+> viewers zero-patch ([security analysis](docs/security/HOST_PERMISSION_BOUNDARY.md)).
+> DOC, XLS, FODS, FODT, FODP, PPT, ODP and PPS remain unrouted. Production is
+> untouched and upstream remains LOCKED. Hardware acceptance, the owner-server
+> check and the independent GPT gate remain open. See
+> [the closure ledger](docs/PROJECT-CLOSURE.md) and
+> [the validation checkpoint](docs/VALIDATION-STATE.md).
 
 
 > Open a file in Seafile Web, edit it in a Craft web editor, save, and get a normal Seafile
@@ -24,12 +35,17 @@ Seafile Web ──(WOPI form POST, access token)──▶ bridge (host page, sam
 Seahub WOPI host ◀──(CheckFileInfo/GetFile/PutFile/Lock, token in headers)── bridge /relay/*
 ```
 
-Status: **MVP candidate frozen at `864fc77` for independent review**. Current bridge evidence covers
+Status: **validated lab candidate at bridge SHA `123d2a0`** (bridge code
+unchanged since `123d2a0`; commits on top are evidence and documentation
+only). Current bridge evidence covers
 WordCraft DOCX, GridCraft XLSX, PdfCraft AcroForm and CADCraft DXF. VectorCraft
 and FigCraft semantic edit/reopen slices passed the combined six-editor replay.
 An opt-in official DeckCraft v0.16.0 candidate also passed a real PPTX title
 edit/save/new-version/fresh-reopen slice; broad presentation fidelity is unverified. The exact closure criteria and remaining checks are in
-[`PROJECT-CLOSURE.md`](docs/PROJECT-CLOSURE.md).
+[`PROJECT-CLOSURE.md`](docs/PROJECT-CLOSURE.md); the current validation
+checkpoint is [`VALIDATION-STATE.md`](docs/VALIDATION-STATE.md). The earlier
+`864fc77` freeze is a historical ledger entry, superseded by the 2026-11-15/16
+replay chain.
 
 ## Zero-patch candidate
 
