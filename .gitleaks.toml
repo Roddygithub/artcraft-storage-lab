@@ -1,0 +1,25 @@
+# Gitleaks configuration for ArtCraft Storage Lab
+# False positives in test fixtures and inventory files are explicitly allowed
+
+[allowlist]
+description = "False positives in test fixtures and inventory files"
+paths = [
+    "lab/real-seafile/results/*/inventory.json",
+    "**/inventory.json",
+]
+regexes = [
+    # Ignore .htaccess placeholder strings in inventory files
+    '''(?i)\.htaccess.*["']?[a-z0-9]{32,}["']?''',
+    # Ignore generic low-entropy strings in test fixtures
+    '''(?i)example|test|placeholder|dummy|fake|synthetic''',
+]
+
+# Ignore commits that only touch allowed files
+commits = [
+    # The initial commit adding evidence directories
+]
+
+# Ignore specific files that are known to contain false positives
+files = [
+    "lab/real-seafile/results/*/inventory.json",
+]
