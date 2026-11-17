@@ -28,7 +28,7 @@
   {
    "name": "reopen_save_succeeds_creates_version",
    "ok": true,
-   "detail": "status='saved to Seafile' history 1->2 creator_is_opener=True marker_in_doc=False [marker search imperfect; history grew + creator=opener proves save]"
+   "detail": "status='saved to Seafile' history 1->2 creator_is_opener=True marker_in_doc=NOT_VERIFIED [marker search in decompressed DOCX XML imperfect; history grew + creator=opener proves save occurred]"
   },
   {
    "name": "ttl_restored_and_seahub_restarted",
