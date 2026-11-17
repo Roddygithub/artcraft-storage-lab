@@ -1,0 +1,128 @@
+{
+ "editor": "wordcraft",
+ "assertion_count": 24,
+ "passed": 24,
+ "failed": 0,
+ "checks": [
+  {
+   "name": "browser_login",
+   "ok": true,
+   "detail": "https://omarchydesktop-1.tailb64fb1.ts.net:8443/"
+  },
+  {
+   "name": "browser_editor_filter_selects_requested_editor",
+   "ok": true,
+   "detail": "selected=['test.docx']"
+  },
+  {
+   "name": "wordcraft_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": "url_has_login_redirect=False"
+  },
+  {
+   "name": "wordcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'https://omarchydesktop-1.tailb64fb1.ts.net:8443/lib/d090b170-746c-4c93', None), ('office_frame', 'https://omarchydesktop-1.tailb64fb1.ts.net:8444/edit/wordcraft?<query>', ''), ('frame', 'https://omarchydesktop-1.tailb64fb1.ts.net:8444/editors/wordcraft/inde', 'office_frame')]"
+  },
+  {
+   "name": "wordcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 3s"
+  },
+  {
+   "name": "wordcraft_typed_edit_before_save_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=browsertypeddf5eee20d9 status='unsaved changes'"
+  },
+  {
+   "name": "wordcraft_save_request_carries_the_typed_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browsertypeddf5eee20d9"
+  },
+  {
+   "name": "wordcraft_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 1->2 grew=True creator_is_opener=True status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_saved_docx_contains_the_typed_marker",
+   "ok": true,
+   "detail": "marker=browsertypeddf5eee20d9 len=6597 bytes_identical_to_original=False"
+  },
+  {
+   "name": "wordcraft_save_is_not_identical_bytes",
+   "ok": true,
+   "detail": "887 -> 6597 bytes"
+  },
+  {
+   "name": "wordcraft_saved_docx_bytes_look_right",
+   "ok": true,
+   "detail": "len=6597"
+  },
+  {
+   "name": "wordcraft_reopen_fresh_seafile_session",
+   "ok": true,
+   "detail": "new_browser_context=True url_has_login_redirect=False"
+  },
+  {
+   "name": "wordcraft_reopened_from_seafile_file_list",
+   "ok": true,
+   "detail": "url_has_login_redirect=False"
+  },
+  {
+   "name": "wordcraft_reopen_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'https://omarchydesktop-1.tailb64fb1.ts.net:8443/lib/d090b170-746c-4c93', None), ('office_frame', 'https://omarchydesktop-1.tailb64fb1.ts.net:8444/edit/wordcraft?<query>', ''), ('frame', 'https://omarchydesktop-1.tailb64fb1.ts.net:8444/editors/wordcraft/inde', 'office_frame')]"
+  },
+  {
+   "name": "wordcraft_reopen_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "relay/file responses=1 after 17s"
+  },
+  {
+   "name": "wordcraft_reopen_bytes_identical_to_the_saved_version",
+   "ok": true,
+   "detail": "len=6597 vs saved 6597"
+  },
+  {
+   "name": "wordcraft_reopen_typed_edit_is_visible_as_unsaved_changes",
+   "ok": true,
+   "detail": "marker=browserreopenedc8f0af64d0 status='unsaved changes'"
+  },
+  {
+   "name": "wordcraft_reopen_save_confirmed_by_host_page",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_reopen_second_save_creates_seafile_version_by_user",
+   "ok": true,
+   "detail": "history 2->3 grew=True creator_is_opener=True status='saved to Seafile'"
+  },
+  {
+   "name": "wordcraft_reopen_seafile_holds_both_markers",
+   "ok": true,
+   "detail": "marker=browserreopenedc8f0af64d0 len=6631"
+  },
+  {
+   "name": "wordcraft_reopen_editor_holds_the_original_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browsertypeddf5eee20d9"
+  },
+  {
+   "name": "wordcraft_reopen_editor_holds_the_second_typed_marker",
+   "ok": true,
+   "detail": "captured=1 marker=browserreopenedc8f0af64d0"
+  },
+  {
+   "name": "wordcraft_saves_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  }
+ ]
+}

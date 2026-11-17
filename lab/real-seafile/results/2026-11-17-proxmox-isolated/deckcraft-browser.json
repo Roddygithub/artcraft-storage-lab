@@ -1,0 +1,83 @@
+{
+ "editor": "deckcraft",
+ "assertion_count": 15,
+ "passed": 15,
+ "failed": 0,
+ "checks": [
+  {
+   "name": "browser_login",
+   "ok": true,
+   "detail": "https://omarchydesktop-1.tailb64fb1.ts.net:8443/"
+  },
+  {
+   "name": "browser_editor_filter_selects_requested_editor",
+   "ok": true,
+   "detail": "selected=['synthetic.pptx']"
+  },
+  {
+   "name": "pptx_opened_from_seafile_file_list",
+   "ok": true,
+   "detail": "url_has_login_redirect=False"
+  },
+  {
+   "name": "deckcraft_host_frame_from_seahub",
+   "ok": true,
+   "detail": "frames=[('', 'https://omarchydesktop-1.tailb64fb1.ts.net:8443/lib/b57d1c83-4988-4992', None), ('office_frame', 'https://omarchydesktop-1.tailb64fb1.ts.net:8444/edit/deckcraft?<query>', ''), ('frame', 'https://omarchydesktop-1.tailb64fb1.ts.net:8444/editors/deckcraft/inde', 'office_frame')]"
+  },
+  {
+   "name": "deckcraft_editor_ready_and_document_opened",
+   "ok": true,
+   "detail": "status='ready' after 5s"
+  },
+  {
+   "name": "pptx_canvas_ready_before_typing",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pptx_save_payload_contains_original_title_and_typed_marker",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pptx_save_confirmed_by_host",
+   "ok": true,
+   "detail": "status='saved to Seafile'"
+  },
+  {
+   "name": "pptx_new_version_attributed_to_user",
+   "ok": true,
+   "detail": "history 1->2 grew=True creator_is_opener=True"
+  },
+  {
+   "name": "pptx_same_file_readback_equals_relay",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pptx_readback_retains_title_and_typed_marker",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pptx_old_page_closed",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pptx_fresh_session_file_list_reopen",
+   "ok": true,
+   "detail": "new_browser_context=True url_has_login_redirect=False"
+  },
+  {
+   "name": "pptx_fresh_editor_loaded_persisted_edit",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pptx_save_did_not_download",
+   "ok": true,
+   "detail": "downloads=0"
+  }
+ ]
+}

@@ -1,0 +1,42 @@
+{
+ "checks": [
+  {
+   "name": "short_ttl_applied_and_seahub_restarted",
+   "ok": true,
+   "detail": "WOPI_ACCESS_TOKEN_EXPIRATION = 120 (temporary, restored at the end)"
+  },
+  {
+   "name": "editor_opened_with_short_ttl",
+   "ok": true,
+   "detail": "status='ready'"
+  },
+  {
+   "name": "edit_typed_before_expiry",
+   "ok": true,
+   "detail": "unsaved changes"
+  },
+  {
+   "name": "expired_save_must_not_create_version",
+   "ok": true,
+   "detail": "status='your Seafile session for this file expired; your document was downloaded instead. Reopen t' history 1->1 downloads=1"
+  },
+  {
+   "name": "reopen_after_expiry_usable",
+   "ok": true,
+   "detail": "status='ready'"
+  },
+  {
+   "name": "reopen_save_succeeds_creates_version",
+   "ok": true,
+   "detail": "status='saved to Seafile' history 1->2 creator_is_opener=True marker_in_doc=False [marker search imperfect; history grew + creator=opener proves save]"
+  },
+  {
+   "name": "ttl_restored_and_seahub_restarted",
+   "ok": true,
+   "detail": "WOPI_ACCESS_TOKEN_EXPIRATION = 1800 (matches the lab baseline)"
+  }
+ ],
+ "passed": 7,
+ "failed": 0,
+ "ok": true
+}
