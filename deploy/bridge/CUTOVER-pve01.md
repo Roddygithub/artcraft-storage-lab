@@ -107,6 +107,16 @@ Never roll back by deleting the old gateway or production containers.
 **Rollback warning**: `pct rollback` destroys all changes since the snapshot.
 Only use if the settings edit is lost and cannot be reverted by editing the file.
 
+## Restore verification status
+
+| Test | Status | Evidence |
+| --- | --- | --- |
+| Isolated LXC 115 snapshot → clone → restore | **VERIFIED** | `pct snapshot 115 restore-test-snap` → `pct clone 115 116 --snapname restore-test-snap --full` → all 4 services healthy, HTTPS connectivity confirmed |
+| Isolated vzdump restore | NOT TESTED | Would require separate storage; not performed |
+| Production LXC 108 vzdump restore | NOT TESTED | Would require production downtime; archive integrity verified via `zstd -t` only |
+
+**ROLLBACK_VERIFIED**: Only for isolated LXC 115 snapshot-based restore. Production restore NOT verified.
+
 ## Security gates that still bind
 
 1. `can_edit` host boundary: fine for the owner's trusted single-user scope;

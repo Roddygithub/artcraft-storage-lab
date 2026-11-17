@@ -210,6 +210,7 @@ def verify_provenance(d: dict) -> None:
     
     The deployed browser runner had a STATIC path modification (sed), so its hash
     differs from the repo version. The sanitizer hash should match exactly.
+    The transformation is documented and reproducible via scripts/reproduce_browser_runner.py.
     """
     # Check sanitizer hash - should match repo version exactly
     sanitizer_hash = d.get("sanitizer_sha256", "")
@@ -233,6 +234,7 @@ def verify_provenance(d: dict) -> None:
     # Repo version: 6aaf9de837d3fb129754ccaffe219a7ed83c448724cc97e0b3284f7bb3d27eb2
     # Deployed version: fbb85c91b9f64a9e55e9b09402d16f53b8784c1b72784911bfe4f0e1540c9b64
     runner_hash = d.get("browser_runner_sha256", "")
+    repo_hash = d.get("browser_runner_repo_sha256", "")
     if runner_hash:
         # Try deployed copy first
         deployed = Path("/home/roddy/.cache/artcraft-storage-lab/deploy-proxmox/e2e/run_browser.py")
@@ -242,17 +244,16 @@ def verify_provenance(d: dict) -> None:
                 raise AssertionError(f"provenance: browser_runner_sha256 mismatch: declared={runner_hash} actual={actual}")
         else:
             # In CI, verify the transformation is documented
-            # The repo version should be 6aaf9de8... and the note should explain the sed modification
-            note = d.get("browser_runner_note", "")
-            if "STATIC path sed-modified" not in note:
-                raise AssertionError("provenance: browser_runner_note missing STATIC path transformation documentation")
+            note = d.get("browser_runner_transformation", "")
+            if "STATIC path sed" not in note:
+                raise AssertionError("provenance: browser_runner_transformation missing STATIC path transformation documentation")
             # Verify repo version hash matches documented value
-            repo_runner = Path("lab/real-seafile/run_browser.py")
-            if repo_runner.exists():
-                actual = sha(repo_runner)
-                expected_repo = "6aaf9de837d3fb129754ccaffe219a7ed83c448724cc97e0b3284f7bb3d27eb2"
-                if actual != expected_repo:
-                    raise AssertionError(f"provenance: repo run_browser.py hash mismatch: expected={expected_repo} actual={actual}")
+            if repo_hash:
+                repo_runner = Path("lab/real-seafile/run_browser.py")
+                if repo_runner.exists():
+                    actual = sha(repo_runner)
+                    if actual != repo_hash:
+                        raise AssertionError(f"provenance: repo run_browser.py hash mismatch: expected={repo_hash} actual={actual}")
 
 def verify_sha256sums() -> None:
     """Verify SHA256SUMS file integrity."""

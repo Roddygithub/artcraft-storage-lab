@@ -1,5 +1,5 @@
 {
-  "source_commit": "aec8e95328b731abe9a3795092a55cdd22f333cf",
+  "source_commit": "f7b9358e93984bd98c6b994735746372e0a376db",
   "bridge_baseline": "123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb",
   "deployment": "isolated Proxmox LXC craft-test (disposable test CT, not production)",
   "seafile_image": "docker.io/seafileltd/seafile-mc@sha256:7bbe7043facbc639a8e6144f32d50dc4d771191ecaa68002efb2b0237fb90358",
@@ -8,7 +8,8 @@
   "https": "tailscale serve valid certs (Seahub :8443, bridge :8444); pve01 socat relay for the bridge->Seahub TLS leg; production 443 route untouched",
   "browser_runner_sha256": "fbb85c91b9f64a9e55e9b09402d16f53b8784c1b72784911bfe4f0e1540c9b64",
   "sanitizer_sha256": "f61186d8f6acfcc458d7677800658a1f59d626cc9df19b22af999771c1312e75",
-  "browser_runner_note": "deployed copy with STATIC path sed-modified from /app/lab/real-seafile/static to /home/roddy/.cache/artcraft-storage-lab/pptx-candidate-20261108/static; repo version at lab/real-seafile/run_browser.py has sha256 6aaf9de837d3fb129754ccaffe219a7ed83c448724cc97e0b3284f7bb3d27eb2",
+  "browser_runner_repo_sha256": "6aaf9de837d3fb129754ccaffe219a7ed83c448724cc97e0b3284f7bb3d27eb2",
+  "browser_runner_transformation": "scripts/reproduce_browser_runner.py applies STATIC path sed: '/app/lab/real-seafile/static' -> '/home/roddy/.cache/artcraft-storage-lab/pptx-candidate-20261108/static'",
   "date": "2026-11-17",
   "e2e_results": {
     "wordcraft": "24/24 PASS (open→edit→save→version 1→2→3→fresh reopen, bytes identical relay==readback, downloads=0)",
@@ -21,11 +22,11 @@
     "webgl": "ANGLE (NVIDIA GeForce GTX 1060 6GB/PCIe/SSE2)",
     "webgpu": "vendor=nvidia, architecture=pascal, isFallback=null",
     "wayland": "wayland-1, real Omarchy desktop session",
-    "clipboard_editor_to_os": "NOT VERIFIED - canvas WASM editor cannot write OS clipboard",
-    "clipboard_os_to_editor": "accepted visually; not persisted in saved DOCX (canvas limitation)",
+    "clipboard_editor_to_os": "UNSUPPORTED - canvas WASM editor cannot write OS clipboard",
+    "clipboard_os_to_editor": "VISUALLY ACCEPTED ONLY - paste accepted but not persisted in saved DOCX",
     "dirty_close": "beforeunload prompted, unsaved edit discarded, saved version intact",
-    "reader_save_refused": "read-only user via bridge relay; no version created",
+    "reader_save_refused": "Seafile CE 12.0.14 limitation: RPC share doesn't propagate to web API",
     "network_outage": "seafile container stop/start: save fails dirty kept, recovery works",
-    "session_expiry": "TTL 120s: expired save downloads file, reopen works, new save creates version"
+    "session_expiry": "TTL 30s: expired save creates version (LIMITATION: token TTL not enforced for PutFile)"
   }
 }
