@@ -22,7 +22,7 @@ coherence; fault injection tests PASS (10/10 mutation types rejected).
 
 **Remediation summary (audit anomalies resolved):**
 
-1. **Token TTL expiration behavior characterized** — controlled test with 120s TTL showed expired save REJECTED (token TTL enforced for PutFile; download fallback works); marker persistence verified on reopen save. Documented in `session-expiry.json` and `VALIDATION-STATE.md`.
+1. **Token TTL expiration behavior characterized** — controlled test with 120s TTL showed expired save REJECTED (token TTL enforced for PutFile; download fallback works); reopen save creates version; marker persistence NOT_VERIFIED (XML search imperfect). Documented in `session-expiry.json` and `VALIDATION-STATE.md`.
 2. **Dirty close evidence completed** — headed browser test on Omarchy confirms beforeunload dialog captured, history unchanged (1→1), doc loads on reopen, dirty marker discarded. Recorded in `hardware.json`.
 3. **Provenance made reproducible** — transformation script `scripts/reproduce_browser_runner.py` reproduces deployed runner SHA256 from repo version via documented STATIC path sed modification. Provenance coherence verified in CI.
 4. **Restore claims qualified** — LXC 115 snapshot→clone→restore verified (all services healthy, HTTPS OK); production vzdump restore NOT tested. Runbook updated with qualified claims.
@@ -33,7 +33,7 @@ Evidence retained: `lab/real-seafile/results/2026-11-17-proxmox-isolated/` (sani
 
 **Production cutover runbook updated** (`deploy/bridge/CUTOVER-pve01.md`) with qualified restore claims, routing precedence table, and rollback warning. **NOT EXECUTED** — requires explicit owner authorization.
 
-Evidence verifier strengthened, CI evidence validation workflow added (`.github/workflows/evidence-validation.yml`). All tests pass (Bridge 33, Lab 13, Legacy 9, Node 4, Evidence Verify 1). CI GREEN.
+Evidence verifier strengthened, CI evidence validation workflow added (`.github/workflows/evidence-validation.yml`). All tests pass (Bridge 33, Lab 13, Legacy 9, Node 4, Evidence Verify 1). CI status: CI_UNVERIFIED (GitHub Actions runs not accessible for verification).
 
 GPT_FINAL_GATE=PENDING (quota unavailable); UPSTREAM_STATUS=LOCKED.
 

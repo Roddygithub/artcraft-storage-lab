@@ -27,6 +27,6 @@
     "dirty_close": "beforeunload prompted, unsaved edit discarded, saved version intact",
     "reader_save_refused": "Seafile CE 12.0.14 limitation: RPC share doesn't propagate to web API",
     "network_outage": "seafile container stop/start: save fails dirty kept, recovery works",
-    "session_expiry": "TTL 120s: expired save REJECTED (token TTL enforced for PutFile); download fallback works; reopen save creates version with marker persistence verified"
+    "session_expiry": "TTL 120s: expired save REJECTED (token TTL enforced for PutFile); download fallback works; reopen save creates version; marker persistence NOT_VERIFIED (XML search imperfect)"
   }
 }
