@@ -6,8 +6,9 @@
   "bridge_image": "deploy/bridge/Dockerfile (gunicorn 23.0.0) built from source_commit",
   "editor_bundles": "cache pptx-candidate-20261108/static wordcraft+gridcraft+deckcraft; manifest static-sha256.json of the 2026-11-16 byteproof run",
   "https": "tailscale serve valid certs (Seahub :8443, bridge :8444); pve01 socat relay for the bridge->Seahub TLS leg; production 443 route untouched",
-  "browser_runner_sha256": "b8c9c1e2a6c8f7b3e1f8e4a2b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4",
-  "sanitizer_sha256": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+  "browser_runner_sha256": "fbb85c91b9f64a9e55e9b09402d16f53b8784c1b72784911bfe4f0e1540c9b64",
+  "sanitizer_sha256": "f61186d8f6acfcc458d7677800658a1f59d626cc9df19b22af999771c1312e75",
+  "browser_runner_note": "deployed copy with STATIC path sed-modified from /app/lab/real-seafile/static to /home/roddy/.cache/artcraft-storage-lab/pptx-candidate-20261108/static; repo version at lab/real-seafile/run_browser.py has sha256 6aaf9de837d3fb129754ccaffe219a7ed83c448724cc97e0b3284f7bb3d27eb2",
   "date": "2026-11-17",
   "e2e_results": {
     "wordcraft": "24/24 PASS (open→edit→save→version 1→2→3→fresh reopen, bytes identical relay==readback, downloads=0)",

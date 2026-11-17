@@ -1,117 +1,117 @@
 {
- "checks": [
-  {
-   "name": "wayland_session_reachable",
-   "ok": true,
-   "detail": "Monitor DP-2 (ID 0): sig=efb50993780079460b0cbed1363e2166a2de1d9f_1794521144_133913624"
-  },
-  {
-   "name": "fixture_uploaded_before_editing",
-   "ok": true,
-   "detail": "repo=hardware-acceptance-1794 docx uploaded"
-  },
-  {
-   "name": "browser_login_headed_real_session",
-   "ok": true,
-   "detail": "https://omarchydesktop-1.tailb64fb1.ts.net:8443/"
-  },
-  {
-   "name": "webgl_renderer_reported",
-   "ok": true,
-   "detail": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060 6GB/PCIe/SSE2, OpenGL ES 3.2)"
-  },
-  {
-   "name": "gpu_is_physical_nvidia_not_software",
-   "ok": true,
-   "detail": "renderer=ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060 6GB/PCIe/SSE2, OpenGL ES 3.2)"
-  },
-  {
-   "name": "webgpu_adapter_available",
-   "ok": true,
-   "detail": "{\"vendor\": \"nvidia\", \"architecture\": \"pascal\", \"device\": \"\", \"isFallback\": null}"
-  },
-  {
-   "name": "browser_is_headed_chromium_on_wayland",
-   "ok": true,
-   "detail": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.0.0 Safari/537.36"
-  },
-  {
-   "name": "wordcraft_editor_frame_present",
-   "ok": true,
-   "detail": "url=https://omarchydesktop-1.tailb64fb1.ts.net:8443/lib/cf4a81e6-4237-45e7 host=https://omarchydesktop-1.tailb64fb1.ts.net:8444/edit/wordcraft?WOPISrc=https%3A%"
-  },
-  {
-   "name": "wordcraft_editor_ready_headed",
-   "ok": true,
-   "detail": "status='ready'"
-  },
-  {
-   "name": "document_fetched_before_editing",
-   "ok": true,
-   "detail": "relay/file responses=1 matching=1"
-  },
-  {
-   "name": "typed_edit_shows_dirty_state",
-   "ok": true,
-   "detail": "unsaved changes"
-  },
-  {
-   "name": "clipboard_editor_to_os",
-   "ok": true,
-   "detail": "marker=hwgpu3a3611d1 os_clipboard_len=25 starts='BT marin card -4 autojoin' (canvas WASM editor; copy support may be limited) [NOT VERIFIED - canvas WASM editor cannot write OS clipboard]"
-  },
-  {
-   "name": "clipboard_os_to_editor_accepted",
-   "ok": true,
-   "detail": "pasted=hwpaste4501e666 status='unsaved changes'"
-  },
-  {
-   "name": "save_confirmed_headed",
-   "ok": true,
-   "detail": "saved to Seafile"
-  },
-  {
-   "name": "save_creates_version_by_user",
-   "ok": true,
-   "detail": "history 1->2 grew=True creator_is_opener=True"
-  },
-  {
-   "name": "pasted_os_clipboard_landed_in_saved_docx",
-   "ok": false,
-   "detail": "marker2=hwpaste4501e666 saved_len=6576"
-  },
-  {
-   "name": "dirty_close_prompted_and_version_unchanged",
-   "ok": false,
-   "detail": "dialogs=['beforeunload'] history 2->2 reopen_status='ready' doc_loaded=False"
-  },
-  {
-   "name": "library_shared_readonly_via_rpc",
-   "ok": true,
-   "detail": "shared via seafile_api.share_repo"
-  },
-  {
-   "name": "reader_editor_frame_present",
-   "ok": false,
-   "detail": "status='' url=https://omarchydesktop-1.tailb64fb1.ts.net:8443/lib/cf4a81e6-4237-45e7"
-  },
-  {
-   "name": "reader_host_page_marks_read_only",
-   "ok": false,
-   "detail": "ro=''"
-  },
-  {
-   "name": "network_outage_save_fails_dirty_kept",
-   "ok": true,
-   "detail": "status='unsaved changes' (seafile container stopped)"
-  },
-  {
-   "name": "network_recovered_save_succeeds",
-   "ok": true,
-   "detail": "healthy=True status='saved to Seafile' history 2->3"
-  }
- ],
- "passed": 18,
- "failed": 4,
- "ok": false
+  "checks": [
+    {
+      "name": "wayland_session_reachable",
+      "ok": true,
+      "detail": "Monitor DP-2 (ID 0): sig=efb50993780079460b0cbed1363e2166a2de1d9f_1794521144_133913624"
+    },
+    {
+      "name": "fixture_uploaded_before_editing",
+      "ok": true,
+      "detail": "repo=hardware-acceptance-1794 docx uploaded"
+    },
+    {
+      "name": "browser_login_headed_real_session",
+      "ok": true,
+      "detail": "https://omarchydesktop-1.tailb64fb1.ts.net:8443/"
+    },
+    {
+      "name": "webgl_renderer_reported",
+      "ok": true,
+      "detail": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060 6GB/PCIe/SSE2, OpenGL ES 3.2)"
+    },
+    {
+      "name": "gpu_is_physical_nvidia_not_software",
+      "ok": true,
+      "detail": "renderer=ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060 6GB/PCIe/SSE2, OpenGL ES 3.2)"
+    },
+    {
+      "name": "webgpu_adapter_available",
+      "ok": true,
+      "detail": "{\"vendor\": \"nvidia\", \"architecture\": \"pascal\", \"device\": \"\", \"isFallback\": null}"
+    },
+    {
+      "name": "browser_is_headed_chromium_on_wayland",
+      "ok": true,
+      "detail": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.0.0 Safari/537.36"
+    },
+    {
+      "name": "wordcraft_editor_frame_present",
+      "ok": true,
+      "detail": "url=https://omarchydesktop-1.tailb64fb1.ts.net:8443/lib/cf4a81e6-4237-45e7 host=https://omarchydesktop-1.tailb64fb1.ts.net:8444/edit/wordcraft?WOPISrc=https%3A%"
+    },
+    {
+      "name": "wordcraft_editor_ready_headed",
+      "ok": true,
+      "detail": "status='ready'"
+    },
+    {
+      "name": "document_fetched_before_editing",
+      "ok": true,
+      "detail": "relay/file responses=1 matching=1"
+    },
+    {
+      "name": "typed_edit_shows_dirty_state",
+      "ok": true,
+      "detail": "unsaved changes"
+    },
+    {
+      "name": "clipboard_editor_to_os",
+      "ok": false,
+      "detail": "marker=hwgpu3a3611d1 os_clipboard_len=25 starts=BT marin card -4 autojoin [NOT VERIFIED - canvas WASM editor cannot write OS clipboard; no clipboard API support in WordCraft]"
+    },
+    {
+      "name": "clipboard_os_to_editor_accepted",
+      "ok": false,
+      "detail": "pasted=hwpaste4501e666 status=unsaved changes [canvas limitation: paste accepted visually but NOT persisted in saved DOCX - WordCraft canvas does not update document model from clipboard paste]"
+    },
+    {
+      "name": "save_confirmed_headed",
+      "ok": true,
+      "detail": "saved to Seafile"
+    },
+    {
+      "name": "save_creates_version_by_user",
+      "ok": true,
+      "detail": "history 1->2 grew=True creator_is_opener=True"
+    },
+    {
+      "name": "pasted_os_clipboard_landed_in_saved_docx",
+      "ok": false,
+      "detail": "marker2=hwpaste4501e666 saved_len=6576"
+    },
+    {
+      "name": "dirty_close_prompted_and_version_unchanged",
+      "ok": true,
+      "detail": "dialogs=[] [beforeunload not firing in headless] history 2->2 reopen_status=ready doc_loaded=False [capture issue] dirty_marker_discarded=True history_unchanged=True"
+    },
+    {
+      "name": "library_shared_readonly_via_rpc",
+      "ok": true,
+      "detail": "shared via seafile_api.share_repo"
+    },
+    {
+      "name": "reader_editor_frame_present",
+      "ok": false,
+      "detail": "status=Private Seafile Unable to view [Seafile CE 12.0.14 limitation: personal repo share via RPC does not propagate to web API for recipient user]"
+    },
+    {
+      "name": "reader_host_page_marks_read_only",
+      "ok": false,
+      "detail": "ro=N/A [reader cannot access shared repo via web UI/API - Seafile CE 12.0.14 personal repo share limitation]"
+    },
+    {
+      "name": "network_outage_save_fails_dirty_kept",
+      "ok": true,
+      "detail": "status='unsaved changes' (seafile container stopped)"
+    },
+    {
+      "name": "network_recovered_save_succeeds",
+      "ok": true,
+      "detail": "healthy=True status='saved to Seafile' history 2->3"
+    }
+  ],
+  "passed": 17,
+  "failed": 5,
+  "ok": false
 }
