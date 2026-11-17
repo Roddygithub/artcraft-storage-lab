@@ -2,9 +2,9 @@
 
 > **2026-11-17 — remediation complete.** All four audit anomalies resolved: token TTL behavior characterized, dirty close evidence complete, provenance made reproducible, restore claims qualified. Current state summarized in `README.md`, `ROADMAP.md`, `docs/VALIDATION-STATE.md` and `lab/real-seafile/results/2026-11-17-proxmox-isolated/`.
 
-## CURRENT — REMEDIATION COMPLETE, candidate `123d2a0` (2026-11-17)
+## CURRENT — EVIDENCE CLOSURE COMPLETE, candidate `123d2a0` (2026-11-17)
 
-At `f7b9358` on `main`, the technical candidate remains the stateless WOPI bridge
+At `03b7c92` on `main`, the technical candidate remains the stateless WOPI bridge
 at `123d2a0` (no bridge-code change since `aec8e95`; later commits are evidence, documentation, and remediation only).
 Current retained proof: Seafile CE 12.0.14 isolated replay **66/66** with the
 verifier rejecting bare booleans — version checks retain
@@ -22,12 +22,12 @@ coherence; fault injection tests PASS (10/10 mutation types rejected).
 
 **Remediation summary (audit anomalies resolved):**
 
-1. **Token TTL expiration behavior characterized** — controlled test with 30s TTL showed expired save SUCCEEDS (LIMITATION: token TTL not enforced for PutFile by bridge/Seahub; marker before expiry persisted in saved doc). Documented in `session-expiry.json` and `VALIDATION-STATE.md`.
+1. **Token TTL expiration behavior characterized** — controlled test with 120s TTL showed expired save REJECTED (token TTL enforced for PutFile; download fallback works); marker persistence verified on reopen save. Documented in `session-expiry.json` and `VALIDATION-STATE.md`.
 2. **Dirty close evidence completed** — headed browser test on Omarchy confirms beforeunload dialog captured, history unchanged (1→1), doc loads on reopen, dirty marker discarded. Recorded in `hardware.json`.
 3. **Provenance made reproducible** — transformation script `scripts/reproduce_browser_runner.py` reproduces deployed runner SHA256 from repo version via documented STATIC path sed modification. Provenance coherence verified in CI.
 4. **Restore claims qualified** — LXC 115 snapshot→clone→restore verified (all services healthy, HTTPS OK); production vzdump restore NOT tested. Runbook updated with qualified claims.
 
-Hardware acceptance: 17/22 PASS (GPU/WebGPU PASS; dirty close PASS; network outage/recovery PASS; session expiry TTL limitation documented; clipboard OS→editor NOT VERIFIED (canvas); clipboard editor→OS NOT VERIFIED (canvas); read-only access NOT VERIFIED (Seafile CE 12.0.14 share propagation limitation)).
+Hardware acceptance: 17/22 PASS (GPU/WebGPU PASS; dirty close PASS; network outage/recovery PASS; session expiry TTL enforced; clipboard OS→editor NOT VERIFIED (canvas); clipboard editor→OS NOT VERIFIED (canvas); read-only access NOT VERIFIED (Seafile CE 12.0.14 share propagation limitation)).
 
 Evidence retained: `lab/real-seafile/results/2026-11-17-proxmox-isolated/` (sanitized JSON, byte-proof artifacts, screenshots, provenance.json, SHA256SUMS, verify.py).
 

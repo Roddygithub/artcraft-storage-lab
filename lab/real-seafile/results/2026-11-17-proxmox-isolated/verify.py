@@ -194,16 +194,18 @@ def verify_session_expiry_evidence(d: dict) -> None:
     if missing:
         raise AssertionError(f"session-expiry: missing required checks: {missing}")
     
-    # Verify expired save behavior - current limitation: token TTL not enforced for PutFile
+    # Verify expired save behavior - token TTL should be enforced for PutFile
+    # (If not enforced, it's a limitation that must be documented)
     for c in checks:
         if c.get("name") == "expired_save_must_not_create_version":
             detail = c.get("detail", "")
-            # Current behavior: expired save SUCCEEDS (token TTL not enforced for PutFile)
+            # Must document history change
             if "history 1->2" not in detail and "history 1->1" not in detail:
                 raise AssertionError(f"session-expiry: expired_save must document history change: {detail}")
-            # Must mention the limitation
-            if "LIMITATION" not in detail.upper() and "TOKEN TTL NOT ENFORCED" not in detail.upper():
-                raise AssertionError(f"session-expiry: expired_save must document TTL enforcement limitation: {detail}")
+            # If save succeeded (history 1->2), must document the limitation
+            if "history 1->2" in detail and "LIMITATION" not in detail.upper() and "TOKEN TTL NOT ENFORCED" not in detail.upper():
+                raise AssertionError(f"session-expiry: expired_save succeeded but must document TTL enforcement limitation: {detail}")
+            # If save rejected (history 1->1), that's correct behavior - no limitation note needed
 
 def verify_provenance(d: dict) -> None:
     """Verify provenance coherence with available source files.

@@ -2,9 +2,9 @@
 
 # ArtCraft Storage Lab
 
-> **2026-11-17:** project **REMEDIATION COMPLETE**, stabilised on `main` at `f7b9358`.
+> **2026-11-17:** project **EVIDENCE CLOSURE COMPLETE**, stabilised on `main` at `03b7c92`.
 > The validated candidate is the stateless WOPI bridge at `123d2a0` (bridge
-> code unchanged since; later commits are evidence, documentation, and remediation only).
+> code unchanged since `aec8e95`; later commits are evidence, documentation, and remediation only).
 > Current proof: Seafile CE 12.0.14 isolated 66/66 browser replay with
 > byte-level relay==readback artifacts for DOCX, XLSX and PPTX, version
 > history and fresh-context details retained
@@ -15,7 +15,7 @@
 > viewers zero-patch ([security analysis](docs/security/HOST_PERMISSION_BOUNDARY.md)).
 > DOC, XLS, FODS, FODT, FODP, PPT, ODP and PPS remain unrouted. Production is
 > untouched and upstream remains LOCKED. Hardware acceptance (17/22 PASS),
-> session expiry TTL limitation documented, and restore test completed.
+> session expiry TTL enforced (expired save rejected), restore test completed.
 > GPT_FINAL_GATE=PENDING, UPSTREAM_STATUS=LOCKED. See
 > [the closure ledger](docs/PROJECT-CLOSURE.md) and
 > [the validation checkpoint](docs/VALIDATION-STATE.md).

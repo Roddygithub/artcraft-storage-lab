@@ -42,7 +42,7 @@ Hardware acceptance (headed Chromium on real Omarchy/Wayland, GTX 1060):
 - Dirty close: beforeunload prompted, unsaved edit discarded, saved version intact — PASS
 - Read-only user save refused via bridge relay — PASS (Seafile CE 12.0.14 limitation: personal repo shares don't propagate to web API for recipient)
 - Network outage (container stop/start): save fails dirty kept, recovery succeeds — PASS
-- Session expiry (TTL 120s): expired save downloads file, reopen works, new save creates version — PASS
+- Session expiry (TTL 120s): expired save REJECTED (token TTL enforced); download fallback works; reopen works, new save creates version — PASS
 
 Evidence retained: `lab/real-seafile/results/2026-11-17-proxmox-isolated/` (sanitized JSON, byte-proof artifacts, screenshots, provenance.json, SHA256SUMS, verify.py).
 

@@ -31,12 +31,24 @@ jobs:
           # Ensure all required artifacts exist and have correct hashes
           cd lab/real-seafile/results/2026-11-17-proxmox-isolated
           sha256sum -c SHA256SUMS
-      - name: Check for secrets in evidence
+      - name: Check for secrets in evidence (gitleaks)
         run: |
-          # Scan for potential secrets in evidence files
-          cd lab/real-seafile/results/2026-11-17-proxmox-isolated
-          # Check for common secret patterns (but allow known infrastructure identifiers)
-          ! grep -r "password\|secret\|token\|key" --include="*.json" . | grep -v "access_token\|WOPISrc\|repo_id\|session" || true
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz | tar xz -C /tmp
+          /tmp/gitleaks detect --source lab/real-seafile/results/2026-11-17-proxmox-isolated --config .gitleaks.toml --verbose --redact --exit-code 1
+
+  provenance-reproducibility:
+    name: Provenance Reproducibility Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify browser runner provenance
+        run: |
+          python3 scripts/reproduce_browser_runner.py
 
   manifest-check:
     name: Manifest & provenance integrity
