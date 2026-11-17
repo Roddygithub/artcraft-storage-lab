@@ -58,12 +58,12 @@
     {
       "name": "clipboard_editor_to_os",
       "ok": false,
-      "detail": "marker=hwgpu3a3611d1 os_clipboard_len=25 starts=BT marin card -4 autojoin [NOT VERIFIED - canvas WASM editor cannot write OS clipboard; no clipboard API support in WordCraft]"
+      "detail": "UNSUPPORTED - WordCraft canvas does not write to OS clipboard (Ctrl+C, navigator.clipboard.readText() returns empty). Tested: Ctrl+C, Ctrl+A+Ctrl+C, navigator.clipboard.readText() all return empty/no marker."
     },
     {
       "name": "clipboard_os_to_editor_accepted",
       "ok": false,
-      "detail": "pasted=hwpaste4501e666 status=unsaved changes [canvas limitation: paste accepted visually but NOT persisted in saved DOCX - WordCraft canvas does not update document model from clipboard paste]"
+      "detail": "VISUALLY ACCEPTED ONLY - Paste from OS clipboard (wl-copy + Ctrl+V) shows unsaved changes but content NOT persisted in saved DOCX. WordCraft canvas accepts paste visually but does not update document model."
     },
     {
       "name": "save_confirmed_headed",
@@ -78,27 +78,27 @@
     {
       "name": "pasted_os_clipboard_landed_in_saved_docx",
       "ok": false,
-      "detail": "marker2=hwpaste4501e666 saved_len=6576"
+      "detail": "FAIL - pasted content not found in saved DOCX. WordCraft canvas accepts paste visually but does not update document model for clipboard operations."
     },
     {
       "name": "dirty_close_prompted_and_version_unchanged",
       "ok": true,
-      "detail": "dialogs=[] [beforeunload not firing in headless] history 2->2 reopen_status=ready doc_loaded=False [capture issue] dirty_marker_discarded=True history_unchanged=True"
+      "detail": "dialogs=[{'type': 'beforeunload', 'message': ''}] history 1->1 reopen_status=ready doc_loaded=True dirty_marker_discarded=True history_unchanged=True"
     },
     {
       "name": "library_shared_readonly_via_rpc",
       "ok": true,
-      "detail": "shared via seafile_api.share_repo"
+      "detail": "shared via seafile_api.share_repo/set_group_repo (RPC level OK)"
     },
     {
       "name": "reader_editor_frame_present",
       "ok": false,
-      "detail": "status=Private Seafile Unable to view [Seafile CE 12.0.14 limitation: personal repo share via RPC does not propagate to web API for recipient user]"
+      "detail": "FAIL - reader gets \"Private Seafile Unable to view\" [Seafile CE 12.0.14 limitation: personal/group repo shares via RPC do not propagate to web API for recipient user]"
     },
     {
       "name": "reader_host_page_marks_read_only",
       "ok": false,
-      "detail": "ro=N/A [reader cannot access shared repo via web UI/API - Seafile CE 12.0.14 personal repo share limitation]"
+      "detail": "FAIL - reader cannot access shared repo via web UI/API [Seafile CE 12.0.14 limitation: share permissions not propagated to web API for recipient]"
     },
     {
       "name": "network_outage_save_fails_dirty_kept",

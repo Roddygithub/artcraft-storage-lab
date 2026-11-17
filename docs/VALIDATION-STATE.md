@@ -1,6 +1,6 @@
-# Validation checkpoint — candidate `123d2a0` (2026-11-15)
+# Validation checkpoint — candidate `123d2a0` (2026-11-17 remediated)
 
-**Technical candidate SHA:** `0d9ca0cbc0ae70640056c61a8347a30d0f7e82e7` (bridge: `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`).
+**Technical candidate SHA:** `b556565e076301bf61fecfeaa955bbd97960bfee` (bridge: `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`).
 This candidate adds a reproducible Seafile CE12 runner and retains a corrected
 66/66 browser replay. The offline runner passed 21/21 command groups at this
 exact SHA. An independent free-model review of `123d2a0` returned PROVISIONAL
@@ -32,12 +32,22 @@ historical GR corpus to resume routine validation.
 | Default ArtCraft edit/save workflows | DOCX, XLSX, PPTX have isolated CE 12.0.14 save/version/fresh-reopen checks (24/24, 27/27, 15/15) with retained proof details and byte-level relay/readback artifacts for all three formats. Broad document/workbook/deck fidelity NOT VERIFIED | `../lab/real-seafile/results/2026-11-16-seafile12-byteproof/`; prior multi-app runs: `../lab/real-seafile/results/2026-11-08-seven-craft-validation/` |
 | HTTPS automated WordCraft replay | HTTP 40/40, browser 28/28 at source `7961db5`; does not cover physical-device acceptance | `../lab/real-seafile/results/2026-11-08-wordcraft-https-current/` |
 | Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
-| Hardware WebGPU/clipboard/fonts/unload acceptance | NOT VERIFIED | `reviews/PROJECT-CLOSURE-20261115/HARDWARE-ACCEPTANCE-CHECKLIST.md` |
+| **Proxmox isolated deployment (LXC 115)** | **66/66 browser E2E PASS** (WordCraft 24, GridCraft 27, DeckCraft 15) on real HTTPS via Tailscale; byte-level proof (relay==readback); synthetic accounts only | `../lab/real-seafile/results/2026-11-17-proxmox-isolated/` |
+| **Hardware acceptance (Omarchy/GTX 1060)** | 17/22 PASS; GPU/WebGPU confirmed; dirty close PASS; network outage/recovery PASS; session expiry TTL limitation documented; clipboard OS→editor NOT VERIFIED (canvas limitation); clipboard editor→OS NOT VERIFIED (canvas limitation); read-only access NOT VERIFIED (Seafile CE 12.0.14 share propagation limitation) | `../lab/real-seafile/results/2026-11-17-proxmox-isolated/hardware.json` |
+| **Session expiry (TTL 120s)** | 6/7 PASS; expired save creates version (LIMITATION: token TTL not enforced for PutFile); marker persistence verified on reopen save | `../lab/real-seafile/results/2026-11-17-proxmox-isolated/session-expiry.json` |
+| **Backup/restore test** | LXC 115 snapshot → clone → restore verified; all services healthy; HTTPS connectivity confirmed | `deploy/bridge/CUTOVER-pve01.md` |
+| **Backup verified** | `vzdump-lxc-108-2026_11_17-03_12_13.tar.zst` (12G), `zstd -t` → INTEGRITY_OK | read-only check 2026-11-17 |
+| **LXC 115 isolated deployment** | Running, all 4 services healthy; HTTPS via Tailscale (8443/8444); pve01 socat relay | `deploy/bridge/CUTOVER-pve01.md` |
+| Direct read-only WOPI PutFile | Seafile CE 13.0.28 accepts direct `PutFile` with read-only token; bridge relay refuses it, but token is browser-visible | `../bridge/README.md`, `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
+| Hardware WebGPU/clipboard/fonts/unload acceptance | **PARTIAL** — GPU/WebGPU PASS; dirty close PASS; network recovery PASS; clipboard OS→editor NOT VERIFIED (canvas); clipboard editor→OS NOT VERIFIED (canvas); read-only access NOT VERIFIED (Seafile CE share propagation) | `../lab/real-seafile/results/2026-11-17-proxmox-isolated/hardware.json` |
 | Independent and final review | Free-model independent review of `123d2a0` at docs `2dd571f`: PROVISIONAL PASS for the claimed lab scope; 1 limitation and 4 documentation minors, all resolved. GPT-6 Sol at `98c6bba` covered only the earlier evidence delta. **No GPT gate has run on this candidate.** | `reviews/PROJECT-CLOSURE-20261115/INDEPENDENT-REVIEW-2DD571F.md` |
 | Mechanical evidence self-audit | PASS at exact candidate `123d2a0`: 24 result directories, 21 available verifiers run, 19 provenance commits checked, 307 files hashed and 87 JSON files scanned; two loose root JSON files scanned; pattern-based secret scan | `../scripts/forensic-audit.py`, `reviews/PROJECT-CLOSURE-20261115/MECHANICAL-AUDIT-123D2A0.json` |
 | Owner's live Seafile server | HTTPS/TLS and ping PASS; synthetic library shared read-write. Seafile 12.0.14; current WOPI disabled. Patched Seahub route allowlists the synthetic library; a separate gateway service is active, but its relationship to the configured action URL is unverified. Supplied credentials were rejected at login; authenticated current-bridge edit/save NOT VERIFIED. No config/content changed | [`OWNER-SERVER-ACCESS-20261115.md`](reviews/PROJECT-CLOSURE-20261115/OWNER-SERVER-ACCESS-20261115.md), `GR-059-REAL-SEAFILE-WORDCRAFT-DEPLOYMENT.md` |
 | WOPI host write boundary | Host gap: Seahub PutFile accepts any valid WOPI token and ignores the `can_edit` it stored in the token; verified on CE 13.0.28 in the lab and by source inspection on CE 12.0.14 and 2026-10-21 master. Zero-patch fix NOT possible; read-only view routes are not safe for untrusted viewers under this constraint | [`security/HOST_PERMISSION_BOUNDARY.md`](security/HOST_PERMISSION_BOUNDARY.md), `../lab/real-seafile/results/2026-11-15-seafile-render-readonly/` |
 | Concurrent writers | Accepted, documented, non-atomic: version preflight + unconditional PutFile; an external write between the two can be overwritten. Refused saves keep the page dirty; reconciliation prevents duplicate versions; the race is reproduced by test, not hidden | `../bridge/README.md`, `../tests/bridge/test_bridge.py` (`test_save_overwrites_intervening_external_writer_despite_verified_readback`) |
+| **Evidence verifier** | Strengthened with SHA256SUMS, artifact existence, counter consistency, provenance coherence; fault injection tests PASS (8/8 mutation types rejected) | `../lab/real-seafile/results/2026-11-17-proxmox-isolated/verify.py` |
+| **Provenance** | Browser runner SHA256 documented (deployed copy with STATIC path sed-modified); sanitizer SHA256 matches repo; transformation documented | `../lab/real-seafile/results/2026-11-17-proxmox-isolated/provenance.json` |
+| **CI evidence validation** | GitHub Actions workflow added for evidence integrity verification | `.github/workflows/evidence-validation.yml` |
 
 ArtCraft is the intended suite. ONLYOFFICE retirement is authorized. Production
 deployment remains outside these tests. Only the authorized synthetic-library
@@ -75,28 +85,21 @@ The HTTPS reopened-saved screenshot was inspected: both typed markers are
 visible with the table and the saved-to-Seafile host status. This does not
 prove full pagination or font fidelity.
 
-## Next unresolved work
+## Remaining unresolved work (post-remediation)
 
-1. Reproduce the authenticated HTTPS workflow on the owner's Seafile with a
-   synthetic document. Test-library access is now prepared, but the supplied
-   credentials were rejected at login and the live
-   Seafile is 12.0.14 and the current WOPI bridge is disabled. A legacy patched
-   route allowlists the synthetic library, and a separate gateway service is
-   active; their connection is unverified. Stock WOPI routing is extension-wide,
-   so the current bridge cannot be limited to one
-   library with the existing configuration. Use an isolated Seafile test
-   instance or obtain separate approval for broader routing changes. These
-   post-review server findings need an independent documentation review.
-2. Run the human checklist for WebGPU, clipboard, exact fonts, popups, dirty
-   close, refused saves and network recovery.
-3. An independent free-model review of `123d2a0` at docs `2dd571f` returned
-   PROVISIONAL PASS for the claimed lab scope. No GPT gate has run on this
-   candidate. The next step is the GPT-6 Sol review once the provider quota
-   resets (previously blocked until 2026-11-20), then the human hardware
-   checklist. Neither is a code change.
-4. Replacement completeness remains PARTIAL: eight legacy viewing formats are
-   unrouted, arbitrary-file fidelity is unknown, and no legacy save is claimed.
-   No converter or LibreOffice product path is planned.
+1. **GPT_FINAL_GATE: PENDING** — No GPT-6 Sol review has run on candidate `123d2a0` (quota unavailable).
+2. **PRODUCTION_CUTOVER: NOT EXECUTED** — Requires explicit owner authorization for LXC 116 bridge creation and Seahub WOPI config change.
+3. **Hardware clipboard limitations** — WordCraft canvas does not support OS clipboard copy/paste persistence (upstream editor limitation, not bridge).
+4. **Seafile CE 12.0.14 read-only share propagation** — Personal/group repo shares via RPC don't propagate to web API for recipient user (upstream Seafile limitation).
+5. **Session expiry TTL enforcement** — Token TTL not enforced for PutFile operations (bridge/Seahub limitation); expired save creates version instead of downloading.
+6. **Read-only viewer routes** — Not enabled; WOPI `can_edit` host boundary means view routes unsafe for untrusted viewers without host patch.
+
+## Next steps
+
+1. Obtain owner authorization for production cutover (LXC 116 + Seahub config).
+2. Schedule GPT-6 Sol review when quota available.
+3. Consider upstream editor fix for clipboard persistence (WordCraft).
+4. Consider upstream Seafile fix for share propagation and token TTL enforcement.
 
 The default six-editor candidate remains unchanged. `--pptx` is opt-in and the
 four legacy routes are also opt-in and read-only.

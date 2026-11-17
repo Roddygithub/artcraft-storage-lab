@@ -17,8 +17,8 @@
     },
     {
       "name": "expired_save_must_not_create_version",
-      "ok": true,
-      "detail": "status='your Seafile session for this file expired; your document was downloaded instead. Reopen t' history 1->1 downloads=1"
+      "ok": false,
+      "detail": "LIMITATION: expired save SUCCEEDED (status='saved to Seafile' history 1->2) - token TTL not enforced for PutFile by bridge/Seahub; marker before expiry persisted in saved doc"
     },
     {
       "name": "reopen_after_expiry_usable",
@@ -28,7 +28,7 @@
     {
       "name": "reopen_save_succeeds_creates_version",
       "ok": true,
-      "detail": "status=saved to Seafile history 1->2 creator_is_opener=True [marker search imperfect - new marker was afterexpiry<hex>; history growth + creator=opener proves save succeeded with new content]"
+      "detail": "status='saved to Seafile' history 2->3 creator_is_opener=True marker_after_expiry_found=True"
     },
     {
       "name": "ttl_restored_and_seahub_restarted",
@@ -36,7 +36,7 @@
       "detail": "WOPI_ACCESS_TOKEN_EXPIRATION = 1800 (matches the lab baseline)"
     }
   ],
-  "passed": 7,
-  "failed": 0,
-  "ok": true
+  "passed": 6,
+  "failed": 1,
+  "ok": false
 }
