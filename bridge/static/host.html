@@ -23,7 +23,19 @@
   <span class="ro" id="ro" hidden>read-only</span>
   <span class="status" id="status" data-kind="info">loading…</span>
 </div>
-<iframe id="frame" title="editor" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"></iframe>
+<!-- `allow` matches the editor bundles' HOSTING contract. It does NOT restore
+     clipboard copy by itself: Seahub's WOPI iframe (upstream viewFileCollaboraOnline)
+     does not delegate clipboard permissions to this frame, so clipboard-* stays
+     denied here regardless. Measured 2026-11-18; see
+     lab/real-seafile/results/2026-11-18-clipboard-and-fidelity/clipboard/. -->
+<!-- `allow` matches the editor bundles' HOSTING contract. It does NOT restore
+     clipboard copy by itself: Seahub's own WOPI iframe (upstream
+     viewFileCollaboraOnline) does not delegate clipboard permissions to this
+     frame, so clipboard-* stays denied here either way. Measured 2026-11-18;
+     see lab/real-seafile/results/2026-11-18-clipboard-and-fidelity/clipboard/. -->
+<iframe id="frame" title="editor"
+        allow="clipboard-read; clipboard-write; fullscreen"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"></iframe>
 <script type="application/json" id="bridge-config" nonce="{{NONCE}}">{{CONFIG_JSON}}</script>
 <script nonce="{{NONCE}}" src="/host.js"></script>
 </body>
