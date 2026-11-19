@@ -1,0 +1,76 @@
+{
+ "repo_id": "e4e8f899-b1ce-450d-8c7e-f5f0f7dcfc28",
+ "reader": "f0fc181a779a490b932049aee66ec8c8@auth.local",
+ "checks": [
+  {
+   "name": "reader_account_created",
+   "ok": true,
+   "detail": "status=200 body={'email': 'f0fc181a779a490b932049aee66ec8c8@auth.local', 'name': 'Read Only Probe', 'contact_email': 'reader-71437b@exam"
+  },
+  {
+   "name": "reader_canonical_email_used",
+   "ok": true,
+   "detail": "f0fc181a779a490b932049aee66ec8c8@auth.local"
+  },
+  {
+   "name": "share_readonly_accepted",
+   "ok": true,
+   "detail": "status=200 body=success"
+  },
+  {
+   "name": "reader_can_access_repo",
+   "ok": true,
+   "detail": "status=200 body={'type': 'repo', 'id': 'e4e8f899-b1ce-450d-8c7e-f5f0f7dcfc28', 'owner': 'share', 'name': 'routing-1795028511', 'mtime': 1795028512, 'size': 858, 'encrypted': Fa"
+  },
+  {
+   "name": "owner_gets_wopi_edit_route",
+   "ok": true,
+   "detail": "[\"https://omarchydesktop-1.tailb64fb1.ts.net:8444/edit/deckcraft?WOPISrc=https%3A%2F%2Fomarchydesktop-1.tailb64fb1.ts.net%3A8443%2Fapi2%2Fwopi%2Ffiles%2F5a205cef0d83aefc1585e0c801edddd7c716fd39&ui=en-US&rs=en-US&lang=en-US\", \"https://omarchydesktop-1.tailb64fb1.ts.net:8444/editors/deckcraft/index.html?host=parent\"]"
+  },
+  {
+   "name": "reader_gets_no_wopi_route",
+   "ok": true,
+   "detail": "frames=[] token_in_page=False"
+  },
+  {
+   "name": "reader_page_has_no_wopi_token",
+   "ok": true,
+   "detail": "token_in_page=False"
+  },
+  {
+   "name": "reader_page_does_not_silently_break",
+   "ok": true,
+   "detail": "body='routing.pptx\\nsynthetic-fc5c3435f8af2026-11-18 20:01\\n\\nOnline view is not applicable to this file format\\n\\nDownload'"
+  }
+ ],
+ "reader_repo_meta": {
+  "repo_id": "e4e8f899-b1ce-450d-8c7e-f5f0f7dcfc28",
+  "repo_name": "routing-1795028511",
+  "repo_type": null,
+  "owner_email": "synthetic-fc5c3435f8af@lab.test",
+  "owner_name": "synthetic-fc5c3435f8af",
+  "owner_contact_email": "synthetic-fc5c3435f8af@lab.test",
+  "owner_avatar": "https://omarchydesktop-1.tailb64fb1.ts.net/media/avatars/default.png",
+  "size": 858,
+  "encrypted": false,
+  "file_count": 1,
+  "permission": "r",
+  "no_quota": false,
+  "is_admin": false,
+  "is_virtual": false,
+  "has_been_shared_out": true,
+  "lib_need_decrypt": false,
+  "last_modified": "2026-11-18T19:01:52+00:00",
+  "status": "normal",
+  "enable_onlyoffice": false
+ },
+ "owner_frames": [
+  "https://omarchydesktop-1.tailb64fb1.ts.net:8444/edit/deckcraft?WOPISrc=https%3A%2F%2Fomarchydesktop-1.tailb64fb1.ts.net%3A8443%2Fapi2%2Fwopi%2Ffiles%2F5a205cef0d83aefc1585e0c801edddd7c716fd39&ui=en-US&rs=en-US&lang=en-US",
+  "https://omarchydesktop-1.tailb64fb1.ts.net:8444/editors/deckcraft/index.html?host=parent"
+ ],
+ "reader_frames": [],
+ "reader_page_text": "routing.pptx\nsynthetic-fc5c3435f8af2026-11-18 20:01\n\nOnline view is not applicable to this file format\n\nDownload",
+ "passed": 8,
+ "failed": 0,
+ "ok": true
+}

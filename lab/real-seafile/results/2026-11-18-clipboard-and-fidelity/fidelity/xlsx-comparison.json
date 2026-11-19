@@ -1,0 +1,113 @@
+{
+ "kind": "xlsx",
+ "verdicts": {
+  "sheet_count": "PRESERVED",
+  "sheet_names": "PRESERVED",
+  "formulas": "PRESERVED",
+  "cross_sheet_formula": "PRESERVED",
+  "sum_formula": "PRESERVED",
+  "date_format": "PRESERVED",
+  "header_fill": "PRESERVED",
+  "borders": "PRESERVED",
+  "cell_texts": "PRESERVED",
+  "charts": "NOT_SUPPORTED"
+ },
+ "counts": {
+  "PRESERVED": 9,
+  "NOT_SUPPORTED": 1
+ },
+ "before": {
+  "kind": "xlsx",
+  "parts": [
+   "[Content_Types].xml",
+   "_rels/.rels",
+   "xl/_rels/workbook.xml.rels",
+   "xl/styles.xml",
+   "xl/workbook.xml",
+   "xl/worksheets/sheet1.xml",
+   "xl/worksheets/sheet2.xml"
+  ],
+  "part_count": 7,
+  "sheet_names": [
+   "Data",
+   "Source"
+  ],
+  "sheet_count": 2,
+  "formulas": [
+   "Sheet2!B1",
+   "SUM(B2:B4)"
+  ],
+  "formula_count": 2,
+  "cross_sheet_formula": true,
+  "sum_formula": true,
+  "inline_strings": 11,
+  "numeric_cells": 7,
+  "date_cells": 1,
+  "header_filled_cells": 5,
+  "bordered_cells": 18,
+  "shared_strings": 0,
+  "texts": [
+   "Item",
+   "Value",
+   "Link",
+   "Alpha",
+   "Beta",
+   "Gamma",
+   "Total",
+   "Date",
+   "Source",
+   "Number",
+   "Constant"
+  ]
+ },
+ "after": {
+  "kind": "xlsx",
+  "parts": [
+   "[Content_Types].xml",
+   "_rels/.rels",
+   "docProps/app.xml",
+   "docProps/core.xml",
+   "xl/_rels/workbook.xml.rels",
+   "xl/sharedStrings.xml",
+   "xl/styles.xml",
+   "xl/theme/theme1.xml",
+   "xl/workbook.xml",
+   "xl/worksheets/sheet1.xml",
+   "xl/worksheets/sheet2.xml"
+  ],
+  "part_count": 11,
+  "sheet_names": [
+   "Data",
+   "Source"
+  ],
+  "sheet_count": 2,
+  "formulas": [
+   "Sheet2!B1",
+   "SUM(B2:B4)"
+  ],
+  "formula_count": 2,
+  "cross_sheet_formula": true,
+  "sum_formula": true,
+  "inline_strings": 0,
+  "numeric_cells": 7,
+  "date_cells": 1,
+  "header_filled_cells": 5,
+  "bordered_cells": 18,
+  "shared_strings": 12,
+  "texts": [
+   "Item",
+   "Value",
+   "Link",
+   "Alpha",
+   "Beta",
+   "fidxlsxd7e36f",
+   "Gamma",
+   "Total",
+   "Date",
+   "Source",
+   "Number",
+   "Constant"
+  ]
+ },
+ "regressions": []
+}

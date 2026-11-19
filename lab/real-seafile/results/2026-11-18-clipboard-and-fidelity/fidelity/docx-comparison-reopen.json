@@ -1,0 +1,117 @@
+{
+ "kind": "docx",
+ "verdicts": {
+  "tables": "PRESERVED",
+  "images": "PRESERVED",
+  "page_breaks": "PRESERVED",
+  "list_paragraphs": "PRESERVED",
+  "bold_runs": "PRESERVED",
+  "italic_runs": "PRESERVED",
+  "colour_runs": "PRESERVED",
+  "heading1": "PRESERVED",
+  "title_style": "PRESERVED",
+  "sectPr": "PRESERVED",
+  "header": "PRESERVED",
+  "footer_page_field": "PRESERVED",
+  "accents": "ALTERED",
+  "cjk": "PRESERVED",
+  "paragraph_count": "PRESERVED"
+ },
+ "counts": {
+  "PRESERVED": 14,
+  "ALTERED": 1
+ },
+ "before": {
+  "kind": "docx",
+  "parts": [
+   "[Content_Types].xml",
+   "_rels/.rels",
+   "word/_rels/document.xml.rels",
+   "word/document.xml",
+   "word/footer1.xml",
+   "word/header1.xml",
+   "word/media/image1.png",
+   "word/numbering.xml",
+   "word/styles.xml"
+  ],
+  "part_count": 9,
+  "paragraphs": 28,
+  "tables": 1,
+  "table_rows": 4,
+  "table_cells": 12,
+  "images": 1,
+  "media_parts": [
+   "word/media/image1.png"
+  ],
+  "page_breaks": 1,
+  "list_paragraphs": 4,
+  "heading1": true,
+  "title_style": true,
+  "bold_runs": 9,
+  "italic_runs": 1,
+  "colour_runs": 1,
+  "sectPr": true,
+  "accents_expected": "éïéÅöñü",
+  "accents_found": "Åéïñöü",
+  "cjk_found": "中文日本語국어한",
+  "header_parts": [
+   "word/header1.xml"
+  ],
+  "footer_parts": [
+   "word/footer1.xml"
+  ],
+  "footer_page_field": true,
+  "has_tblxml": true,
+  "text_len": 313
+ },
+ "after": {
+  "kind": "docx",
+  "parts": [
+   "[Content_Types].xml",
+   "_rels/.rels",
+   "docProps/app.xml",
+   "docProps/core.xml",
+   "word/_rels/document.xml.rels",
+   "word/document.xml",
+   "word/footer1.xml",
+   "word/header1.xml",
+   "word/media/image1.png",
+   "word/numbering.xml",
+   "word/settings.xml",
+   "word/styles.xml",
+   "word/theme/theme1.xml"
+  ],
+  "part_count": 13,
+  "paragraphs": 28,
+  "tables": 1,
+  "table_rows": 4,
+  "table_cells": 12,
+  "images": 1,
+  "media_parts": [
+   "word/media/image1.png"
+  ],
+  "page_breaks": 1,
+  "list_paragraphs": 4,
+  "heading1": true,
+  "title_style": true,
+  "bold_runs": 9,
+  "italic_runs": 1,
+  "colour_runs": 1,
+  "sectPr": true,
+  "accents_expected": "éïéÅöñü",
+  "accents_found": "Åéïñöü",
+  "cjk_found": "中文日本語국어한",
+  "header_parts": [
+   "word/header1.xml"
+  ],
+  "footer_parts": [
+   "word/footer1.xml"
+  ],
+  "footer_page_field": true,
+  "has_tblxml": true,
+  "text_len": 326
+ },
+ "regressions": [
+  "accents"
+ ]
+}

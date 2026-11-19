@@ -1,0 +1,19 @@
+{
+ "date": "2026-11-18",
+ "source_commit": "23de889181bd1b002019da89f824877d123d81b3",
+ "bridge_commit": "123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb",
+ "environment": "isolated LXC 115 'craft-test', Seafile CE 12.0.14 (pinned image sha256:7bbe7043...), bridge built from deploy/bridge/Dockerfile, HTTPS via tailscale serve on omarchydesktop-1 (8443/8444)",
+ "editors": {
+  "wordcraft": "v0.13.2",
+  "gridcraft": "v0.14.2",
+  "deckcraft": "v0.16.0"
+ },
+ "production_touched": false,
+ "probes": {
+  "clipboard": "lab/real-seafile/clipboard_probe.py (baseline run, no delegation)",
+  "wopi_routing": "lab/real-seafile/wopi_routing_probe.py (FILE_EXTENSION=(), EDIT_FILE_EXTENSION=('pptx',))",
+  "fidelity": "lab/real-seafile/fidelity_probe.py + fidelity_corpus.py + fidelity_compare.py"
+ },
+ "lab_config_restored": true,
+ "secrets": "none; admin credentials came from the private deploy-proxmox/secrets.env and are not stored here"
+}

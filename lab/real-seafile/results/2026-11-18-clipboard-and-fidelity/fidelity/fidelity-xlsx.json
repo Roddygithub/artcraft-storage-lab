@@ -1,0 +1,35 @@
+{
+ "cases": {
+  "xlsx": {
+   "kind": "xlsx",
+   "editor": "GridCraft",
+   "repo_id": "b0661ee1-02f6-45d7-b34b-98423269f150",
+   "marker": "fidxlsxd7e36f"
+  }
+ },
+ "checks": [
+  {
+   "name": "xlsx_editor_opened",
+   "ok": true,
+   "detail": "status='ready'"
+  },
+  {
+   "name": "xlsx_edit_registered",
+   "ok": true,
+   "detail": "status='unsaved changes'"
+  },
+  {
+   "name": "xlsx_save_confirmed",
+   "ok": true,
+   "detail": "saved to Seafile"
+  },
+  {
+   "name": "xlsx_browser_error",
+   "ok": false,
+   "detail": "Page.screenshot: Timeout 30000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n"
+  }
+ ],
+ "passed": 3,
+ "failed": 1,
+ "ok": false
+}

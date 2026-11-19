@@ -1,0 +1,261 @@
+{
+ "generated_by": "fidelity_corpus.py + fidelity_compare.py",
+ "note": "one representative fixture per format; one targeted edit; save via the real bridge; comparison on decompressed parts",
+ "scope_limits": [
+  "single fixture per format",
+  "no chart fixture (editor claims no chart support)",
+  "no tracked changes/comments/annotations fixture",
+  "rendering/visual fidelity NOT compared",
+  "broad arbitrary-document fidelity remains NOT VERIFIED"
+ ],
+ "cases": {
+  "docx": {
+   "marker": "fiddocx031a50",
+   "verdicts": {
+    "tables": "PRESERVED",
+    "images": "PRESERVED",
+    "page_breaks": "PRESERVED",
+    "list_paragraphs": "PRESERVED",
+    "bold_runs": "PRESERVED",
+    "italic_runs": "PRESERVED",
+    "colour_runs": "PRESERVED",
+    "heading1": "PRESERVED",
+    "title_style": "PRESERVED",
+    "sectPr": "PRESERVED",
+    "header": "PRESERVED",
+    "footer_page_field": "PRESERVED",
+    "accents": "PRESERVED",
+    "cjk": "PRESERVED",
+    "paragraph_count": "PRESERVED"
+   },
+   "counts": {
+    "PRESERVED": 15
+   },
+   "regressions": []
+  },
+  "xlsx": {
+   "marker": "fidxlsxd7e36f",
+   "verdicts": {
+    "sheet_count": "PRESERVED",
+    "sheet_names": "PRESERVED",
+    "formulas": "PRESERVED",
+    "cross_sheet_formula": "PRESERVED",
+    "sum_formula": "PRESERVED",
+    "date_format": "PRESERVED",
+    "header_fill": "PRESERVED",
+    "borders": "PRESERVED",
+    "cell_texts": "PRESERVED",
+    "charts": "NOT_SUPPORTED"
+   },
+   "counts": {
+    "PRESERVED": 9,
+    "NOT_SUPPORTED": 1
+   },
+   "regressions": []
+  },
+  "pptx": {
+   "marker": "fidpptx7f3e45",
+   "verdicts": {
+    "slide_count": "PRESERVED",
+    "shapes": "PRESERVED",
+    "images": "PRESERVED",
+    "geometry": "PRESERVED",
+    "texts": "PRESERVED",
+    "fills": "PRESERVED"
+   },
+   "counts": {
+    "PRESERVED": 6
+   },
+   "regressions": []
+  }
+ },
+ "checks": [
+  {
+   "name": "docx_edit_persisted_in_saved_file",
+   "ok": true,
+   "detail": "marker=fiddocx031a50 found_in_decompressed_xml=True"
+  },
+  {
+   "name": "docx_fidelity_tables",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_images",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_page_breaks",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_list_paragraphs",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_bold_runs",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_italic_runs",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_colour_runs",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_heading1",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_title_style",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_sectPr",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_header",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_footer_page_field",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_accents",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_cjk",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_fidelity_paragraph_count",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "docx_no_structural_regression",
+   "ok": true,
+   "detail": "regressions=[]"
+  },
+  {
+   "name": "xlsx_edit_persisted_in_saved_file",
+   "ok": true,
+   "detail": "marker=fidxlsxd7e36f found_in_decompressed_xml=True"
+  },
+  {
+   "name": "xlsx_fidelity_sheet_count",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_sheet_names",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_formulas",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_cross_sheet_formula",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_sum_formula",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_date_format",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_header_fill",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_borders",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_cell_texts",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "xlsx_fidelity_charts",
+   "ok": true,
+   "detail": "NOT_SUPPORTED"
+  },
+  {
+   "name": "xlsx_no_structural_regression",
+   "ok": true,
+   "detail": "regressions=[]"
+  },
+  {
+   "name": "pptx_edit_persisted_in_saved_file",
+   "ok": true,
+   "detail": "marker=fidpptx7f3e45 found_in_decompressed_xml=True"
+  },
+  {
+   "name": "pptx_fidelity_slide_count",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "pptx_fidelity_shapes",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "pptx_fidelity_images",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "pptx_fidelity_geometry",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "pptx_fidelity_texts",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "pptx_fidelity_fills",
+   "ok": true,
+   "detail": "PRESERVED"
+  },
+  {
+   "name": "pptx_no_structural_regression",
+   "ok": true,
+   "detail": "regressions=[]"
+  }
+ ],
+ "passed": 37,
+ "failed": 0
+}

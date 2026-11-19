@@ -1,0 +1,99 @@
+{
+ "checks": [
+  {
+   "name": "browser_login",
+   "ok": true,
+   "detail": "https://omarchydesktop-1.tailb64fb1.ts.net:8443/"
+  },
+  {
+   "name": "editor_frame_found",
+   "ok": true,
+   "detail": "host=True editor=True status='ready'"
+  },
+  {
+   "name": "document_loaded",
+   "ok": true,
+   "detail": "status='ready'"
+  },
+  {
+   "name": "clipboard_permission_state",
+   "ok": true,
+   "detail": "{\"top_page\": {\"origin\": \"https://omarchydesktop-1.tailb64fb1.ts.net:8443\", \"clipboard-read\": \"prompt\", \"clipboard-write\": \"granted\", \"secureContext\": true, \"readText\": \"<timeout>\"}, \"bridge_host\": {\"origin\": \"https://omarchydesktop-1.tailb64fb1.ts.net:8444\", \"clipboard-read\": \"denied\", \"clipboard-write\": \"denied\", \"secureContext\": true, \"readTextError\": \"NotAllowedError: Failed to execute 'readText' on 'Clipboard': Document is not focused.\"}, \"editor\": {\"origin\": \"https://omarchydesktop-1.tailb64fb1.ts.net:8444\", \"clipboard-read\": \"denied\", \"clipboard-write\": \"denied\", \"secureContext\": true, \"readTextError\": \"NotAllowedError: Failed to execute 'readText' on 'Clipboard': Document is not focused.\"}}"
+  },
+  {
+   "name": "copy_editor_to_system",
+   "ok": false,
+   "detail": "marker=copyf4c734d5 os_len=25 os_starts='clipboard-sentinel-77624e' editor_has=False top_has=False"
+  },
+  {
+   "name": "paste_system_to_editor",
+   "ok": true,
+   "detail": "status='unsaved changes'"
+  },
+  {
+   "name": "save_confirmed",
+   "ok": true,
+   "detail": "saved to Seafile"
+  },
+  {
+   "name": "save_creates_version",
+   "ok": true,
+   "detail": "history 1->2 grew=True creator_is_opener=True"
+  },
+  {
+   "name": "paste_survives_save",
+   "ok": true,
+   "detail": "marker=paste91355389 saved_len=6580 xml_len=2472 raw_byte_search_would_match=False"
+  },
+  {
+   "name": "typed_edit_survives_save",
+   "ok": true,
+   "detail": "marker=copyf4c734d5 xml_len=2472"
+  },
+  {
+   "name": "reopen_editor_ready",
+   "ok": true,
+   "detail": "status='ready'"
+  },
+  {
+   "name": "paste_survives_reopen",
+   "ok": true,
+   "detail": "marker=paste91355389 xml_len=2472"
+  }
+ ],
+ "marker_type": "copyf4c734d5",
+ "marker_paste": "paste91355389",
+ "clipboard_permissions": {
+  "top_page": {
+   "origin": "https://omarchydesktop-1.tailb64fb1.ts.net:8443",
+   "clipboard-read": "prompt",
+   "clipboard-write": "granted",
+   "secureContext": true,
+   "readText": "<timeout>"
+  },
+  "bridge_host": {
+   "origin": "https://omarchydesktop-1.tailb64fb1.ts.net:8444",
+   "clipboard-read": "denied",
+   "clipboard-write": "denied",
+   "secureContext": true,
+   "readTextError": "NotAllowedError: Failed to execute 'readText' on 'Clipboard': Document is not focused."
+  },
+  "editor": {
+   "origin": "https://omarchydesktop-1.tailb64fb1.ts.net:8444",
+   "clipboard-read": "denied",
+   "clipboard-write": "denied",
+   "secureContext": true,
+   "readTextError": "NotAllowedError: Failed to execute 'readText' on 'Clipboard': Document is not focused."
+  }
+ },
+ "copy": {
+  "editor_frame": "<error: NotAllowedError: Failed to execute 'readText' on 'Clipboard': The Clipboard API has been blocked because of a permissions policy applied to the current document. See https://crbug.com/41434823",
+  "top_page": "<timeout>",
+  "os_clipboard": "clipboard-sentinel-77624e",
+  "os_len": 25
+ },
+ "saved_bytes": 6580,
+ "passed": 11,
+ "failed": 1,
+ "ok": false
+}

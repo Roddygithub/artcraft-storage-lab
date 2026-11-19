@@ -1,0 +1,218 @@
+{
+ "kind": "pptx",
+ "verdicts": {
+  "slide_count": "PRESERVED",
+  "shapes": "PRESERVED",
+  "images": "PRESERVED",
+  "geometry": "PRESERVED",
+  "texts": "PRESERVED",
+  "fills": "PRESERVED"
+ },
+ "counts": {
+  "PRESERVED": 6
+ },
+ "before": {
+  "kind": "pptx",
+  "parts": [
+   "[Content_Types].xml",
+   "_rels/.rels",
+   "ppt/_rels/presentation.xml.rels",
+   "ppt/media/image1.png",
+   "ppt/presentation.xml",
+   "ppt/slideLayouts/_rels/slideLayout1.xml.rels",
+   "ppt/slideLayouts/slideLayout1.xml",
+   "ppt/slideMasters/_rels/slideMaster1.xml.rels",
+   "ppt/slideMasters/slideMaster1.xml",
+   "ppt/slides/_rels/slide1.xml.rels",
+   "ppt/slides/_rels/slide2.xml.rels",
+   "ppt/slides/_rels/slide3.xml.rels",
+   "ppt/slides/slide1.xml",
+   "ppt/slides/slide2.xml",
+   "ppt/slides/slide3.xml",
+   "ppt/theme/theme1.xml"
+  ],
+  "part_count": 16,
+  "slide_ids": 3,
+  "slide_parts": 3,
+  "media_parts": [
+   "ppt/media/image1.png"
+  ],
+  "per_slide": [
+   {
+    "part": "ppt/slides/slide1.xml",
+    "shapes": 1,
+    "pictures": 0,
+    "offsets": [
+     [
+      0,
+      0
+     ],
+     [
+      914400,
+      1885950
+     ]
+    ],
+    "texts": [
+     "ArtCraft fidelity deck"
+    ],
+    "fill_colours": [
+     "F2F6FF"
+    ]
+   },
+   {
+    "part": "ppt/slides/slide2.xml",
+    "shapes": 2,
+    "pictures": 1,
+    "offsets": [
+     [
+      0,
+      0
+     ],
+     [
+      609600,
+      457200
+     ],
+     [
+      609600,
+      1371600
+     ],
+     [
+      5486400,
+      1371600
+     ]
+    ],
+    "texts": [
+     "Second slide heading",
+     "Body text on slide two, with a rectangle shape."
+    ],
+    "fill_colours": [
+     "D9EAF7"
+    ]
+   },
+   {
+    "part": "ppt/slides/slide3.xml",
+    "shapes": 1,
+    "pictures": 0,
+    "offsets": [
+     [
+      0,
+      0
+     ],
+     [
+      1234440,
+      987552
+     ]
+    ],
+    "texts": [
+     "Precisely positioned text"
+    ],
+    "fill_colours": []
+   }
+  ]
+ },
+ "after": {
+  "kind": "pptx",
+  "parts": [
+   "[Content_Types].xml",
+   "_rels/.rels",
+   "docProps/app.xml",
+   "docProps/core.xml",
+   "ppt/_rels/presentation.xml.rels",
+   "ppt/media/image1.png",
+   "ppt/presProps.xml",
+   "ppt/presentation.xml",
+   "ppt/slideLayouts/_rels/slideLayout1.xml.rels",
+   "ppt/slideLayouts/slideLayout1.xml",
+   "ppt/slideMasters/_rels/slideMaster1.xml.rels",
+   "ppt/slideMasters/slideMaster1.xml",
+   "ppt/slides/_rels/slide1.xml.rels",
+   "ppt/slides/_rels/slide2.xml.rels",
+   "ppt/slides/_rels/slide3.xml.rels",
+   "ppt/slides/slide1.xml",
+   "ppt/slides/slide2.xml",
+   "ppt/slides/slide3.xml",
+   "ppt/tableStyles.xml",
+   "ppt/theme/theme1.xml",
+   "ppt/viewProps.xml"
+  ],
+  "part_count": 21,
+  "slide_ids": 3,
+  "slide_parts": 3,
+  "media_parts": [
+   "ppt/media/image1.png"
+  ],
+  "per_slide": [
+   {
+    "part": "ppt/slides/slide1.xml",
+    "shapes": 1,
+    "pictures": 0,
+    "offsets": [
+     [
+      0,
+      0
+     ],
+     [
+      914400,
+      1885950
+     ]
+    ],
+    "texts": [
+     "fidpptx7f3e45"
+    ],
+    "fill_colours": [
+     "F2F6FF"
+    ]
+   },
+   {
+    "part": "ppt/slides/slide2.xml",
+    "shapes": 2,
+    "pictures": 1,
+    "offsets": [
+     [
+      0,
+      0
+     ],
+     [
+      609600,
+      457200
+     ],
+     [
+      609600,
+      1371600
+     ],
+     [
+      5486400,
+      1371600
+     ]
+    ],
+    "texts": [
+     "Second slide heading",
+     "Body text on slide two, with a rectangle shape."
+    ],
+    "fill_colours": [
+     "D9EAF7"
+    ]
+   },
+   {
+    "part": "ppt/slides/slide3.xml",
+    "shapes": 1,
+    "pictures": 0,
+    "offsets": [
+     [
+      0,
+      0
+     ],
+     [
+      1234440,
+      987552
+     ]
+    ],
+    "texts": [
+     "Precisely positioned text"
+    ],
+    "fill_colours": []
+   }
+  ]
+ },
+ "regressions": []
+}
