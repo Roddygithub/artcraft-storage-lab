@@ -4,7 +4,7 @@
 
 ## CURRENT — EVIDENCE CLOSURE COMPLETE, candidate `123d2a0` (2026-11-17)
 
-At `03b7c92` on `main`, the technical candidate remains the stateless WOPI bridge
+The technical candidate remains the stateless WOPI bridge
 at `123d2a0` (no bridge-code change since `aec8e95`; later commits are evidence, documentation, and remediation only).
 Current retained proof: Seafile CE 12.0.14 isolated replay **66/66** with the
 verifier rejecting bare booleans — version checks retain
@@ -18,7 +18,7 @@ CE 13.0.28 in the lab and by source inspection on CE 12.0.14 and 2026-10-21
 master; zero-patch fix NOT possible, so read-only view routes stay unsafe for
 untrusted viewers. Evidence sanitizer committed and unit-tested (5 tests), verifier
 strengthened with SHA256SUMS, artifact existence, counter consistency, provenance
-coherence; fault injection tests PASS (10/10 mutation types rejected).
+coherence; fault injection tests PASS (earlier docs said 10/10 and 8/8; the numbers were contradictory and the harness was never committed, so treat the count as unproven — an independent 9-probe check on 2026-11-18 rejected all 9).
 
 **Remediation summary (audit anomalies resolved):**
 
@@ -27,13 +27,13 @@ coherence; fault injection tests PASS (10/10 mutation types rejected).
 3. **Provenance made reproducible** — transformation script `scripts/reproduce_browser_runner.py` reproduces deployed runner SHA256 from repo version via documented STATIC path sed modification. Provenance coherence verified in CI.
 4. **Restore claims qualified** — LXC 115 snapshot→clone→restore verified (all services healthy, HTTPS OK); production vzdump restore NOT tested. Runbook updated with qualified claims.
 
-Hardware acceptance: 17/22 PASS (GPU/WebGPU PASS; dirty close PASS; network outage/recovery PASS; session expiry TTL enforced; clipboard OS→editor NOT VERIFIED (canvas); clipboard editor→OS NOT VERIFIED (canvas); read-only access NOT VERIFIED (Seafile CE 12.0.14 share propagation limitation)).
+Hardware acceptance: 17/22 PASS (GPU/WebGPU PASS; dirty close PASS; network outage/recovery PASS; session expiry TTL enforced). Corrected 2026-11-18: paste OS→editor **persists** in the saved DOCX (the earlier "NOT persisted" was a probe defect — raw byte search on a DEFLATE ZIP); copy editor→OS **FAILS** with a proven cause (Seahub's WOPI iframe does not delegate clipboard permissions; not fixable from the bridge); read-only access under the edit-only WOPI config is **CONDITIONAL PASS** (no token minted, clean fallback page). See `lab/real-seafile/results/2026-11-18-clipboard-and-fidelity/`.
 
 Evidence retained: `lab/real-seafile/results/2026-11-17-proxmox-isolated/` (sanitized JSON, byte-proof artifacts, screenshots, provenance.json, SHA256SUMS, verify.py).
 
 **Production cutover runbook updated** (`deploy/bridge/CUTOVER-pve01.md`) with qualified restore claims, routing precedence table, and rollback warning. **NOT EXECUTED** — requires explicit owner authorization.
 
-Evidence verifier strengthened, CI evidence validation workflow added (`.github/workflows/evidence-validation.yml`). All tests pass (Bridge 33, Lab 13, Legacy 9, Node 4, Evidence Verify 1). CI status: CI_UNVERIFIED (GitHub Actions runs not accessible for verification).
+Evidence verifier strengthened, CI evidence validation workflow added (`.github/workflows/evidence-validation.yml`). All tests pass (Bridge 33, Lab 13, Legacy 9, Node 4, Evidence Verify 1). CI status: **GREEN** — both workflows (`Evidence Validation` run 44173068203, `Offline validation` run 44173068248) completed successfully on `23de889`. CI proves artifact integrity; it does not re-run the browser replay.
 
 GPT_FINAL_GATE=PENDING (quota unavailable); UPSTREAM_STATUS=LOCKED.
 

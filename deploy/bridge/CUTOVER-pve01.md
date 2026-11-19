@@ -37,10 +37,26 @@ sanitized copies under `lab/real-seafile/results/2026-11-17-proxmox-isolated/`.
 
 Hardware acceptance (headed Chromium on real Omarchy/Wayland, GTX 1060):
 - GPU/WebGPU identity confirmed (ANGLE NVIDIA, WebGPU vendor=nvidia pascal, isFallback=null)
-- Clipboard OS→editor: visually accepted but NOT persisted in saved DOCX (WordCraft canvas limitation) — NOT VERIFIED
-- Clipboard editor→OS: NOT VERIFIED (canvas WASM editor cannot write OS clipboard)
+- Clipboard OS→editor: **PASS** — the pasted marker IS persisted in the saved DOCX and
+  survives a fresh-context reopen (`clipboard_probe.py`, 2026-11-18). The earlier
+  "NOT persisted" result was a probe defect: it searched *raw* DOCX bytes, and every
+  DOCX part is DEFLATE-compressed, so that check could never match.
+- Clipboard editor→OS (copy): **FAIL — cause proven**. WordCraft's copy path uses the
+  async Clipboard API, and the frame chain denies `clipboard-write` by Permissions
+  Policy. The blocking delegation is Seahub's own WOPI iframe
+  (`frontend/src/view-file-collabora-online.js`, built into `viewFileCollaboraOnline`),
+  which carries no `allow` attribute; the bridge iframe is *not* the blocker (it is
+  already denied, so it has nothing to delegate). A plain `allow` does not fix it:
+  the iframe is form-POST-targeted with no `src`, so the `'src'` allowlist resolves to
+  the wrong origin. An **origin-qualified** `allow` changes the error from
+  "blocked by a permissions policy" to "Write permission denied", i.e. the policy is
+  then correct and Chromium only needs the usual user-activation grant.
+  Fixing it therefore requires a Seahub front-end patch (forbidden by the project's
+  no-patch rule) or serving the bridge same-origin with Seahub (a security regression:
+  the editor bundle would share Seahub's origin and session). Left as a documented
+  limitation; paste is unaffected.
 - Dirty close: beforeunload prompted, unsaved edit discarded, saved version intact — PASS
-- Read-only user save refused via bridge relay — PASS (Seafile CE 12.0.14 limitation: personal repo shares don't propagate to web API for recipient)
+- Read-only user save refused via bridge relay — PASS (bridge-side refusal verified)
 - Network outage (container stop/start): save fails dirty kept, recovery succeeds — PASS
 - Session expiry (TTL 120s): expired save REJECTED (token TTL enforced); download fallback works; reopen works, new save creates version — PASS
 
@@ -60,16 +76,34 @@ Evidence retained: `lab/real-seafile/results/2026-11-17-proxmox-isolated/` (sani
    ```python
    ENABLE_OFFICE_WEB_APP = True
    OFFICE_WEB_APP_BASE_URL = 'http://192.168.1.116:8778/wopi/discovery.xml'
-   OFFICE_WEB_APP_FILE_EXTENSION = ('docx', 'xlsx', 'pptx')
+   # View tokens must stay disabled. Seahub 12 PutFile ignores the token's
+   # can_edit (docs/security/HOST_PERMISSION_BOUNDARY.md), and ALL five
+   # get_wopi_dict() call sites are gated on OFFICE_WEB_APP_FILE_EXTENSION
+   # (views/file.py:964,1089,1410,1653; api2/views.py:2890), so an empty
+   # tuple closes every view-token path for read-only users.
+   OFFICE_WEB_APP_FILE_EXTENSION = ()
    ENABLE_OFFICE_WEB_APP_EDIT = True
-   OFFICE_WEB_APP_EDIT_FILE_EXTENSION = ('docx', 'xlsx', 'pptx')
+   # Roll out ONE format at a time; pptx first. WOPI routing is extension-wide,
+   # so a format is the smallest safe unit (there is no per-library canary).
+   OFFICE_WEB_APP_EDIT_FILE_EXTENSION = ('pptx',)
    ```
+   **Verified, not assumed** (isolated LXC 115, 2026-11-18, 8/8 checks): with this
+   configuration the owner still gets the bridge edit route, and a real read-only
+   share recipient gets **no WOPI route and no token** — Seahub renders
+   "Online view is not applicable to this file format" with a Download link.
+   Evidence: `lab/real-seafile/results/2026-11-18-wopi-edit-only-routing/`.
    Do **not** enable view-only legacy routes (odt/ods/csv/ppsx): Seahub PutFile
    ignores the token's `can_edit` (see `docs/security/HOST_PERMISSION_BOUNDARY.md`),
    so view tokens are unsafe for any untrusted viewer.
+   **Check before widening**: confirm `ONLYOFFICE_FILE_EXTENSION` still covers the
+   formats being held back, so read-only users keep a viewer (WOPI outranks
+   ONLYOFFICE, so this only matters for formats NOT in the edit list).
 4. Restart Seahub (~30–60 s interruption; Seafile file service keeps running).
 5. Create a dedicated synthetic test account + synthetic library (never the
    owner's account), then run the 66-assertion browser suite against production.
+   **The test library must be OUTSIDE the `ARTCRAFT_REPO_IDS` allowlist** — for a
+   repo inside the allowlist the legacy ARTCRAFT route wins (1st priority) and the
+   suite would validate the old gateway, not the WOPI bridge.
 
 ## Coexistence findings that gate the cutover
 
@@ -133,11 +167,11 @@ Only use if the settings edit is lost and cannot be reverted by editing the file
 
 ## Hardware acceptance limitations (honestly recorded)
 
-| Check | Status | Reason |
+| Check | Status | Reason (verified 2026-11-18) |
 | --- | --- | --- |
-| Clipboard OS → editor | NOT VERIFIED | Paste visually accepted but NOT persisted in saved DOCX (WordCraft canvas limitation) |
-| Clipboard editor → OS | NOT VERIFIED | Canvas WASM editor cannot write OS clipboard |
-| Read-only user access | NOT VERIFIED | Seafile CE 12.0.14: personal repo share via RPC doesn't propagate to web API for recipient |
+| Paste system → editor → saved DOCX | **PASS** | Marker present in the decompressed saved DOCX and after reopen. Earlier FAIL was a probe defect (raw-byte search on a DEFLATE ZIP). |
+| Copy editor → OS | **FAIL** | Permissions-Policy denial originating at Seahub's WOPI iframe (no `allow`, and `src`-relative delegation cannot name the bridge). Not fixable from the bridge. See above. |
+| Read-only user access (edit-only config) | **CONDITIONAL PASS** | With `OFFICE_WEB_APP_FILE_EXTENSION = ()` a real read-only share recipient gets no WOPI route/token and a clean fallback page (8/8, `2026-11-18-wopi-edit-only-routing`). The earlier "CE 12.0.14 limitation" attribution is withdrawn: the earlier probe's reader had no working share. Broad read-only viewing of every format is still NOT VERIFIED. |
 
 These are **editor/Seafile limitations**, not bridge failures. Documented for transparency.
 
