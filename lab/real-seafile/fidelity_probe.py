@@ -61,6 +61,11 @@ def compare_saved_file(save_confirmed, kind, fixture, body, marker, mark):
     return fidelity_compare.compare(fixture, body, marker=marker)
 
 
+def write_json(path: Path, result: dict) -> None:
+    """Write a complete fidelity report using the probe's normal JSON format."""
+    path.write_text(json.dumps(result, indent=1, ensure_ascii=False) + "\n")
+
+
 def find_frames(page, timeout=120):
     end = time.time() + timeout
     host = editor = None
@@ -203,8 +208,7 @@ def roundtrip(token, kind, name, results: Path, mark):
     out["comparison"] = {"verdicts": comparison.get("verdicts"),
                          "counts": comparison.get("counts"),
                          "regressions": comparison.get("regressions")}
-    (results / f"{kind}-comparison.json").write_text(
-        json.dumps(comparison, indent=1, ensure_ascii=False) + "\n")
+    write_json(results / f"{kind}-comparison.json", comparison)
     mark(f"{kind}_saved_file_structurally_valid", "error" not in comparison,
          str(comparison.get("error"))[:150])
     for feature, verdict in (comparison.get("verdicts") or {}).items():
@@ -226,8 +230,7 @@ def roundtrip(token, kind, name, results: Path, mark):
 
     body2, _ = rs.download(token, repo_id, name)
     comparison2 = fidelity_compare.compare(fixture, body2, marker=marker)
-    (results / f"{kind}-comparison-reopen.json").write_text(
-        json.dumps(comparison2, indent=1, ensure_ascii=False) + "\n")
+    write_json(results / f"{kind}-comparison-reopen.json", comparison2)
     same = (comparison.get("verdicts") == comparison2.get("verdicts"))
     mark(f"{kind}_fidelity_stable_across_reopen", same, "verdicts identical" if same else "changed")
     rs.api(token, "DELETE", f"/api2/repos/{repo_id}/")
@@ -261,7 +264,7 @@ def main() -> int:
     outcome["passed"] = sum(1 for c in checks if c["ok"])
     outcome["failed"] = sum(1 for c in checks if not c["ok"])
     outcome["ok"] = outcome["failed"] == 0
-    (results / "fidelity.json").write_text(json.dumps(outcome, indent=1, ensure_ascii=False) + "\n")
+    write_json(results / "fidelity.json", outcome)
     print(f"\n{outcome['passed']}/{len(checks)} checks passed -> {results}/fidelity.json")
     return 0 if outcome["ok"] else 1
 

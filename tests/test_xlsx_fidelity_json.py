@@ -56,6 +56,10 @@ class XlsxReportJsonTests(unittest.TestCase):
         result = fidelity_probe.compare_saved_file(
             True, "xlsx", self.fixture, self.fixture, "marker", mark)
         self.assert_complete_report_json(result)
+        with tempfile.TemporaryDirectory() as temp:
+            report = Path(temp) / "xlsx-comparison.json"
+            fidelity_probe.write_json(report, result)
+            self.assert_complete_report_json(json.loads(report.read_text(encoding="utf-8")))
         mark.assert_not_called()
 
 
