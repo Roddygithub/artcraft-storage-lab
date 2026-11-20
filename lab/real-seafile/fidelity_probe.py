@@ -34,7 +34,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import run_slice as rs  # noqa: E402
 import fidelity_corpus  # noqa: E402
 import fidelity_compare  # noqa: E402
-from playwright.sync_api import sync_playwright  # noqa: E402
 
 SEAFILE = rs.SEAFILE
 BRIDGE = rs.BRIDGE
@@ -51,6 +50,15 @@ CASES = [
     ("xlsx", "fidelity-workbook.xlsx", "GridCraft"),
     ("pptx", "fidelity-deck.pptx", "DeckCraft"),
 ]
+
+
+def compare_saved_file(save_confirmed, kind, fixture, body, marker, mark):
+    """Never count the original upload as a successful saved-file comparison."""
+    if not save_confirmed:
+        mark(f"{kind}_fidelity", False,
+             "NOT_VERIFIED: the editor never saved, so comparing the fixture with itself would be vacuous")
+        return None
+    return fidelity_compare.compare(fixture, body, marker=marker)
 
 
 def find_frames(page, timeout=120):
@@ -116,12 +124,15 @@ def click_editor(page):
 
 def roundtrip(token, kind, name, results: Path, mark):
     """One open -> edit -> save -> download -> compare -> reopen cycle."""
+    from playwright.sync_api import sync_playwright
+
     fixture = fidelity_corpus.corpus()[name]
     st, repo = rs.api(token, "POST", "/api2/repos/", {"name": f"fid-{kind}-{int(time.time())}"})
     repo_id = repo["repo_id"]
     rs.upload(token, repo_id, name, fixture)
     out = {"kind": kind, "editor": {"docx": "WordCraft", "xlsx": "GridCraft",
                                     "pptx": "DeckCraft"}[kind], "repo_id": repo_id}
+    save_confirmed = False
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=False, args=[
@@ -165,8 +176,9 @@ def roundtrip(token, kind, name, results: Path, mark):
 
             page.keyboard.press("Control+s")
             saved_status = wait_status(host, lambda t: "saved to seafile" in t.lower(), 90)
-            mark(f"{kind}_save_confirmed", "saved to seafile" in saved_status.lower(),
-                 saved_status[:80])
+            save_confirmed = mark(f"{kind}_save_confirmed",
+                                  "saved to seafile" in saved_status.lower(),
+                                  saved_status[:80])
             try:
                 page.screenshot(path=results / f"{kind}-saved.png")
             except Exception as exc:  # noqa: BLE001
@@ -183,17 +195,11 @@ def roundtrip(token, kind, name, results: Path, mark):
         rs.api(token, "DELETE", f"/api2/repos/{repo_id}/")
         return out
     (results / f"{kind}-after-save{Path(name).suffix}").write_bytes(body)
-    saved_confirmed = any(c["name"] == f"{kind}_save_confirmed" and c["ok"] for c in checks)
-    if not saved_confirmed:
-        # No save happened: comparing the fixture with itself would report a
-        # fake 100% fidelity. Record the truth instead.
-        mark(f"{kind}_fidelity", False,
-             "NOT_VERIFIED: the editor never saved, so the downloaded file is "
-             "the original upload and a comparison would be vacuous")
+    comparison = compare_saved_file(save_confirmed, kind, fixture, body, marker, mark)
+    if comparison is None:
         out["comparison"] = {"verdicts": {}, "counts": {},
                              "regressions": [], "note": "NOT_VERIFIED (no save occurred)"}
         return out
-    comparison = fidelity_compare.compare(fixture, body, marker=marker)
     out["comparison"] = {"verdicts": comparison.get("verdicts"),
                          "counts": comparison.get("counts"),
                          "regressions": comparison.get("regressions")}
