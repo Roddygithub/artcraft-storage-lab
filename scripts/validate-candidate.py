@@ -31,7 +31,8 @@ PYTHON_CHECKS = [
     'tests/test_vector_fig_real_edit.py', 'tests/test_docx_fidelity_corpus.py',
     'tests/test_wordcraft_browser_fixture.py', 'tests/test_wordcraft_reopen_wait.py',
     'tests/test_pptx_roundtrip_fixture.py', 'tests/test_deckcraft_real_edit.py', 'tests/test_deckcraft_render_wait.py',
-    'tests/test_xlsx_fixture.py', 'tests/test_fidelity_probe_save_gate.py',
+    'tests/test_xlsx_fixture.py', 'tests/test_xlsx_fidelity_mutations.py',
+    'tests/test_fidelity_probe_save_gate.py',
     'tests/test_gr041_craft_zip_limits.py',
     'tests/test_legacy_fixtures.py', 'tests/test_sanitize_browser_evidence.py',
 ]

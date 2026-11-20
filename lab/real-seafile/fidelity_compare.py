@@ -110,6 +110,22 @@ def _xlsx_shared(parts: dict[str, bytes]) -> list[str]:
     return [_text_of(si) for si in root.findall("%ssi" % S)]
 
 
+def _style_value(node):
+    """Return XML style properties without depending on prefixes/serialization."""
+    if node is None:
+        return None
+    return (node.tag.rsplit("}", 1)[-1], tuple(sorted(node.attrib.items())),
+            tuple(_style_value(child) for child in node))
+
+
+def _style_has(node, tag, attr=None):
+    if not node:
+        return False
+    if node[0] == tag and (attr is None or any(key == attr for key, _ in node[1])):
+        return True
+    return any(_style_has(child, tag, attr) for child in node[2])
+
+
 def xlsx_features(body: bytes) -> dict:
     p = _parts(body)
     wb = _xml(p, "xl/workbook.xml")
@@ -119,46 +135,63 @@ def xlsx_features(body: bytes) -> dict:
         return f
     names = [s.get("name") for s in wb.findall(".//%ssheet" % S)]
     shared = _xlsx_shared(p)
-    formulas, inline, numbers, dates, fills, borders = [], 0, 0, 0, 0, 0
-    texts: list[str] = []
+    styles = _xml(p, "xl/styles.xml")
+    numfmts = {}
+    if styles is not None:
+        numfmts = {int(x.get("numFmtId")): x.get("formatCode")
+                   for x in styles.findall(".//%snumFmt" % S)}
+    xfs = styles.findall(".//%scellXfs/%sxf" % (S, S)) if styles is not None else []
+    fills = styles.findall(".//%sfills/%sfill" % (S, S)) if styles is not None else []
+    borders = styles.findall(".//%sborders/%sborder" % (S, S)) if styles is not None else []
+    cell_map = {}
     for name in sorted(n for n in p if re.match(r"xl/worksheets/sheet\d+\.xml", n)):
         sh = _xml(p, name)
         if sh is None:
             continue
+        sheet_name = names[int(re.search(r"sheet(\d+)\.xml$", name).group(1)) - 1]
         for c in sh.findall(".//%sc" % S):
-            if c.find(".//%sf" % S) is not None:
-                formulas.append(_text_of(c.find(".//%sf" % S)))
+            coord = c.get("r")
+            v = c.find("%sv" % S)
+            formula = c.find("%sf" % S)
             if c.get("t") == "inlineStr":
-                inline += 1
-                texts.append(_text_of(c))
-            elif c.get("t") == "s":
-                v = c.find("%sv" % S)
-                if v is not None and v.text and v.text.isdigit():
-                    idx = int(v.text)
-                    if idx < len(shared):
-                        texts.append(shared[idx])
-            elif c.find("%sv" % S) is not None:
-                numbers += 1
-            style = c.get("s")
-            if style in ("1", "2"):
-                if style == "2":
-                    dates += 1
-                if style == "1":
-                    fills += 1
-            if style in ("1", "2", "3"):
-                borders += 1
+                value = _text_of(c)
+            elif c.get("t") == "s" and v is not None and v.text and v.text.isdigit():
+                idx = int(v.text)
+                value = shared[idx] if idx < len(shared) else None
+            else:
+                value = v.text if v is not None else None
+            style_id = int(c.get("s", "0"))
+            xf = xfs[style_id] if style_id < len(xfs) else None
+            def component(items, key):
+                idx = int(xf.get(key, "0")) if xf is not None else 0
+                return _style_value(items[idx]) if idx < len(items) else None
+            numfmt_id = int(xf.get("numFmtId", "0")) if xf is not None else 0
+            cell_map[(sheet_name, coord)] = {
+                "value": value,
+                "type": c.get("t"),
+                "value_type": "string" if c.get("t") in ("s", "inlineStr", "str") else c.get("t", "number"),
+                "formula": _text_of(formula) if formula is not None else None,
+                "number_format": numfmts.get(numfmt_id, f"builtin:{numfmt_id}"),
+                "fill": component(fills, "fillId"),
+                "border": component(borders, "borderId"),
+                "font": component(styles.findall(".//%sfonts/%sfont" % (S, S)), "fontId") if styles is not None else None,
+            }
+    formulas = {f"{sheet}!{cell}": item["formula"]
+                for (sheet, cell), item in cell_map.items() if item["formula"] is not None}
+    texts = [x["value"] for x in cell_map.values() if isinstance(x["value"], str)]
     f.update({
         "sheet_names": names,
         "sheet_count": len(names),
         "formulas": formulas,
         "formula_count": len(formulas),
-        "cross_sheet_formula": any("!" in x for x in formulas),
-        "sum_formula": any("SUM(" in x.upper() for x in formulas),
-        "inline_strings": inline,
-        "numeric_cells": numbers,
-        "date_cells": dates,
-        "header_filled_cells": fills,
-        "bordered_cells": borders,
+        "cross_sheet_formula": any("!" in x for x in formulas.values()),
+        "sum_formula": any("SUM(" in x.upper() for x in formulas.values()),
+        "cells": cell_map,
+        "inline_strings": sum(1 for x in cell_map.values() if x["type"] == "inlineStr"),
+        "numeric_cells": sum(1 for x in cell_map.values() if x["value"] is not None and x["type"] not in ("s", "inlineStr")),
+        "date_cells": sum(1 for x in cell_map.values() if x["number_format"] == "builtin:14" or "yyyy" in x["number_format"].lower() or "dd" in x["number_format"].lower()),
+        "header_filled_cells": sum(1 for x in cell_map.values() if _style_has(x["fill"], "patternFill", "patternType") and _style_has(x["fill"], "fgColor")),
+        "bordered_cells": sum(1 for x in cell_map.values() if _style_has(x["border"], "left", "style") or _style_has(x["border"], "right", "style") or _style_has(x["border"], "top", "style") or _style_has(x["border"], "bottom", "style")),
         "shared_strings": len(shared),
         "texts": texts[:40],
     })
@@ -246,21 +279,31 @@ def compare(original: bytes, saved: bytes, marker: str | None = None) -> dict:
              "PRESERVED" if after.get("sheet_count") == before.get("sheet_count") else "ALTERED")
         mark("sheet_names",
              "PRESERVED" if after.get("sheet_names") == before.get("sheet_names") else "ALTERED")
-        mark("formulas",
-             "PRESERVED" if after.get("formula_count") and
-             after.get("formula_count") >= before.get("formula_count") else
-             ("ALTERED" if after.get("formula_count") else "LOST"))
+        mark("formulas", "PRESERVED" if before.get("formulas") == after.get("formulas") else "ALTERED")
         mark("cross_sheet_formula",
              "PRESERVED" if after.get("cross_sheet_formula") else "LOST")
         mark("sum_formula", "PRESERVED" if after.get("sum_formula") else "LOST")
         mark("date_format",
-             "PRESERVED" if after.get("date_cells") else "LOST")
+             "PRESERVED" if after.get("date_cells") else
+             ("ALTERED" if before.get("date_cells") else "LOST"))
         mark("header_fill",
              "PRESERVED" if after.get("header_filled_cells") else "LOST")
         mark("borders", "PRESERVED" if after.get("bordered_cells") else "LOST")
-        mark("cell_texts",
-             "PRESERVED" if set(before.get("texts", [])) <= set(after.get("texts", []))
-             else "ALTERED")
+        before_cells, after_cells = before.get("cells", {}), after.get("cells", {})
+        allowed = set()
+        if marker:
+            allowed = {key for key, value in after_cells.items()
+                       if marker in str(value.get("value"))
+                       and marker not in str(before_cells.get(key, {}).get("value"))}
+        keys = set(before_cells) | set(after_cells)
+        def equal_cell(key, field):
+            return before_cells.get(key, {}).get(field) == after_cells.get(key, {}).get(field)
+        mark("cell_values", "PRESERVED" if all(key in allowed or
+             (equal_cell(key, "value") and equal_cell(key, "value_type")) for key in keys) else "ALTERED")
+        mark("number_formats", "PRESERVED" if all(equal_cell(key, "number_format") for key in keys) else "ALTERED")
+        mark("fills", "PRESERVED" if all(equal_cell(key, "fill") for key in keys) else "ALTERED")
+        mark("borders", "PRESERVED" if all(equal_cell(key, "border") for key in keys) else "ALTERED")
+        mark("fonts", "PRESERVED" if all(equal_cell(key, "font") for key in keys) else "ALTERED")
         mark("charts", "NOT_SUPPORTED")  # no fixture chart; no editor chart claim
     else:
         mark("slide_count",
