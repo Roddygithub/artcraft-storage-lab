@@ -6,6 +6,20 @@ and coexistence requirements below are historical and no longer block closure.
 The active lab now targets Craft only. Missing office-format coverage, HTTPS
 acceptance, exact-source evidence and independent final review remain open.
 
+## Fidelity evidence correction — 2026-11-20
+
+The archived 2026-11-18 `37/37` report is historical and not a reproducible
+three-format pass: its exact producer scripts and fixture bytes are not
+recorded. Recomparison found the retained XLSX has a dangling `Sheet2!B1`
+formula rendered as `#REF!`; the fixture is corrected for future runs, while
+the old artifact/report remain untouched. Saved DOCX/PPTX artifacts pass the
+current semantic comparator with their recorded intentional markers, but
+their post-reopen binaries are absent. Reopen fidelity for all three formats
+is therefore **NOT_VERIFIED**. The probe now requires authenticated fresh-editor
+`/relay/file` bytes, visible marker OCR, and a new Seafile history entry; an API
+download cannot substitute. No new runtime replay has been performed.
+Details: [`FIDELITY-EVIDENCE-RECONCILIATION-20261120.md`](reviews/FIDELITY-EVIDENCE-RECONCILIATION-20261120.md).
+
 ## Current candidate delta — 2026-11-15
 
 ArtCraft is the intended office suite. No production deployment, configuration,

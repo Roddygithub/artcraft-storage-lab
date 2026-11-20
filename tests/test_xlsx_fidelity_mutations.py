@@ -13,6 +13,7 @@ import fidelity_corpus  # noqa: E402
 
 S = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 FIXTURE = fidelity_corpus.corpus()["fidelity-workbook.xlsx"]
+assert fidelity_compare.xlsx_features(FIXTURE)["formulas"]["Data!C2"] == "Source!B2"
 
 
 def mutate(part, change):
@@ -48,7 +49,7 @@ formula_result = assert_regression(formula_mutation, "formulas")
 assert formula_result["before"]["formula_count"] == formula_result["after"]["formula_count"]
 
 reference_mutation = mutate("xl/worksheets/sheet1.xml", lambda root: set_formula(
-    root.find(f".//{S}c[@r='C2']"), "Sheet2!B2"))
+    root.find(f".//{S}c[@r='C2']"), "Source!B1"))
 assert_regression(reference_mutation, "formulas")
 
 value_mutation = mutate("xl/worksheets/sheet1.xml", lambda root: root.find(

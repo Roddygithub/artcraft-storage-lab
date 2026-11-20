@@ -1,5 +1,24 @@
 # Validation checkpoint — candidate `123d2a0` (2026-11-17 remediated)
 
+## Evidence correction — 2026-11-20
+
+The 2026-11-18 `37/37` fidelity row below is retained as a historical report,
+but its producer scripts and exact fixture bytes are not recoverable from the
+packet. It is **not** a reproducible fidelity pass. The current comparators
+reconcile the saved DOCX/PPTX artifacts as preserved when the recorded edit
+marker is excluded; their second readback binaries are absent, so reopened
+fidelity remains **NOT_VERIFIED**. The saved XLSX artifact contains an invalid
+`Data!C2` formula (`Sheet2!B1`) and `#REF!`; its archived formula/value pass is
+not supported. The source fixture has been corrected for future campaigns,
+without altering historical evidence. See
+[`FIDELITY-EVIDENCE-RECONCILIATION-20261120.md`](reviews/FIDELITY-EVIDENCE-RECONCILIATION-20261120.md).
+
+The probe now requires the fresh editor to receive the saved bytes through its
+own `/relay/file` request and requires OCR confirmation of the edited marker
+in the reopened screenshot. An API download is storage-integrity evidence
+only. No new tri-format Seafile replay has been performed: this checkout has no
+Lima executable or editor bundles, and the isolated CE12 stack is not running.
+
 **Technical candidate SHA:** `23de889181bd1b002019da89f824877d123d81b3` (bridge: `123d2a0ca8435e93e37b6d2f31fb73ac016fc5fb`).
 This candidate adds a reproducible Seafile CE12 runner and retains a corrected
 66/66 browser replay. The offline runner passed 21/21 command groups at this
@@ -36,7 +55,7 @@ historical GR corpus to resume routine validation.
 | **Hardware acceptance (Omarchy/GTX 1060)** | 17/22 PASS; GPU/WebGPU confirmed; dirty close PASS; network outage/recovery PASS; session expiry TTL enforced. **Corrected 2026-11-18:** paste OS→editor **persists** in the saved DOCX and across reopen — the earlier "NOT persisted" was a probe defect (raw byte search on a DEFLATE ZIP, `clipboard_probe.py:289` in the old runner); copy editor→OS **FAILS** with a proven cause (Seahub's WOPI iframe does not delegate clipboard permissions — not a bridge defect, not fixable from the bridge); read-only access under the edit-only config is **CONDITIONAL PASS** | `../lab/real-seafile/results/2026-11-17-proxmox-isolated/hardware.json`, `../lab/real-seafile/results/2026-11-18-clipboard-and-fidelity/clipboard/` |
 | **Session expiry (TTL 120s)** | 7/7 PASS; expired save REJECTED (**token TTL is enforced**, not a limitation); download fallback works; reopen save creates version; marker persistence NOT_VERIFIED (XML search imperfect) | `../lab/real-seafile/results/2026-11-17-proxmox-isolated/session-expiry.json` |
 | **WOPI edit-only routing (2026-11-18)** | **8/8 PASS**: with `OFFICE_WEB_APP_FILE_EXTENSION = ()` and `OFFICE_WEB_APP_EDIT_FILE_EXTENSION = ('pptx',)` the owner still gets the bridge edit route, while a real read-only share recipient gets **no WOPI route and no token** and a clean "Online view is not applicable to this file format" page. All five `get_wopi_dict()` call sites are gated on `OFFICE_WEB_APP_FILE_EXTENSION` (`views/file.py:964,1089,1410,1653`; `api2/views.py:2890`), so the empty tuple closes every view-token path. Lab config restored after the test | `../lab/real-seafile/results/2026-11-18-clipboard-and-fidelity/wopi-edit-only-routing/`, `../lab/real-seafile/wopi_routing_probe.py` |
-| **Document fidelity (2026-11-18)** | **37/37 checks PASS** on one representative fixture per format, one targeted edit each, save through the real bridge, comparison on decompressed parts: DOCX 15/15 PRESERVED (table, image, page break, lists, bold/italic/colour, headings, header, footer PAGE field, sectPr, accents, CJK); XLSX 9 PRESERVED + charts NOT_SUPPORTED (sheet names, formulas, cross-sheet formula, SUM, date format, header fill, borders); PPTX 6/6 PRESERVED (slide count, shapes, image, geometry, fills, texts); typed marker present in every saved file. **Scope:** one fixture per format, no charts/tracked changes/annotations, rendering not compared — broad arbitrary-document fidelity remains NOT VERIFIED | `../lab/real-seafile/results/2026-11-18-clipboard-and-fidelity/fidelity/`, `../lab/real-seafile/fidelity_corpus.py`, `../lab/real-seafile/fidelity_compare.py` |
+| **Document fidelity (2026-11-18, historical only)** | Archived report asserts 37/37, but exact producer scripts/source fixture bytes are not established. Current comparison confirms saved DOCX/PPTX features with the intentional marker; XLSX saved bytes have an invalid cross-sheet formula and `#REF!`. Second readback binaries are absent. **Overall historical verdict: NOT_VERIFIED**; do not cite the 37/37 as a reproducible pass. The tri-format fresh-editor probe correction is source-only until a new isolated lab run. | `../lab/real-seafile/results/2026-11-18-clipboard-and-fidelity/fidelity/`, `reviews/FIDELITY-EVIDENCE-RECONCILIATION-20261120.md` |
 | **Clipboard copy/paste (2026-11-18)** | Paste system→editor→saved DOCX **PASS** (marker in the decompressed saved DOCX and after a fresh-context reopen). Copy editor→OS **FAIL, cause proven**: WordCraft's copy path uses the async Clipboard API; `clipboard-write` is denied by Permissions Policy; the blocking delegation is **Seahub's own WOPI iframe** (`frontend/src/view-file-collabora-online.js`, no `allow`). A plain `allow` is insufficient — that iframe is form-POST-targeted with no `src`, so `'src'` resolves to the wrong origin; an origin-qualified `allow` moves the error to "Write permission denied". Not fixable from the bridge; the bridge iframe `allow` attribute is contract-correct but insufficient on its own | `../lab/real-seafile/results/2026-11-18-clipboard-and-fidelity/clipboard/`, `../bridge/static/host.html` |
 | **Backup/restore test** | LXC 115 snapshot → clone → restore verified; all services healthy; HTTPS connectivity confirmed | `deploy/bridge/CUTOVER-pve01.md` |
 | **Backup verified** | `vzdump-lxc-108-2026_11_17-03_12_13.tar.zst` (12G), `zstd -t` → INTEGRITY_OK | read-only check 2026-11-17 |

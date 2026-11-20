@@ -36,6 +36,7 @@ PYTHON_CHECKS = [
     'tests/test_xlsx_fixture.py', 'tests/test_xlsx_fidelity_mutations.py',
     'tests/test_xlsx_fidelity_json.py',
     'tests/test_fidelity_probe_save_gate.py',
+    'tests/test_fidelity_probe_reopen.py',
     'tests/test_gr041_craft_zip_limits.py',
     'tests/test_legacy_fixtures.py', 'tests/test_sanitize_browser_evidence.py',
 ]

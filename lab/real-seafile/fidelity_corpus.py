@@ -299,7 +299,7 @@ def xlsx() -> bytes:
         '<row r="1">%s%s%s</row>' % (_c("A1", s=1, text="Item"), _c("B1", s=1, text="Value"),
                                      _c("C1", s=1, text="Link")),
         '<row r="2">%s%s%s</row>' % (_c("A2", s=3, text="Alpha"), _c("B2", s=3, number=10),
-                                     _c("C2", s=3, formula="Sheet2!B1", number=42)),
+                                     _c("C2", s=3, formula="Source!B2", number=42)),
         '<row r="3">%s%s</row>' % (_c("A3", s=3, text="Beta"), _c("B3", s=3, number=20)),
         '<row r="4">%s%s</row>' % (_c("A4", s=3, text="Gamma"), _c("B4", s=3, number=30)),
         '<row r="5">%s%s</row>' % (_c("A5", s=3, text="Total"),
