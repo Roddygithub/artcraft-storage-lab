@@ -533,37 +533,210 @@ def xlsx_features(body: bytes) -> dict:
 
 
 # ------------------------------------------------------------------------ PPTX
+_PPTX_SHAPE_TAGS = {P + name for name in ("sp", "pic", "graphicFrame", "cxnSp")}
+_PPTX_FILL_TAGS = {A + name for name in ("solidFill", "gradFill", "blipFill", "pattFill",
+                                         "noFill", "grpFill")}
+
+
+def _pptx_xml(node):
+    """Return a JSON-safe, prefix-independent signature for meaningful DrawingML."""
+    if node is None:
+        return None
+    return {"tag": node.tag.rsplit("}", 1)[-1],
+            "attrs": sorted((key.rsplit("}", 1)[-1], value) for key, value in node.attrib.items()),
+            "text": (node.text or "").strip(), "children": [_pptx_xml(child) for child in node]}
+
+
+def _pptx_transform(shape):
+    xfrm = shape.find(f"{P}spPr/{A}xfrm")
+    if xfrm is None:
+        xfrm = shape.find(f"{P}grpSpPr/{A}xfrm")
+    if xfrm is None:
+        xfrm = shape.find(f"{P}xfrm")
+    if xfrm is None:
+        return None
+    off, ext = xfrm.find(f"{A}off"), xfrm.find(f"{A}ext")
+    child_off, child_ext = xfrm.find(f"{A}chOff"), xfrm.find(f"{A}chExt")
+    def pair(node, xkey, ykey):
+        if node is None:
+            return None
+        try:
+            return {"x": int(node.get(xkey)), "y": int(node.get(ykey))}
+        except (TypeError, ValueError):
+            return {"x": node.get(xkey), "y": node.get(ykey)}
+    geometry = {"position": pair(off, "x", "y"), "size": pair(ext, "cx", "cy"),
+                "rotation": int(xfrm.get("rot", "0")),
+                "flip_h": xfrm.get("flipH", "0") == "1",
+                "flip_v": xfrm.get("flipV", "0") == "1"}
+    if child_off is not None or child_ext is not None:
+        geometry["child_position"] = pair(child_off, "x", "y")
+        geometry["child_size"] = pair(child_ext, "cx", "cy")
+    return geometry
+
+
+def _pptx_shape_properties(shape):
+    props = shape.find(f"{P}spPr")
+    if props is None:
+        props = shape.find(f"{P}grpSpPr")
+    if props is None:
+        props = shape
+    fill = next((child for child in props if child.tag in _PPTX_FILL_TAGS), None)
+    line = props.find(f"{A}ln")
+    geom = props.find(f"{A}prstGeom")
+    if geom is None:
+        geom = props.find(f"{A}custGeom")
+    return {"fill": _pptx_xml(fill), "line": _pptx_xml(line), "geometry": _pptx_xml(geom)}
+
+
+def _pptx_shape_identity(shape):
+    nonvisual = next((child for child in shape if child.tag in
+                      (P + "nvSpPr", P + "nvPicPr", P + "nvGraphicFramePr", P + "nvCxnSpPr")), None)
+    props = nonvisual.find(f"{P}cNvPr") if nonvisual is not None else None
+    if props is None:
+        return {"id": None, "name": None}
+    return {"id": props.get("id"), "name": props.get("name")}
+
+
+def _pptx_shape_text(shape):
+    paragraphs = []
+    for paragraph in shape.findall(f".//{A}p"):
+        runs = []
+        for item in paragraph:
+            if item.tag in (A + "r", A + "fld"):
+                runs.append("".join(t.text or "" for t in item.findall(f".//{A}t")))
+            elif item.tag == A + "br":
+                runs.append("\n")
+        if not runs:
+            runs = ["".join(t.text or "" for t in paragraph.findall(f".//{A}t"))]
+        paragraphs.append("".join(runs))
+    return paragraphs
+
+
+def _pptx_slide_shape_data(root, parts, rels, errors, slide_name):
+    tree = root.find(f".//{P}spTree")
+    if tree is None:
+        errors.append(f"{slide_name} has no shape tree")
+        return []
+    result = []
+
+    def visit(container, groups=()):
+        for shape in container:
+            if shape.tag == P + "grpSp":
+                group_identity = _pptx_shape_identity(shape)
+                group_tree = shape.find(f"{P}spTree")
+                visit(group_tree if group_tree is not None else shape,
+                      groups + ((group_identity, _pptx_transform(shape)),))
+                continue
+            if shape.tag not in _PPTX_SHAPE_TAGS:
+                continue
+            identity = _pptx_shape_identity(shape)
+            if identity["id"] is None or identity["name"] is None:
+                errors.append(f"{slide_name} contains a shape without a complete nonvisual identity")
+            key = (identity["id"], identity["name"])
+            image = None
+            for blip in shape.findall(f".//{A}blip"):
+                rel_id = blip.get(R + "embed") or blip.get(R + "link")
+                relation = rels.get(rel_id)
+                if relation is None:
+                    errors.append(f"{slide_name} image relation {rel_id!r} is unresolved")
+                    image = {"error": "unresolved relationship", "relationship": rel_id}
+                    continue
+                target = relation["target"]
+                if relation["external"] or target not in parts:
+                    errors.append(f"{slide_name} image target {target!r} is missing or external")
+                    image = {"error": "missing or external media", "target": target}
+                    continue
+                image = {"relationship_type": relation["type"],
+                         "sha256": hashlib.sha256(parts[target]).hexdigest()}
+            result.append({"kind": shape.tag.rsplit("}", 1)[-1], "identity": identity,
+                           "group_path": list(groups), "geometry": _pptx_transform(shape),
+                           "properties": _pptx_shape_properties(shape),
+                           "text": _pptx_shape_text(shape), "image": image})
+    visit(tree)
+    keys = [(item["identity"]["id"], item["identity"]["name"]) for item in result]
+    if len(keys) != len(set(keys)):
+        errors.append(f"{slide_name} contains duplicate shape identities")
+    return result
+
+
 def pptx_features(body: bytes) -> dict:
     p = _parts(body)
     pres = _xml(p, "ppt/presentation.xml")
-    f: dict = {"kind": "pptx", "parts": sorted(p), "part_count": len(p)}
-    if pres is None:
-        f["error"] = "no ppt/presentation.xml"
+    f: dict = {"kind": "pptx", "parts": sorted(p), "part_count": len(p), "errors": []}
+    if pres is None or pres.tag != P + "presentation":
+        f["error"] = "missing or invalid ppt/presentation.xml"
         return f
-    ids = pres.findall(".//%ssldId" % P)
-    slides = sorted(n for n in p if re.match(r"ppt/slides/slide\d+\.xml", n))
-    per_slide = []
-    for name in slides:
-        root = _xml(p, name)
-        if root is None:
-            per_slide.append({"part": name, "error": "unparseable"})
+    if _xml(p, "[Content_Types].xml") is None or _xml(p, "_rels/.rels") is None:
+        f["errors"].append("package content types or root relationships are missing or invalid")
+    slide_ids = pres.find(f"{P}sldIdLst")
+    if slide_ids is None or not list(slide_ids):
+        f["errors"].append("presentation has no slide list")
+    elif len({node.get("id") for node in slide_ids}) != len(list(slide_ids)):
+        f["errors"].append("presentation contains duplicate slide identities")
+    rels, rel_errors = _docx_relationships(p, "ppt/_rels/presentation.xml.rels", "ppt/presentation.xml")
+    f["errors"].extend(rel_errors)
+    ordered_slides = []
+    seen_targets = set()
+    for slide_id in list(slide_ids) if slide_ids is not None else []:
+        rel_id = slide_id.get(R + "id")
+        relation = rels.get(rel_id)
+        if relation is None or relation["type"] != "slide" or relation["external"]:
+            f["errors"].append(f"slide relationship {rel_id!r} is unresolved or not a slide")
+            ordered_slides.append({"relationship": rel_id, "error": "unresolved slide relationship",
+                                   "shapes": []})
             continue
-        shapes = root.findall(".//%ssp" % P)
-        pics = root.findall(".//%spic" % P)
-        offs = [(int(o.get("x")), int(o.get("y")))
-                for o in root.findall(".//%soff" % A)]
-        texts = [_text_of(t) for t in root.findall(".//%st" % A)]
-        fills = [c.get("val") for c in root.findall(".//%ssrgbClr" % A)]
-        per_slide.append({
-            "part": name, "shapes": len(shapes), "pictures": len(pics),
-            "offsets": offs, "texts": texts, "fill_colours": fills,
-        })
+        target = relation["target"]
+        if target in seen_targets:
+            f["errors"].append(f"slide target {target!r} is referenced more than once")
+        seen_targets.add(target)
+        root = _xml(p, target)
+        if root is None or root.tag != P + "sld":
+            f["errors"].append(f"referenced slide {target!r} is missing or invalid")
+            ordered_slides.append({"relationship": rel_id, "target": target,
+                                   "error": "missing or invalid slide", "shapes": []})
+            continue
+        slide_rels_name = posixpath.join(posixpath.dirname(target), "_rels",
+                                         posixpath.basename(target) + ".rels")
+        slide_rels, slide_rel_errors = _docx_relationships(p, slide_rels_name, target)
+        if slide_rel_errors:
+            f["errors"].extend(slide_rel_errors)
+        shapes = _pptx_slide_shape_data(root, p, slide_rels, f["errors"], target)
+        common = root.find(f"{P}cSld")
+        ordered_slides.append({"target": target,
+                               "name": common.get("name") if common is not None else None,
+                               "show_master_shapes": common.get("showMasterSp", "1") if common is not None else None,
+                               "visible": root.get("show", "1") != "0",
+                               "shapes": shapes})
+    fills = [{"slide": index, "identity": shape["identity"], "fill": shape["properties"]["fill"]}
+             for index, slide in enumerate(ordered_slides) for shape in slide["shapes"]]
+    images = [{"slide": index, "identity": shape["identity"], "image": shape["image"]}
+              for index, slide in enumerate(ordered_slides) for shape in slide["shapes"]
+              if shape["kind"] == "pic"]
+    presentation_size = pres.find(f"{P}sldSz")
+    dimensions = _pptx_xml(presentation_size)
+    if dimensions is None:
+        f["errors"].append("presentation slide dimensions are missing")
     f.update({
-        "slide_ids": len(ids),
-        "slide_parts": len(slides),
+        "slide_ids": len(slide_ids) if slide_ids is not None else 0,
+        "slide_parts": len(ordered_slides),
+        "slide_order": [{"name": slide.get("name"),
+                         "shapes": [(shape["kind"], shape["identity"]) for shape in slide["shapes"]],
+                         "error": slide.get("error")}
+                        for slide in ordered_slides],
+        "slide_structure": [{"name": slide.get("name"),
+                             "show_master_shapes": slide.get("show_master_shapes"),
+                             "visible": slide.get("visible"), "error": slide.get("error")}
+                            for slide in ordered_slides],
+        "presentation_size": dimensions,
+        "slide_data": ordered_slides,
         "media_parts": sorted(n for n in p if n.startswith("ppt/media/")),
-        "per_slide": per_slide,
+        "shape_count": sum(len(slide["shapes"]) for slide in ordered_slides),
+        "image_data": images,
+        "fill_data": fills,
+        "errors": f["errors"],
     })
+    if f["errors"]:
+        f["error"] = "; ".join(sorted(set(f["errors"])))
     return f
 
 
@@ -620,6 +793,73 @@ def _feature_status(before, after) -> str:
     if before and not after:
         return "LOST"
     return "ALTERED"
+
+
+def _pptx_text_match(before: list[dict], after: list[dict], marker: str | None) -> bool:
+    if len(before) != len(after):
+        return False
+    changed = []
+    marker_count = 0
+    old_marker_count = 0
+    for slide_index, (left_slide, right_slide) in enumerate(zip(before, after)):
+        left_shapes, right_shapes = left_slide["shapes"], right_slide["shapes"]
+        if len(left_shapes) != len(right_shapes):
+            return False
+        for shape_index, (left, right) in enumerate(zip(left_shapes, right_shapes)):
+            if (left["kind"], left["identity"]) != (right["kind"], right["identity"]):
+                return False
+            left_text, right_text = left["text"], right["text"]
+            marker_count += sum(text.count(marker) for text in right_text) if marker else 0
+            old_marker_count += sum(text.count(marker) for text in left_text) if marker else 0
+            if left_text != right_text:
+                changed.append((slide_index, shape_index, left_text, right_text))
+    if not changed:
+        return True
+    if marker is None or len(changed) != 1 or marker_count != 1 or old_marker_count:
+        return False
+    _slide, _shape, left_text, right_text = changed[0]
+    old_value, new_value = "\n".join(left_text), "\n".join(right_text)
+    return new_value == marker or new_value.replace(marker, "", 1) == old_value
+
+
+def _pptx_geometry(slides: list[dict]) -> list[dict]:
+    return [{"slide": slide_index, "identity": shape["identity"],
+             "group_path": shape["group_path"], "geometry": shape["geometry"]}
+            for slide_index, slide in enumerate(slides) for shape in slide["shapes"]]
+
+
+def _pptx_geometry_status(before: list[dict], after: list[dict]) -> str:
+    left, right = _pptx_geometry(before), _pptx_geometry(after)
+    if left != right:
+        return "LOST" if any(item["geometry"] is not None for item in left) and not any(
+            item["geometry"] is not None for item in right) else "ALTERED"
+    return "PRESERVED" if any(item["geometry"] is not None for item in left) else "NOT_SUPPORTED"
+
+
+def _pptx_has_text(slides: list[dict]) -> bool:
+    return any(any(paragraph for paragraph in shape["text"])
+               for slide in slides for shape in slide["shapes"])
+
+
+def _pptx_shape_structure(slides: list[dict]) -> list[dict]:
+    return [{"slide": slide_index, "kind": shape["kind"], "identity": shape["identity"],
+             "group_path": shape["group_path"],
+             "properties": {key: shape["properties"][key] for key in ("line", "geometry")}}
+            for slide_index, slide in enumerate(slides) for shape in slide["shapes"]]
+
+
+def _pptx_fills_status(before: list[dict], after: list[dict]) -> str:
+    if before != after:
+        return "LOST" if any(item["fill"] is not None for item in before) and not any(
+            item["fill"] is not None for item in after) else "ALTERED"
+    return "PRESERVED" if any(item["fill"] is not None for item in before) else "NOT_SUPPORTED"
+
+
+def _pptx_slide_size(value):
+    if value is None:
+        return None
+    attrs = dict(value.get("attrs", []))
+    return (attrs.get("cx"), attrs.get("cy"))
 
 
 def _docx_run_projection(features: dict, key: str, allowed: int | None) -> list[dict]:
@@ -771,31 +1011,27 @@ def compare(original: bytes, saved: bytes, marker: str | None = None) -> dict:
         mark("fonts", "PRESERVED" if all(equal_cell(key, "font") for key in keys) else "ALTERED")
         mark("charts", "NOT_SUPPORTED")  # no fixture chart; no editor chart claim
     else:
-        mark("slide_count",
-             "PRESERVED" if after.get("slide_parts") == before.get("slide_parts") else "ALTERED")
-        b_shapes = [s.get("shapes", 0) for s in before.get("per_slide", [])]
-        a_shapes = [s.get("shapes", 0) for s in after.get("per_slide", [])]
-        mark("shapes",
-             "PRESERVED" if a_shapes == b_shapes and sum(a_shapes) else
-             ("ALTERED" if sum(a_shapes) else "LOST"))
-        b_pics = sum(s.get("pictures", 0) for s in before.get("per_slide", []))
-        a_pics = sum(s.get("pictures", 0) for s in after.get("per_slide", []))
-        mark("images", "PRESERVED" if a_pics and a_pics >= b_pics else
-             ("ALTERED" if a_pics else "LOST"))
-        b_off = [o for s in before.get("per_slide", []) for o in s.get("offsets", [])]
-        a_off = [o for s in after.get("per_slide", []) for o in s.get("offsets", [])]
-        mark("geometry", "PRESERVED" if a_off == b_off else ("ALTERED" if a_off else "LOST"))
-        b_txt = [t for s in before.get("per_slide", []) for t in s.get("texts", [])]
-        a_txt = [t for s in after.get("per_slide", []) for t in s.get("texts", [])]
-        # The probe's own edit replaces one shape's text with the marker; that is
-        # the edit working, not a fidelity loss. Everything else must survive.
-        missing = set(b_txt) - set(a_txt)
-        edited = bool(marker) and marker in a_txt
-        mark("texts",
-             "PRESERVED" if not missing or (edited and len(missing) == 1)
-             else ("ALTERED" if a_txt else "LOST"))
-        mark("fills",
-             "PRESERVED" if after.get("media_parts") or a_shapes else "NOT_VERIFIED")
+        before_slides, after_slides = before["slide_data"], after["slide_data"]
+        mark("slide_count", "PRESERVED" if len(before_slides) == len(after_slides) else
+             ("LOST" if len(after_slides) < len(before_slides) else "ALTERED"))
+        mark("slide_order", "PRESERVED" if before.get("slide_order") == after.get("slide_order") else "ALTERED")
+        mark("slide_structure", "PRESERVED" if before.get("slide_structure") == after.get("slide_structure")
+             else "ALTERED")
+        before_shapes = _pptx_shape_structure(before_slides)
+        after_shapes = _pptx_shape_structure(after_slides)
+        mark("shapes", "PRESERVED" if before_shapes == after_shapes and before_shapes else
+             ("NOT_SUPPORTED" if not before_shapes and not after_shapes else
+              ("LOST" if before_shapes and not after_shapes else "ALTERED")))
+        mark("shape_count", "PRESERVED" if before.get("shape_count") == after.get("shape_count") else "ALTERED")
+        mark("slide_dimensions", "PRESERVED" if _pptx_slide_size(before.get("presentation_size")) ==
+             _pptx_slide_size(after.get("presentation_size")) else "ALTERED")
+        mark("geometry", _pptx_geometry_status(before_slides, after_slides))
+        mark("texts", "PRESERVED" if _pptx_has_text(before_slides) and
+             _pptx_text_match(before_slides, after_slides, marker) else
+             ("NOT_SUPPORTED" if not _pptx_has_text(before_slides) and not _pptx_has_text(after_slides)
+              else ("LOST" if not _pptx_has_text(after_slides) else "ALTERED")))
+        mark("images", _feature_status(before.get("image_data"), after.get("image_data")))
+        mark("fills", _pptx_fills_status(before.get("fill_data", []), after.get("fill_data", [])))
 
     counts: dict[str, int] = {}
     for status in verdicts.values():
