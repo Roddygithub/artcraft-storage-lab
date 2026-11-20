@@ -64,6 +64,14 @@ web editors, with no patch to either side. The architecture is the stateless WOP
   the code it reviews.
 * Push small, coherent commits to the public repository regularly; `main` is
   the integration branch.
+* **Every push to `main` requires CI verification.** After pushing, identify
+  all GitHub Actions runs for the exact commit SHA, wait for completion, and
+  verify workflow conclusions and required jobs (including offline checks,
+  evidence validation, manifest/provenance integrity, and reproducibility).
+  A push is not validated while any applicable run is pending, failed, skipped,
+  or inaccessible. Record the run URLs and outcome with the change. If a run
+  fails, inspect its failed logs, fix the cause, and repeat on the new SHA; do
+  not hide failures by weakening or skipping checks.
 
 ## Definition of done for a change
 
