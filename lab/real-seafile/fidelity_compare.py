@@ -144,6 +144,7 @@ def xlsx_features(body: bytes) -> dict:
     fills = styles.findall(".//%sfills/%sfill" % (S, S)) if styles is not None else []
     borders = styles.findall(".//%sborders/%sborder" % (S, S)) if styles is not None else []
     cell_map = {}
+    formulas = {}
     for name in sorted(n for n in p if re.match(r"xl/worksheets/sheet\d+\.xml", n)):
         sh = _xml(p, name)
         if sh is None:
@@ -166,7 +167,10 @@ def xlsx_features(body: bytes) -> dict:
                 idx = int(xf.get(key, "0")) if xf is not None else 0
                 return _style_value(items[idx]) if idx < len(items) else None
             numfmt_id = int(xf.get("numFmtId", "0")) if xf is not None else 0
-            cell_map[(sheet_name, coord)] = {
+            # JSON-encode the coordinate pair so worksheet names containing
+            # punctuation remain unambiguous in complete comparison reports.
+            key = json.dumps([sheet_name, coord], ensure_ascii=False, separators=(",", ":"))
+            cell_map[key] = {
                 "value": value,
                 "type": c.get("t"),
                 "value_type": "string" if c.get("t") in ("s", "inlineStr", "str") else c.get("t", "number"),
@@ -176,8 +180,8 @@ def xlsx_features(body: bytes) -> dict:
                 "border": component(borders, "borderId"),
                 "font": component(styles.findall(".//%sfonts/%sfont" % (S, S)), "fontId") if styles is not None else None,
             }
-    formulas = {f"{sheet}!{cell}": item["formula"]
-                for (sheet, cell), item in cell_map.items() if item["formula"] is not None}
+            if formula is not None:
+                formulas[f"{sheet_name}!{coord}"] = _text_of(formula)
     texts = [x["value"] for x in cell_map.values() if isinstance(x["value"], str)]
     f.update({
         "sheet_names": names,
